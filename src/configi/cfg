@@ -1,0 +1,32 @@
+#!./lua
+local stdout = io.open("/dev/stdout", "w")
+stdout:setvbuf"no"
+io.stderr:setvbuf"no"
+io.output(stdout)
+local version = "Configi v1.0"
+local date, time, diff, arg, collectgarbage = os.date, os.time, os.difftime, arg, collectgarbage
+local Lib = require"libconfigi"
+local Lc = require"cimicida"
+local Lcli = Lib.cli
+
+function output(R)
+  if not R.failed and R.changed then R.repaired = true end
+  if not R.failed and not R.changed then R.kept = true end
+  Lc.printf("Changed: %s       Failed: %s\n", R.changed, R.failed )
+  Lc.printf("Repaired: %s      Kept: %s\n", R.repaired, R.kept)
+  if R.failed then Lc.errorf("Failed!") end
+end
+
+function main()
+  local t1 = time()
+  output(Lcli.try(Lcli.opt(arg, version)))
+  collectgarbage()
+  local t2 = diff(time(), t1)
+  if t2 == 0 or t2 == 1.0 then
+    Lc.printf("Finished run in %.f second\n", 1.0)
+  else
+    Lc.printf("Finished run in %.f seconds\n", t2)
+  end
+end
+
+main()
