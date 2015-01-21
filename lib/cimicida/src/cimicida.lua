@@ -180,6 +180,7 @@ end
 -- @param plain set to true if doing plain matching (BOOLEAN)
 -- @return modified table (TABLE)
 function cimicida.filtertval (tbl, patt, plain)
+  plain = plaint or true
   local s, c = #tbl, 0
   for n = 1, s do
     if Lua.find(tbl[n], patt, 1, plain) then
