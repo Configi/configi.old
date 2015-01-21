@@ -487,6 +487,9 @@ function Lcli.main (opts)
                 end
               end
             end })
+            if Lua.type(q.source) ~= "string" then
+              Lc.errorf("qload: %s %s\n", Lstr.SERR, "Non-string passed to a promise(function)")
+            end
             local chunk, err = Lua.load(q.source, q.source, "t", q.environment)
             if not chunk then
               Lc.errorf("qload: %s %s\n", Lstr.SERR, err)
