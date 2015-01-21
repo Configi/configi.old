@@ -50,7 +50,7 @@ end
 Func.listed = function (P)
   local jobs = Func.list(P)
   local name = Lc.strf("%s%s", tag, P.name)
-  local n = Lc.tfind(jobs, "^" .. name .. "$")
+  local n = Lc.tfind(jobs, "^" .. Lc.escape_pattern(name) .. "$")
   if n and jobs[n + 1] == P.job then
     return true
   else
