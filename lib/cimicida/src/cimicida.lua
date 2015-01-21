@@ -173,6 +173,30 @@ function cimicida.str2tbl (str)
   return t
 end
 
+--- Escape a string for pattern usage
+-- From lua-nucleo.
+-- @param str string to escape (STRING)
+-- @return a new string (STRING)
+function cimicida.escape_pattern (str)
+  local matches =
+  {
+    ["^"] = "%^",
+    ["$"] = "%$",
+    ["("] = "%(",
+    [")"] = "%)",
+    ["%"] = "%%",
+    ["."] = "%.",
+    ["["] = "%[",
+    ["]"] = "%]",
+    ["*"] = "%*",
+    ["+"] = "%+",
+    ["-"] = "%-",
+    ["?"] = "%?",
+    ["\0"] = "%z"
+  }
+  return Lua.gsub(str, ".", matches)
+end
+
 --- Filter table values.
 -- Adapted from <http://stackoverflow.com/questions/12394841/safely-remove-items-from-an-array-table-while-iterating>
 -- @param tbl table to operate on (TABLE)
