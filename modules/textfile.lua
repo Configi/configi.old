@@ -147,7 +147,7 @@ end
 -- @param line text to insert [REQUIRED] [ALIAS: text]
 -- @param inserts a line (string) if found, skips the operation
 -- @param pattern line is added before or after this pattern [ALIAS: match]
--- @param plain turn off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "no"]
+-- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
 -- @param before [CHOICES: "yes","no"] [DEFAULT: "no"]
 -- @param after [CHOICES: "yes","no"] [DEFAULT: "yes"]
 -- @usage textfile.insert_line [[
@@ -160,6 +160,7 @@ end
 function textfile.insert_line (S)
   local M = { "diff", "line", "plain", "pattern", "before", "after", "inserts" }
   local F, P, R = main(S, M)
+  P.plain = P.plain or true
   P.mode = Pstat.stat(P.path).st_mode
   local file = Lc.file2tbl(P.path)
   if not file then
@@ -169,7 +170,7 @@ function textfile.insert_line (S)
     return R
   end
   if P.inserts then
-    if Lc.tfind(file, P.inserts) then
+    if Lc.tfind(file, P.inserts, P.plain) then
       F.msg(P.line, Str.textfile_insert_line_skip, nil, 0)
       R.kept = true
       R.notify_kept = P.notify_kept
@@ -177,7 +178,7 @@ function textfile.insert_line (S)
     end
   end
   if not P.pattern then
-    if Lc.tfind(file, P.line) then
+    if Lc.tfind(file, P.line, P.plain) then
       F.msg(P.line, Str.textfile_insert_line_skip, nil, 0)
       R.kept = true
       R.notify_kept = P.notify_kept
@@ -207,7 +208,7 @@ end
 --- Remove lines from an existing file.
 -- @param path path of textfile to modify [REQUIRED] [ALIAS: dest,file,textfile]
 -- @param pattern text pattern to remove [REQUIRED] [ALIAS: match]
--- @param plain turn off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "no"]
+-- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
 -- @usage textfile.remove_line [[
 --   path "/etc/sysctl.conf"
 --   match "net.ipv4.ip_forward = 1"
@@ -216,6 +217,7 @@ end
 function textfile.remove_line (S)
   local M = { "pattern", "plain", "diff" }
   local F, P, R = main(S, M)
+  P.plain = P.plain or true
   P.mode = Pstat.stat(P.path).st_mode
   local file = Lc.file2tbl(P.path)
   if not file then
