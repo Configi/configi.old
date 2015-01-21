@@ -41,7 +41,7 @@ Func.list = function (P)
   local t, _, r = Cmd["crontab"]{ "-u", P.user, "-l" }
   if t then
     -- filter out comments except for Configi tag-names
-    return Lc.filtertval(r.stdout, "^#[%C]+", false)
+    return Lc.filtertval(r.stdout, "^#[%C]+")
   else
     return {}
   end
@@ -50,7 +50,7 @@ end
 Func.listed = function (P)
   local jobs = Func.list(P)
   local name = Lc.strf("%s%s", tag, P.name)
-  local n = Lc.tfind(jobs, "^" .. name .. "$", false)
+  local n = Lc.tfind(jobs, "^" .. name .. "$")
   if n and jobs[n + 1] == P.job then
     return true
   else
