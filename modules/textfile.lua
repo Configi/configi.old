@@ -161,6 +161,16 @@ function textfile.insert_line (S)
   local M = { "diff", "line", "plain", "pattern", "before", "after", "inserts" }
   local F, P, R = main(S, M)
   P.plain = P.plain or true
+  local inserts, line, pattern
+  if not P.plain then
+    inserts = Lc.escape_pattern(P.inserts)
+    line = Lc.escape_pattern(P.line)
+    pattern = Lc.escape_pattern(P.pattern)
+  else
+    inserts = P.inserts
+    line = P.line
+    pattern = P.pattern
+  end
   P.mode = Pstat.stat(P.path).st_mode
   local file = Lc.file2tbl(P.path)
   if not file then
@@ -170,7 +180,7 @@ function textfile.insert_line (S)
     return R
   end
   if P.inserts then
-    if Lc.tfind(file, P.inserts, P.plain) then
+    if Lc.tfind(file, inserts, P.plain) then
       F.msg(P.line, Str.textfile_insert_line_skip, nil, 0)
       R.kept = true
       R.notify_kept = P.notify_kept
@@ -178,7 +188,7 @@ function textfile.insert_line (S)
     end
   end
   if not P.pattern then
-    if Lc.tfind(file, P.line, P.plain) then
+    if Lc.tfind(file, line, P.plain) then
       F.msg(P.line, Str.textfile_insert_line_skip, nil, 0)
       R.kept = true
       R.notify_kept = P.notify_kept
@@ -192,7 +202,7 @@ function textfile.insert_line (S)
       x = 0
     end
     repeat
-      if Lua.find(file[n], P.pattern, 1, P.plain) then
+      if Lua.find(file[n], pattern, 1, P.plain) then
         Lua.insert(file, n + x, P.line .. "\n")
         nf = nf + 1
         n = n + 2
@@ -218,6 +228,12 @@ function textfile.remove_line (S)
   local M = { "pattern", "plain", "diff" }
   local F, P, R = main(S, M)
   P.plain = P.plain or true
+  local pattern
+  if not P.plain then
+    pattern = Lc.escape_pattern(P.pattern)
+  else
+    pattern = P.pattern
+  end
   P.mode = Pstat.stat(P.path).st_mode
   local file = Lc.file2tbl(P.path)
   if not file then
@@ -226,7 +242,7 @@ function textfile.remove_line (S)
     R.failed = true
     return R
   end
-  P._input = Lua.concat(Lc.filtertval(file, P.pattern, P.plain))
+  P._input = Lua.concat(Lc.filtertval(file, pattern, P.plain))
   return write(F, P, R)
 end
 
