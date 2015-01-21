@@ -106,7 +106,7 @@ end
 
 --- Add a service to runlevel.
 -- @param service service to add [REQUIRED]
--- @param runlevel runlevel to add to [REQUIRED]
+-- @param runlevel runlevel to add to [REQUIRED] [DEFAULT: default]
 -- @usage openrc.add [[
 --   service "rsyncd"
 --   runlevel "default"
@@ -119,6 +119,7 @@ function openrc.add (S)
     fail = "openrc.add: Error adding service to runlevel."
   }
   local F, P, R = main(S, M, G)
+  P.runlevel = P.runlevel or "default"
   local _
   local code, out, test =
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
@@ -134,7 +135,7 @@ end
 --- Remove a service from a runlevel.
 -- @aliases del
 -- @param service service to remove [REQUIRED] [ALIAS: daemon]
--- @param runlevel runlevel to remove from [REQUIRED]
+-- @param runlevel runlevel to remove from [REQUIRED] [DEFAULT: default]
 -- @usage openrc.delete [[
 --   service "rsyncd"
 --   runlevel "default"
@@ -147,6 +148,7 @@ function openrc.delete (S)
     fail = "openrc.delete: Error deleting service from runlevel."
   }
   local F, P, R = main(S, M, G)
+  P.runlevel = P.runlevel or "default"
   local _
   local code, out, test =
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
