@@ -41,7 +41,7 @@ Func.list = function (P)
   local t, _, r = Cmd["crontab"]{ "-u", P.user, "-l" }
   if t then
     -- filter out comments except for Configi tag-names
-    return Lc.filtertval(r.stdout, "^#[%C]+")
+    return Lc.filtertval(r.stdout, "^#[%C]+", false)
   else
     return {}
   end
