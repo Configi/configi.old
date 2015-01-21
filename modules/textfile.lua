@@ -25,7 +25,8 @@ local Lua = {
   rename = os.rename,
   remove = os.remove,
   find = string.find,
-  match = string.match
+  match = string.match,
+  require = require
 }
 local Configi = require"configi"
 local Lc = require"cimicida"
@@ -125,7 +126,7 @@ function textfile.render (S)
     R.failed = true
     return R
   end
-  local env = {}
+  local env = { require = Lua.require }
   local tbl
   local chunk, err = Lua.load(lua, lua, "t", env)
   if chunk then
