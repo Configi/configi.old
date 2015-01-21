@@ -1,0 +1,4 @@
+
+systemd.reload [[
+  service "sshd"
+]]

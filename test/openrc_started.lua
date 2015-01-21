@@ -1,0 +1,4 @@
+
+openrc.started[[
+  service "rsyncd"
+]]

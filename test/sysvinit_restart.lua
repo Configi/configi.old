@@ -1,0 +1,4 @@
+
+sysvinit.restart[[
+  service "uhttpd"
+]]

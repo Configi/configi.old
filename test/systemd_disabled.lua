@@ -1,0 +1,4 @@
+
+systemd.disabled [[
+  service "tuned"
+]]

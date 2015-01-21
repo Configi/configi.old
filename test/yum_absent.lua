@@ -1,0 +1,4 @@
+
+yum.absent[[
+  package "mtr"
+]]

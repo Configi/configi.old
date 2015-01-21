@@ -1,0 +1,18 @@
+#	Configi: test
+25 09 * * * /bin/ls
+#	Configi: cut
+30 11 * * * /bin/ls
+#	Configi: two
+2 4 * * * /bin/ls
+#	Configi: Moe
+12 6 * * * /bin/ls
+#	Configi: Larry
+2 3 * * * /bin/ls
+#	Configi: Curly
+43 12 * * * /bin/ls
+#	Configi: testing
+1 6 * * * /bin/ls
+#	Configi: south
+6 7 * * * /bin/ls
+#	Configi: Rec
+5 3 * * * /bin/ls

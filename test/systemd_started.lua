@@ -1,0 +1,4 @@
+
+systemd.started [[
+  service "tuned"
+]]

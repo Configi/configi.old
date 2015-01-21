@@ -1,0 +1,4 @@
+
+sysvinit.started[[
+  service "telnet"
+]]

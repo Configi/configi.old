@@ -1,2 +1,4 @@
-configi
+Configi
 =======
+
+The minimalist configuration manager
