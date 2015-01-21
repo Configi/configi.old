@@ -190,7 +190,7 @@ function shell.popen (S)
     if P.test then
       F.msg(P.expects, Str.shell_popenexpect_ok, true)
     else
-      if Lc.tfind(str, P.expects) then
+      if Lc.tfind(str, P.expects, true) then
         res = true
         F.msg(P.expects, Str.shell_popenexpect_ok, true)
       end
@@ -252,7 +252,7 @@ function shell.popen3 (S)
     if P.test then
       F.msg(P.stdout, Str.shell_popen3stdout_ok, true)
     else
-      if Lc.tfind(rt.stdout, P.stdout) then
+      if Lc.tfind(rt.stdout, P.stdout, true) then
         F.msg(P.stdout, Str.shell_popen3stdout_ok, true)
       else
         res = false
@@ -264,7 +264,7 @@ function shell.popen3 (S)
     if P.test then
       F.msg(P.stderr, Str.shell_popen3stderr_ok, true)
     else
-      if Lc.tfind(rt.stderr, P.stderr) then
+      if Lc.tfind(rt.stderr, P.stderr, true) then
         res = true
         F.msg(P.stderr, Str.shell_popen3stderr_ok, true)
       else
