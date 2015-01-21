@@ -9,8 +9,7 @@ local Lua = {
   unpack = table.unpack,
   concat = table.concat,
   remove = table.remove,
-  rename = os.rename,
-  select = select
+  rename = os.rename
 }
 local Cimicida = require"cimicida"
 local Ppwd = require"posix.pwd"
@@ -31,11 +30,7 @@ local retry = function (fn)
   return function (...)
     local ret, err, errnum, errno, _
     repeat
-      if Lua.select("#", ...) == 0 then
-        ret, err, errnum = fn()
-      else
-        ret, err, errnum = fn(...)
-      end
+      ret, err, errnum = fn(...)
       if ret == -1 then
         _, errno = Perrno.errno()
       end
