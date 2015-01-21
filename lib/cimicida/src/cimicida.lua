@@ -222,7 +222,7 @@ end
 -- @param patt boolean setting for plain strings (BOOLEAN)
 -- @return the matching index if string is found, nil otherwise (NUMBER)
 function cimicida.tfind (tbl, str, patt)
-  patt = patt or nil
+  patt = patt or true
   local ok, found
   for n = 1, #tbl do
     ok, found = Lua.pcall(Lua.find, tbl[n], str, 1, patt)
