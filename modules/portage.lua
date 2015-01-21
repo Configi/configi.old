@@ -102,7 +102,7 @@ end
 --   package "dev-util/strace"
 -- ]]
 function portage.present (S)
-  local M = { "deep", "newuse", "nodeps", "noreplace", "oneshot", "onlydeps", "sync", "update", "version" }
+  local M = { "deep", "newuse", "nodeps", "noreplace", "oneshot", "onlydeps", "sync", "unmask", "update", "version" }
   local G = {
     ok = "portage.present: Successfully installed package.",
     skip = "portage.present: Package already installed.",
