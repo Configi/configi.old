@@ -37,7 +37,7 @@ function openrc.started (S)
   }
   local F, P, R = main(S, M, G)
   local code, out, test = F.run(Cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
-  local pattern = "^%s" .. P.service .. "%s*%[%s%sstarted%s%s%]$"
+  local pattern = "^%s" .. Lc.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
   if test or ((code ==0) and (Lc.tfind(out.stdout, pattern))) then
     return F.skip(P.service)
   end
@@ -60,7 +60,7 @@ function openrc.stopped (S)
   }
   local F, P, R = main(S, M, G)
   local code, out, test = F.run(Cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
-  local pattern = "^%s" .. P.service .. "%s*%[%s%sstarted%s%s%]$"
+  local pattern = "^%s" .. Lc.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
   if test or ((code == 0) and not (Lc.tfind(out.stdout, pattern))) then
     return F.skip(P.service)
   end
@@ -123,7 +123,7 @@ function openrc.add (S)
   local _
   local code, out, test =
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
-  local pattern = "^%s*" .. P.service .. "%s|%s" .. P.runlevel .. "%s*$"
+  local pattern = "^%s*" .. Lc.escape_pattern(P.service) .. "%s|%s" .. P.runlevel .. "%s*$"
   if test or ((code == 0) and Lc.tfind(out.stdout, pattern)) then
     return F.skip(P.service)
   end
@@ -152,7 +152,7 @@ function openrc.delete (S)
   local _
   local code, out, test =
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
-  local pattern = "^%s*" .. P.service .. "%s|%s" .. P.runlevel .. "%s*$"
+  local pattern = "^%s*" .. Lc.escape_pattern(P.service) .. "%s|%s" .. P.runlevel .. "%s*$"
   if test or ((code == 0) and not (Lc.tfind(out.stdout, pattern))) then
     return F.skip(P.service)
   end
