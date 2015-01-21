@@ -52,7 +52,7 @@ clean: $(CLEAN)
 	$(ECHO) "Cleaning up..."
 	$(RM) $(RMFLAGS) $(LUA_O) $(VLUA_O) $(VLUA_T) $(LUA_T) $(LUAC_T) $(LUAC2C_T) $(LINIT_T) \
 		$(SRLUA_T) $(GLUE_T) $(CFG_T) $(TESTLOG_F)
-	$(RMDIR) test/tmp
+	$(RMRF) test/tmp
 	$(ECHO) "Done!"
 
 test_lua: $(LUA_T)
