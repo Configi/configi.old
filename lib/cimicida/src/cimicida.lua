@@ -180,7 +180,7 @@ end
 -- @param plain set to true if doing plain matching (BOOLEAN)
 -- @return modified table (TABLE)
 function cimicida.filtertval (tbl, patt, plain)
-  plain = plain or true
+  plain = plain or nil
   local s, c = #tbl, 0
   for n = 1, s do
     if Lua.find(tbl[n], patt, 1, plain) then
@@ -223,7 +223,7 @@ end
 -- @param patt boolean setting for plain strings (BOOLEAN)
 -- @return the matching index if string is found, nil otherwise (NUMBER)
 function cimicida.tfind (tbl, str, patt)
-  patt = patt or true
+  patt = patt or nil
   local ok, found
   for n = 1, #tbl do
     ok, found = Lua.pcall(Lua.find, tbl[n], str, 1, patt)
