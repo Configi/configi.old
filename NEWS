@@ -1,5 +1,8 @@
 Configi
 
-
+CHANGES with 0.9.1
+    * Return an error when attempting to pass a table as parameters to a function
+    * Fixes for the openrc, textfile and portage modules
+    * Fix `make clean` when deleting a temporary directory
 CHANGES with 0.9.0
     * first public release
