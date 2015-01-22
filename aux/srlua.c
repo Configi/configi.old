@@ -64,7 +64,7 @@
 #include "lbitlib.c"
 #endif
 #include "lcorolib.c"
-#ifndef NDEBUG
+#ifdef DEBUG
 #include "ldblib.c"
 #endif
 #include "liolib.c"

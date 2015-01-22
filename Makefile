@@ -13,7 +13,7 @@ AR= ar
 STRIP= strip
 LUAC= bin/luac
 GLUE= bin/glue
-DEFINES= -DLUA_C89_NUMBERS -DLUA_COMPAT_BITLIB -DNDEBUG
+DEFINES= -DLUA_C89_NUMBERS -DLUA_COMPAT_BITLIB
 CCOPT=
 CCWARN= -Wall
 CFLAGS= -Os -mtune=generic -mmmx -msse -msse2 -fomit-frame-pointer -pipe -fno-stack-protector
