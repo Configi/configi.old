@@ -60,6 +60,7 @@
 /* standard library  -- not used by luac */
 #include "lbaselib.c"
 #if defined(LUA_COMPAT_BITLIB)
+#include "lbitlib.h"
 #include "lbitlib.c"
 #endif
 #include "lcorolib.c"

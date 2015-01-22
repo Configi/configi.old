@@ -1,7 +1,7 @@
 .POSIX:
 .SUFFIXES:
 LIB= cimicida px configi factid
-VENDOR= lustache luaposix linotify
+VENDOR= lustache luaposix linotify crc32
 MODULES= unarchive authorized_keys cron file hostname shell textfile user git \
 	portage openrc \
 	yum systemd \
@@ -13,7 +13,7 @@ AR= ar
 STRIP= strip
 LUAC= bin/luac
 GLUE= bin/glue
-DEFINES= -DLUA_C89_NUMBERS
+DEFINES= -DLUA_C89_NUMBERS -DLUA_COMPAT_BITLIB -DNDEBUG
 CCOPT=
 CCWARN= -Wall
 CFLAGS= -Os -mtune=generic -mmmx -msse -msse2 -fomit-frame-pointer -pipe -fno-stack-protector

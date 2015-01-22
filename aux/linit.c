@@ -21,8 +21,8 @@
   int luaopen_factid (lua_State *L);
   int luaopen_factid_c (lua_State *L);
 #endif
-#ifdef lib_lfs
-  int luaopen_lfs (lua_State *L);
+#ifdef lib_crc32
+  int luaopen_crc32 (lua_State *L);
 #endif
 #ifdef lib_linotify
   int luaopen_inotify (lua_State *L);
@@ -154,8 +154,8 @@ static const luaL_Reg preloadedlibs[] = {
   {"factid", luaopen_factid},
   {"factid_c", luaopen_factid_c},
 #endif
-#ifdef lib_lfs
-  {"lfs", luaopen_lfs},
+#ifdef lib_crc32
+  {"crc32", luaopen_crc32},
 #endif
 #ifdef lib_linotify
   {"inotify", luaopen_inotify},
@@ -254,9 +254,11 @@ static const luaL_Reg preloadedlibs[] = {
 #ifdef module_git
   {"module.git", luaopen_module_git},
 #endif
+#if defined(LUA_COMPAT_BITLIB)
+  {"bit32", luaopen_bit32},
+#endif
   {NULL, NULL}
 };
-
 
 LUALIB_API void luaL_openlibs (lua_State *L) {
   const luaL_Reg *lib;
