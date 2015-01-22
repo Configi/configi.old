@@ -183,7 +183,12 @@ function shell.popen (S)
     R.notify_kept = P.notify_kept
     return R
   end
-  local str = Lc.fopen(P.string) or P.string
+  local str
+  if Px.isfile(P.string) then
+    str = Lc.fopen(P.string)
+  else
+    str = P.string
+  end
   str = F.run(Lc.popen, str, P.cwd)
   local res, ok
   if P.expects then
@@ -239,7 +244,12 @@ function shell.popen3 (S)
     R.notify_kept = P.notify_kept
     return R
   end
-  local str = Lc.fopen(P.string) or P.string
+  local str
+  if Px.isfile(P.string) then
+    str = Lc.fopen(P.string)
+  else
+    str = P.string
+  end
   local args = Lc.str2tbl(str)
   args._bin = Lua.remove(args, 1)
   if P.stdin then args._stdin = P.stdin end
