@@ -5,6 +5,7 @@ local Lua = {
   close = io.close,
   flush = io.flush,
   write = io.write,
+  lines = io.lines,
   setvbuf = io.setvbuf,
   input = io.input,
   output = io.output,
@@ -306,19 +307,13 @@ end
 
 --- Read a file/path.
 -- @param file path to the file (STRING)
--- @param mode io.open mode (STRING)
 -- @return the contents of the file, nil if the file cannot be read or opened (STRING or NIL)
-function cimicida.fopen (file, mode)
-  mode = mode or "rb"
-  local _, fd = Lua.pcall(Lua.open, file, mode)
-  if fd then
-    Lua.input(fd)
-    local str = Lua.read("*a")
-    Lua.flush(fd)
-    Lua.close(fd)
-    if not str then
-      return
-    end
+function cimicida.fopen (file)
+  local str
+  for s in Lua.lines(file, 2^12) do
+    str = cimicida.strf("%s%s", str or "", s)
+  end
+  if Lua.len(str) ~= 0 then
     return str
   end
 end
