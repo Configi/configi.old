@@ -17,6 +17,7 @@ Str.textfile_remove_line_ok = "textfile.remove_line: Successfully removed line."
 Str.textfile_remove_line_fail = "textfile.remove_line: Error removing line."
 Str.textfile_missing = "textfile: Can't access or missing file."
 local Lua = {
+  lines = io.lines,
   load = load,
   tonumber = tonumber,
   concat = table.concat,
@@ -30,6 +31,7 @@ local Lua = {
 }
 local Configi = require"configi"
 local Lc = require"cimicida"
+local CRC = require"crc32"
 local Lustache = require"lustache"
 local Pstat = require"posix.sys.stat"
 local Px = require"px"
@@ -94,24 +96,17 @@ end
 -- @param lua [ALIAS: data]
 -- @param mode mode bits for output file [DEFAULT: "0600"]
 -- @param diff show diff [CHOICES: "yes","no"]
--- @param force overwrite existing file [CHOICES: "yes","no"] [DEFAULT: "no"]
 -- @usage textfile.render [[
 --   template "/etc/something/config.template"
 --   dest "/etc/something/config"
 --   view "view_model"
 --   data "/etc/something/config.lua"
---   force "true"
 -- ]]
 function textfile.render (S)
-  local M = { "src", "force", "lua", "table", "mode", "diff" }
+  local M = { "src", "lua", "table", "mode", "diff" }
   local F, P, R = main(S, M)
   P.mode = P.mode or "0600"
   P.mode = Lua.tonumber(P.mode, 8)
-  if Pstat.stat(P.path) and not P.force then
-    F.msg(P.path, Str.textfile_render_skip, nil)
-    R.notify_kept = P.notify_kept
-    return R
-  end
   local ti = F.open(P.src)
   if not ti then
     F.msg(P.src, Str.textfile_render_missingsrc, false)
@@ -139,6 +134,23 @@ function textfile.render (S)
     return R
   end
   P._input = Lustache:render(ti, tbl)
+  if Pstat.stat(P.path) then
+    do -- compare P.path and rendered text
+      local i
+      for b in Lua.lines(P.path, 2^12) do
+        if i == nil then
+         i = CRC.crc32_string(b)
+        else
+         i = CRC.crc32(b, CRC.crc32(i))
+        end
+      end
+      if i == CRC.crc32_string(P._input) then
+        F.msg(P.path, Str.textfile_render_skip, nil)
+        R.notify_kept = P.notify_kept
+        return R
+      end
+    end
+  end
   return write(F, P, R)
 end
 
