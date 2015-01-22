@@ -3,6 +3,5 @@ textfile.render[[
   dest "test/tmp/textfile_render_test.txt"
   view "view_model"
   lua "textfile_render_data.lua"
-  force "true"
   diff "true"
 ]]
