@@ -62,16 +62,18 @@ end
 
 Func.found = function (P)
   local A = Func.decompose(P)
-  if A.lead == "" then
-    -- package "net-misc/rsync"
-    for packages in Pdirent.files("/var/db/pkg/" .. A.category) do
-      if Lua.find(packages, "^" .. A.package .. "%-%g*$") then
+  if Px.isdir("/var/db/pkg/" .. A.category) then
+    if A.lead == "" then
+      -- package "net-misc/rsync"
+      for packages in Pdirent.files("/var/db/pkg/" .. A.category) do
+        if Lua.find(packages, "^" .. A.package .. "%-%g*$") then
+          return true
+        end
+      end
+    else
+      if Pstat.stat(Lc.strf("/var/db/pkg/%s/%s%s", A.category, A.package, A.version)) then
         return true
       end
-    end
-  else
-    if Pstat.stat(Lc.strf("/var/db/pkg/%s/%s%s", A.category, A.package, A.version)) then
-      return true
     end
   end
 end
