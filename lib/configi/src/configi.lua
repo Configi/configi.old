@@ -321,7 +321,7 @@ function Lib.finish (C)
     end
     local secs = Px.difftime(Psystime.gettimeofday(), t1)
     secs = Lc.strf("%s.%s", Lua.tostring(secs.sec), Lua.tostring(secs.usec))
-    msg(Lstr.OPERATION, err, ok, secs, Lc.strf("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
+    msg(Lstr.OPERATION, err, ok or false, secs, Lc.strf("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
     return ok, rt
   end -- functime()
   if not (C.parameters.test or C.parameters.debug) then
