@@ -1,5 +1,15 @@
 Configi
 
+CHANGES with 0.9.3
+    * Several fixes to the textfile module
+    * Fix px.awrite() so the fcntl() call does not abort on failure
+    * Fix F.msg() so a returned nil from a f() is considered a failure
+    * New textfile feature that compares rendered text and a existing destination. This obsoletes the force parameter
+    * Use native Lua 5.3 numbers
+    * Reverse checking for the DEBUG DEFINE. Now we pass -DDEBUG to get the debug Lua module
+    * Fix the shell module to use the new cimicida.fopen()
+    * A more efficient cimicida.fopen()
+    * Add a CRC32 Lua module for textfile feature. It requires bit32 so pull that in too
 CHANGES with 0.9.2
     * New function cimicida.escape_pattern()
     * Fixes for pattern matching in several module parameters
