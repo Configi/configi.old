@@ -5,9 +5,6 @@
 -- @added 0.9.0
 
 local Str = {}
-Str.textfile_render_ok = "textfile.render: Successfully rendered textfile."
-Str.textfile_render_skip = "textfile.render: Not overwriting existing destination."
-Str.textfile_render_fail = "textfile.render: Error rendering textfile. Error: "
 Str.textfile_render_missingsrc = "textfile.render: Can't access or missing source file."
 Str.textfile_render_missinglua = "textfile.render: Can't access or missing lua file."
 Str.textfile_insert_line_ok = "textfile.insert_line: Successfully inserted line."
@@ -55,35 +52,25 @@ end
 local write = function (F, P, R)
   -- ignore P.diff if diffutils is not found
   if not Px.binpath("diff") then P.diff = false end
-  if (P.debug or P.test) and (P.diff) then
+  if (P.debug or P.test) and P.diff then
     local temp = Lua.tmpname()
     if Px.awrite(temp, P._input, 384) then
       local dtbl = {}
       local res, _, diff = Cmd["/usr/bin/diff"]{ "-N", "-a", "-u", P.path, temp }
       Lua.remove(temp)
       if res then
-        F.msg(P.path, "No changes found", nil, 0)
-        R.notify_kept = P.notify_kept
-        R.kept = true
-        return R
+        return F.skip(P.path)
       else
         for n = 1, #diff.stdout do
           dtbl[n] = Lua.match(diff.stdout[n], "[%g%s]+") or ""
         end
-        F.msg(P.path, "Showing changes", true, 0, Lc.strf("Diff:%s%s%s", "\n\n", Lua.concat(dtbl, "\n"), "\n"))
+        F.msg(P.path, "Showing changes", 0, 0, Lc.strf("Diff:%s%s%s", "\n\n", Lua.concat(dtbl, "\n"), "\n"))
       end
+    else
+      return F.result(false, P.path)
     end
   end
-  if F.run(Px.awrite, P.path, P._input, P.mode) then
-    F.msg(P.path, Str.textfile_render_ok, true)
-    R.notify = P.notify
-    R.repaired = true
-  else
-    F.msg(P.path, Str.textfile_render_fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-  end
-  return R
+  return F.result(Px.awrite(P.path, P._input, P.mode), P.path)
 end
 
 --- Render a textfile using Lustache.
@@ -104,7 +91,12 @@ end
 -- ]]
 function textfile.render (S)
   local M = { "src", "lua", "table", "mode", "diff" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "textfile.render: Successfully rendered textfile.",
+    skip = "textfile.render: No difference detected, not overwriting existing destination.",
+    fail = "textfile.render: Error rendering textfile."
+  }
+  local F, P, R = main(S, M, G)
   P.mode = P.mode or "0600"
   P.mode = Lua.tonumber(P.mode, 8)
   local ti = F.open(P.src)
@@ -145,9 +137,7 @@ function textfile.render (S)
         end
       end
       if i == CRC.crc32_string(P._input) then
-        F.msg(P.path, Str.textfile_render_skip, nil)
-        R.notify_kept = P.notify_kept
-        return R
+        return F.skip(P.path)
       end
     end
   end
