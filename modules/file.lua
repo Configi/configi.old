@@ -51,8 +51,8 @@ _ENV = ENV
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)
   C.required = { "path" }
-  C.alias.path = { "dest", "name", "target" }
-  C.alias.src = { "link", "source" }
+  C.alias.path = { "name", "link", "dest", "target" }
+  C.alias.src = { "source" }
   C.alias.owner = { "uid" }
   C.alias.group = { "gid" }
   return Configi.finish(C)
@@ -176,22 +176,22 @@ function file.attributes (S)
 end
 
 --- Create a symlink.
--- @param path path where the symlink points to [REQUIRED] [ALIAS: dest,target]
--- @param src the symlink [REQUIRED]
+-- @param src path where the symlink points to [REQUIRED]
+-- @param path the symlink [REQUIRED] [ALIAS: link]
 -- @param force remove existing symlink [CHOICES: "yes","no"]
 -- @usage file.link [[
---   src "/home/ed/root"
---   path "/"
+--   src "/"
+--   path "/home/ed/root"
 -- ]]
 function file.link (S)
   local M = { "src", "force" }
   local F, P, R = main(S, M)
-  local target = Punistd.readlink(P.src)
-  if P.path == target then
+  local symlink = Punistd.readlink(P.path)
+  if symlink == P.src then
     F.msg(P.src, Str.file_link_skip, nil)
     return attrib(F, P, R)
   end
-  local args = { "-s", P.path, P.src }
+  local args = { "-s", P.src, P.path }
   Lc.insertif(P.force, args, 2, "-f")
   if F.run(Cmd.ln, args) then
     F.msg(P.path, Str.file_link_ok, true)
@@ -206,29 +206,29 @@ function file.link (S)
 end
 
 --- Create a hard link.
--- @param path path where the hard link points to [REQUIRED] [ALIAS: dest,target]
--- @param src the hard link [REQUIRED]
+-- @param src path where the hard link points to [REQUIRED]
+-- @param path the hard link [REQUIRED] [ALIAS: link]
 -- @param force remove existing hard link [CHOICES: "yes","no"]
 -- @usage file.hard [[
---   src "/home/ed/root"
---   path "/"
+--   src "/"
+--   path "/home/ed/root"
 -- ]]
 function file.hard (S)
   local M = { "src", "force" }
   local F, P, R = main(S, M)
   local source = Pstat.stat(P.src)
-  local target = Pstat.stat(P.path)
-  if not target then
+  local link = Pstat.stat(P.path) or nil
+  if not source then
     F.msg(P.path, Lc.strf(" '%s' is missing", source), false)
     R.notify_failed = P.notify_failed
     R.failed = true
     return R
   end
-  if source and (source.st_ino == target.st_ino) then
+  if source and link and (source.st_ino == link.st_ino) then
     F.msg(P.path, Str.file_hard_skip, nil)
     return attrib(F, P, R)
   end
-  local args = { P.path, P.src }
+  local args = { P.src, P.path }
   Lc.insertif(P.force, args, 1, "-f")
   if F.run(Cmd.ln, args) then
     F.msg(P.path, Str.file_hard_ok, true)

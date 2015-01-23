@@ -1,5 +1,5 @@
 
 file.link[[
-  src "test/tmp/file_link"
-  dest "/"
+  link "test/tmp/file_link"
+  src "/"
 ]]

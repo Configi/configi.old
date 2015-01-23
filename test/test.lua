@@ -442,10 +442,10 @@ T:start"file.hard (modules/file.lua)"
   do
     T:yes(cfg{ "-f", "test/file_hard.lua" })
     local stat1 = Psysstat.stat(testdir .. "file_hard_src")
-    local stat2 = Psysstat.stat(testdir .. "file_hard_dest")
+    local stat2 = Psysstat.stat(testdir .. "file_hard_link")
     T:eq(stat1.st_ino, stat2.st_ino)
     T:yes(Lc.execute("rm " .. testdir .. "file_hard_src"))
-    T:yes(Lc.execute("rm " .. testdir .. "file_hard_dest"))
+    T:yes(Lc.execute("rm " .. testdir .. "file_hard_link"))
   end
 T:done(N)
 
