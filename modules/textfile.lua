@@ -7,8 +7,6 @@
 local Str = {}
 Str.textfile_render_missingsrc = "textfile.render: Can't access or missing source file."
 Str.textfile_render_missinglua = "textfile.render: Can't access or missing lua file."
-Str.textfile_remove_line_ok = "textfile.remove_line: Successfully removed line."
-Str.textfile_remove_line_fail = "textfile.remove_line: Error removing line."
 Str.textfile_missing = "textfile: Can't access or missing file."
 local Lua = {
   lines = io.lines,
@@ -224,7 +222,12 @@ end
 -- ]]
 function textfile.remove_line (S)
   local M = { "pattern", "plain", "diff" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "textfile.remove_line: Successfully removed line."
+    skip = "textfile.remove_line: Line not found."
+    fail = "textfile.remove_line: Error removing line."
+  }
+  local F, P, R = main(S, M, G)
   P.plain = P.plain or true
   local pattern
   if not P.plain then
@@ -232,13 +235,16 @@ function textfile.remove_line (S)
   else
     pattern = P.pattern
   end
-  P.mode = Pstat.stat(P.path).st_mode
   local file = Lc.file2tbl(P.path)
   if not file then
     F.msg(P.path, Str.textfile_missing, false, 0)
     R.notify_failed = P.notify_failed
     R.failed = true
     return R
+  end
+  P.mode = Pstat.stat(P.path).st_mode
+  if not Lc.tfind(file, pattern, P.plain) then
+    return F.skip(P.path)
   end
   P._input = Lua.concat(Lc.filtertval(file, pattern, P.plain))
   return write(F, P, R)
