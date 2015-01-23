@@ -223,8 +223,8 @@ end
 function textfile.remove_line (S)
   local M = { "pattern", "plain", "diff" }
   local G = {
-    ok = "textfile.remove_line: Successfully removed line."
-    skip = "textfile.remove_line: Line not found."
+    ok = "textfile.remove_line: Successfully removed line.",
+    skip = "textfile.remove_line: Line not found.",
     fail = "textfile.remove_line: Error removing line."
   }
   local F, P, R = main(S, M, G)
