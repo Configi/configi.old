@@ -1,5 +1,7 @@
 Configi
 
+CHANGES with 0.9.5
+    * Fixed bugs in the file module. owner, group and mode should be declared when using attrib()
 CHANGES with 0.9.4
     * Fixed bugs in the file module. The src and path parameters are swapped in the file.link and file.hard functions
 CHANGES with 0.9.3
