@@ -7,9 +7,6 @@
 local Str = {}
 Str.textfile_render_missingsrc = "textfile.render: Can't access or missing source file."
 Str.textfile_render_missinglua = "textfile.render: Can't access or missing lua file."
-Str.textfile_insert_line_ok = "textfile.insert_line: Successfully inserted line."
-Str.textfile_insert_line_skip = "textfile.insert_line: Insert cancelled, found a matching line."
-Str.textfile_insert_line_fail = "textfile.insert_line: Error inserting line."
 Str.textfile_remove_line_ok = "textfile.remove_line: Successfully removed line."
 Str.textfile_remove_line_fail = "textfile.remove_line: Error removing line."
 Str.textfile_missing = "textfile: Can't access or missing file."
@@ -161,7 +158,12 @@ end
 -- ]]
 function textfile.insert_line (S)
   local M = { "diff", "line", "plain", "pattern", "before", "after", "inserts" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "textfile.insert_line: Successfully inserted line.",
+    skip = "textfile.insert_line: Insert cancelled, found a matching line.",
+    fail = "textfile.insert_line: Error inserting line."
+  }
+  local F, P, R = main(S, M, G)
   P.plain = P.plain or true
   local inserts, line, pattern
   if not P.plain then
@@ -173,7 +175,6 @@ function textfile.insert_line (S)
     line = P.line
     pattern = P.pattern
   end
-  P.mode = Pstat.stat(P.path).st_mode
   local file = Lc.file2tbl(P.path)
   if not file then
     F.msg(P.path, Str.textfile_missing, false, 0)
@@ -181,20 +182,15 @@ function textfile.insert_line (S)
     R.notify_failed = P.notify_failed
     return R
   end
+  P.mode = Pstat.stat(P.path).st_mode
   if P.inserts then
     if Lc.tfind(file, inserts, P.plain) then
-      F.msg(P.line, Str.textfile_insert_line_skip, nil, 0)
-      R.kept = true
-      R.notify_kept = P.notify_kept
-      return R
+      return F.skip(P.path)
     end
   end
   if not P.pattern then
     if Lc.tfind(file, line, P.plain) then
-      F.msg(P.line, Str.textfile_insert_line_skip, nil, 0)
-      R.kept = true
-      R.notify_kept = P.notify_kept
-      return R
+      return F.skip(P.path)
     else
       file[#file + 1] = P.line .. "\n"
     end
