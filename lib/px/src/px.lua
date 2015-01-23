@@ -331,9 +331,9 @@ function Px.awrite (path, str, mode)
   }
   local ok, err
   local fd = Px.open(path, (Pfcntl.O_CREAT | Pfcntl.O_WRONLY | Pfcntl.O_TRUNC), mode)
-  ok, err = Px.fcntl(fd, Pfcntl.F_SETLK, lock)
+  ok = Lua.pcall(Px.fcntl, fd, Pfcntl.F_SETLK, lock)
   if not ok then
-    return nil, err
+    return nil
   end
   local tmp, temp = Pstdlib.mkstemp(Cimicida.splitp(path) .. "/._configiXXXXXX")
   --local tmp = Px.open(temp, Pfcntl.O_WRONLY)
