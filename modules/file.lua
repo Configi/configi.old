@@ -184,7 +184,7 @@ end
 --   path "/home/ed/root"
 -- ]]
 function file.link (S)
-  local M = { "src", "force" }
+  local M = { "src", "force", "owner", "group", "mode" }
   local F, P, R = main(S, M)
   local symlink = Punistd.readlink(P.path)
   if symlink == P.src then
@@ -214,7 +214,7 @@ end
 --   path "/home/ed/root"
 -- ]]
 function file.hard (S)
-  local M = { "src", "force" }
+  local M = { "src", "force", "owner", "group", "mode" }
   local F, P, R = main(S, M)
   local source = Pstat.stat(P.src)
   local link = Pstat.stat(P.path) or nil
