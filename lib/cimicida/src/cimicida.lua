@@ -425,6 +425,7 @@ end
 -- @return the output as a string if the command exits with a non-zero status, nil otherwise (STRING or BOOLEAN)
 -- @return a status output from cimicida.exitstr as a string (STRING)
 function cimicida.popen (str, cwd, _ignore_error, _return_code)
+  local result = {}
   local header = [[  set -ef
   export LC_ALL=C
   exec 0>&- 2>&1
@@ -440,13 +441,15 @@ function cimicida.popen (str, cwd, _ignore_error, _return_code)
   for ln in pipe:lines() do
     tbl[#tbl + 1] = ln
   end
-  local _, status, code = Lua.close(pipe)
+  local _
+  _, result.status, result.code = Lua.close(pipe)
+  result.bin = "io.popen"
   if _return_code then
-    return code, cimicida.exitstr("io.popen", status, code)
-  elseif _ignore_error or code == 0 then
-    return tbl, cimicida.exitstr("io.popen", status, code)
+    return result.code, result
+  elseif _ignore_error or result.code == 0 then
+    return tbl, result
   else
-    return nil, cimicida.exitstr("io.popen", status, code)
+    return nil, result
   end
 end
 
@@ -463,6 +466,7 @@ end
 -- @return the true if the command exits with a non-zero status, nil otherwise (BOOLEAN)
 -- @return a status output from cimicida.exitstr as a string (STRING)
 function cimicida.pwrite (str, data)
+  local result = {}
   local write = Lua.write
   str = [[  set -ef
   export LC_ALL=C
@@ -470,11 +474,12 @@ function cimicida.pwrite (str, data)
   local pipe = Lua.popen(str, "we")
   Lua.flush(pipe)
   pipe:write(data)
-  local _, status, code = Lua.close(pipe)
-  if code == 0 then
-    return true, cimicida.exitstr("io.popen", status, code)
+  local _
+  _, result.status, result.code = Lua.close(pipe)
+  if result.code == 0 then
+    return true, result
   else
-    return nil, cimicida.exitstr("io.popen", status, code)
+    return nil, result
   end
 end
 
@@ -489,16 +494,19 @@ end
 -- @return true if exit code is equal to zero, nil otherwise (BOOLEAN)
 -- @return a status output from cimicida.exitstr as a string (STRING)
 function cimicida.system (str)
+  local result = {}
   local set = [[  set -ef
   export LC_ALL=C
   exec 0>&- 2>&- 1>/dev/null
   exec ]]
   local redir = [[ 0>&- 2>&- 1>/dev/null ]]
-  local _, status, code = Lua.execute(set .. str .. redir)
-  if code == 0 then
-    return true, cimicida.exitstr("os.execute", status, code)
+  local _
+  _, result.status, result.code = Lua.execute(set .. str .. redir)
+  result.bin = "os.execute"
+  if result.code == 0 then
+    return true, result
   else
-    return nil, cimicida.exitstr("os.execute", status, code)
+    return nil, result
   end
 end
 
@@ -509,14 +517,16 @@ end
 -- @return true if exit code is equal to zero, nil otherwise (BOOLEAN)
 -- @return a status output from cimicida.exitstr as a string (STRING)
 function cimicida.execute (str)
+  local result = {}
   local set = [[  set -ef
   exec 0>&- 2>&- 1>/dev/null
   ]]
-  local _, status, code = Lua.execute(set .. str)
-  if code == 0 then
-    return true, cimicida.exitstr("os.execute", status, code)
+  local _
+  _, result.status, result.code = Lua.execute(set .. str)
+  if result.code == 0 then
+    return true, result
   else
-    return nil, cimicida.exitstr("os.execute", status, code)
+    return nil, result
   end
 end
 
