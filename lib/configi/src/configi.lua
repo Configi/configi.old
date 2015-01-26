@@ -310,12 +310,13 @@ function Lib.finish (C)
   local functime = function (f, ...)
     local t1 = Psystime.gettimeofday()
     local stdout, stderr = "", ""
-    local ok, err, rt = f(...)
+    local ok, rt = f(...)
+    local err = Lc.exitstr(rt.bin, rt.status, rt.code)
     if rt then
-      if #rt.stdout > 0 then
+      if Lua.type(rt.stdout) == "table" then
         stdout = Lua.concat(rt.stdout, "\n")
       end
-      if #rt.stderr > 0 then
+      if Lua.type(rt.stderr) == "table" then
         stderr = Lua.concat(rt.stderr, "\n")
       end
     end
@@ -327,7 +328,8 @@ function Lib.finish (C)
   if not (C.parameters.test or C.parameters.debug) then
     msg = Lmod.msg(C)
     C.functions.run = function (f, ...)
-      local ok, err, rt = f(...)
+      local ok, rt = f(...)
+      local err = Lc.exitstr(rt.bin, rt.status, rt.code)
       local res = false
       if ok then
         res = true
