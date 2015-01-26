@@ -263,25 +263,26 @@ function Px.exec (args)
   end
   Px.close(fd1)
   Px.close(fd2)
-  local _, status, code = Px.wait(pid)
+  result.pid, result.status, result.code = Px.wait(pid)
+  result.bin = args._bin
   if args._return_code then
-    return code, Cimicida.exitstr(args._bin, status, code), result
-  elseif args._ignore_error or code == 0 then
-    return true, Cimicida.exitstr(args._bin, status, code), result
+    return result.code, result
+  elseif args._ignore_error or result.code == 0 then
+    return true, result
   else
-    return nil, Cimicida.exitstr(args._bin, status, code), result
+    return nil, result
   end
 end
 
 -- Use if caller does not care for STDIN, STDOUT or STDERR.
 function Px.qexec (args)
   local pid, err = Punistd.fork()
-  local res, status, code
+  local result = {}
   if pid == nil or pid == -1 then
     return nil, err
   elseif pid == 0 then
     if args._cwd then
-      res, err = Px.chdir(args._cwd)
+      local res, err = Px.chdir(args._cwd)
       if not res then
         return nil, err
       end
@@ -291,16 +292,16 @@ function Px.qexec (args)
     local _, no = Perrno.errno()
     Punistd._exit(no)
   else
-    local _ -- pid is unused
-    _, status, code = Px.wait(pid)
+    result.pid, result.status, result.code = Px.wait(pid)
+    result.bin = args._bin
   end
   -- return values depending on flags
   if args._return_code then
-    return code, Cimicida.exitstr(args._bin, status, code)
-  elseif args._ignore_error or code == 0 then
-    return true, Cimicida.exitstr(args._bin, status, code)
+    return result.code, result
+  elseif args._ignore_error or result.code == 0 then
+    return true, result
   else
-    return nil, Cimicida.exitstr(args._bin, status, code)
+    return nil, result
   end
 end
 
