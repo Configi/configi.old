@@ -256,7 +256,8 @@ function shell.popen3 (S)
   if P.cwd then args._cwd = P.cwd end
   if P.env then args._env = Func.envt(P) end
   if P.error == "ignore" then args._ignore_error = true end
-  local res, err, rt = Px.exec(args)
+  local res, rt = Px.exec(args)
+  local err = Lc.exitstr(rt.bin, rt.status, rt.code)
   F.msg(args[1], err, res or false)
   if P.stdout then
     if P.test then

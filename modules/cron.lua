@@ -38,7 +38,7 @@ Func.genjob = function (P)
 end
 
 Func.list = function (P)
-  local t, _, r = Cmd["crontab"]{ "-u", P.user, "-l" }
+  local t, r = Cmd["crontab"]{ "-u", P.user, "-l" }
   if t then
     -- filter out comments except for Configi tag-names
     return Lc.filtertval(r.stdout, "^#[%C]+")

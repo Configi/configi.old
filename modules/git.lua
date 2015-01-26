@@ -58,7 +58,8 @@ function git.clone (S)
   if ret then
     return F.skip(P.repository)
   elseif ret == nil then
-    local dir, err = Cmd.mkdir{ "-p", P.path }
+    local dir, res = Cmd.mkdir{ "-p", P.path }
+    local err = Lc.exitstr(res.bin, res.status, res.bin)
     if not dir then
       F.msg(P.path, err, false)
       R.notify_failed = P.notify_failed

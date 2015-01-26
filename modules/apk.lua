@@ -20,7 +20,7 @@ local main = function (S, M, G)
 end
 
 Func.found = function (package)
-  local _, _, out = Cmd["/sbin/apk"]{ "version", package }
+  local _, out = Cmd["/sbin/apk"]{ "version", package }
   if Lc.tfind(out.stdout, package, true) then
     return true
   end

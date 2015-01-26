@@ -45,7 +45,7 @@ Cmd.yum = function (a)
 end
 
 Func.found = function (package)
-  local _, _, cmd = Cmd.yum{ command = "info", package = package, cacheonly = true }
+  local _, cmd = Cmd.yum{ command = "info", package = package, cacheonly = true }
   if Lc.tfind(cmd.stdout, "Installed Packages", true) then
     return true
   end

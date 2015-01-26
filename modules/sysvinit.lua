@@ -21,7 +21,7 @@ local main = function (S, M, G)
 end
 
 Func.pgrep = function (service)
-  local ok, _, cmd = Cmd.pgrep{ service }
+  local ok, cmd = Cmd.pgrep{ service }
   if ok then
     return true, cmd.stdout[1]
   end

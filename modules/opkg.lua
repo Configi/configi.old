@@ -20,7 +20,7 @@ local main = function (S, M, G)
 end
 
 Func.found = function (package)
-  local _, _, cmd = Cmd.opkg{ "status", package }
+  local _, cmd = Cmd.opkg{ "status", package }
   if Lc.tfind(cmd.stdout, "Installed-Time", true) then
     return true
   end

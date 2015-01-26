@@ -51,7 +51,7 @@ local write = function (F, P, R)
     local temp = Lua.tmpname()
     if Px.awrite(temp, P._input, 384) then
       local dtbl = {}
-      local res, _, diff = Cmd["/usr/bin/diff"]{ "-N", "-a", "-u", P.path, temp }
+      local res, diff = Cmd["/usr/bin/diff"]{ "-N", "-a", "-u", P.path, temp }
       Lua.remove(temp)
       if res then
         return F.skip(P.path)
