@@ -2,6 +2,7 @@
 package.path = "../cwtest/?.lua"
 local Lc, Px, Factid = require"cimicida", require"px", require"factid"
 local Cmd = Px.cmd
+local crc = require"crc32".crc32_string
 local Psysstat, Ppwd, Pgrp = require"posix.sys.stat", require"posix.pwd", require"posix.grp"
 
 local Ct = require"cwtest"
@@ -9,9 +10,6 @@ local T, N = Ct.new(), { failures = 0, successes = 0 }
 
 
 local osfamily = Factid.osfamily()
-local diff = function (from, to)
-  return Cmd.diff{ "-N", "-a", "-u", from, to }
-end
 
 local bin = "bin/cfg -vf test/"
 local testdir = "test/tmp/"
@@ -120,8 +118,7 @@ T:start"cron.present (modules/cron.lua) test/cron_present.lua"
     local _, r = Cmd.crontab{ "-l" }
     local t = Lc.filtertval(r.stdout, "^#[%C]+") -- Remove comments
     t[#t] = t[#t] .. "\n" -- Add trailing newline
-    T:yes(Lc.fwrite(temp, table.concat(t, "\n")))
-    T:eq(true, diff("test/cron_present.out", temp))
+    T:eq(crc(Lc.fopen("test/cron_present.out")), crc(table.concat(t, "\n")))
     T:eq(true, Cmd.crontab{ "-r" })
     T:yes(os.remove(temp))
   end
@@ -145,7 +142,7 @@ T:start"textfile.render (modules/textfile.lua) test/textfile_render.lua"
   do
     local out = testdir .. "textfile_render_test.txt"
     T:eq(true, cfg{ "-f", "test/textfile_render.lua"})
-    T:eq(true, diff("test/textfile_render.txt", out))
+    T:eq(crc(Lc.fopen("test/textfile_render.txt")), crc(Lc.fopen(out)))
     T:yes(os.remove(out))
   end
 T:done(N)
@@ -154,9 +151,9 @@ T:start"textfile.insert_line (modules/textfile.lua) test/textfile_insert.lua"
   do
     local out = testdir .. "textfile_insert_test.txt"
     T:eq(true, cfg{ "-f", "test/textfile_insert.lua"})
-    T:eq(true, diff("test/textfile_insert.txt", out))
+    T:eq(crc(Lc.fopen("test/textfile_insert.txt")), crc(Lc.fopen(out)))
     T:eq(true, cfg{ "-f", "test/textfile_insert_inserts.lua"})
-    T:eq(true, diff("test/textfile_insert.txt", out))
+    T:eq(crc(Lc.fopen("test/textfile_insert.txt")), crc(Lc.fopen(out)))
     T:yes(os.remove(out))
   end
 T:done(N)
@@ -164,14 +161,14 @@ T:done(N)
 T:start"textfile.insert_line_before (modules/textfile.lua) test/textfile_insert_line_before.lua"
   do
     T:eq(true, cfg{ "-f", "test/textfile_insert_line_before.lua"})
-    T:eq(true, diff("test/textfile_insert_line_before.txt", "test/tmp/textfile_insert_line_test.txt"))
+    T:eq(crc(Lc.fopen("test/textfile_insert_line_before.txt")), crc(Lc.fopen("test/tmp/textfile_insert_line_test.txt")))
  end
 T:done(N)
 
 T:start"textfile.insert_line_after (modules/textfile.lua) test/textfile_insert_line_after.lua"
   do
     T:eq(true, cfg{ "-f", "test/textfile_insert_line_after.lua"})
-    T:eq(true, diff("test/textfile_insert_line_after.txt", "test/tmp/textfile_insert_line_test.txt"))
+    T:eq(crc(Lc.fopen("test/textfile_insert_line_after.txt")), crc(Lc.fopen("test/tmp/textfile_insert_line_test.txt")))
     T:eq(true, Cmd.rm { testdir .. "textfile_insert_line_test.txt"} )
     T:eq(true, Cmd.rm { testdir .. "._configi_textfile_insert_line_test.txt" })
  end
@@ -180,7 +177,7 @@ T:done(N)
 T:start"textfile.remove_line (modules/textfile.lua) test/textfile_remove_line.lua"
  do
    T:eq(true, cfg{ "-f", "test/textfile_remove_line.lua"})
-   T:eq(true, diff("test/textfile_remove_line.txt", "test/tmp/textfile_remove_line_test.txt"))
+   T:eq(crc(Lc.fopen("test/textfile_remove_line.txt")), crc(Lc.fopen("test/tmp/textfile_remove_line_test.txt")))
    T:eq(true, Cmd.rm { testdir .. "textfile_remove_line_test.txt" } )
  end
 T:done(N)
@@ -479,7 +476,7 @@ T:start"file.copy (modules/file.lua)"
     local _, ls = Cmd.ls{ "-1", testdir .. "file_copy_dest" }
     local stdout = table.concat(ls.stdout, "\n")
     T:yes(Lc.fwrite(testdir .. "file_copy.tmp", stdout))
-    T:eq(true, diff("test/file_copy.out", testdir .. "file_copy.tmp"))
+    T:eq(crc(Lc.fopen("test/file_copy.out")), crc(Lc.fopen(testdir .. "file_copy.tmp")))
     T:eq(true, Cmd.rm{ "-r", testdir .. "file_copy_dest" })
     T:eq(true, Cmd.rm{ "-r", testdir .. "file_copy_src" })
     T:eq(true, Cmd.rm{ testdir .. "file_copy.tmp" })
