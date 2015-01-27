@@ -4,19 +4,16 @@ local Lc, Px, Factid = require"cimicida", require"px", require"factid"
 local Cmd = Px.cmd
 local crc = require"crc32".crc32_string
 local Psysstat, Ppwd, Pgrp = require"posix.sys.stat", require"posix.pwd", require"posix.grp"
-
 local Ct = require"cwtest"
 local T, N = Ct.new(), { failures = 0, successes = 0 }
-
-
 local osfamily = Factid.osfamily()
-
-local bin = "bin/cfg -vf test/"
 local testdir = "test/tmp/"
+local cfg = Cmd["bin/cfg"]
+
 if not Px.isdir(testdir) then
   Psysstat.mkdir(testdir)
 end
-local cfg = Cmd["bin/cfg"]
+
 T:start"debug test/core-debug.lua"
  do
    local _, out = cfg{ "-v",  "-f", "test/core-debug.lua"}
@@ -251,7 +248,6 @@ if osfamily == "centos" then
       local ok, cmd = Cmd.pgrep{ "tuned" }
       local first = cmd.stdout[1]
       T:yes(ok)
-      T:yes(exec(bin .. "systemd_restart.lua"))
       T:eq(true, cfg{ "-f", "test/systemd_restart.lua" })
       ok, cmd = Cmd.pgrep{ "tuned" }
       local second = cmd.stdout[1]
