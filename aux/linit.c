@@ -27,12 +27,6 @@
 #ifdef lib_linotify
   int luaopen_inotify (lua_State *L);
 #endif
-#ifdef lib_lustache
-  int luaopen_lustacherenderer (lua_State *L);
-  int luaopen_lustachescanner (lua_State *L);
-  int luaopen_lustachecontext (lua_State *L);
-  int luaopen_lustache (lua_State *L);
-#endif
 #ifdef lib_px
   int luaopen_px (lua_State *L);
   int luaopen_px_c (lua_State *L);
@@ -159,12 +153,6 @@ static const luaL_Reg preloadedlibs[] = {
 #endif
 #ifdef lib_linotify
   {"inotify", luaopen_inotify},
-#endif
-#ifdef lib_lustache
-  {"lustache", luaopen_lustache},
-  {"lustacherenderer", luaopen_lustacherenderer},
-  {"lustachescanner", luaopen_lustachescanner},
-  {"lustachecontext", luaopen_lustachecontext},
 #endif
 #ifdef lib_lunix
   {"unix", luaopen_unix},

@@ -1,7 +1,7 @@
 .POSIX:
 .SUFFIXES:
 LIB= cimicida px configi factid
-VENDOR= lustache luaposix linotify crc32
+VENDOR= luaposix linotify crc32
 MODULES= unarchive authorized_keys cron file hostname shell textfile user git \
 	portage openrc \
 	yum systemd \
