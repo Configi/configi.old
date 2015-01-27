@@ -18,7 +18,10 @@ local Lua = {
   len = string.len,
   sub = string.sub,
   gmatch = string.gmatch,
+  type = type,
   pcall = pcall,
+  load = load,
+  setmetatable = setmetatable,
   pairs = pairs,
   exit = os.exit,
   date = os.date,
@@ -363,10 +366,25 @@ end
 -- @param tbl table (record) to deduce values from (TABLE)
 -- @return processed string (STRING)
 function cimicida.sub (str, tbl)
-  -- note: string coercion
-  local _
-  _, str = Lua.pcall(Lua.gsub, str, '{{[%s]-([%w_]+)[%s]-}}', function (v) return tbl[v] end)
-  _, str = Lua.pcall(Lua.gsub, str, '{{[%s]-([%w_]+)%.([%w_]+)[%s]-}}', function (t, v) return tbl[t][v] end)
+  local t, _ = {}, nil
+  _, str = Lua.pcall(Lua.gsub, str, "{{[%s]-([%g]+)[%s]-}}",
+    function (s)
+      t.type = Lua.type
+      local code = [[
+        V=%s
+        if type(V) == "function" then
+          V=V()
+        end
+      ]]
+      local lua = cimicida.strf(code, s)
+      local chunk, err = Lua.load(lua, lua, "t", Lua.setmetatable(t, {__index=tbl}))
+      if chunk then
+        chunk()
+        return t.V
+      else
+        return s
+      end
+    end) -- pcall
   return str
 end
 
