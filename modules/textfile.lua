@@ -12,6 +12,7 @@ local Lua = {
   lines = io.lines,
   load = load,
   tonumber = tonumber,
+  pcall = pcall,
   concat = table.concat,
   insert = table.insert,
   tmpname = os.tmpname,
@@ -24,7 +25,6 @@ local Lua = {
 local Configi = require"configi"
 local Lc = require"cimicida"
 local CRC = require"crc32"
-local Lustache = require"lustache"
 local Pstat = require"posix.sys.stat"
 local Px = require"px"
 local Cmd = Px.cmd
@@ -68,9 +68,7 @@ local write = function (F, P, R)
   return F.result(Px.awrite(P.path, P._input, P.mode), P.path)
 end
 
---- Render a textfile using Lustache.
--- <br />
--- See: <https://github.com/Olivine-Labs/lustache>
+--- Render a textfile.
 -- @note Requires the diffutils package for the diff parameter to work
 -- @param path output file [REQUIRED] [ALIAS: dest,file,textfile]
 -- @param src source template [REQUIRED] [ALIAS: template]
@@ -110,8 +108,8 @@ function textfile.render (S)
   end
   local env = { require = Lua.require }
   local tbl
-  local chunk, err = Lua.load(lua, lua, "t", env)
-  if chunk then
+  local stat, chunk, err = Lua.pcall(Lua.load, lua, lua, "t", env)
+  if stat and chunk then
     chunk()
     tbl = env[P.table]
   else
@@ -120,7 +118,7 @@ function textfile.render (S)
     R.failed = true
     return R
   end
-  P._input = Lustache:render(ti, tbl)
+  P._input = Lc.sub(ti, tbl)
   if Pstat.stat(P.path) then
     do -- compare P.path and rendered text
       local i
