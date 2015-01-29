@@ -15,12 +15,7 @@ Str.shell_system_ok = "shell.system: Script successfully executed."
 Str.shell_system_fail = "shell.system: Error executing script."
 Str.shell_popenexpect_ok = "expects: Expected pattern found."
 Str.shell_popenexpect_fail = "expects: Expected pattern not found."
-Str.shell_popen3stdout_ok = "stdout: Expected stdout pattern found."
-Str.shell_popen3stdout_fail = "stdout: Expectd stdout pattern not found."
-Str.shell_popen3stderr_ok = "stderr: Expected stderr pattern found."
-Str.shell_popen3stderr_fail = "stderr: Expected stderr pattern not found."
 Str.shell_popen_ok = "shell.popen: Command or script successfully executed."
-Str.shell_popen3_ok = "shell.popen3: Command or script successfully executed."
 local Lua = {
   gmatch = string.gmatch,
   remove = table.remove
@@ -238,11 +233,21 @@ end
 --   stdout ".X11-unix"
 -- ]]
 function shell.popen3 (S)
+  local Str = {
+    shell_popen3stdout_ok = "stdout: Expected stdout pattern found.",
+    shell_popen3stdout_fail = "stdout: Expectd stdout pattern not found.",
+    shell_popen3stderr_ok = "stderr: Expected stderr pattern found.",
+    shell_popen3stderr_fail = "stderr: Expected stderr pattern not found."
+  }
   local M = { "cwd", "creates", "removes", "stdin", "stdout", "stderr", "error" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "shell.popen3: Command or script successfully executed.",
+    skip = "shell.popen3: `creates` or `removes` parameter satisfied.",
+    fail = "shell.popen3: Command or script error."
+  }
+  local F, P, R = main(S, M, G)
   if Func.rc(F, P) then
-    R.notify_kept = P.notify_kept
-    return R
+    return F.skip(P.string)
   end
   local str
   if Px.isfile(P.string) then
@@ -289,15 +294,7 @@ function shell.popen3 (S)
   else
     ok = res
   end
-  if ok then
-    F.msg(P.string, Str.shell_popen3_ok, true)
-    R.notify = P.notify
-    R.repaired = true
-  else
-    R.notify_failed = P.notify_failed
-    R.failed = true
-  end
-  return R
+  return F.result(ok, P.string)
 end
 
 shell.script = shell.system
