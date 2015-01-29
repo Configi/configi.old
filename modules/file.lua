@@ -23,7 +23,6 @@ Str.file_hard_fail = "file.hard: Error creating hardlink."
 Str.file_directory_ok = "file.directory: Directory created."
 Str.file_directory_skip = "file.directory: Already a directory."
 Str.file_directory_fail = "file.directory: Error creating directory."
-Str.file_touch_ok = "file.touch: touch(1) succeeded."
 local Lua = {
   tostring = tostring,
   rename = os.rename,
@@ -284,12 +283,16 @@ end
 -- ]]
 function file.touch (S)
   local M = { "mode", "owner", "group" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "file.touch: touch(1) succeeded.",
+    fail = "file.touch: touch(1) failed."
+  }
+  local F, P, R = main(S, M, G)
   if F.run(Cmd.touch, { P.path }) then
-    F.msg(P.path, Str.file_touch_ok, true)
-    R.changed = true
+    F.msg(P.path, G.ok, true)
     return attrib(F, P, R)
   else
+    F.msg(P.path, G.failed, false)
     R.notify_failed = P.notify_failed
     R.failed = true
     return R
