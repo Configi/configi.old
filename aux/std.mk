@@ -14,9 +14,9 @@ CFG= bin/cfg.lua
 CFG_T= bin/cfg
 
 LUACFLAGS?= -s
-ECHO = printf '%s\n'
-ECHON = printf '%s'
-ECHOT = printf ' %s\t%s\n'
+ECHO = @printf '%s\n'
+ECHON = @printf '%s'
+ECHOT = @printf ' %s\t%s\n'
 RM= rm
 RMFLAGS= -f
 RMRF= rm -rf
