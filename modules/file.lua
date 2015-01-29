@@ -14,9 +14,6 @@ Str.file_group_fail = "file.group: Error setting group/gid."
 Str.file_mode_ok = "file.mode: Mode corrected."
 Str.file_mode_skip = "file.mode: Mode matched."
 Str.file_mode_fail = "file.mode: Error setting mode."
-Str.file_link_ok = "file.link: Symlink created."
-Str.file_link_skip = "file.link: Already a symlink."
-Str.file_link_fail = "file.link: Error creating symlink."
 local Lua = {
   tostring = tostring,
   rename = os.rename,
@@ -172,20 +169,24 @@ end
 -- ]]
 function file.link (S)
   local M = { "src", "force", "owner", "group", "mode" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "file.link: Symlink created.",
+    skip = "file.link: Already a symlink.",
+    fail = "file.link: Error creating symlink."
+  }
+  local F, P, R = main(S, M, G)
   local symlink = Punistd.readlink(P.path)
   if symlink == P.src then
-    F.msg(P.src, Str.file_link_skip, nil)
+    F.msg(P.src, G.skip, nil)
     return attrib(F, P, R)
   end
   local args = { "-s", P.src, P.path }
   Lc.insertif(P.force, args, 2, "-f")
   if F.run(Cmd.ln, args) then
-    F.msg(P.path, Str.file_link_ok, true)
-    R.changed = true
+    F.msg(P.path, G.ok, true)
     return attrib(F, P, R)
   else
-    F.msg(P.path, Str.file_link_fail, false)
+    F.msg(P.path, G.fail, false)
     R.notify_failed = P.notify_failed
     R.failed = true
   end
