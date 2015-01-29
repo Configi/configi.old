@@ -1,5 +1,6 @@
 .POSIX:
 .SUFFIXES:
+MAKEFLAGS= --silent
 LIB= cimicida px configi factid
 VENDOR= luaposix linotify crc32
 MODULES= unarchive authorized_keys cron file hostname shell textfile user git \
@@ -41,6 +42,17 @@ LDFLAGS+= -fwhole-program -flto
 RANLIB= gcc-ranlib
 AR= gcc-ar
 endif
+endif
+
+ifeq ($(DEBUG), 1)
+DEFINES+= -DDEBUG
+nulstring :=
+LUACFLAGS := $(nulstring)
+MAKEFLAGS := $(nulstring)
+endif
+
+ifeq ($(STATIC), 1)
+LDFLAGS+= -static
 endif
 
 # Linux only for now

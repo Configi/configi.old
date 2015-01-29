@@ -1,4 +1,3 @@
-MAKEFLAGS= --silent
 TESTLOG_F = test.log
 AUX_P = aux
 LUAC_T= bin/luac
@@ -14,7 +13,7 @@ GLUE_T= bin/glue
 CFG= bin/cfg.lua
 CFG_T= bin/cfg
 
-LUACFLAGS= -s
+LUACFLAGS?= -s
 ECHO = printf '%s\n'
 ECHON = printf '%s'
 ECHOT = printf ' %s\t%s\n'
