@@ -17,9 +17,6 @@ Str.file_mode_fail = "file.mode: Error setting mode."
 Str.file_link_ok = "file.link: Symlink created."
 Str.file_link_skip = "file.link: Already a symlink."
 Str.file_link_fail = "file.link: Error creating symlink."
-Str.file_hard_ok = "file.hard: Hardlink created."
-Str.file_hard_skip = "file.hard: Already a hardlink."
-Str.file_hard_fail = "file.hard: Error creating hardlink."
 local Lua = {
   tostring = tostring,
   rename = os.rename,
@@ -205,7 +202,12 @@ end
 -- ]]
 function file.hard (S)
   local M = { "src", "force", "owner", "group", "mode" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "file.hard: Hardlink created.",
+    skip = "file.hard: Already a hardlink.",
+    fail = "file.hard: Error creating hardlink."
+  }
+  local F, P, R = main(S, M, G)
   local source = Pstat.stat(P.src)
   local link = Pstat.stat(P.path) or nil
   if not source then
@@ -215,17 +217,16 @@ function file.hard (S)
     return R
   end
   if source and link and (source.st_ino == link.st_ino) then
-    F.msg(P.path, Str.file_hard_skip, nil)
+    F.msg(P.path, G.skip, nil)
     return attrib(F, P, R)
   end
   local args = { P.src, P.path }
   Lc.insertif(P.force, args, 1, "-f")
   if F.run(Cmd.ln, args) then
-    F.msg(P.path, Str.file_hard_ok, true)
-    R.changed = true
+    F.msg(P.path, G.ok, true)
     return attrib(F, P, R)
   else
-    F.msg(P.path, Str.file_hard_fail, false)
+    F.msg(P.path, G.fail, false)
     R.notify_failed = P.notify_failed
     R.failed = true
   end
