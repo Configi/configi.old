@@ -36,6 +36,16 @@ _ENV = ENV
 Lib.str = { IDENT = "Configi", ERROR = "ERROR: ", WARN = "WARNING: ", SERR = "POLICY ERROR: ", OPERATION = "Operation" }
 local Lstr = Lib.str
 
+-- Logging function for export too
+Lib.LOG = function (syslog, file, str, level)
+  level = level or Psyslog.LOG_DEBUG
+  if syslog then
+    return Px.log(file, Lstr.IDENT, str, Psyslog.LOG_NDELAY|Psyslog.LOG_PID, Psyslog.LOG_DAEMON, level)
+  elseif not syslog and file then
+    return Lc.log(file, Lstr.IDENT, str)
+  end
+end
+
 --[[ Module internal functions ]]
 local Lmod = {}
 
@@ -115,7 +125,6 @@ function Lmod.dmsg (C)
     flag, msg, sec, extra or "", "\n")
     end
     local rs = Lua.char(9)
-    local file = C.parameters.log
     local lstr
     sec = sec or ""
     if Lua.len(C.parameters.comment) > 0 then
@@ -123,8 +132,7 @@ function Lmod.dmsg (C)
     else
       lstr = Lc.strf("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
     end
-    level = level or Psyslog.LOG_DEBUG
-    Px.log(file, Lstr.IDENT, lstr, Psyslog.LOG_NDELAY|Psyslog.LOG_PID, Psyslog.LOG_DAEMON, level)
+    Lib.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
     C.results.msgt[#C.results.msgt + 1] = {
       item = item,
       msg = msg,
@@ -177,13 +185,7 @@ function Lmod.msg (C)
     else
       lstr = Lc.strf("[%s]%s%s%s%s", flag, rs, msg, rs, item)
     end
-    level = level or Psyslog.LOG_DEBUG
-    if C.parameters.syslog then
-      Px.log(nil, Lstr.IDENT, lstr, Psyslog.LOG_NDELAY|Psyslog.LOG_PID, Psyslog.LOG_DAEMON, level)
-    end
-    if C.parameters.log then
-      Lc.log(C.parameters.log, Lstr.IDENT, lstr)
-    end
+    Lib.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
     C.results.msgt[#C.results.msgt + 1] = {
       item = item,
       msg = msg,
