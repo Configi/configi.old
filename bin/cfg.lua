@@ -1,6 +1,9 @@
 local version = "Configi 0.9.0"
 local arg = arg
 local Lua = {
+  type = type,
+  tostring = tostring,
+  pairs = pairs,
   exit = os.exit,
   next = next,
   tostring = tostring,
@@ -11,6 +14,8 @@ local Lc = require"cimicida"
 local Lcli = Lib.cli
 local Punistd = require"posix.unistd"
 local Psignal = require"posix.signal"
+local Pstat = require"posix.sys.stat"
+local Psyslog = require"posix.syslog"
 local Psystime = require"posix.sys.time"
 local Px = require"px"
 local inotify = require"inotify"
@@ -50,15 +55,26 @@ while true do
     end
   end
   if opts.daemon then
+    if Punistd.geteuid() == 0 then
+      if Pstat.stat("/proc/self/oom_score_adj") then
+        Px.fwrite("/proc/self/oom_score_adj", "-1000")
+      else
+        Px.fwrite("/proc/self/oom_adj", "-1000")
+      end
+    end
     handle = inotify.init()
     wd = handle:addwatch(opts.script, inotify.IN_MODIFY, inotify.IN_ATTRIB)
-    local bail = function()
+    local bail = function(sig)
       handle:rmwatch(wd)
       handle:close()
+      Lib.LOG(opts.syslog, opts.log, Lc.strf("Caught signal %s. Exiting.", Lua.tostring(sig)), Psyslog.LOG_ERR)
       Lua.exit(255)
     end
-    Psignal.signal(Psignal.SIGINT, bail)
-    Psignal.signal(Psignal.SIGTERM, bail)
+    for _, v in Lua.pairs(Psignal) do
+      if Lua.type(v) == "number" then
+        Psignal.signal(v, bail)
+      end
+    end
     handle:read()
     Lua.collectgarbage()
   elseif opts.periodic then
