@@ -4,16 +4,6 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 --
-local Str = {}
-Str.file_owner_ok = "file.owner: Owner/uid corrected."
-Str.file_owner_skip = "file.owner: Owner/uid already matches "
-Str.file_owner_fail = "file.owner: Error setting owner/uid."
-Str.file_group_ok = "file.group: Group/gid corrected."
-Str.file_group_skip = "file.group: Group/gid already matches "
-Str.file_group_fail = "file.group: Error setting group/gid."
-Str.file_mode_ok = "file.mode: Mode corrected."
-Str.file_mode_skip = "file.mode: Mode matched."
-Str.file_mode_fail = "file.mode: Error setting mode."
 local Lua = {
   tostring = tostring,
   rename = os.rename,
@@ -43,6 +33,11 @@ local main = function (S, M, G)
 end
 
 local owner = function (F, P, R)
+  local Str = {
+    file_owner_ok = "file.owner: Owner/uid corrected.",
+    file_owner_skip = "file.owner: Owner/uid already matches ",
+    file_owner_fail = "file.owner: Error setting owner/uid."
+  }
   local stat = Pstat.stat(P.path)
   local u = Ppwd.getpwuid(stat.st_uid)
   local uid = Lc.strf("%s(%s)", u.pw_uid, u.pw_name)
@@ -66,6 +61,11 @@ local owner = function (F, P, R)
 end
 
 local group = function (F, P, R)
+  local Str = {
+    file_group_ok = "file.group: Group/gid corrected.",
+    file_group_skip = "file.group: Group/gid already matches ",
+    file_group_fail = "file.group: Error setting group/gid."
+  }
   local stat = Pstat.stat(P.path)
   local g = Pgrp.getgrgid(stat.st_gid)
   local cg = Lc.strf("%s(%s)", g.gr_gid, g.gr_name)
@@ -89,6 +89,11 @@ local group = function (F, P, R)
 end
 
 local mode = function (F, P, R)
+  local Str = {
+    file_mode_ok = "file.mode: Mode corrected.",
+    file_mode_skip = "file.mode: Mode matched.",
+    file_mode_fail = "file.mode: Error setting mode."
+  }
   local stat = Pstat.stat(P.path)
   local mode = Lua.sub(Lua.tostring(Lua.format("%o", stat.st_mode)), -3, -1)
   if mode == Lua.sub(P.mode, -3, -1) then
