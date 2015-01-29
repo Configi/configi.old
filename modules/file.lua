@@ -24,9 +24,6 @@ Str.file_directory_ok = "file.directory: Directory created."
 Str.file_directory_skip = "file.directory: Already a directory."
 Str.file_directory_fail = "file.directory: Error creating directory."
 Str.file_touch_ok = "file.touch: touch(1) succeeded."
-Str.file_absent_ok = "file.absent: Successfully removed."
-Str.file_absent_skip = "file.absent: Already absent."
-Str.file_absent_fail = "file.absent: Error removing path."
 local Lua = {
   tostring = tostring,
   rename = os.rename,
@@ -305,22 +302,16 @@ end
 --   path "/home/ed/.xinitrc"
 -- ]]
 function file.absent (S)
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "file.absent: Successfully removed.",
+    skip = "file.absent: Already absent.",
+    fail = "file.absent: Error removing path.",
+  }
+  local F, P, R = main(S, M, G)
   if not Pstat.stat(P.path) then
-    F.msg(P.path, Str.file_absent_skip, nil)
-    R.notify_kept = P.notify_kept
-    return R
+    return F.skip(P.path)
   end
-  if F.run(Cmd.rm, { "-r", "-f", P.path }) then
-    F.msg(P.path, Str.file_absent_ok, true)
-    R.notify = P.notify
-    R.repaired = true
-  else
-    F.msg(P.path, Str.file_absent_fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-  end
-  return R
+  return F.result(F.run(Cmd.rm, { "-r", "-f", P.path }), P.path)
 end
 
 --- Copy a path.
