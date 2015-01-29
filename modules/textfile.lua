@@ -4,7 +4,6 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local Str = {}
 local Lua = {
   lines = io.lines,
   load = load,
