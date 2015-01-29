@@ -321,6 +321,14 @@ function Px.readin (sz)
   return str
 end
 
+function Px.fwrite (path, str)
+  local fd = Px.open(path, (Pfcntl.O_RDWR))
+  if not fd then
+    return nil
+  end
+  return Px.write(fd, str)
+end
+
 -- atomic write
 function Px.awrite (path, str, mode)
   mode = mode or 384
