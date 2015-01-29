@@ -11,8 +11,6 @@ Str.shell_creates_skip = "creates: Already present."
 Str.shell_creates_fail = "creates: Command or script failed to create path."
 Str.shell_command_ok = "shell.command: Command successfully executed."
 Str.shell_command_fail = "shell.command: Error executing command."
-Str.shell_system_ok = "shell.system: Script successfully executed."
-Str.shell_system_fail = "shell.system: Error executing script."
 local Lua = {
   gmatch = string.gmatch,
   remove = table.remove
@@ -134,7 +132,12 @@ end
 -- ]]
 function shell.system (S)
   local M = { "creates", "removes" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "shell.system: Script successfully executed.",
+    skip = "shell.system: `creates` or `removes` parameter satisfied.",
+    fail = "shell.system: Error executing script."
+  }
+  local F, P, R = main(S, M, G)
   local script = Lc.fopen(P.string)
   if not script then
     F.msg(P.string, "shell.system: script not found", false)
@@ -143,18 +146,9 @@ function shell.system (S)
     return R
   end
   if Func.rc(F, P) then
-    R.notify_kept = P.notify_kept
-    return R
+    return F.skip(P.string)
   end
-  if F.run(Lc.execute, script) then
-    F.msg(P.string, Str.shell_system_ok, true)
-    R.notify = P.notify
-    R.repaired = true
-  else
-    R.notify_failed = P.notify_failed
-    R.failed = true
-  end
-  return R
+  return F.result(F.run(Lc.execute, script), P.string)
 end
 
 --- Run a command via io.popen.
