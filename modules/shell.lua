@@ -13,9 +13,6 @@ Str.shell_command_ok = "shell.command: Command successfully executed."
 Str.shell_command_fail = "shell.command: Error executing command."
 Str.shell_system_ok = "shell.system: Script successfully executed."
 Str.shell_system_fail = "shell.system: Error executing script."
-Str.shell_popenexpect_ok = "expects: Expected pattern found."
-Str.shell_popenexpect_fail = "expects: Expected pattern not found."
-Str.shell_popen_ok = "shell.popen: Command or script successfully executed."
 local Lua = {
   gmatch = string.gmatch,
   remove = table.remove
@@ -172,11 +169,19 @@ end
 --   expects ".X11-unix"
 -- ]]
 function shell.popen (S)
+  local Str = {
+    shell_popenexpect_ok = "expects: Expected pattern found.",
+    shell_popenexpect_fail = "expects: Expected pattern not found."
+  }
   local M = { "cwd", "creates", "removes", "expects" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "shell.popen: Command or script successfully executed.",
+    skip = "shell.popen: `creates` or `removes` parameter satisfied.",
+    fail = "shell.popen: Command or script error."
+  }
+  local F, P, R = main(S, M, G)
   if Func.rc(F, P) then
-    R.notify_kept = P.notify_kept
-    return R
+    return F.skip(P.string)
   end
   local str
   if Px.isfile(P.string) then
@@ -206,15 +211,7 @@ function shell.popen (S)
   else
     ok = res
   end
-  if ok then
-    F.msg(P.string, Str.shell_popen_ok, true)
-    R.notify = P.notify
-    R.repaired = true
-  else
-    R.notify_failed = P.notify_failed
-    R.failed = true
-  end
-  return R
+  return F.result(ok, P.string)
 end
 
 --- Run a command via Px.exec which can expect strings from STDIN, STDOUT or STDERR
