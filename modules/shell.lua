@@ -4,11 +4,6 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local Str = {}
-Str.shell_removes_skip = "removes: Already absent."
-Str.shell_removes_fail = "removes: Command or script failed to removed path."
-Str.shell_creates_skip = "creates: Already present."
-Str.shell_creates_fail = "creates: Command or script failed to create path."
 local Lua = {
   gmatch = string.gmatch,
   remove = table.remove
@@ -39,6 +34,12 @@ Func.envt = function (P)
 end
 
 Func.rc = function (F, P)
+  local Str = {
+    shell_removes_skip = "removes: Already absent.",
+    shell_removes_fail = "removes: Command or script failed to removed path.",
+    shell_creates_skip = "creates: Already present.",
+    shell_creates_fail = "creates: Command or script failed to create path."
+  }
   local created, removed
   if P.removes then
     if not Pstat.stat(P.removes) then
