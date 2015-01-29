@@ -350,7 +350,7 @@ function file.copy (S)
   Lc.insertif(P.recurse, args, 2, "-R")
   Lc.insertif(P.force, args, 2, "-f")
   if F.run(Cmd.cp, args) then
-    F.msg(P.path, Str.file_copy_ok, true)
+    F.msg(P.path, G.ok, true)
     R.notify = P.notify
     R.repaired = true
     return F.result(true, P.path)
