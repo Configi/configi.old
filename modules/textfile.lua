@@ -5,9 +5,6 @@
 -- @added 0.9.0
 
 local Str = {}
-Str.textfile_render_missingsrc = "textfile.render: Can't access or missing source file."
-Str.textfile_render_missinglua = "textfile.render: Can't access or missing lua file."
-Str.textfile_missing = "textfile: Can't access or missing file."
 local Lua = {
   lines = io.lines,
   load = load,
@@ -83,6 +80,10 @@ end
 --   data "/etc/something/config.lua"
 -- ]]
 function textfile.render (S)
+  local Str = {
+    textfile_render_missingsrc = "textfile.render: Can't access or missing source file.",
+    textfile_render_missinglua = "textfile.render: Can't access or missing lua file."
+  }
   local M = { "src", "lua", "table", "mode", "diff" }
   local G = {
     ok = "textfile.render: Successfully rendered textfile.",
@@ -153,6 +154,9 @@ end
 --   plain "true"
 -- ]]
 function textfile.insert_line (S)
+  local Str = {
+    textfile_missing = "textfile: Can't access or missing file."
+  }
   local M = { "diff", "line", "plain", "pattern", "before", "after", "inserts" }
   local G = {
     ok = "textfile.insert_line: Successfully inserted line.",
