@@ -27,9 +27,6 @@ Str.file_touch_ok = "file.touch: touch(1) succeeded."
 Str.file_absent_ok = "file.absent: Successfully removed."
 Str.file_absent_skip = "file.absent: Already absent."
 Str.file_absent_fail = "file.absent: Error removing path."
-Str.file_copy_ok = "file.copy: Copy succeeded."
-Str.file_copy_skip = "file.copy: Not copying over destination."
-Str.file_copy_fail = "file.copy: Error copying."
 local Lua = {
   tostring = tostring,
   rename = os.rename,
@@ -338,21 +335,21 @@ end
 -- ]]
 function file.copy (S)
   local M = { "src", "path", "recurse", "force", "backup" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "file.copy: Copy succeeded.",
+    skip = "file.copy: Not copying over destination.",
+    fail = "file.copy: Error copying."
+  }
+  local F, P, R = main(S, M, G)
   local dir, file = Lc.splitp(P.path)
   local backup = dir .. "/._configi_" .. file
   local present = Pstat.stat(P.path)
   if present and P.backup and (not Pstat.stat(backup)) then
-    if F.run(Cmd.mv, { P.path, backup }) then
-      R.changed = true
-    else
-      R.failed = true
-      return R
+    if not F.run(Cmd.mv, { P.path, backup }) then
+      return F.result(false, P.path)
     end
   elseif not P.force and present then
-    F.msg(P.path, Str.file_copy_skip, nil)
-    R.notify_kept = P.notify_kept
-    return R
+    return F.skip(P.path)
   end
   local args = { "-P", P.src, P.path }
   Lc.insertif(P.recurse, args, 2, "-R")
@@ -361,13 +358,11 @@ function file.copy (S)
     F.msg(P.path, Str.file_copy_ok, true)
     R.notify = P.notify
     R.repaired = true
+    return F.result(true, P.path)
   else
     F.run(Cmd.rm, { "-r", "-f", P.path }) -- clean up incomplete copy
-    F.msg(P.path, Str.file_copy_fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
+    return F.result(false, P.path)
   end
-  return R
 end
 
 return file
