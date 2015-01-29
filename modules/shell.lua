@@ -9,8 +9,6 @@ Str.shell_removes_skip = "removes: Already absent."
 Str.shell_removes_fail = "removes: Command or script failed to removed path."
 Str.shell_creates_skip = "creates: Already present."
 Str.shell_creates_fail = "creates: Command or script failed to create path."
-Str.shell_command_ok = "shell.command: Command successfully executed."
-Str.shell_command_fail = "shell.command: Error executing command."
 local Lua = {
   gmatch = string.gmatch,
   remove = table.remove
@@ -89,10 +87,14 @@ end
 -- ]]
 function shell.command (S)
   local M = { "cwd", "creates", "removes" }
-  local F, P, R = main(S, M)
+  local G = {
+    ok = "shell.command: Command successfully executed.",
+    skip = "shell.command: `creates` or `removes` parameter satisfied.",
+    fail = "shell.command: Error executing command."
+  }
+  local F, P, R = main(S, M, G)
   if Func.rc(F, P) then
-    R.notify_kept = P.notify_kept
-    return R
+    return F.skip(P.string)
   end
   local args = {}
   for c in Lua.gmatch(P.string, "%S+") do
@@ -109,15 +111,7 @@ function shell.command (S)
     args[2] = true
   end
   local code = F.run(Px.qexec, args)
-  if code == 0 then
-    F.msg(P.string, Str.shell_command_ok, true)
-    R.notify = P.notify
-    R.repaired = true
-  else
-    R.notify_failed = P.notify_failed
-    R.failed = true
-  end
-  return R
+  return F.result((code == 0), P.string)
 end
 
 --- Run a script or command via os.execute.
