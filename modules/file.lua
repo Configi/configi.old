@@ -48,9 +48,7 @@ local owner = function (F, P, R)
   local uid = Lc.strf("%s(%s)", u.pw_uid, u.pw_name)
   if P.owner == u.pw_name or P.owner == Lua.tostring(u.pw_uid) then
     F.msg(P.path, Str.file_owner_skip .. uid .. ".", nil)
-    if not R.changed then
-      R.notify_kept = P.notify_kept
-    end
+    R.notify_kept = P.notify_kept
     return R
   end
   local args = { "-h", P.owner, P.path }
@@ -73,9 +71,7 @@ local group = function (F, P, R)
   local cg = Lc.strf("%s(%s)", g.gr_gid, g.gr_name)
   if P.group == g.gr_name or P.group == Lua.tostring(g.gr_gid) then
     F.msg(P.path, Str.file_group_skip .. cg .. ".", nil)
-    if not R.changed then
-      R.notify_kept = P.notify_kept
-    end
+    R.notify_kept = P.notify_kept
     return R
   end
   local args = { "-h", ":" .. P.group, P.path }
@@ -97,9 +93,7 @@ local mode = function (F, P, R)
   local mode = Lua.sub(Lua.tostring(Lua.format("%o", stat.st_mode)), -3, -1)
   if mode == Lua.sub(P.mode, -3, -1) then
     F.msg(P.path, Str.file_mode_skip, nil)
-    if not R.changed then
-      R.notify_kept = P.notify_kept
-    end
+    R.notify_kept = P.notify_kept
     return R
   end
   local args = { P.mode, P.path }
