@@ -1,9 +1,6 @@
 local version = "Configi 0.9.0"
 local arg = arg
 local Lua = {
-  type = type,
-  tostring = tostring,
-  pairs = pairs,
   exit = os.exit,
   next = next,
   tostring = tostring,
@@ -70,11 +67,8 @@ while true do
       Lib.LOG(opts.syslog, opts.log, Lc.strf("Caught signal %s. Exiting.", Lua.tostring(sig)), Psyslog.LOG_ERR)
       Lua.exit(255)
     end
-    for _, v in Lua.pairs(Psignal) do
-      if Lua.type(v) == "number" then
-        Psignal.signal(v, bail)
-      end
-    end
+    Psignal.signal(Psignal.SIGINT, bail)
+    Psignal.signal(Psignal.SIGTERM, bail)
     handle:read()
     Lua.collectgarbage()
   elseif opts.periodic then
