@@ -55,13 +55,10 @@ clean: $(CLEAN)
 	$(RMRF) test/tmp
 	$(ECHO) "Done!"
 
-test_lua: $(LUA_T)
-	pushd tests; ../lua -e"_U=true" all.lua; popd
-
 test_configi: $(LUA_T)
 	bin/lua test/test.lua | tee $(TESTLOG_F)
 
-test: test_lua $(TEST)
+test: test_configi $(TEST)
 	$(ECHO) "Tests done."
 
 .PHONY: all init bootstrap modules interpreter compress strip clean test test_lua
