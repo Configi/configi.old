@@ -42,7 +42,6 @@ end
 -- Handle EINTR
 Px.fsync = retry(Punistd.fsync)
 Px.chdir = retry(Punistd.chdir)
-Px.close = retry(Punistd.close)
 Px.fcntl = retry(Pfcntl.fcntl)
 Px.dup2 = retry(Punistd.dup2)
 Px.wait = retry(Pwait.wait)
@@ -122,8 +121,8 @@ pipeline = function (t, pipe_fn)
       if not Px.dup2(read_fd, Punistd.STDIN_FILENO) then
         Cimicida.errorf("error dup2-ing")
       end
-      Px.close(read_fd)
-      Px.close(write_fd)
+      Punistd.close(read_fd)
+      Punistd.close(write_fd)
       Punistd._exit(pipeline(list.sub(t, 2), pipe_fn))
     else
       save_stdout = Punistd.dup(Punistd.STDOUT_FILENO)
@@ -133,21 +132,21 @@ pipeline = function (t, pipe_fn)
       if not Px.dup2(write_fd, Punistd.STDOUT_FILENO) then
         Cimicida.errorf("error dup2-ing")
       end
-      Px.close(read_fd)
-      Px.close(write_fd)
+      Punistd.close(read_fd)
+      Punistd.close(write_fd)
     end
   end
 
   local code, status = Px.execp(t[1])
-  Px.close(Punistd.STDOUT_FILENO)
+  Punistd.close(Punistd.STDOUT_FILENO)
 
   if #t > 1 then
-    Px.close(write_fd)
+    Punistd.close(write_fd)
     Px.wait(pid)
     if not Px.dup2 (save_stdout, Punistd.STDOUT_FILENO) then
       Cimicida.errorf("error dup2-ing")
     end
-    Px.close(save_stdout)
+    Punistd.close(save_stdout)
   end
 
   if code == 0 then
@@ -194,15 +193,15 @@ local pexec = function (args)
   if pid == nil or pid == -1 then
     return nil, err
   elseif pid == 0 then
-    Px.close(fd0)
-    Px.close(fd1)
-    Px.close(fd2)
+    Punistd.close(fd0)
+    Punistd.close(fd1)
+    Punistd.close(fd2)
     Px.dup2(stdin, Punistd.STDIN_FILENO)
     Px.dup2(stdout, Punistd.STDOUT_FILENO)
     Px.dup2(stderr, Punistd.STDERR_FILENO)
-    Px.close(stdin)
-    Px.close(stdout)
-    Px.close(stderr)
+    Punistd.close(stdin)
+    Punistd.close(stdout)
+    Punistd.close(stderr)
     if args._cwd then
       res, err = Px.chdir(args._cwd)
       if not res then
@@ -214,9 +213,9 @@ local pexec = function (args)
     _, no = Perrno.errno()
     Punistd._exit(no)
   end
-  Px.close(stdin)
-  Px.close(stdout)
-  Px.close(stderr)
+  Punistd.close(stdin)
+  Punistd.close(stdout)
+  Punistd.close(stderr)
   return pid, err, fd0, fd1, fd2
 end
 
@@ -228,9 +227,9 @@ function Px.exec (args)
   end
   if args._stdin then
     Px.write(fd0, args._stdin)
-    Px.close(fd0)
+    Punistd.close(fd0)
   else
-    Px.close(fd0)
+    Punistd.close(fd0)
   end
   local buf, sz, stdout, stderr = nil, 4096, {}, {}
   while true do
@@ -261,8 +260,8 @@ function Px.exec (args)
   if #result.stderr == 0 then
     result.stderr[1] = Lua.concat(stderr)
   end
-  Px.close(fd1)
-  Px.close(fd2)
+  Punistd.close(fd1)
+  Punistd.close(fd2)
   result.pid, result.status, result.code = Px.wait(pid)
   result.bin = args._bin
   if args._return_code then
@@ -355,8 +354,8 @@ function Px.awrite (path, str, mode)
   Px.fsync(fd)
   lock.l_type = Pfcntl.F_UNLCK
   Px.fcntl(fd, Pfcntl.F_SETLK, lock)
-  Px.close(fd)
-  Px.close(tmp)
+  Punistd.close(fd)
+  Punistd.close(tmp)
   return true, Cimicida.strf("Successfully wrote %s", path)
 end
 
