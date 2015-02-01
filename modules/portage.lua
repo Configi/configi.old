@@ -17,7 +17,8 @@ local Lc = require"cimicida"
 local Pstat = require"posix.sys.stat"
 local Pdirent = require"posix.dirent"
 local portage = {}
-_ENV = nil
+local ENV = {}
+_ENV = ENV
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)

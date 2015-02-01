@@ -10,7 +10,8 @@ local Configi = require"configi"
 local Px = require"px"
 local Cmd = Px.cmd
 local sysvinit = {}
-_ENV = nil
+local ENV = {}
+_ENV = ENV
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)

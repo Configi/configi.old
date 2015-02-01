@@ -25,7 +25,8 @@ local Pstat = require"posix.sys.stat"
 local Px = require"px"
 local Cmd = Px.cmd
 local textfile = {}
-_ENV = nil
+local ENV = {}
+_ENV = ENV
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)

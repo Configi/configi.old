@@ -11,7 +11,8 @@ local Px = require"px"
 local Cmd = Px.cmd
 local Pstat = require"posix.sys.stat"
 local unarchive = {}
-_ENV = nil
+local ENV = {}
+_ENV = ENV
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)

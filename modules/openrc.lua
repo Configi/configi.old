@@ -13,7 +13,8 @@ local Px = require"px"
 local Lc = require"cimicida"
 local Cmd = Px.cmd
 local openrc = {}
-_ENV = nil
+local ENV = {}
+_ENV = ENV
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)
