@@ -22,8 +22,7 @@ local Px = require"px"
 local Cmd = Px.cmd
 local cron = {}
 local tag = "#" .. Lua.char(9) .. "Configi: " -- hackish anti-match tech.
-local ENV = {}
-_ENV = ENV
+_ENV = nil
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)

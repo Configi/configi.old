@@ -19,8 +19,7 @@ local Punistd = require"posix.unistd"
 local Ppwd = require"posix.pwd"
 local Pgrp = require"posix.grp"
 local file = {}
-local ENV = {}
-_ENV = ENV
+_ENV = nil
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)

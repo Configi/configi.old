@@ -17,8 +17,7 @@ local Ppwd = require"posix.pwd"
 local Factid = require"factid"
 local Px = require"px"
 local authorized_keys = {}
-local ENV = {}
-_ENV = ENV
+_ENV = nil
 
 Var.osfamily = Factid.osfamily()
 

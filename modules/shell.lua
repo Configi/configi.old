@@ -14,8 +14,7 @@ local Lc = require"cimicida"
 local Px = require"px"
 local Pstat = require"posix.sys.stat"
 local shell = {}
-local ENV = {}
-_ENV = ENV
+_ENV = nil
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)

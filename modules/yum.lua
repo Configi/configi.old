@@ -10,8 +10,7 @@ local Px = require"px"
 local Cmd = Px.cmd
 local Lc = require"cimicida"
 local yum = {}
-local ENV = {}
-_ENV = ENV
+_ENV = nil
 
 Cmd.yum = function (a)
   a[1], a[2] = {}, {}

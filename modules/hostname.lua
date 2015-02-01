@@ -8,8 +8,7 @@ local Configi = require"configi"
 local Fact = require"factid"
 local Cmd = require"px".cmd
 local hostname = {}
-local ENV = {}
-_ENV = ENV
+_ENV = nil
 
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)
