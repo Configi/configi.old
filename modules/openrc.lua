@@ -43,7 +43,7 @@ function openrc.started (S)
   end
   local start =
     F.run(Cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "start", _return_code = true })
-  return F.result((start == 0), P.service)
+  return F.result(P.service, (start == 0))
 end
 
 --- Stop a service.
@@ -65,7 +65,7 @@ function openrc.stopped (S)
     return F.skip(P.service)
   end
   local stop = F.run(Cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "stop", _return_code = true })
-  return F.result((stop == 0), P.service)
+  return F.result(P.service, (stop == 0))
 end
 
 --- Restart a service.
@@ -82,7 +82,7 @@ function openrc.restart (S)
   local code, _, test =
     F.run(Cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "restart", _return_code = true })
   if test or (code == 0) then
-    return F.result(true, P.service)
+    return F.result(P.service, true)
   end
 end
 
@@ -100,7 +100,7 @@ function openrc.reload (S)
   local code, _, test =
     F.run(Cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "reload", _return_code = true })
   if test or (code == 0) then
-    return F.result(true, P.service)
+    return F.result(P.service, true)
   end
 end
 
@@ -129,7 +129,7 @@ function openrc.add (S)
   end
   code, _, test =
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "add", P.service, P.runlevel, _return_code = true })
-  return F.result((test or (code == 0)), P.service)
+  return F.result(P.service, (test or (code == 0)))
 end
 
 --- Remove a service from a runlevel.
@@ -158,7 +158,7 @@ function openrc.delete (S)
   end
   code, _, test =
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "del", P.service, P.runlevel, _return_code = true })
-  return F.result((test or (code == 0)), P.service)
+  return F.result(P.service, (test or (code == 0)))
 end
 
 openrc.present = openrc.started

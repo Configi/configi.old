@@ -42,7 +42,7 @@ function sha256.verify (S)
   }
   local F, P, R = main(S, M, G)
   if not Pstat.stat(P.path) then
-    return F.result(false, P.path, G.missing)
+    return F.result(P.path, false, G.missing)
   end
   local S = sha2.new256()
   for f in Lua.lines(P.path, 2^12) do
@@ -51,7 +51,7 @@ function sha256.verify (S)
   if S:close() ==  P.hash then
     return F.skip(P.path)
   else
-    return F.result(false, P.path)
+    return F.result(P.path, false)
   end
 end
 

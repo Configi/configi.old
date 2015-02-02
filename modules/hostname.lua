@@ -33,7 +33,7 @@ function hostname.set (S)
   if P.hostname == Fact.hostname() then
     return F.skip(P.hostname)
   end
-  return F.result(F.run(Cmd.hostname{ P.hostname }), P.hostname)
+  return F.result(P.hostname, F.run(Cmd.hostname{ P.hostname }))
 end
 
 return hostname

@@ -58,7 +58,7 @@ function unarchive.unpack (S)
   elseif Func.extension(P.src) == "rar" then
     code = F.run(Cmd.unrar, { "x", P.src, "-inul", P.dest, _return_code = true })
   end
-  return F.result((code == 0), P.src)
+  return F.result(P.src, (code == 0))
 end
 
 unarchive.unzip = unarchive.unpack

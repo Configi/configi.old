@@ -58,10 +58,10 @@ local write = function (F, P, R)
         F.msg(P.path, "Showing changes", 0, 0, Lc.strf("Diff:%s%s%s", "\n\n", Lua.concat(dtbl, "\n"), "\n"))
       end
     else
-      return F.result(false, P.path)
+      return F.result(P.path, false)
     end
   end
-  return F.result(Px.awrite(P.path, P._input, P.mode), P.path)
+  return F.result(P.path, Px.awrite(P.path, P._input, P.mode))
 end
 
 --- Render a textfile.
@@ -92,11 +92,11 @@ function textfile.render (S)
   P.mode = Lua.tonumber(P.mode, 8)
   local ti = F.open(P.src)
   if not ti then
-    return F.result(false, P.src, G.missingsrc)
+    return F.result(P.src, false, G.missingsrc)
   end
   local lua = F.open(P.lua)
   if not lua then
-    return F.result(false, P.lua, G.missinglua)
+    return F.result(P.lua, false, G.missinglua)
   end
   local env = { require = Lua.require }
   local tbl
@@ -105,7 +105,7 @@ function textfile.render (S)
     chunk()
     tbl = env[P.table]
   else
-    return F.result(false, P.src, err)
+    return F.result(P.src, false, err)
   end
   P._input = Lc.sub(ti, tbl)
   if Pstat.stat(P.path) then
@@ -163,7 +163,7 @@ function textfile.insert_line (S)
   end
   local file = Lc.file2tbl(P.path)
   if not file then
-    return F.result(false, P.path, G.missing)
+    return F.result(P.path, false, G.missing)
   end
   P.mode = Pstat.stat(P.path).st_mode
   if P.inserts then
@@ -223,7 +223,7 @@ function textfile.remove_line (S)
   end
   local file = Lc.file2tbl(P.path)
   if not file then
-    return F.result(false, P.path, G.missing)
+    return F.result(P.path, false, G.missing)
   end
   P.mode = Pstat.stat(P.path).st_mode
   if not Lc.tfind(file, pattern, P.plain) then

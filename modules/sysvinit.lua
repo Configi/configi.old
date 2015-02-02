@@ -44,7 +44,7 @@ function sysvinit.started (S)
     return F.skip(P.service)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "start", _ignore_error = true })
-  return F.result(Func.pgrep(P.service), P.service)
+  return F.result(P.service, Func.pgrep(P.service))
 end
 
 --- Stop a service.
@@ -64,7 +64,7 @@ function sysvinit.stopped (S)
     return F.skip(P.service)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "stop", _ignore_error = true })
-  return F.result((Func.pgrep(P.service) == nil), P.service)
+  return F.result(P.service, (Func.pgrep(P.service) == nil))
 end
 
 --- Restart a service.
@@ -85,7 +85,7 @@ function sysvinit.restart (S)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "restart", _ignore_error = true })
   local _, npid = Func.pgrep(P.service)
-  return F.result((pid ~= npid), P.service)
+  return F.result(P.service, (pid ~= npid))
 end
 
 --- Reload a service.
@@ -107,7 +107,7 @@ function sysvinit.reload (S)
   end
   -- Assumed to always succeed
   F.run(Cmd["-/etc/init.d/" .. P.service], { "reload", _ignore_error = true })
-  return F.result(true, P.service)
+  return F.result(P.service, true)
 end
 
 --- Enable a service
@@ -126,7 +126,7 @@ function sysvinit.enabled (S)
     return F.skip(P.service)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "enable", _ignore_error = true })
-  return F.result(F.run(Cmd["-/etc/init.d/" .. P.service], { "enabled"}), P.service)
+  return F.result(P.service, F.run(Cmd["-/etc/init.d/" .. P.service], { "enabled"}))
 end
 
 --- Disable a service.
@@ -147,7 +147,7 @@ function sysvinit.disabled (S)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "disable", _ignore_error = true })
   ok = Cmd["-/etc/init.d/" .. P.service]{ "enabled" }
-  return F.result((not ok), P.service)
+  return F.result(P.service, (not ok))
 end
 
 sysvinit.present = sysvinit.started

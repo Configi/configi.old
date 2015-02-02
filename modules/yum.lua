@@ -70,7 +70,7 @@ function yum.clean (S)
     fail = "yum.clean: Error running `yum clean`."
   }
   local F, P, R = main(S, M, G)
-  return F.result(F.run(Cmd.yum, { command = "clean", package = P.package }), P.package)
+  return F.result(P.package, F.run(Cmd.yum, { command = "clean", package = P.package }))
 end
 
 --- Install a package via the Yum package manager.
@@ -109,17 +109,17 @@ function yum.present (S)
     elseif P.update == true then
       command = "update"
     end
-    return F.result(F.run(Cmd.yum, { _env = env, assumeyes = true, command = command, config = P.config,
+    return F.result(P.package, F.run(Cmd.yum, { _env = env, assumeyes = true, command = command, config = P.config,
                         nogpgcheck = P.nogpgcheck, security = P.security,
-                        bugfix = P.bugfix, package = P.package }), P.package)
+                        bugfix = P.bugfix, package = P.package }))
   end
   -- Install mode
   if Func.found(P.package) then
     return F.skip(P.package)
   end
-  return F.result(F.run(Cmd.yum, { env = env, assumeyes = true, command = "install", config = P.config,
+  return F.result(P.package, F.run(Cmd.yum, { env = env, assumeyes = true, command = "install", config = P.config,
                       nogpgcheck = P.nogpgcheck, security = P.security,
-                      bugfix = P.bugfix, package = P.package }), P.package)
+                      bugfix = P.bugfix, package = P.package }))
   end
 
 --- Remove a package via the Yum package manager.
@@ -138,7 +138,7 @@ function yum.absent (S)
   if not Func.found(P.package) then
     F.skip(P.package)
   end
-  return F.result(F.run(Cmd.yum, { assumeyes = true, command = "erase", package = P.package }), P.package)
+  return F.result(P.package, F.run(Cmd.yum, { assumeyes = true, command = "erase", package = P.package }))
 end
 
 yum.installed = yum.present

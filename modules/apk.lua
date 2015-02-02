@@ -49,7 +49,7 @@ function apk.present (S)
   end
   local args = { "add", "--no-progress", "--quiet", P.package }
   Lc.insertif(P.update_cache, args, 2, "--update-cache")
-  return F.result(F.run(Cmd["/sbin/apk"], args), P.package)
+  return F.result(P.package, F.run(Cmd["/sbin/apk"], args))
 end
 
 --- Remove a package
@@ -66,7 +66,7 @@ function apk.absent (S)
   if not Func.found(P.package) then
     return F.skip(P.package)
   end
-  return F.result(F.run(Cmd["/sbin/apk"], { "del", "--no-progress", "--quiet", P.package }), P.package)
+  return F.result(P.package, F.run(Cmd["/sbin/apk"], { "del", "--no-progress", "--quiet", P.package }))
 end
 
 apk.installed = apk.present

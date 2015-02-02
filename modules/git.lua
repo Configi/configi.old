@@ -61,13 +61,13 @@ function git.clone (S)
     local dir, res = Cmd.mkdir{ "-p", P.path }
     local err = Lc.exitstr(res.bin, res.status, res.bin)
     if not dir then
-      return F.result(false, P.path, err)
+      return F.result(P.path, false, err)
     end
   elseif ret == false then
-    return F.result(false, P.path, "Directory not empty")
+    return F.result(P.path, false, "Directory not empty")
   end
   local args = { "clone", P.repository, P.path }
-  return F.result(F.run(Cmd["/usr/bin/git"], args), P.repository)
+  return F.result(P.repository, F.run(Cmd["/usr/bin/git"], args))
 end
 
 --- Run `git pull` for a repository.
@@ -89,7 +89,7 @@ function git.pull (S)
     return F.skip(P.path) -- piggyback on skip()
   end
   local args = { _cwd = P.path, "pull" }
-  return F.result(F.run(Cmd["/usr/bin/git"], args), P.path)
+  return F.result(P.path, F.run(Cmd["/usr/bin/git"], args))
 end
 
 git.cloned = git.clone

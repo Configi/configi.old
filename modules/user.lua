@@ -117,7 +117,7 @@ function user.present (S)
     Lc.insertif(P.user_group, 1, "-U")
     ret = F.run(Cmd.adduser, args)
   end
-  return F.result(ret, P.login)
+  return F.result(P.login, ret)
 end
 
 --- Remove a system user account.
@@ -147,7 +147,7 @@ function user.absent (S)
   else
     ret = F.run(Cmd.deluser, args)
   end
-  return F.result(ret, P.login)
+  return F.result(P.login, ret)
 end
 
 user.remove = user.absent

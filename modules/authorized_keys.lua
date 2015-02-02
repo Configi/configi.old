@@ -109,7 +109,7 @@ function authorized_keys.present (S)
   local file = Func.keyfile(P)
   if not file then
     F.msg("authorized_keys file", G.missing_fail, false)
-    return F.result(false, "authorized_keys file")
+    return F.result(item, false)
   end
   if Func.found(P) then
     return F.skip(item)
@@ -123,7 +123,7 @@ function authorized_keys.present (S)
     tfile[#tfile + 1] = Lc.strf("%s %s %s", P["type"], P.key, id)
   end
   tfile[#tfile] = tfile[#tfile] .. "\n"
-  return F.result(F.run(Px.awrite, file, Lua.concat(tfile), 384), item)
+  return F.result(item, F.run(Px.awrite, file, Lua.concat(tfile), 384))
 end
 
 --- Remove key from a user's authorized_keys file.
@@ -153,7 +153,7 @@ function authorized_keys.absent (S)
     return F.skip(item)
   end
   local tfile = Lc.filtertval(Lc.file2tbl(file), P.key, true)
-  return F.result(F.run(Px.awrite, file, Lua.concat(tfile), 384), item)
+  return F.result(item, F.run(Px.awrite, file, Lua.concat(tfile), 384))
 end
 
 return authorized_keys

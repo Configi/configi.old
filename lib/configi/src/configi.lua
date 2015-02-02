@@ -353,7 +353,7 @@ function Lib.finish (C)
     C.functions.run = functime -- functime() is used when debug=true
   end
   C.functions.msg = msg -- Assign msg to F.msg()
-  C.functions.result = function (test, item, alt)
+  C.functions.result = function (item, test, alt)
     local flag = false
     if test then
       flag = true

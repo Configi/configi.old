@@ -58,7 +58,7 @@ function opkg.present (S)
   end
   -- Update mode
   if P.update == true then
-     return F.result(F.run(Cmd.opkg, { _env = env, "update", P.package}), P.package)
+     return F.result(P.package, F.run(Cmd.opkg, { _env = env, "update", P.package}))
   end
   -- Install mode
   if Func.found(P.package) then
@@ -71,7 +71,7 @@ function opkg.present (S)
   Lc.insertif(P.force_remove, args, 1, "--force-remove")
   Lc.insertif(P.force_maintainer, args, 1, "--force-maintainer")
   Lc.insertif(P.nodeps, args, 1, "--nodeps")
-  return F.result(F.run(Cmd.opkg, args), P.package)
+  return F.result(P.package, F.run(Cmd.opkg, args))
 end
 
 --- Uninstall a package.
@@ -101,7 +101,7 @@ function opkg.absent (S)
   Lc.insertif(P.force_remove, args, 1, "--force-remove")
   Lc.insertif(P.autoremove, args, 1, "--autoremove")
   Lc.insertif(P.force_removal_of_dependent_packages, args, 1, "--force--removal-of-dependent-packages")
-  return F.result(F.run(Cmd.opkg, args), P.package)
+  return F.result(P.package, F.run(Cmd.opkg, args))
 end
 
 opkg.installed = opkg.present

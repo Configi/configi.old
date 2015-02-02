@@ -112,7 +112,7 @@ function shell.command (S)
     args[2] = true
   end
   local code = F.run(Px.qexec, args)
-  return F.result((code == 0), P.string)
+  return F.result(P.string, (code == 0))
 end
 
 --- Run a script or command via os.execute.
@@ -135,12 +135,12 @@ function shell.system (S)
   local F, P, R = main(S, M, G)
   local script = Lc.fopen(P.string)
   if not script then
-    return F.result(false, P.string, "shell.system: script not found")
+    return F.result(P.string, false, "shell.system: script not found")
   end
   if Func.rc(F, P) then
     return F.skip(P.string)
   end
-  return F.result(F.run(Lc.execute, script), P.string)
+  return F.result(P.string, F.run(Lc.execute, script))
 end
 
 --- Run a command via io.popen.
@@ -197,7 +197,7 @@ function shell.popen (S)
   else
     ok = res
   end
-  return F.result(ok, P.string)
+  return F.result(P.string, ok)
 end
 
 --- Run a command via Px.exec which can expect strings from STDIN, STDOUT or STDERR
@@ -277,7 +277,7 @@ function shell.popen3 (S)
   else
     ok = res
   end
-  return F.result(ok, P.string)
+  return F.result(P.string, ok)
 end
 
 shell.script = shell.system

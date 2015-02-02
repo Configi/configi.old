@@ -35,7 +35,7 @@ function systemd.started (S)
   if code == 0 then
     return F.skip(P.service)
   end
-  return F.result(F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "start", P.service }), P.service)
+  return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "start", P.service }))
 end
 
 --- Stop a service.
@@ -55,7 +55,7 @@ function systemd.stopped (S)
   if code ~= 0 then
     return F.skip(P.service)
   end
-  return F.result(F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "stop", P.service}), P.service)
+  return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "stop", P.service}))
 end
 
 --- Restart a service.
@@ -75,7 +75,7 @@ function systemd.restart (S)
   if code ~= 0 then
     return F.skip(P.service)
   end
-  return F.result(F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "restart", P.service }), P.service)
+  return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "restart", P.service }))
 end
 
 --- Reload a service.
@@ -94,7 +94,7 @@ function systemd.reload (S)
   if code ~= 0 then
     return F.skip(P.service)
   end
-  return F.result(F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "reload", P.service }), P.service)
+  return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "reload", P.service }))
 end
 
 --- Enable a service.
@@ -113,7 +113,7 @@ function systemd.enabled (S)
   if code == 0 then
     return F.skip(P.service)
   end
-  return F.result(F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "enable", P.service}), P.service)
+  return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "enable", P.service}))
 end
 
 --- Disable a service.
@@ -132,7 +132,7 @@ function systemd.disabled (S)
   if code ~= 0 then
     return F.skip(P.service)
   end
-  return F.result(F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "disable", P.service}), P.service)
+  return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "disable", P.service}))
 end
 
 systemd.present = systemd.started

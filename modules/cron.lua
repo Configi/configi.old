@@ -128,7 +128,7 @@ function cron.present (S)
   jobs[#jobs + 1] = P.job
   jobs = Lua.concat(jobs, "\n") -- tostring(jobs)
   jobs = jobs .. "\n" -- vixie-cron needs a blank line at the end. Complains about a premature EOF.
-  return F.result(F.run(Cmd["crontab"], { _stdin = jobs, "-u", P.user, "-" }), P.name)
+  return F.result(P.name, F.run(Cmd["crontab"], { _stdin = jobs, "-u", P.user, "-" }))
 end
 
 --- Remove a job from a user's crontab.
@@ -158,7 +158,7 @@ function cron.absent (S)
   P.job = Func.genjob(P)
   jobs = Lua.concat(Func.remove(jobs, Lc.strf("%s%s", tag, P.name)), "\n")
   jobs = jobs .. "\n"
-  return F.result(F.run(Cmd["crontab"], { _stdin = jobs, "-u", P.user, "-"}), P.name)
+  return F.result(P.name, F.run(Cmd["crontab"], { _stdin = jobs, "-u", P.user, "-"}))
 end
 
 return cron

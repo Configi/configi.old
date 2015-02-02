@@ -119,7 +119,7 @@ function portage.present (S)
     if F.run(Cmd["/usr/bin/emerge"], { "--sync" }) then
       F.msg("sync", "Sync finished", true)
     else
-      return F.result(false, "sync", "Sync failed")
+      return F.result("sync", false, "Sync failed")
     end
   end
   if Func.found(P) then
@@ -138,7 +138,7 @@ function portage.present (S)
     Lua.insert(args, 3, "--auto-unmask-write")
     Lua.insert(args, 3, "--auto-unmask")
   end
-  return F.result(F.run(Cmd["/usr/bin/emerge"], args), atom)
+  return F.result(atom, F.run(Cmd["/usr/bin/emerge"], args))
 end
 
 --- Remove package atom.
@@ -164,7 +164,7 @@ function portage.absent (S)
   local atom = Lc.strf("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
   local args = { _env = env, "--quiet", "-C", atom }
   Lc.insertif(P.depclean, args, 2, "--depclean")
-  return F.result(F.run(Cmd["/usr/bin/emerge"], args), atom)
+  return F.result(atom, F.run(Cmd["/usr/bin/emerge"], args))
 end
 
 portage.installed = portage.present
