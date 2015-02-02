@@ -1,5 +1,30 @@
 Configi
 
+CHANGES with 0.9.6
+    * tests: Equality tests are reversed.
+    * makefile: Added make arguments for turning on AddressSanitizer.
+    * configi: For uniformity, swap the 1st and 2nd arguments of F.result().
+    * modules: Make use of the new F.result() capability.
+    * configi: Allow alternate messages via F.result calls.
+    * sha256: Introduce new Configi module.
+    * sha2: Introduce sha2 Lua module.
+    * makefile: Prefix the static library name of Configi modules.
+    * px: close(2) should not be retried ever.
+    * Removed Lustache dependency.
+    * makefile: Do not show calls to printf.
+    * modules: Use the G table for messages.
+    * px: Introduce fwrite().
+    * cfg: Set the OOM score when running in daemon mode.
+    * configi: Use a function for logging.
+    * makefile: Add DEBUG and STATIC make arguments.
+    * tests: Get rid of calls to diff(diffutils).
+    * crc32: Introduce crc32lua Lua module.
+    * cimicida: A bit more robust version of sub().
+    * tests: Update to accomodate the recent to px.exec, px.qexec, cimicida.popen, cimicida.execute change.
+    * modules: Update run() to accomodate the recent to px.exec, px.qexec change.
+    * cimicida.popen, cimicida.execute: Compatibility change. Output is now similar to px.exec, px.qexec.
+    * px.exec, px.qexec: Change the output to bool, tbl.
+    * module.portage: Test for a valid directory before traversing it.
 CHANGES with 0.9.5
     * Fixed bugs in the file module. owner, group and mode should be declared when using attrib()
 CHANGES with 0.9.4
