@@ -24,6 +24,9 @@
 #ifdef lib_crc32
   int luaopen_crc32 (lua_State *L);
 #endif
+#ifdef lib_sha2
+  int luaopen_sha2 (lua_State *L);
+#endif
 #ifdef lib_linotify
   int luaopen_inotify (lua_State *L);
 #endif
@@ -112,6 +115,9 @@ int luaopen_module_apk(lua_State *L);
 #ifdef module_git
 int luaopen_module_git(lua_State *L);
 #endif
+#ifdef module_sha256
+int luaopen_module_sha256(lua_State *L);
+#endif
 
 /*
 ** these libs are loaded by lua.c and are readily available to any Lua
@@ -150,6 +156,9 @@ static const luaL_Reg preloadedlibs[] = {
 #endif
 #ifdef lib_crc32
   {"crc32", luaopen_crc32},
+#endif
+#ifdef lib_sha2
+  {"sha2", luaopen_sha2},
 #endif
 #ifdef lib_linotify
   {"inotify", luaopen_inotify},
@@ -241,6 +250,9 @@ static const luaL_Reg preloadedlibs[] = {
 #endif
 #ifdef module_git
   {"module.git", luaopen_module_git},
+#endif
+#ifdef module_sha256
+  {"module.sha256", luaopen_module_sha256},
 #endif
 #if defined(LUA_COMPAT_BITLIB)
   {"bit32", luaopen_bit32},

@@ -2,8 +2,8 @@
 .SUFFIXES:
 MAKEFLAGS= --silent
 LIB= cimicida px configi factid
-VENDOR= luaposix linotify crc32
-MODULES= unarchive authorized_keys cron file hostname shell textfile user git \
+VENDOR= luaposix linotify crc32 sha2
+MODULES= unarchive authorized_keys cron file hostname shell textfile user git sha256 \
 	portage openrc \
 	yum systemd \
 	apk opkg sysvinit
