@@ -61,16 +61,10 @@ function git.clone (S)
     local dir, res = Cmd.mkdir{ "-p", P.path }
     local err = Lc.exitstr(res.bin, res.status, res.bin)
     if not dir then
-      F.msg(P.path, err, false)
-      R.notify_failed = P.notify_failed
-      R.failed = true
-      return R
+      return F.result(false, P.path, err)
     end
   elseif ret == false then
-    F.msg(P.path, "Directory not empty", false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-    return R
+    return F.result(false, P.path, "Directory not empty")
   end
   local args = { "clone", P.repository, P.path }
   return F.result(F.run(Cmd["/usr/bin/git"], args), P.repository)

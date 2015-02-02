@@ -42,22 +42,15 @@ local owner = function (F, P, R)
   local u = Ppwd.getpwuid(stat.st_uid)
   local uid = Lc.strf("%s(%s)", u.pw_uid, u.pw_name)
   if P.owner == u.pw_name or P.owner == Lua.tostring(u.pw_uid) then
-    F.msg(P.path, Str.file_owner_skip .. uid .. ".", nil)
-    R.notify_kept = P.notify_kept
-    return R
+    return F.result(nil, P.path, Str.file_owner_skip .. uid .. ".")
   end
   local args = { "-h", P.owner, P.path }
   Lc.insertif(P.recurse, args, 2, "-R")
   if F.run(Cmd.chown, args) then
-    F.msg(P.path, Str.file_owner_ok, true)
-    R.notify = P.notify
-    R.repaired = true
+    return F.result(true, P.path, Str.file_owner_ok)
   else
-    F.msg(P.path, Str.file_owner_fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
+    return F.result(false, P.path, Str.file_owner_fail)
   end
-  return R
 end
 
 local group = function (F, P, R)
@@ -70,22 +63,15 @@ local group = function (F, P, R)
   local g = Pgrp.getgrgid(stat.st_gid)
   local cg = Lc.strf("%s(%s)", g.gr_gid, g.gr_name)
   if P.group == g.gr_name or P.group == Lua.tostring(g.gr_gid) then
-    F.msg(P.path, Str.file_group_skip .. cg .. ".", nil)
-    R.notify_kept = P.notify_kept
-    return R
+    return F.result(nil, P.path, Str.file_group_skip .. cg .. ".")
   end
   local args = { "-h", ":" .. P.group, P.path }
   Lc.insertif(P.recurse, args, 2, "-R")
   if F.run(Cmd.chown, args) then
-    F.msg(P.path, Str.file_group_ok, true)
-    R.notify = P.notify
-    R.repaired = true
+    return F.result(true, P.path, Str.file_group_ok)
   else
-    F.msg(P.path, Str.file_group_fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
+    return F.result(false, P.path, Str.file_group_fail)
   end
-  return R
 end
 
 local mode = function (F, P, R)
@@ -97,22 +83,15 @@ local mode = function (F, P, R)
   local stat = Pstat.stat(P.path)
   local mode = Lua.sub(Lua.tostring(Lua.format("%o", stat.st_mode)), -3, -1)
   if mode == Lua.sub(P.mode, -3, -1) then
-    F.msg(P.path, Str.file_mode_skip, nil)
-    R.notify_kept = P.notify_kept
-    return R
+    return F.result(nil, P.path, Str.file_mode_skip)
   end
   local args = { P.mode, P.path }
   Lc.insertif(P.recurse, args, 1, "-R")
   if F.run(Cmd.chmod, args) then
-    F.msg(P.path, Str.file_mode_ok, true)
-    R.notify = P.notify
-    R.repaired = true
+    return F.result(true, P.path, Str.file_mode_ok)
   else
-    F.msg(P.path, Str.file_mode_fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
+    return F.result(false, P.path, Str.file_mode_fail)
   end
-  return R
 end
 
 local attrib = function (F, P, R)
@@ -149,10 +128,7 @@ function file.attributes (S)
   local F, P, R = main(S, M)
   if not P.test then
     if not Pstat.stat(P.path) then
-      F.msg(P.path, "Missing path", false)
-      R.notify_failed = P.notify_failed
-      R.failed = true
-      return R
+      return F.result(false, P.path, "Missing path.")
     end
   end
   return attrib(F, P, R)
@@ -185,11 +161,8 @@ function file.link (S)
     F.msg(P.path, G.ok, true)
     return attrib(F, P, R)
   else
-    F.msg(P.path, G.fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
+    return F.result(false, P.path)
   end
-  return R
 end
 
 --- Create a hard link.
@@ -211,10 +184,7 @@ function file.hard (S)
   local source = Pstat.stat(P.src)
   local link = Pstat.stat(P.path) or nil
   if not source then
-    F.msg(P.path, Lc.strf(" '%s' is missing", source), false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-    return R
+    return F.result(false, P.path, Lc.strf(" '%s' is missing", source))
   end
   if source and link and (source.st_ino == link.st_ino) then
     F.msg(P.path, G.skip, nil)
@@ -226,11 +196,8 @@ function file.hard (S)
     F.msg(P.path, G.ok, true)
     return attrib(F, P, R)
   else
-    F.msg(P.path, G.fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
+    return F.result(false, P.path)
   end
-  return R
 end
 
 --- Create a directory.
@@ -267,11 +234,8 @@ function file.directory (S)
     F.msg(P.path, G.ok, true)
     return attrib(F, P, R)
   else
-    F.msg(P.path, G.fail, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
+    return F.result(false, P.path)
   end
-  return R
 end
 
 --- Touch a path.
@@ -293,10 +257,7 @@ function file.touch (S)
     F.msg(P.path, G.ok, true)
     return attrib(F, P, R)
   else
-    F.msg(P.path, G.failed, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-    return R
+    return F.result(false, P.path)
   end
 end
 
@@ -350,9 +311,6 @@ function file.copy (S)
   Lc.insertif(P.recurse, args, 2, "-R")
   Lc.insertif(P.force, args, 2, "-f")
   if F.run(Cmd.cp, args) then
-    F.msg(P.path, G.ok, true)
-    R.notify = P.notify
-    R.repaired = true
     return F.result(true, P.path)
   else
     F.run(Cmd.rm, { "-r", "-f", P.path }) -- clean up incomplete copy

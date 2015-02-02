@@ -119,10 +119,7 @@ function portage.present (S)
     if F.run(Cmd["/usr/bin/emerge"], { "--sync" }) then
       F.msg("sync", "Sync finished", true)
     else
-      F.msg("sync", "Sync failed", false)
-      R.notify_failed = P.notify_failed
-      R.failed = true
-      return R
+      return F.result(false, "sync", "Sync failed")
     end
   end
   if Func.found(P) then

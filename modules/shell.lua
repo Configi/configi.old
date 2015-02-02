@@ -135,10 +135,7 @@ function shell.system (S)
   local F, P, R = main(S, M, G)
   local script = Lc.fopen(P.string)
   if not script then
-    F.msg(P.string, "shell.system: script not found", false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-    return R
+    return F.result(false, P.string, "shell.system: script not found")
   end
   if Func.rc(F, P) then
     return F.skip(P.string)
@@ -179,7 +176,7 @@ function shell.popen (S)
     str = P.string
   end
   str = F.run(Lc.popen, str, P.cwd)
-  local res, ok
+  local res, ok = false, false
   if P.expects then
     if P.test then
       F.msg(P.expects, Str.shell_popenexpect_ok, true)

@@ -69,7 +69,6 @@ function user.present (S)
         F.msg(P.login, G.mod_shell, true, 0, Lc.strf("From: %s To: %s", user.shell, P.shell))
         R.notify = P.notify
         R.repaired = true
-        R.changed = true
       end
     end
     if P.uid and Lua.tostring(user.pw_uid) ~= P.uid then
@@ -77,7 +76,6 @@ function user.present (S)
         F.msg(P.login, G.mod_uid, true, 0, Lc.strf("From: %s To: %s", user.uid, P.uid))
         R.notify = P.notify
         R.repaired = true
-        R.changed = true
       end
     end
     if P.gid and Lua.tostring(user.pw_gid) ~= P.gid then
@@ -85,7 +83,6 @@ function user.present (S)
         F.msg(P.login, G.mod_gid, true, 0, Lc.strf("From: %s To: %s", user.gid, P.gid))
         R.notify = P.notify
         R.repaired = true
-        R.changed = true
       end
     end
     if P.home and user.dir ~= P.home then
@@ -93,7 +90,6 @@ function user.present (S)
         F.msg(P.login, G.mod_home, true, 0, Lc.strf("From: %s To: %s", user.dir, P.home))
         R.notify = P.notify
         R.repaired = true
-        R.changed = true
       end
     end
     return R

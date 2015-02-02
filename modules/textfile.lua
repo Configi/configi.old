@@ -79,32 +79,24 @@ end
 --   data "/etc/something/config.lua"
 -- ]]
 function textfile.render (S)
-  local Str = {
-    textfile_render_missingsrc = "textfile.render: Can't access or missing source file.",
-    textfile_render_missinglua = "textfile.render: Can't access or missing lua file."
-  }
   local M = { "src", "lua", "table", "mode", "diff" }
   local G = {
     ok = "textfile.render: Successfully rendered textfile.",
     skip = "textfile.render: No difference detected, not overwriting existing destination.",
-    fail = "textfile.render: Error rendering textfile."
+    fail = "textfile.render: Error rendering textfile.",
+    missingsrc = "textfile.render: Can't access or missing source file.",
+    missinglua = "textfile.render: Can't access or missing lua file."
   }
   local F, P, R = main(S, M, G)
   P.mode = P.mode or "0600"
   P.mode = Lua.tonumber(P.mode, 8)
   local ti = F.open(P.src)
   if not ti then
-    F.msg(P.src, Str.textfile_render_missingsrc, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-    return R
+    return F.result(false, P.src, G.missingsrc)
   end
   local lua = F.open(P.lua)
   if not lua then
-    F.msg(P.lua, Str.textfile_render_missinglua, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-    return R
+    return F.result(false, P.lua, G.missinglua)
   end
   local env = { require = Lua.require }
   local tbl
@@ -113,10 +105,7 @@ function textfile.render (S)
     chunk()
     tbl = env[P.table]
   else
-    F.msg(P.src, err, false)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-    return R
+    return F.result(false, P.src, err)
   end
   P._input = Lc.sub(ti, tbl)
   if Pstat.stat(P.path) then
@@ -153,14 +142,12 @@ end
 --   plain "true"
 -- ]]
 function textfile.insert_line (S)
-  local Str = {
-    textfile_missing = "textfile: Can't access or missing file."
-  }
   local M = { "diff", "line", "plain", "pattern", "before", "after", "inserts" }
   local G = {
     ok = "textfile.insert_line: Successfully inserted line.",
     skip = "textfile.insert_line: Insert cancelled, found a matching line.",
-    fail = "textfile.insert_line: Error inserting line."
+    fail = "textfile.insert_line: Error inserting line.",
+    missing = "textfile.insert_line: Can't access or missing file."
   }
   local F, P, R = main(S, M, G)
   P.plain = P.plain or true
@@ -176,10 +163,7 @@ function textfile.insert_line (S)
   end
   local file = Lc.file2tbl(P.path)
   if not file then
-    F.msg(P.path, Str.textfile_missing, false, 0)
-    R.failed = true
-    R.notify_failed = P.notify_failed
-    return R
+    return F.result(false, P.path, G.missing)
   end
   P.mode = Pstat.stat(P.path).st_mode
   if P.inserts then
@@ -226,7 +210,8 @@ function textfile.remove_line (S)
   local G = {
     ok = "textfile.remove_line: Successfully removed line.",
     skip = "textfile.remove_line: Line not found.",
-    fail = "textfile.remove_line: Error removing line."
+    fail = "textfile.remove_line: Error removing line.",
+    missing = "textfile.remove_line: Can't access or missing file."
   }
   local F, P, R = main(S, M, G)
   P.plain = P.plain or true
@@ -238,10 +223,7 @@ function textfile.remove_line (S)
   end
   local file = Lc.file2tbl(P.path)
   if not file then
-    F.msg(P.path, Str.textfile_missing, false, 0)
-    R.notify_failed = P.notify_failed
-    R.failed = true
-    return R
+    return F.result(false, P.path, G.missing)
   end
   P.mode = Pstat.stat(P.path).st_mode
   if not Lc.tfind(file, pattern, P.plain) then
