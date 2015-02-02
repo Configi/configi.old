@@ -515,6 +515,12 @@ if Px.binpath("git") then
   T:done(N)
 end
 
+T:start"sha256.verify (modules/sha256.lua)"
+  do
+    T:eq(true, cfg{ "-f", "test/sha256_verify.lua"})
+  end
+T:done(N)
+
 Lc.printf("\n  Summary: \n")
 Lc.printf("    %s Passed\n", N.successes)
 Lc.printf("    %s Failures\n\n", N.failures)
