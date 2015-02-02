@@ -353,18 +353,24 @@ function Lib.finish (C)
     C.functions.run = functime -- functime() is used when debug=true
   end
   C.functions.msg = msg -- Assign msg to F.msg()
-  C.functions.result = function (test, item)
-    local flag
+  C.functions.result = function (test, item, alt)
+    local flag = false
     if test then
       flag = true
-      C.results.repaired = true
       C.results.notify = C.parameters.notify
+      C.results.repaired = true
+    elseif test == nil then
+      flag = nil
+      C.results.notify_kept = C.parameters.notify_kept
     else
-      flag = false
       C.results.notify_failed = C.parameters.notify_failed
       C.results.failed = true
     end
-    msg(item, flag)
+    if Lua.type(alt) == "string" then
+      msg(item, alt, flag)
+    else
+      msg(item, flag)
+    end
     return C.results
   end -- F.result()
   C.functions.skip =  function (item)
