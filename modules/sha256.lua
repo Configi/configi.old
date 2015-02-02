@@ -1,4 +1,4 @@
--- Verify the SHA256 hash of a file.
+--- Verify the SHA256 hash of a file.
 -- @module sha256
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
@@ -24,9 +24,8 @@ local main = function (S, M, G)
 end
 
 --- Check that a given hash matches the actual SHA256 hash of a file.
--- <br />
--- Useful for alerting on changed hashes
--- @alias check
+-- Useful for alerting on changed hashes.
+-- @aliases check
 -- @param path path of file to hash [ALIAS: file] [REQUIRED]
 -- @param hash the 32-byte alphanumeric string to match for [ALIAS: digest,signature] [REQUIRED]
 -- @usage sha256.verify [[
