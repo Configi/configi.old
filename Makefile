@@ -55,6 +55,12 @@ ifeq ($(STATIC), 1)
 LDFLAGS+= -static
 endif
 
+ifeq ($(ASAN), 1)
+CFLAGS := -fsanitize=address -O1 -fno-omit-frame-pointer -g
+nulstring :=
+LDFLAGS := $(nulstring)
+endif
+
 # Linux only for now
 DEFINES+= -DLUA_USE_LINUX
 DLDFLAGS:= -Wl,-E -ldl -lpthread -lm -lcrypt -lrt $(LDFLAGS)
