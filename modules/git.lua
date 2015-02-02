@@ -1,5 +1,5 @@
 -- Ensure that a Git repository is cloned or pull.
--- @moduleg git
+-- @module git
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
