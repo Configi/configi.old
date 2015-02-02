@@ -1,6 +1,6 @@
 CLEAN+= clean_modules
 
-modules/lib%.a: modules/%.o $(LINIT_T)
+modules/libmodule_%.a: modules/%.o $(LINIT_T)
 	$(ECHOT) [AR] $@
 	$(AR) $(ARFLAGS) $@ $< >/dev/null 2>&1
 	$(RANLIB) $@
