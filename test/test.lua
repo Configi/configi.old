@@ -1,5 +1,5 @@
 #!bin/lua
-package.path = "../cwtest/?.lua"
+package.path = "vendor/cwtest/?.lua"
 local Lc, Px, Factid = require"cimicida", require"px", require"factid"
 local Cmd = Px.cmd
 local crc = require"crc32".crc32_string
@@ -266,7 +266,7 @@ if osfamily == "centos" then
   T:start"systemd.stopped (modules/systemd.lua)"
     do
       T:eq(true, cfg{ "-f", "test/systemd_stopped.lua"})
-      T:no(Cmd.pgrep{ "tuned" })
+      T:eq(Cmd.pgrep{ "tuned" }, nil)
     end
   T:done(N)
   T:start"systemd.enabled (modules/systemd.lua)"
