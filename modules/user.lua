@@ -47,9 +47,9 @@ end
 -- ]]
 function user.present (S)
   local G = {
-    ok = "user.present: Successfully created user login.",
-    skip = "user.present: User login exists.",
-    fail = "user.present: Error creating user login.",
+    repaired = "user.present: Successfully created user login.",
+    kept = "user.present: User login exists.",
+    failed = "user.present: Error creating user login.",
     mod_shell = "user.present: Modified shell.",
     mod_home = "user.present: Modified home directory.",
     mod_uid = "user.present: Modified uid.",
@@ -61,7 +61,7 @@ function user.present (S)
   local user = Ppwd.getpwnam(P.login)
   if not (P.shell or P.uid or P.gid or P.home) then
     if user then
-      return F.skip(P.login)
+      return F.kept(P.login)
     end
   elseif user then
     if P.shell and user.pw_shell ~= P.shell then
@@ -131,13 +131,13 @@ end
 function user.absent (S)
   local M = { "remove" }
   local G = {
-    ok = "user.absent: Successfully deleted user login.",
-    skip = "user.absent: User login already absent.",
-    fail = "user.absent: Error deleting user login"
+    repaired = "user.absent: Successfully deleted user login.",
+    kept = "user.absent: User login already absent.",
+    failed = "user.absent: Error deleting user login"
   }
   local F, P, R = main(S, M, G)
   if not Ppwd.getpwnam(P.login) then
-    return F.skip(P.login)
+    return F.kept(P.login)
   end
   local ret
   local args = { P.login }

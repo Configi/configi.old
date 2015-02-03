@@ -106,9 +106,9 @@ end
 function cron.present (S)
   local M = { "minute", "hour", "day", "weekday", "month", "user" }
   local G = {
-    ok = "cron.present: Successfully added Cron job.",
-    skip = "cron.present: Cron job already present.",
-    fail = "cron.present: Error adding Cron job"
+    repaired = "cron.present: Successfully added Cron job.",
+    kept = "cron.present: Cron job already present.",
+    failed = "cron.present: Error adding Cron job"
   }
   local F, P, R = main(S, M, G)
   if P.user == nil then
@@ -118,7 +118,7 @@ function cron.present (S)
   P.job = Func.genjob(P) -- Replace P.job with prepended scheduling info. This is used by Func.listed
   local listed = Func.listed(P)
   if listed == true then
-    return F.skip(P.name)
+    return F.kept(P.name)
   end
   -- Removes jobs[listed] (name) and the unmatching jobs[listed+1] (job)
   if listed then
@@ -143,9 +143,9 @@ end
 function cron.absent (S)
   local M = { "minute", "hour", "day", "weekday", "month", "user" }
   local G = {
-    ok = "cron.absent: Successfully removed Cron job.",
-    skip = "cron.absent: Cron job already absent.",
-    fail = "cron.absent: Error removing Cron job."
+    repaired = "cron.absent: Successfully removed Cron job.",
+    kept = "cron.absent: Cron job already absent.",
+    failed = "cron.absent: Error removing Cron job."
   }
   local F, P, R = main(S, M, G)
   if P.user == nil then
@@ -153,7 +153,7 @@ function cron.absent (S)
   end
   local jobs = Func.list(P)
   if not Lua.next(jobs) or not Func.listed(P) then
-    return F.skip(P.name)
+    return F.kept(P.name)
   end
   P.job = Func.genjob(P)
   jobs = Lua.concat(Func.remove(jobs, Lc.strf("%s%s", tag, P.name)), "\n")

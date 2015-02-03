@@ -31,15 +31,15 @@ end
 -- ]]
 function openrc.started (S)
   local G = {
-    ok = "openrc.started: Successfully started service.",
-    skip = "openrc.started: Service already started.",
-    fail = "openrc.started: Error starting service"
+    repaired = "openrc.started: Successfully started service.",
+    kept = "openrc.started: Service already started.",
+    failed = "openrc.started: Error starting service"
   }
   local F, P, R = main(S, M, G)
   local code, out, test = F.run(Cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
   local pattern = "^%s" .. Lc.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
   if test or ((code ==0) and (Lc.tfind(out.stdout, pattern))) then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   local start =
     F.run(Cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "start", _return_code = true })
@@ -54,15 +54,15 @@ end
 -- ]]
 function openrc.stopped (S)
   local G = {
-    ok = "openrc.stopped: Successfully stopped service.",
-    skip = "openrc.stopped: Service already stopped.",
-    fail = "openrc.stopped: Error stopping service."
+    repaired = "openrc.stopped: Successfully stopped service.",
+    kept = "openrc.stopped: Service already stopped.",
+    failed = "openrc.stopped: Error stopping service."
   }
   local F, P, R = main(S, M, G)
   local code, out, test = F.run(Cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
   local pattern = "^%s" .. Lc.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
   if test or ((code == 0) and not (Lc.tfind(out.stdout, pattern))) then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   local stop = F.run(Cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "stop", _return_code = true })
   return F.result(P.service, (stop == 0))
@@ -75,8 +75,8 @@ end
 -- ]]
 function openrc.restart (S)
   local G = {
-    ok = "openrc.restart: Successfully restarted service.",
-    fail = "openrc.restart: Error restarting service."
+    repaired = "openrc.restart: Successfully restarted service.",
+    failed = "openrc.restart: Error restarting service."
   }
   local F, P, R = main(S, M, G)
   local code, _, test =
@@ -93,8 +93,8 @@ end
 -- ]]
 function openrc.reload (S)
   local G = {
-    ok = "openrc.reload: Successfully reloaded service",
-    fail = "openrc.reload: Error reloading service."
+    repaired = "openrc.reload: Successfully reloaded service",
+    failed = "openrc.reload: Error reloading service."
   }
   local F, P, R = main(S, M, G)
   local code, _, test =
@@ -114,9 +114,9 @@ end
 function openrc.add (S)
   local M = { "runlevel" }
   local G = {
-    ok = "openrc.add: Successfully added service to runlevel.",
-    skip = "openrc.add: Service already in the runlevel.",
-    fail = "openrc.add: Error adding service to runlevel."
+    repaired = "openrc.add: Successfully added service to runlevel.",
+    kept = "openrc.add: Service already in the runlevel.",
+    failed = "openrc.add: Error adding service to runlevel."
   }
   local F, P, R = main(S, M, G)
   P.runlevel = P.runlevel or "default"
@@ -125,7 +125,7 @@ function openrc.add (S)
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
   local pattern = "^%s*" .. Lc.escape_pattern(P.service) .. "%s|%s" .. P.runlevel .. "%s*$"
   if test or ((code == 0) and Lc.tfind(out.stdout, pattern)) then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   code, _, test =
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "add", P.service, P.runlevel, _return_code = true })
@@ -143,9 +143,9 @@ end
 function openrc.delete (S)
   local M = { "runlevel" }
   local G = {
-    ok = "openrc.delete: Successfully deleted service from runlevel.",
-    skip = "openrc.delete: Service already absent from runlevel.",
-    fail = "openrc.delete: Error deleting service from runlevel."
+    repaired = "openrc.delete: Successfully deleted service from runlevel.",
+    kept = "openrc.delete: Service already absent from runlevel.",
+    failed = "openrc.delete: Error deleting service from runlevel."
   }
   local F, P, R = main(S, M, G)
   P.runlevel = P.runlevel or "default"
@@ -154,7 +154,7 @@ function openrc.delete (S)
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
   local pattern = "^%s*" .. Lc.escape_pattern(P.service) .. "%s|%s" .. P.runlevel .. "%s*$"
   if test or ((code == 0) and not (Lc.tfind(out.stdout, pattern))) then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   code, _, test =
     F.run(Cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "del", P.service, P.runlevel, _return_code = true })

@@ -25,13 +25,13 @@ end
 -- ]]
 function hostname.set (S)
   local G = {
-    ok = "hostname.set: Successfully set hostname.",
-    skip = "hostname.set: Hostname already set.",
-    fail = "hostname.set: Error setting hostname.",
+    repaired = "hostname.set: Successfully set hostname.",
+    kept = "hostname.set: Hostname already set.",
+    failed = "hostname.set: Error setting hostname.",
   }
   local F, P, R = main(S, M, G)
   if P.hostname == Fact.hostname() then
-    return F.skip(P.hostname)
+    return F.kept(P.hostname)
   end
   return F.result(P.hostname, F.run(Cmd.hostname{ P.hostname }))
 end

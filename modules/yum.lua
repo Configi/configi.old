@@ -66,8 +66,8 @@ end
 -- ]]
 function yum.clean (S)
   local G = {
-    ok = "yum.clean: Successfully executed `yum clean`.",
-    fail = "yum.clean: Error running `yum clean`."
+    repaired = "yum.clean: Successfully executed `yum clean`.",
+    failed = "yum.clean: Error running `yum clean`."
   }
   local F, P, R = main(S, M, G)
   return F.result(P.package, F.run(Cmd.yum, { command = "clean", package = P.package }))
@@ -93,9 +93,9 @@ end
 function yum.present (S)
   local M =  { "clean_all", "config", "nogpgcheck", "security", "bugfix", "proxy", "update", "update_minimal" }
   local G = {
-    ok = "yum.present: Successfully installed package.",
-    skip = "yum.present: Package already installed.",
-    fail = "yum.present: Error installing package."
+    repaired = "yum.present: Successfully installed package.",
+    kept = "yum.present: Package already installed.",
+    failed = "yum.present: Error installing package."
   }
   local F, P, R = main(S, M, G)
   local env, command
@@ -115,7 +115,7 @@ function yum.present (S)
   end
   -- Install mode
   if Func.found(P.package) then
-    return F.skip(P.package)
+    return F.kept(P.package)
   end
   return F.result(P.package, F.run(Cmd.yum, { env = env, assumeyes = true, command = "install", config = P.config,
                       nogpgcheck = P.nogpgcheck, security = P.security,
@@ -130,13 +130,13 @@ function yum.present (S)
 function yum.absent (S)
   local M = { "config" }
   local G = {
-    ok = "yum.absent: Successfully removed package.",
-    skip = "yum.absent: Package not installed.",
-    fail = "yum.absent: Error removing package."
+    repaired = "yum.absent: Successfully removed package.",
+    kept = "yum.absent: Package not installed.",
+    failed = "yum.absent: Error removing package."
   }
   local F, P, R = main(S, M, G)
   if not Func.found(P.package) then
-    F.skip(P.package)
+    F.kept(P.package)
   end
   return F.result(P.package, F.run(Cmd.yum, { assumeyes = true, command = "erase", package = P.package }))
 end

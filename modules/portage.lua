@@ -106,9 +106,9 @@ end
 function portage.present (S)
   local M = { "deep", "newuse", "nodeps", "noreplace", "oneshot", "onlydeps", "sync", "unmask", "update", "version" }
   local G = {
-    ok = "portage.present: Successfully installed package.",
-    skip = "portage.present: Package already installed.",
-    fail = "portage.present: Error installing package."
+    repaired = "portage.present: Successfully installed package.",
+    kept = "portage.present: Package already installed.",
+    failed = "portage.present: Error installing package."
   }
   local F, P, R = main(S, M, G)
   if P.oneshot == nil then
@@ -123,7 +123,7 @@ function portage.present (S)
     end
   end
   if Func.found(P) then
-    return F.skip(P.atom)
+    return F.kept(P.atom)
   end
   local A = Func.decompose(P)
   local atom = Lc.strf("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
@@ -151,13 +151,13 @@ end
 function portage.absent (S)
   local M = { "depclean" }
   local G = {
-    ok = "portage.absent: Successfully removed package.",
-    skip = "portage.absent: Package not installed.",
-    fail = "portage.absent: Error removing package."
+    repaired = "portage.absent: Successfully removed package.",
+    kept = "portage.absent: Package not installed.",
+    failed = "portage.absent: Error removing package."
   }
   local F, P, R = main(S, M, G)
   if not Func.found(P) then
-    return F.skip(P.atom)
+    return F.kept(P.atom)
   end
   local env = { "CLEAN_DELAY=0", "PATH=/bin:/usr/bin:/sbin:/usr/sbin" } -- PORTAGE_BZIP2_COMMAND needs $PATH
   local A = Func.decompose(P)

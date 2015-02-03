@@ -39,13 +39,13 @@ end
 function apk.present (S)
   local M = { "update_cache" }
   local G = {
-    ok = "apk.present: Successfully installed package.",
-    skip = "apk.present: Package already installed.",
-    fail = "apk.present: Error installing package."
+    repaired = "apk.present: Successfully installed package.",
+    kept = "apk.present: Package already installed.",
+    failed = "apk.present: Error installing package."
   }
   local F, P, R = main(S, M, G)
   if Func.found(P.package) then
-    return F.skip(P.package)
+    return F.kept(P.package)
   end
   local args = { "add", "--no-progress", "--quiet", P.package }
   Lc.insertif(P.update_cache, args, 2, "--update-cache")
@@ -58,13 +58,13 @@ end
 -- @param package name of the package to remove [REQUIRED]
 function apk.absent (S)
   local G = {
-    ok = "apk.absent: Successfully removed package",
-    skip = "apk.absent: Package not installed.",
-    fail = "apk.absent: Error removing package."
+    repaired = "apk.absent: Successfully removed package",
+    kept = "apk.absent: Package not installed.",
+    failed = "apk.absent: Error removing package."
   }
   local F, P, R = main(S, M, G)
   if not Func.found(P.package) then
-    return F.skip(P.package)
+    return F.kept(P.package)
   end
   return F.result(P.package, F.run(Cmd["/sbin/apk"], { "del", "--no-progress", "--quiet", P.package }))
 end

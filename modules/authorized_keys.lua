@@ -96,9 +96,9 @@ end
 function authorized_keys.present (S)
   local M =  { "user", "options", "id", "create" }
   local G = {
-    ok = "authorized_keys.present: Key successfully added.",
-    skip = "authorized_keys.present: Key already present.",
-    fail = "authorized_keys.present: Error adding key.",
+    repaired = "authorized_keys.present: Key successfully added.",
+    kept = "authorized_keys.present: Key already present.",
+    failed = "authorized_keys.present: Error adding key.",
     missing_fail = "authorized_keys.present: authorized_keys file missing."
   }
   local F, P, R = main(S, M, G)
@@ -112,7 +112,7 @@ function authorized_keys.present (S)
     return F.result(item, false)
   end
   if Func.found(P) then
-    return F.skip(item)
+    return F.kept(item)
   end
   -- first remove any matching key
   local tfile = Lc.filtertval(Lc.file2tbl(file), P.key, true)
@@ -141,16 +141,16 @@ end
 function authorized_keys.absent (S)
   local M =  { "user", "options", "id", "create" } -- make it easier to toggle a key
   local G = {
-    ok = "authorized_keys.absent: Key successfully removed.",
-    skip = "authorized_keys.absent: Key already absent.",
-    fail = "authorized_keys.absent: Error removing key."
+    repaired = "authorized_keys.absent: Key successfully removed.",
+    kept = "authorized_keys.absent: Key already absent.",
+    failed = "authorized_keys.absent: Error removing key."
   }
   local F, P, R = main(S, M, G)
   local item = P["type"]  .. " key"
   P.create = "no"
   local file = Func.keyfile(P)
   if not file or not Func.found(P) then
-    return F.skip(item)
+    return F.kept(item)
   end
   local tfile = Lc.filtertval(Lc.file2tbl(file), P.key, true)
   return F.result(item, F.run(Px.awrite, file, Lua.concat(tfile), 384))

@@ -50,7 +50,7 @@ local write = function (F, P, R)
       local res, diff = Cmd["/usr/bin/diff"]{ "-N", "-a", "-u", P.path, temp }
       Lua.remove(temp)
       if res then
-        return F.skip(P.path)
+        return F.kept(P.path)
       else
         for n = 1, #diff.stdout do
           dtbl[n] = Lua.match(diff.stdout[n], "[%g%s]+") or ""
@@ -81,9 +81,9 @@ end
 function textfile.render (S)
   local M = { "src", "lua", "table", "mode", "diff" }
   local G = {
-    ok = "textfile.render: Successfully rendered textfile.",
-    skip = "textfile.render: No difference detected, not overwriting existing destination.",
-    fail = "textfile.render: Error rendering textfile.",
+    repaired = "textfile.render: Successfully rendered textfile.",
+    kept = "textfile.render: No difference detected, not overwriting existing destination.",
+    failed = "textfile.render: Error rendering textfile.",
     missingsrc = "textfile.render: Can't access or missing source file.",
     missinglua = "textfile.render: Can't access or missing lua file."
   }
@@ -119,7 +119,7 @@ function textfile.render (S)
         end
       end
       if i == CRC.crc32_string(P._input) then
-        return F.skip(P.path)
+        return F.kept(P.path)
       end
     end
   end
@@ -144,9 +144,9 @@ end
 function textfile.insert_line (S)
   local M = { "diff", "line", "plain", "pattern", "before", "after", "inserts" }
   local G = {
-    ok = "textfile.insert_line: Successfully inserted line.",
-    skip = "textfile.insert_line: Insert cancelled, found a matching line.",
-    fail = "textfile.insert_line: Error inserting line.",
+    repaired = "textfile.insert_line: Successfully inserted line.",
+    kept = "textfile.insert_line: Insert cancelled, found a matching line.",
+    failed = "textfile.insert_line: Error inserting line.",
     missing = "textfile.insert_line: Can't access or missing file."
   }
   local F, P, R = main(S, M, G)
@@ -168,12 +168,12 @@ function textfile.insert_line (S)
   P.mode = Pstat.stat(P.path).st_mode
   if P.inserts then
     if Lc.tfind(file, inserts, P.plain) then
-      return F.skip(P.path)
+      return F.kept(P.path)
     end
   end
   if not P.pattern then
     if Lc.tfind(file, line, P.plain) then
-      return F.skip(P.path)
+      return F.kept(P.path)
     else
       file[#file + 1] = P.line .. "\n"
     end
@@ -208,9 +208,9 @@ end
 function textfile.remove_line (S)
   local M = { "pattern", "plain", "diff" }
   local G = {
-    ok = "textfile.remove_line: Successfully removed line.",
-    skip = "textfile.remove_line: Line not found.",
-    fail = "textfile.remove_line: Error removing line.",
+    repaired = "textfile.remove_line: Successfully removed line.",
+    kept = "textfile.remove_line: Line not found.",
+    failed = "textfile.remove_line: Error removing line.",
     missing = "textfile.remove_line: Can't access or missing file."
   }
   local F, P, R = main(S, M, G)
@@ -227,7 +227,7 @@ function textfile.remove_line (S)
   end
   P.mode = Pstat.stat(P.path).st_mode
   if not Lc.tfind(file, pattern, P.plain) then
-    return F.skip(P.path)
+    return F.kept(P.path)
   end
   P._input = Lua.concat(Lc.filtertval(file, pattern, P.plain))
   return write(F, P, R)

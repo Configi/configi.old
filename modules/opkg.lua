@@ -47,9 +47,9 @@ function opkg.present (S)
   local M = { "force_depends", "force_reinstall", "force_ovewrite", "force_downgrade", "force_maintainer",
               "nodeps", "proxy", "update" }
   local G = {
-    ok = "opkg.present: Successfully installed package.",
-    skip = "opkg.present: Package already installed.",
-    fail = "opkg.present: Error installing package."
+    repaired = "opkg.present: Successfully installed package.",
+    kept = "opkg.present: Package already installed.",
+    failed = "opkg.present: Error installing package."
   }
   local F, P, R = main(S, M, G)
   local env
@@ -62,7 +62,7 @@ function opkg.present (S)
   end
   -- Install mode
   if Func.found(P.package) then
-    return F.skip(P.package)
+    return F.kept(P.package)
   end
   local args = { _env = env, "install", P.package }
   Lc.insertif(P.force_depends, args, 1, "--force-depends")
@@ -89,13 +89,13 @@ end
 function opkg.absent (S)
   local M = { "force_depends", "force_remove", "autoremove", "force_removal_of_dependent_packages" }
   local G = {
-    ok = "opkg.absent: Successfully removed package.",
-    skip = "opkg.absent: Package not installed.",
-    fail = "opkg.absent: Error removing package."
+    repaired = "opkg.absent: Successfully removed package.",
+    kept = "opkg.absent: Package not installed.",
+    failed = "opkg.absent: Error removing package."
   }
   local F, P, R = main(S, M, G)
   if not Func.found(P.package) then
-    return F.skip(P.package)
+    return F.kept(P.package)
   end
   local args = { "remove", P.package }
   Lc.insertif(P.force_remove, args, 1, "--force-remove")

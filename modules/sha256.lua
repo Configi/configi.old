@@ -34,9 +34,9 @@ end
 -- ]]
 function sha256.verify (S)
   local G = {
-    ok = "sha256.verify: Hash matched.",
-    skip = "sha256.verify: Hash matched.",
-    fail = "sha256.verify: Hash mismatch.",
+    repaired = "sha256.verify: Hash matched.",
+    kept = "sha256.verify: Hash matched.",
+    failed = "sha256.verify: Hash mismatch.",
     missing = "sha256.verify: Missing path."
   }
   local F, P, R = main(S, M, G)
@@ -48,7 +48,7 @@ function sha256.verify (S)
     S:add(f)
   end
   if S:close() ==  P.hash then
-    return F.skip(P.path)
+    return F.kept(P.path)
   else
     return F.result(P.path, false)
   end

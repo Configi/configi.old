@@ -35,13 +35,13 @@ end
 -- ]]
 function sysvinit.started (S)
   local G = {
-    ok = "sysvinit.started: Successfully started service.",
-    skip = "sysvinit.started: Service already started.",
-    fail = "sysvinit.started: Error restarting service."
+    repaired = "sysvinit.started: Successfully started service.",
+    kept = "sysvinit.started: Service already started.",
+    failed = "sysvinit.started: Error restarting service."
   }
   local F, P, R = main(S, M, G)
   if Func.pgrep(P.service) then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "start", _ignore_error = true })
   return F.result(P.service, Func.pgrep(P.service))
@@ -55,13 +55,13 @@ end
 -- ]]
 function sysvinit.stopped (S)
   local G = {
-    ok = "sysvinit.stopped: Successfully stopped service.",
-    skip = "sysvinit.stopped: Service already stopped.",
-    fail = "sysvinit.stopped: Error stopping service."
+    repaired = "sysvinit.stopped: Successfully stopped service.",
+    kept = "sysvinit.stopped: Service already stopped.",
+    failed = "sysvinit.stopped: Error stopping service."
   }
   local F, P, R = main(S, M, G)
   if not Func.pgrep(P.service) then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "stop", _ignore_error = true })
   return F.result(P.service, (Func.pgrep(P.service) == nil))
@@ -74,14 +74,14 @@ end
 -- ]]
 function sysvinit.restart (S)
   local G = {
-    ok = "sysvinit.restart: Successfully restarted service.",
-    skip = "sysvinit.restart: Service not yet started.",
-    fail = "sysvinit.restart: Error restarting service."
+    repaired = "sysvinit.restart: Successfully restarted service.",
+    kept = "sysvinit.restart: Service not yet started.",
+    failed = "sysvinit.restart: Error restarting service."
   }
   local F, P, R = main(S, M, G)
   local _, pid = Func.pgrep(P.service)
   if not pid then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "restart", _ignore_error = true })
   local _, npid = Func.pgrep(P.service)
@@ -96,14 +96,14 @@ end
 -- ]]
 function sysvinit.reload (S)
   local G = {
-    ok = "sysvinit.reload: Successfully reloaded service.",
-    skip = "sysvinit.reload: Service not yet started.",
-    fail = "sysvinit.reload: Error reloading service."
+    repaired = "sysvinit.reload: Successfully reloaded service.",
+    kept = "sysvinit.reload: Service not yet started.",
+    failed = "sysvinit.reload: Error reloading service."
   }
   local F, P, R = main(S, M, G)
   local _, pid = Func.pgrep(P.service)
   if not pid then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   -- Assumed to always succeed
   F.run(Cmd["-/etc/init.d/" .. P.service], { "reload", _ignore_error = true })
@@ -117,13 +117,13 @@ end
 -- ]]
 function sysvinit.enabled (S)
   local G = {
-    ok = "sysvinit.enabled: Successfully enabled service.",
-    skip = "sysvinit.enabled: Service already enabled.",
-    fail = "sysvinit.enabled: Error enabling service."
+    repaired = "sysvinit.enabled: Successfully enabled service.",
+    kept = "sysvinit.enabled: Service already enabled.",
+    failed = "sysvinit.enabled: Error enabling service."
   }
   local F, P, R = main(S, M, G)
   if F.run(Cmd["-/etc/init.d/" .. P.service], { "enabled" }) then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "enable", _ignore_error = true })
   return F.result(P.service, F.run(Cmd["-/etc/init.d/" .. P.service], { "enabled"}))
@@ -136,14 +136,14 @@ end
 -- ]]
 function sysvinit.disabled (S)
   local G = {
-    ok = "sysvinit.disabled: Successfully disabled service.",
-    skip = "sysvinit.disabled: Service already disabled.",
-    fail = "sysvinit.disabled: Error disabling service."
+    repaired = "sysvinit.disabled: Successfully disabled service.",
+    kept = "sysvinit.disabled: Service already disabled.",
+    failed = "sysvinit.disabled: Error disabling service."
   }
   local F, P, R = main(S, M, G)
   local ok = Cmd["-/etc/init.d/" .. P.service]{ "enabled" }
   if not ok then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   F.run(Cmd["-/etc/init.d/" .. P.service], { "disable", _ignore_error = true })
   ok = Cmd["-/etc/init.d/" .. P.service]{ "enabled" }

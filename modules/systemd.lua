@@ -26,14 +26,14 @@ end
 -- ]]
 function systemd.started (S)
   local G = {
-    ok = "systemd.started: Successfully started service.",
-    skip = "systemd.started: Service already started.",
-    fail = "systemd.started: Error starting service."
+    repaired = "systemd.started: Successfully started service.",
+    kept = "systemd.started: Service already started.",
+    failed = "systemd.started: Error starting service."
   }
   local F, P, R = main(S, M, G)
   local code = F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "is-active", P.service, _return_code = true })
   if code == 0 then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "start", P.service }))
 end
@@ -46,14 +46,14 @@ end
 -- ]]
 function systemd.stopped (S)
   local G = {
-    ok = "systemd.stopped: Successfully stopped service.",
-    skip = "systemd.stopped: Service already stopped.",
-    fail = "systemd.stopped: Error stopping service."
+    repaired = "systemd.stopped: Successfully stopped service.",
+    kept = "systemd.stopped: Service already stopped.",
+    failed = "systemd.stopped: Error stopping service."
   }
   local F, P, R = main(S, M, G)
   local code = F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "is-active", P.service, _return_code = true })
   if code ~= 0 then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "stop", P.service}))
 end
@@ -66,14 +66,14 @@ end
 -- ]]
 function systemd.restart (S)
   local G = {
-    ok = "systemd.restart: Successfully restarted service.",
-    skip = "systemd.restart: Service not active.",
-    fail = "systemd.restart: Error restarting service."
+    repaired = "systemd.restart: Successfully restarted service.",
+    kept = "systemd.restart: Service not active.",
+    failed = "systemd.restart: Error restarting service."
   }
   local F, P, R = main(S, M, G)
   local code = F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "is-active", P.service, _return_code = true})
   if code ~= 0 then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "restart", P.service }))
 end
@@ -85,14 +85,14 @@ end
 -- ]]
 function systemd.reload (S)
   local G = {
-    ok = "system.reload: Successfully reloaded service.",
-    skip = "system.reload: Service not active.",
-    fail = "systemd.reload: Error reloading service."
+    repaired = "system.reload: Successfully reloaded service.",
+    kept = "system.reload: Service not active.",
+    failed = "systemd.reload: Error reloading service."
   }
   local F, P, R = main(S, M, G)
   local code = F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "is-active", P.service, _return_code = true})
   if code ~= 0 then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "reload", P.service }))
 end
@@ -104,14 +104,14 @@ end
 -- ]]
 function systemd.enabled (S)
   local G = {
-    ok = "systemd.enabled: Successfully enabled service.",
-    skip = "systemd.enabled: Service already enabled.",
-    fail = "systemd.enabled: Error enabling service."
+    repaired = "systemd.enabled: Successfully enabled service.",
+    kept = "systemd.enabled: Service already enabled.",
+    failed = "systemd.enabled: Error enabling service."
   }
   local F, P, R = main(S, M, G)
   local code = F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "is-enabled", P.service, _return_code = true})
   if code == 0 then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "enable", P.service}))
 end
@@ -123,14 +123,14 @@ end
 -- ]]
 function systemd.disabled (S)
   local G = {
-    ok = "systemd.disabled: Successfully disabled service.",
-    skip = "systemd.disabled: Service already disabled.",
-    fail = "systemd.disabled: Error disabling service."
+    repaired = "systemd.disabled: Successfully disabled service.",
+    kept = "systemd.disabled: Service already disabled.",
+    failed = "systemd.disabled: Error disabling service."
   }
   local F, P, R = main(S, M, G)
   local code = F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "is-enabled", P.service, _return_code = true })
   if code ~= 0 then
-    return F.skip(P.service)
+    return F.kept(P.service)
   end
   return F.result(P.service, F.run(Cmd["-/usr/bin/systemctl"], { "--quiet", "disable", P.service}))
 end

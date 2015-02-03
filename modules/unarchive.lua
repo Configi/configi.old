@@ -42,13 +42,13 @@ end
 function unarchive.unpack (S)
   local M = { "creates" }
   local G = {
-    ok = "unarchive.unpack: Successfully unpacked archive.",
-    skip = "unarchive.unpack: Archive already unpacked.",
-    fail = "unarchive.unpack: Error unpacking archive.",
+    repaired = "unarchive.unpack: Successfully unpacked archive.",
+    kept = "unarchive.unpack: Archive already unpacked.",
+    failed = "unarchive.unpack: Error unpacking archive.",
   }
   local F, P, R = main(S, M, G)
   if P.creates and Pstat.stat(P.creates) then
-    return F.skip(P.src)
+    return F.kept(P.src)
   end
   local code
   if Func.extension(P.src) == "tar" then

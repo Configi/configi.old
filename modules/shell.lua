@@ -89,13 +89,13 @@ end
 function shell.command (S)
   local M = { "cwd", "creates", "removes" }
   local G = {
-    ok = "shell.command: Command successfully executed.",
-    skip = "shell.command: `creates` or `removes` parameter satisfied.",
-    fail = "shell.command: Error executing command."
+    repaired = "shell.command: Command successfully executed.",
+    kept = "shell.command: `creates` or `removes` parameter satisfied.",
+    failed = "shell.command: Error executing command."
   }
   local F, P, R = main(S, M, G)
   if Func.rc(F, P) then
-    return F.skip(P.string)
+    return F.kept(P.string)
   end
   local args = {}
   for c in Lua.gmatch(P.string, "%S+") do
@@ -128,9 +128,9 @@ end
 function shell.system (S)
   local M = { "creates", "removes" }
   local G = {
-    ok = "shell.system: Script successfully executed.",
-    skip = "shell.system: `creates` or `removes` parameter satisfied.",
-    fail = "shell.system: Error executing script."
+    repaired = "shell.system: Script successfully executed.",
+    kept = "shell.system: `creates` or `removes` parameter satisfied.",
+    failed = "shell.system: Error executing script."
   }
   local F, P, R = main(S, M, G)
   local script = Lc.fopen(P.string)
@@ -138,7 +138,7 @@ function shell.system (S)
     return F.result(P.string, false, "shell.system: script not found")
   end
   if Func.rc(F, P) then
-    return F.skip(P.string)
+    return F.kept(P.string)
   end
   return F.result(P.string, F.run(Lc.execute, script))
 end
@@ -161,13 +161,13 @@ function shell.popen (S)
   }
   local M = { "cwd", "creates", "removes", "expects" }
   local G = {
-    ok = "shell.popen: Command or script successfully executed.",
-    skip = "shell.popen: `creates` or `removes` parameter satisfied.",
-    fail = "shell.popen: Command or script error."
+    repaired = "shell.popen: Command or script successfully executed.",
+    kept = "shell.popen: `creates` or `removes` parameter satisfied.",
+    failed = "shell.popen: Command or script error."
   }
   local F, P, R = main(S, M, G)
   if Func.rc(F, P) then
-    return F.skip(P.string)
+    return F.kept(P.string)
   end
   local str
   if Px.isfile(P.string) then
@@ -224,13 +224,13 @@ function shell.popen3 (S)
   }
   local M = { "cwd", "creates", "removes", "stdin", "stdout", "stderr", "error" }
   local G = {
-    ok = "shell.popen3: Command or script successfully executed.",
-    skip = "shell.popen3: `creates` or `removes` parameter satisfied.",
-    fail = "shell.popen3: Command or script error."
+    repaired = "shell.popen3: Command or script successfully executed.",
+    kept = "shell.popen3: `creates` or `removes` parameter satisfied.",
+    failed = "shell.popen3: Command or script error."
   }
   local F, P, R = main(S, M, G)
   if Func.rc(F, P) then
-    return F.skip(P.string)
+    return F.kept(P.string)
   end
   local str
   if Px.isfile(P.string) then

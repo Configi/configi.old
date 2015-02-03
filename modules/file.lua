@@ -145,20 +145,20 @@ end
 function file.link (S)
   local M = { "src", "force", "owner", "group", "mode" }
   local G = {
-    ok = "file.link: Symlink created.",
-    skip = "file.link: Already a symlink.",
-    fail = "file.link: Error creating symlink."
+    repaired = "file.link: Symlink created.",
+    kept = "file.link: Already a symlink.",
+    failed = "file.link: Error creating symlink."
   }
   local F, P, R = main(S, M, G)
   local symlink = Punistd.readlink(P.path)
   if symlink == P.src then
-    F.msg(P.src, G.skip, nil)
+    F.msg(P.src, G.kept, nil)
     return attrib(F, P, R)
   end
   local args = { "-s", P.src, P.path }
   Lc.insertif(P.force, args, 2, "-f")
   if F.run(Cmd.ln, args) then
-    F.msg(P.path, G.ok, true)
+    F.msg(P.path, G.repaired, true)
     return attrib(F, P, R)
   else
     return F.result(P.path, false)
@@ -176,9 +176,9 @@ end
 function file.hard (S)
   local M = { "src", "force", "owner", "group", "mode" }
   local G = {
-    ok = "file.hard: Hardlink created.",
-    skip = "file.hard: Already a hardlink.",
-    fail = "file.hard: Error creating hardlink."
+    repaired = "file.hard: Hardlink created.",
+    kept = "file.hard: Already a hardlink.",
+    failed = "file.hard: Error creating hardlink."
   }
   local F, P, R = main(S, M, G)
   local source = Pstat.stat(P.src)
@@ -187,13 +187,13 @@ function file.hard (S)
     return F.result(P.path, false, Lc.strf(" '%s' is missing", source))
   end
   if source and link and (source.st_ino == link.st_ino) then
-    F.msg(P.path, G.skip, nil)
+    F.msg(P.path, G.kept, nil)
     return attrib(F, P, R)
   end
   local args = { P.src, P.path }
   Lc.insertif(P.force, args, 1, "-f")
   if F.run(Cmd.ln, args) then
-    F.msg(P.path, G.ok, true)
+    F.msg(P.path, G.repaired, true)
     return attrib(F, P, R)
   else
     return F.result(P.path, false)
@@ -213,14 +213,14 @@ end
 function file.directory (S)
   local M = { "mode", "owner", "group", "force", "backup" }
   local G = {
-    ok = "file.directory: Directory created.",
-    skip = "file.directory: Already a directory.",
-    fail = "file.directory: Error creating directory."
+    repaired = "file.directory: Directory created.",
+    kept = "file.directory: Already a directory.",
+    failed = "file.directory: Error creating directory."
   }
   local F, P, R = main(S, M, G)
   local stat = Pstat.stat(P.path)
   if stat and (Pstat.S_ISDIR(stat.st_mode) ~= 0 )then
-    F.msg(P.path, G.skip, nil)
+    F.msg(P.path, G.kept, nil)
     return attrib(F, P, R)
   end
   if P.force then
@@ -231,7 +231,7 @@ function file.directory (S)
     F.run(Cmd.rm, { "-r", "-f", P.path })
   end
   if F.run(Cmd.mkdir, { "-p", P.path }) then
-    F.msg(P.path, G.ok, true)
+    F.msg(P.path, G.repaired, true)
     return attrib(F, P, R)
   else
     return F.result(P.path, false)
@@ -249,12 +249,12 @@ end
 function file.touch (S)
   local M = { "mode", "owner", "group" }
   local G = {
-    ok = "file.touch: touch(1) succeeded.",
-    fail = "file.touch: touch(1) failed."
+    repaired = "file.touch: touch(1) succeeded.",
+    failed = "file.touch: touch(1) failed."
   }
   local F, P, R = main(S, M, G)
   if F.run(Cmd.touch, { P.path }) then
-    F.msg(P.path, G.ok, true)
+    F.msg(P.path, G.repaired, true)
     return attrib(F, P, R)
   else
     return F.result(P.path, false)
@@ -268,13 +268,13 @@ end
 -- ]]
 function file.absent (S)
   local G = {
-    ok = "file.absent: Successfully removed.",
-    skip = "file.absent: Already absent.",
-    fail = "file.absent: Error removing path.",
+    repaired = "file.absent: Successfully removed.",
+    kept = "file.absent: Already absent.",
+    failed = "file.absent: Error removing path.",
   }
   local F, P, R = main(S, M, G)
   if not Pstat.stat(P.path) then
-    return F.skip(P.path)
+    return F.kept(P.path)
   end
   return F.result(P.path, F.run(Cmd.rm, { "-r", "-f", P.path }))
 end
@@ -292,9 +292,9 @@ end
 function file.copy (S)
   local M = { "src", "path", "recurse", "force", "backup" }
   local G = {
-    ok = "file.copy: Copy succeeded.",
-    skip = "file.copy: Not copying over destination.",
-    fail = "file.copy: Error copying."
+    repaired = "file.copy: Copy succeeded.",
+    kept = "file.copy: Not copying over destination.",
+    failed = "file.copy: Error copying."
   }
   local F, P, R = main(S, M, G)
   local dir, file = Lc.splitp(P.path)
@@ -305,7 +305,7 @@ function file.copy (S)
       return F.result(P.path, false)
     end
   elseif not P.force and present then
-    return F.skip(P.path)
+    return F.kept(P.path)
   end
   local args = { "-P", P.src, P.path }
   Lc.insertif(P.recurse, args, 2, "-R")

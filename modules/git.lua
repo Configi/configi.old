@@ -49,14 +49,14 @@ end
 function git.clone (S)
   local M = { "repository" }
   local G = {
-    ok = "git.clone: Successfully cloned Git repository.",
-    skip = "git.clone: Already a git repository.",
-    fail = "git.clone: Error running `git clone`."
+    repaired = "git.clone: Successfully cloned Git repository.",
+    kept = "git.clone: Already a git repository.",
+    failed = "git.clone: Error running `git clone`."
   }
   local F, P, R = main(S, M, G)
   local ret = Func.found(P)
   if ret then
-    return F.skip(P.repository)
+    return F.kept(P.repository)
   elseif ret == nil then
     local dir, res = Cmd.mkdir{ "-p", P.path }
     local err = Lc.exitstr(res.bin, res.status, res.bin)
@@ -80,13 +80,13 @@ end
 -- ]]
 function git.pull (S)
   local G = {
-    ok = "git.pull: Successfully pulled Git repository.",
-    skip = "git.pull: Path is non-existent or not a Git repository.",
-    fail = "git.pull: Error running `git pull`."
+    repaired = "git.pull: Successfully pulled Git repository.",
+    kept = "git.pull: Path is non-existent or not a Git repository.",
+    failed = "git.pull: Error running `git pull`."
   }
   local F, P, R = main(S, M, G)
   if not Func.found(P) then
-    return F.skip(P.path) -- piggyback on skip()
+    return F.kept(P.path) -- piggyback on kept()
   end
   local args = { _cwd = P.path, "pull" }
   return F.result(P.path, F.run(Cmd["/usr/bin/git"], args))
