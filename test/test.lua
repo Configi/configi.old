@@ -90,7 +90,7 @@ T:start"comment test/core-comment.lua"
   do
     local _, out = cfg{ "-v", "-f", "test/core-comment.lua" }
     out = table.concat(out.stderr, "\n")
-    T:eq(string.find(out, "TEST COMMENT", 1, true), 55)
+    T:eq(string.find(out, "TEST COMMENT", 1, true), 30)
   end
 T:done(N)
 
