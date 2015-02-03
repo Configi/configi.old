@@ -5,6 +5,7 @@ local Lua = {
   ipairs = ipairs,
   len = string.len,
   sub = string.sub,
+  format = string.format,
   gmatch = string.gmatch,
   unpack = table.unpack,
   concat = table.concat,
@@ -231,13 +232,17 @@ function Px.exec (args)
   else
     Punistd.close(fd0)
   end
-  local buf, sz, stdout, stderr = nil, 4096, {}, {}
+  local buf, sz, stdout, stderr = nil, 4096, nil, nil
   while true do
     buf = Punistd.read(fd1, sz)
     if buf == nil or Lua.len(buf) == 0 then
       break
     else
-      stdout[#stdout + 1] = buf
+      if not stdout then
+        stdout = Lua.format("%s", buf)
+      else
+        stdout = Lua.format("%s%s", stdout, buf)
+      end
     end
   end
   while true do
@@ -245,20 +250,28 @@ function Px.exec (args)
     if buf == nil or Lua.len(buf) == 0 then
       break
     else
-      stderr[#stderr + 1] = buf
+      if not stderr then
+        stderr = Lua.format("%s", buf)
+      else
+        stderr = Lua.format("%s%s", stderr, buf)
+      end
     end
   end
-  for ln in Lua.gmatch(Lua.concat(stdout), "([^\n]*)\n") do
-    if ln ~= "" then result.stdout[#result.stdout + 1] = ln end
+  if stdout then
+    for ln in Lua.gmatch(stdout, "([^\n]*)\n") do
+      if ln ~= "" then result.stdout[#result.stdout + 1] = ln end
+    end
+    if #result.stdout == 0 then
+      result.stdout[1] = stdout
+    end
   end
-  if #result.stdout == 0 then
-    result.stdout[1] = Lua.concat(stdout)
-  end
-  for ln in Lua.gmatch(Lua.concat(stderr), "([^\n]*)\n") do
-    if ln ~= "" then result.stderr[#result.stderr + 1] = ln end
-  end
-  if #result.stderr == 0 then
-    result.stderr[1] = Lua.concat(stderr)
+  if stderr then
+    for ln in Lua.gmatch(stderr, "([^\n]*)\n") do
+      if ln ~= "" then result.stderr[#result.stderr + 1] = ln end
+    end
+    if #result.stderr == 0 then
+      result.stderr[1] = stderr
+    end
   end
   Punistd.close(fd1)
   Punistd.close(fd2)
