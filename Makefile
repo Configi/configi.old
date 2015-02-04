@@ -1,5 +1,6 @@
 .POSIX:
 .SUFFIXES:
+NULSTRING:=
 MAKEFLAGS= --silent
 LIB= cimicida px configi factid
 VENDOR= luaposix linotify crc32 sha2
@@ -46,9 +47,8 @@ endif
 
 ifeq ($(DEBUG), 1)
 DEFINES+= -DDEBUG
-nulstring :=
-LUACFLAGS := $(nulstring)
-MAKEFLAGS := $(nulstring)
+LUACFLAGS:= $(NULSTRING)
+MAKEFLAGS:= $(NULSTRING)
 endif
 
 ifeq ($(STATIC), 1)
@@ -56,9 +56,8 @@ LDFLAGS+= -static
 endif
 
 ifeq ($(ASAN), 1)
-CFLAGS := -fsanitize=address -O1 -fno-omit-frame-pointer -g
-nulstring :=
-LDFLAGS := $(nulstring)
+CFLAGS:= -fsanitize=address -O1 -fno-omit-frame-pointer -g
+LDFLAGS:= $(NULSTRING)
 endif
 
 # Linux only for now
