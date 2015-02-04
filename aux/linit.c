@@ -11,6 +11,9 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#ifdef lib_policy
+  int luaopen_policy (lua_State *L);
+#endif
 #ifdef lib_cimicida
   int luaopen_cimicida (lua_State *L);
 #endif
@@ -144,6 +147,9 @@ static const luaL_Reg loadedlibs[] = {
 ** these libs are preloaded and must be required before used
 */
 static const luaL_Reg preloadedlibs[] = {
+#ifdef lib_policy
+  {"policy", luaopen_policy},
+#endif
 #ifdef lib_cimicida
   {"cimicida", luaopen_cimicida},
 #endif

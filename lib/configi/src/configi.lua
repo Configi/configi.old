@@ -379,7 +379,12 @@ function Lib.finish (C)
     return C.results
   end -- F.kept()
   C.functions.open = function (f)
-    return Lc.fopen(PATH .. "/" .. f)
+    if Lua.type(PATH) == "table" then
+      f = PATH[f]
+    else
+      f = Lc.fopen(PATH .. "/" .. f)
+    end
+    return f
   end
   C.environment, C.required = nil, nil -- GC
   return C.functions, C.parameters, C.results -- F, P, R
@@ -422,12 +427,19 @@ end
 
 --[[ CLI functions ]]
 function Lcli.compile(s, env)
-  -- Check if script exists.
-  if not Lc.isfile(s) then
-    Lc.errorf("%s %s not found\n", Lstr.SERR, s)
+  local chunk, err
+  if Lua.type(PATH) == "table" then
+    Lc.warningf("HERE")
+    if not PATH[s] then
+      Lc.errorf("%s %s not found\n", Lstr.SERR, s)
+    end
+    chunk, err = Lua.load(PATH[s], PATH[s], "t", env)
+  else
+    if not Lc.isfile(s) then
+      Lc.errorf("%s %s not found\n", Lstr.SERR, s)
+    end
+    chunk, err = Lua.loadfile(s, "t", env)
   end
-  -- load() the script
-  local chunk, err = Lua.loadfile(s, "t", env)
   if not chunk then
     Lc.errorf("%s%s%s\n", Lstr.ERR, s, err)
   end
@@ -459,7 +471,13 @@ function Lcli.main (opts)
   env.test = function (b) if Lc.truthy(b) then opts.test = true end end
   env.syslog = function (b) if Lc.truthy(b) then opts.syslog = true end end
   env.log = function (b) opts.log = b end
-  env.include = function (f) scripts[#scripts + 1] = PATH .. "/" .. f end
+  env.include = function (f)
+    if Lua.type(PATH) == "table" then
+      scripts[#scripts + 1] = f
+    else
+      scripts[#scripts + 1] = PATH .. "/" .. f
+    end
+  end
 
   -- Metatable for the script environment
   Lua.setmetatable(env, {
@@ -617,7 +635,12 @@ function Lcli.opt (arg, version)
   for r, optarg, optind, li in Pgetopt.getopt(arg, short, long) do
     if r == "f" then
       opts.script = optarg
-      PATH = Lc.splitp(opts.script)
+      local _, policy = Lua.pcall(Lua.require, "policy")
+      if not Px.isfile(opts.script) and Lua.type(policy) == "table" then
+        PATH = policy
+      else
+        PATH = Lc.splitp(opts.script)
+      end
     end
     if r == "m" then opts.msg = true end
     if r == "v" then opts.debug = true end

@@ -60,6 +60,10 @@ CFLAGS:= -fsanitize=address -O1 -fno-omit-frame-pointer -g
 LDFLAGS:= $(NULSTRING)
 endif
 
+ifeq ($(POLICY), 1)
+LIB+= policy
+endif
+
 # Linux only for now
 DEFINES+= -DLUA_USE_LINUX
 DLDFLAGS:= -Wl,-E -ldl -lpthread -lm -lcrypt -lrt $(LDFLAGS)
