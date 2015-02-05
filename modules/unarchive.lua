@@ -4,7 +4,10 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local Lua = { sub = string.sub }
+local Lua = {
+  sub = string.sub,
+  lower = string.lower
+}
 local Func = {}
 local Configi = require"configi"
 local Px = require"px"
@@ -23,7 +26,13 @@ local main = function (S, M, G)
 end
 
 Func.extension = function (filename)
-  return Lua.sub(filename, -3)
+  local ext = Lua.sub(Lua.lower(filename), -7)
+  if ext == ".tar.xz" or ext == "tar.bz2" or ext == ".tar.gz" then
+    ext = "tar"
+  else
+    ext = Lua.sub(Lua.lower(filename), -3)
+  end
+  return ext
 end
 
 --- Unpack a tar, zip or rar archive.
