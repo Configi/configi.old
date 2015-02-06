@@ -23,8 +23,7 @@ LDFLAGS= -Wl,--gc-sections -Wl,--strip-all -Wl,--relax -Wl,--sort-common
 
 # FLAGS when compiling for an OpenWRT target.
 ifneq (,$(findstring openwrt,$(CC)))
-CFLAGS= -Os -fomit-frame-pointer -pipe
-CFLAGS+= -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables
+CCOPT:= -Os -fomit-frame-pointer -pipe
 LDFLAGS= -Wl,--gc-sections -Wl,--strip-all
 DEFINES+= -DHAVE_UCLIBC
 endif
@@ -56,6 +55,7 @@ endif
 
 ifeq ($(ASAN), 1)
 CFLAGS:= -fsanitize=address -O1 -fno-omit-frame-pointer -g
+CCOPT:= $(NULSTRING)
 LDFLAGS:= $(NULSTRING)
 endif
 
