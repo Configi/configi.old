@@ -27,7 +27,13 @@ end
 
 Func.extension = function (filename)
   local ext = Lua.sub(Lua.lower(filename), -7)
-  if ext == ".tar.xz" or ext == "tar.bz2" or ext == ".tar.gz" then
+  if ext == ".tar.xz" or
+     ext == ".tar.gz" or
+     ext == ".tar.lz" or
+     ext == "tar.bz2" or
+     ext == "tar.lzo" or
+     ext == "tar.lz4" or
+     ext == "ar.lzma" then
     ext = "tar"
   else
     ext = Lua.sub(Lua.lower(filename), -3)
