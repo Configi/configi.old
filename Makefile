@@ -16,9 +16,8 @@ STRIP= strip
 LUAC= bin/luac
 GLUE= bin/glue
 DEFINES= -DLUA_COMPAT_BITLIB
-CCOPT=
 CCWARN= -Wall
-CFLAGS= -Os -mtune=generic -mmmx -msse -msse2 -fomit-frame-pointer -pipe
+CCOPT= -Os -mtune=generic -mmmx -msse -msse2 -fomit-frame-pointer -pipe
 CFLAGS+= -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables
 LDFLAGS= -Wl,--gc-sections -Wl,--strip-all -Wl,--relax -Wl,--sort-common
 
