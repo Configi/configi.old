@@ -1,11 +1,11 @@
 CLEAN+= clean_modules
 
-modules/libmodule_%.a: modules/%.o $(LINIT_T)
+modules/libmodule_%.a: modules/%.o
 	$(ECHOT) [AR] $@
 	$(AR) $(ARFLAGS) $@ $< >/dev/null 2>&1
 	$(RANLIB) $@
 
-modules/%.o: modules/%.c $(LINIT_T)
+modules/%.o: modules/%.c
 	$(ECHOT) [CC] $@
 	$(CC) -o $@ $(DEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) -c $<
 

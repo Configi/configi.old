@@ -1,9 +1,3 @@
-$(LINIT_T):
-	$(ECHOT) [CP] linit.c
-	$(INSTALL) $(INSTALLFLAGS) $(AUX_P)/linit.c $(SRC_P)/linit.c
-
-init: $(LINIT_T)
-
 $(LUAC_T):
 	$(ECHOT) [CC] $@
 	$(CC) -o $@ -DMAKE_LUAC $(DEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c $(DLDFLAGS)
@@ -43,7 +37,7 @@ compress: $(LUA_T)
 
 clean: $(CLEAN)
 	$(ECHO) "Cleaning up..."
-	$(RM) $(RMFLAGS) $(LUA_O) $(VLUA_O) $(VLUA_T) $(LUA_T) $(LUAC_T) $(LUAC2C_T) $(LINIT_T) \
+	$(RM) $(RMFLAGS) $(LUA_O) $(VLUA_O) $(VLUA_T) $(LUA_T) $(LUAC_T) $(LUAC2C_T) \
 		$(SRLUA_T) $(GLUE_T) $(CFG_T) $(TESTLOG_F)
 	$(RMRF) test/tmp
 	$(ECHO) "Done!"

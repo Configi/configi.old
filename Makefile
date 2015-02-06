@@ -68,7 +68,7 @@ endif
 DEFINES+= -DLUA_USE_LINUX
 DLDFLAGS:= -Wl,-E -ldl -lpthread -lm -lcrypt -lrt $(LDFLAGS)
 
-all: init bootstrap deps interpreter
+all: bootstrap deps interpreter
 include aux/std.mk
 include aux/tests.mk
 include $(eval _d:=lib/$(LIB) $(_d)) $(call _lget,$(LIB))

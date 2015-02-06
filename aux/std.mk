@@ -38,7 +38,6 @@ _lget= $(firstword lib/$(1))/Makefile $(if $(_rest),$(call _lget,$(_rest)),)
 _vget= $(firstword vendor/$(1))/Makefile $(if $(_rest),$(call _vget,$(_rest)),)
 SRC_P= vendor/lua
 INCLUDES:= -I$(SRC_P) -Iinclude -I$(AUX_P)
-LINIT_T:= $(SRC_P)/linit.c
 LDLIBS+= $(foreach m, $(LIB), -Llib/$m -l$m)
 LDLIBS+= $(foreach m, $(VENDOR), -Lvendor/$m -l$m)
 LDLIBS+= $(foreach m, $(MODULES), -Lmodules -lmodule_$m)
