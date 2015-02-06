@@ -28,7 +28,7 @@
 ** variables that Lua check to set its paths.
 */
 #if !defined(LUA_PATH_VAR)
-#define LUA_PATH_VAR "MODULE_PATH"
+#define LUA_PATH_VAR	"LUA_PATH"
 #endif
 
 #if !defined(LUA_CPATH_VAR)
