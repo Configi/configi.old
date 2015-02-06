@@ -1,11 +1,4 @@
 $(LINIT_T):
-	$(ECHOT) [ED] luaconf.h
-	$(SED) $(SEDFLAGS) -e 's:/usr/local/:.:g' \
-	                   -e 's:share/lua/\"\ LUA_VDIR:/\":g' \
-	                   -e 's:lib/lua/\"\ LUA_VDIR:/\":g' $(SRC_P)/luaconf.h
-	$(SED) $(SEDFLAGS) -e '/#define LUA_USE_READLINE/d' $(SRC_P)/luaconf.h
-	$(ECHOT) [ED] loadlib.c
-	$(SED) $(SEDFLAGS) -e 's:LUA_PATH_VAR.*"LUA_PATH":LUA_PATH_VAR\ "MODULE_PATH":g' $(SRC_P)/loadlib.c
 	$(ECHOT) [CP] linit.c
 	$(INSTALL) $(INSTALLFLAGS) $(AUX_P)/linit.c $(SRC_P)/linit.c
 
