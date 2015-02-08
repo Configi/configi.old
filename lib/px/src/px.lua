@@ -178,7 +178,8 @@ end
   _bin=path to binary
   _env=environment
   _cwd=current working directory
-  _stdin=standard input
+  _stdin=standard input (STRING)
+  _stdout=standard output (FILE)
   _return_code=return the exit code instead of boolean true
   _ignore_error=always return boolean true
 ]]
@@ -223,20 +224,35 @@ end
 function Px.exec (args)
   local result = { stdout = {}, stderr = {} }
   local pid, err, fd0, fd1, fd2 = pexec(args)
+  local fd, buf, sz  = nil, nil, 4096
+  local stdout, stderr
+  local res, msg
   if not pid then
     return nil, err
   end
   if args._stdin then
-    Px.write(fd0, args._stdin)
-    Punistd.close(fd0)
-  else
-    Punistd.close(fd0)
+    res, msg = Px.write(fd0, args._stdin)
+    if not res then
+      return nil, msg
+    end
   end
-  local buf, sz, stdout, stderr = nil, 4096, nil, nil
+  Punistd.close(fd0)
+  if args._stdout then
+    fd, msg = Px.open(args._stdout, (Pfcntl.O_CREAT | Pfcntl.F_WRLCK | Pfcntl.O_WRONLY))
+    if not fd then return nil, msg end
+  end
   while true do
     buf = Punistd.read(fd1, sz)
     if buf == nil or Lua.len(buf) == 0 then
+      if args._stdout then
+        Punistd.close(fd)
+      end
       break
+    elseif args._stdout then
+      res, msg = Px.write(fd, buf)
+      if not res then
+        return nil, msg
+      end
     else
       if not stdout then
         stdout = Lua.format("%s", buf)
@@ -257,7 +273,7 @@ function Px.exec (args)
       end
     end
   end
-  if stdout then
+  if stdout and not args._stdout then
     for ln in Lua.gmatch(stdout, "([^\n]*)\n") do
       if ln ~= "" then result.stdout[#result.stdout + 1] = ln end
     end
