@@ -180,6 +180,7 @@ end
   _cwd=current working directory
   _stdin=standard input (STRING)
   _stdout=standard output (FILE)
+  _stderr=standard error (FILE)
   _return_code=return the exit code instead of boolean true
   _ignore_error=always return boolean true
 ]]
@@ -223,73 +224,58 @@ end
 
 function Px.exec (args)
   local result = { stdout = {}, stderr = {} }
+  local sz = 4096
   local pid, err, fd0, fd1, fd2 = pexec(args)
-  local fd, buf, sz  = nil, nil, 4096
-  local stdout, stderr
-  local res, msg
   if not pid then
     return nil, err
   end
+  local fdcopy = function (fileno, std, output)
+    local buf, str
+    local fd, res, msg
+    if output then
+      fd, msg = Px.open(output, (Pfcntl.O_CREAT | Pfcntl.F_WRLCK | Pfcntl.O_WRONLY))
+      if not fd then return nil, msg end
+    end
+    while true do
+      buf = Punistd.read(fileno, sz)
+      if buf == nil or Lua.len(buf) == 0 then
+        if output then
+          Punistd.close(fd)
+        end
+        break
+      elseif output then
+        res, msg = Px.write(fd, buf)
+        if not res then
+          return nil, msg
+        end
+      else
+        if not str then
+          str = Lua.format("%s", buf)
+        else
+          str = Lua.format("%s%s", str, buf)
+        end
+      end
+    end
+    if str and not output then
+      for ln in Lua.gmatch(str, "([^\n]*)\n") do
+        if ln ~= "" then result[std][#result[std] + 1] = ln end
+      end
+      if #result[std] == 0 then
+        result[std][1] = str
+      end
+    end
+    return true
+  end
   if args._stdin then
-    res, msg = Px.write(fd0, args._stdin)
+    local res, msg = Px.write(fd0, args._stdin)
     if not res then
       return nil, msg
     end
   end
   Punistd.close(fd0)
-  if args._stdout then
-    fd, msg = Px.open(args._stdout, (Pfcntl.O_CREAT | Pfcntl.F_WRLCK | Pfcntl.O_WRONLY))
-    if not fd then return nil, msg end
-  end
-  while true do
-    buf = Punistd.read(fd1, sz)
-    if buf == nil or Lua.len(buf) == 0 then
-      if args._stdout then
-        Punistd.close(fd)
-      end
-      break
-    elseif args._stdout then
-      res, msg = Px.write(fd, buf)
-      if not res then
-        return nil, msg
-      end
-    else
-      if not stdout then
-        stdout = Lua.format("%s", buf)
-      else
-        stdout = Lua.format("%s%s", stdout, buf)
-      end
-    end
-  end
-  while true do
-    buf = Punistd.read(fd2, sz)
-    if buf == nil or Lua.len(buf) == 0 then
-      break
-    else
-      if not stderr then
-        stderr = Lua.format("%s", buf)
-      else
-        stderr = Lua.format("%s%s", stderr, buf)
-      end
-    end
-  end
-  if stdout and not args._stdout then
-    for ln in Lua.gmatch(stdout, "([^\n]*)\n") do
-      if ln ~= "" then result.stdout[#result.stdout + 1] = ln end
-    end
-    if #result.stdout == 0 then
-      result.stdout[1] = stdout
-    end
-  end
-  if stderr then
-    for ln in Lua.gmatch(stderr, "([^\n]*)\n") do
-      if ln ~= "" then result.stderr[#result.stderr + 1] = ln end
-    end
-    if #result.stderr == 0 then
-      result.stderr[1] = stderr
-    end
-  end
+  fdcopy(fd1, "stdout", args._stdout)
   Punistd.close(fd1)
+  fdcopy(fd2, "stderr", args._stderr)
   Punistd.close(fd2)
   result.pid, result.status, result.code = Px.wait(pid)
   result.bin = args._bin
