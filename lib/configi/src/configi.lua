@@ -478,7 +478,11 @@ function Lcli.main (opts)
       scripts[#scripts + 1] = PATH .. "/" .. f
     end
   end
-
+  env.map = function (f, t)
+    for i in Lscript.list(t) do
+      f(i)
+    end
+  end
   -- Metatable for the script environment
   Lua.setmetatable(env, {
     __newindex = function (_, var, value) -- var = "something"
