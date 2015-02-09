@@ -149,11 +149,7 @@ static int pmain(lua_State *L)
 
 static void fatal(const char* progname, const char* message)
 {
-#ifdef _WIN32
- MessageBox(NULL,message,progname,MB_ICONERROR | MB_OK);
-#else
  fprintf(stderr,"%s: %s\n",progname,message);
-#endif
  exit(EXIT_FAILURE);
 }
 
@@ -162,21 +158,8 @@ char* getprog() {
   char* progdir = malloc(nsize * sizeof(char));
   char *lb;
   int n = 0;
-#if defined(__CYGWIN__)
-  char win_buff[_PATH_MAX + 1];
-  GetModuleFileNameA(NULL, win_buff, nsize);
-  cygwin_conv_path(CCP_WIN_A_TO_POSIX, win_buff, progdir, nsize);
-  n = strlen(progdir);
-#elif defined(_WIN32)
-  n = GetModuleFileNameA(NULL, progdir, nsize);
-#elif defined(__linux__)
+#if defined(__linux__)
   n = readlink("/proc/self/exe", progdir, nsize);
-  if (n > 0) progdir[n] = 0;
-#elif defined(__sun)
-  pid_t pid = getpid();
-  char linkname[256];
-  sprintf(linkname, "/proc/%d/path/a.out", pid);
-  n = readlink(linkname, progdir, nsize);
   if (n > 0) progdir[n] = 0;
 #elif defined(__FreeBSD__)
   int mib[4];
@@ -190,26 +173,6 @@ char* getprog() {
 #elif defined(__BSD__)
   n = readlink("/proc/curproc/file", progdir, nsize);
   if (n > 0) progdir[n] = 0;
-#elif defined(__APPLE__)
-  uint32_t nsize_apple = nsize;
-  if (_NSGetExecutablePath(progdir, &nsize_apple) == 0)
-    n = strlen(progdir);
-#else
-  // FALLBACK
-  // Use 'lsof' ... should work on most UNIX systems (incl. OSX)
-  // lsof will list open files, this captures the 1st file listed (usually the executable)
-  int pid;
-  FILE* fd;
-  char cmd[80];
-  pid = getpid();
-
-  sprintf(cmd, "lsof -p %d | awk '{if ($5==\"REG\") { print $9 ; exit}}' 2> /dev/null", pid);
-  fd = popen(cmd, "r");
-  n = fread(progdir, 1, nsize, fd);
-  pclose(fd);
-
-  // remove newline
-  if (n > 1) progdir[--n] = '\0';
 #endif
   if (n == 0 || n == nsize || (lb = strrchr(progdir, (int)LUA_DIRSEP[0])) == NULL)
     return NULL;
