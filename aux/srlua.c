@@ -170,6 +170,9 @@ char* getprog() {
   size_t cb = nsize;
   sysctl(mib, 4, progdir, &cb, NULL, 0);
   n = cb;
+#elif defined(__NetBSD__)
+  n = readlink("/proc/curproc/exe", progdir, nsize);
+  if (n > 0) progdir[n] = 0;
 #elif defined(__BSD__)
   n = readlink("/proc/curproc/file", progdir, nsize);
   if (n > 0) progdir[n] = 0;
