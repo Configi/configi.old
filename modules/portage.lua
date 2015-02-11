@@ -6,6 +6,7 @@
 
 local Lua = {
   find = string.find,
+  remove = table.remove,
   match = string.match,
   insert = table.insert
 }
@@ -137,6 +138,11 @@ function portage.present (S)
   if P.unmask then
     Lua.insert(args, 3, "--auto-unmask-write")
     Lua.insert(args, 3, "--auto-unmask")
+    if not F.run(Cmd["/usr/bin/emerge"], args) then
+      return F.result(atom, false, G.failed)
+    end
+    Lua.remove(args, 3)
+    Lua.remove(args, 3)
   end
   return F.result(atom, F.run(Cmd["/usr/bin/emerge"], args))
 end
