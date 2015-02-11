@@ -7,6 +7,7 @@
 local Lua = {
   find = string.find,
   remove = table.remove,
+  format = string.format,
   match = string.match,
   insert = table.insert
 }
@@ -72,7 +73,7 @@ Func.found = function (P)
         end
       end
     else
-      if Pstat.stat(Lc.strf("/var/db/pkg/%s/%s%s", A.category, A.package, A.version)) then
+      if Pstat.stat(Lua.format("/var/db/pkg/%s/%s%s", A.category, A.package, A.version)) then
         return true
       end
     end
@@ -127,7 +128,7 @@ function portage.present (S)
     return F.kept(P.atom)
   end
   local A = Func.decompose(P)
-  local atom = Lc.strf("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
+  local atom = Lua.format("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
   local args = { "--quiet", "--quiet-build", atom }
   Lc.insertif(P.deep, args, 3, "--deep")
   Lc.insertif(P.newuse, args, 3, "--newuse")
@@ -167,7 +168,7 @@ function portage.absent (S)
   end
   local env = { "CLEAN_DELAY=0", "PATH=/bin:/usr/bin:/sbin:/usr/sbin" } -- PORTAGE_BZIP2_COMMAND needs $PATH
   local A = Func.decompose(P)
-  local atom = Lc.strf("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
+  local atom = Lua.format("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
   local args = { _env = env, "--quiet", "-C", atom }
   Lc.insertif(P.depclean, args, 2, "--depclean")
   return F.result(atom, F.run(Cmd["/usr/bin/emerge"], args))

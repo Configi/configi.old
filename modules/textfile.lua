@@ -15,6 +15,7 @@ local Lua = {
   rename = os.rename,
   remove = os.remove,
   find = string.find,
+  format = string.format,
   match = string.match,
   require = require
 }
@@ -55,7 +56,7 @@ local write = function (F, P, R)
         for n = 1, #diff.stdout do
           dtbl[n] = Lua.match(diff.stdout[n], "[%g%s]+") or ""
         end
-        F.msg(P.path, "Showing changes", 0, 0, Lc.strf("Diff:%s%s%s", "\n\n", Lua.concat(dtbl, "\n"), "\n"))
+        F.msg(P.path, "Showing changes", 0, 0, Lua.format("Diff:%s%s%s", "\n\n", Lua.concat(dtbl, "\n"), "\n"))
       end
     else
       return F.result(P.path, false)

@@ -5,7 +5,8 @@
 -- @added 0.9.0
 
 local Lua = {
-  tostring = tostring
+  tostring = tostring,
+  format = string.format
 }
 local Configi = require"configi"
 local Ppwd = require"posix.pwd"
@@ -66,28 +67,28 @@ function user.present (S)
   elseif user then
     if P.shell and user.pw_shell ~= P.shell then
       if F.run(Cmd.usermod, { "-s", P.shell, P.login}) then
-        F.msg(P.login, G.mod_shell, true, 0, Lc.strf("From: %s To: %s", user.shell, P.shell))
+        F.msg(P.login, G.mod_shell, true, 0, Lua.format("From: %s To: %s", user.shell, P.shell))
         R.notify = P.notify
         R.repaired = true
       end
     end
     if P.uid and Lua.tostring(user.pw_uid) ~= P.uid then
       if F.run(Cmd.usermod, { "-u", P.uid, P.login}) then
-        F.msg(P.login, G.mod_uid, true, 0, Lc.strf("From: %s To: %s", user.uid, P.uid))
+        F.msg(P.login, G.mod_uid, true, 0, Lua.format("From: %s To: %s", user.uid, P.uid))
         R.notify = P.notify
         R.repaired = true
       end
     end
     if P.gid and Lua.tostring(user.pw_gid) ~= P.gid then
       if F.run(Cmd.usermod, { "-g", P.gid, P.login }) then
-        F.msg(P.login, G.mod_gid, true, 0, Lc.strf("From: %s To: %s", user.gid, P.gid))
+        F.msg(P.login, G.mod_gid, true, 0, Lua.format("From: %s To: %s", user.gid, P.gid))
         R.notify = P.notify
         R.repaired = true
       end
     end
     if P.home and user.dir ~= P.home then
       if F.run(Cmd.usermod, { "-m", "-d", P.home, P.login}) then
-        F.msg(P.login, G.mod_home, true, 0, Lc.strf("From: %s To: %s", user.dir, P.home))
+        F.msg(P.login, G.mod_home, true, 0, Lua.format("From: %s To: %s", user.dir, P.home))
         R.notify = P.notify
         R.repaired = true
       end

@@ -5,6 +5,7 @@ local Lua = {
   next = next,
   len = string.len,
   match = string.match,
+  format = string.format,
   find = string.find
 }
 local Lc = require"cimicida"
@@ -165,7 +166,7 @@ function factid.gather ()
     fact.architecture[architecture] = true
     -- kernel version information are strings
     local v1, v2, v3 = Lua.match(uname.release, "(%d+).(%d+).(%d+)")
-    kernelmajversion = Lc.strf("%d.%d", v1, v2)
+    kernelmajversion = Lua.format("%d.%d", v1, v2)
     fact.kernelmajversion = {}
     fact.kernelmajversion.string = kernelmajversion
     fact.kernelmajversion[kernelmajversion] = true
@@ -173,7 +174,7 @@ function factid.gather ()
     fact.kernelrelease = {}
     fact.kernelrelease.string = kernelrelease
     fact.kernelrelease[kernelrelease] = true
-    kernelversion = Lc.strf("%d.%d.%d", v1, v2, v3)
+    kernelversion = Lua.format("%d.%d.%d", v1, v2, v3)
     fact.kernelversion = {}
     fact.kernelversion.string = kernelversion
     fact.kernelversion[kernelversion] = true

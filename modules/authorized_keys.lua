@@ -6,6 +6,7 @@
 
 local Lua = {
   ipairs = ipairs,
+  format = string.format,
   concat = table.concat
 }
 local Func = {}
@@ -66,9 +67,9 @@ Func.found = function (P)
   local id = P.id or ""
   local line
   if P.options then
-    line = Lc.strf("%s %s %s %s", P.options, P["type"], P.key, id)
+    line = Lua.format("%s %s %s %s", P.options, P["type"], P.key, id)
   else
-    line = Lc.strf("%s %s %s", P["type"], P.key, id)
+    line = Lua.format("%s %s %s", P["type"], P.key, id)
   end
   if Lc.tfind(file, line, true) then
     return true
@@ -118,9 +119,9 @@ function authorized_keys.present (S)
   local tfile = Lc.filtertval(Lc.file2tbl(file), P.key, true)
   local id = P.id or ""
   if P.options then
-    tfile[#tfile + 1] = Lc.strf("%s %s %s %s", P.options, P["type"], P.key, id)
+    tfile[#tfile + 1] = Lua.format("%s %s %s %s", P.options, P["type"], P.key, id)
   else
-    tfile[#tfile + 1] = Lc.strf("%s %s %s", P["type"], P.key, id)
+    tfile[#tfile + 1] = Lua.format("%s %s %s", P["type"], P.key, id)
   end
   tfile[#tfile] = tfile[#tfile] .. "\n"
   return F.result(item, F.run(Px.awrite, file, Lua.concat(tfile), 384))

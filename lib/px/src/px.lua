@@ -329,7 +329,7 @@ function Px.readin (sz)
     Ppoll.poll(fds, -1)
     if fds[fd].revents.IN then
       local buf = Punistd.read(fd, sz)
-      if buf == "" then fds = nil else str = Cimicida.strf("%s%s", str, buf) end
+      if buf == "" then fds = nil else str = Lua.format("%s%s", str, buf) end
     end
   end
   return str
@@ -371,7 +371,7 @@ function Px.awrite (path, str, mode)
   Px.fcntl(fd, Pfcntl.F_SETLK, lock)
   Punistd.close(fd)
   Punistd.close(tmp)
-  return true, Cimicida.strf("Successfully wrote %s", path)
+  return true, Lua.format("Successfully wrote %s", path)
 end
 
 function Px.isdir (path)

@@ -77,7 +77,7 @@ function Lmod.setvalue (tbl, field)
 end
 
 --- Return a function that passes the string argument to syslog() and add it to tbl
--- It calls Lc.strf if a C-like argument is passed to the returned function
+-- It calls Lua.format if a C-like argument is passed to the returned function
 -- @param T module table (TABLE)
 -- @return function (FUNCTION)
 function Lmod.dmsg (C)
@@ -109,7 +109,7 @@ function Lmod.dmsg (C)
     end
     local str
     if sec == nil then
-      str = Lc.strf([[
+      str = Lua.format([[
 
  [%s] %s
         Comment: %s
@@ -117,7 +117,7 @@ function Lmod.dmsg (C)
         %s%s]],
     flag, msg, C.parameters.comment, item or "", extra or "", "\n")
     else
-       str = Lc.strf([[
+       str = Lua.format([[
 
  [%s] %s
         Elapsed: %.fs
@@ -128,9 +128,9 @@ function Lmod.dmsg (C)
     local lstr
     sec = sec or ""
     if Lua.len(C.parameters.comment) > 0 then
-      lstr = Lc.strf("[%s]%s%s%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, sec, rs, C.parameters.comment)
+      lstr = Lua.format("[%s]%s%s%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, sec, rs, C.parameters.comment)
     else
-      lstr = Lc.strf("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
+      lstr = Lua.format("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
     end
     Lib.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
     C.results.msgt[#C.results.msgt + 1] = {
@@ -172,7 +172,7 @@ function Lmod.msg (C)
       end
     end
 
-    local str = Lc.strf([[
+    local str = Lua.format([[
 
  [%s] %s
         Item: %s
@@ -181,9 +181,9 @@ function Lmod.msg (C)
     local rs = Lua.char(9)
     local lstr
     if Lua.len(C.parameters.comment) > 0 then
-      lstr = Lc.strf("[%s]%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, C.parameters.comment)
+      lstr = Lua.format("[%s]%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, C.parameters.comment)
     else
-      lstr = Lc.strf("[%s]%s%s%s%s", flag, rs, msg, rs, item)
+      lstr = Lua.format("[%s]%s%s%s%s", flag, rs, msg, rs, item)
     end
     Lib.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
     C.results.msgt[#C.results.msgt + 1] = {
@@ -323,8 +323,8 @@ function Lib.finish (C)
       end
     end
     local secs = Px.difftime(Psystime.gettimeofday(), t1)
-    secs = Lc.strf("%s.%s", Lua.tostring(secs.sec), Lua.tostring(secs.usec))
-    msg(Lstr.OPERATION, err, ok or false, secs, Lc.strf("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
+    secs = Lua.format("%s.%s", Lua.tostring(secs.sec), Lua.tostring(secs.usec))
+    msg(Lstr.OPERATION, err, ok or false, secs, Lua.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
     return ok, rt
   end -- functime()
   if not (C.parameters.test or C.parameters.debug) then
@@ -345,7 +345,7 @@ function Lib.finish (C)
   end
   if C.parameters.test then
     C.functions.run = function ()
-      msg(Lstr.OPERATION, Lc.strf("Would execute a corrective operation"), true)
+      msg(Lstr.OPERATION, Lua.format("Would execute a corrective operation"), true)
       return true, {stdout={}, stderr={}}, true
     end -- F.run()
     C.functions.xrun = functime -- if you must execute something use F.xrun()
@@ -406,9 +406,9 @@ function Lscript.list (tbl)
     while Lua.next(tbl[i]) do
       p, v = Lua.next(tbl[i], p)
       if p == nil then break end
-      str = Lc.strf("%s%s \"%s\"\n", str, p, v)
+      str = Lua.format("%s%s \"%s\"\n", str, p, v)
     end
-    str = Lc.strf("%s\n", str)
+    str = Lua.format("%s\n", str)
     return str
   end
 end

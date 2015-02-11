@@ -6,21 +6,6 @@ local input, read, flush, tmpfile, close, output, write =
 local T = ct.new()
 local E = {} ; _ENV = E
 
-T:start"C.strf"
-  do
-    local name = "Bob"
-    local str = "My name is %s"
-    local res = "My name is Bob"
-    T:eq(C.strf(str, name), res)
-    name = "James"
-    local lname = "Bond"
-    str = "My name is %s\n%s"
-    res = [[My name is James
-Bond]]
-    T:eq(C.strf(str, name, lname), res)
-  end
-T:done()
-
 T:start"C.outf"
   do
     local name = "Bob"

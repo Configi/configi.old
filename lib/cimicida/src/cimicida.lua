@@ -36,19 +36,11 @@ local cimicida = {}
 local ENV = {}
 _ENV = ENV
 
---- Format string.
--- @param str C-like string (STRING)
--- @param ... Variable number of arguments to interpolate str (VARS)
--- @return formatted string
-function cimicida.strf (str, ...)
-  return Lua.format(str, ...)
-end
-
 --- Output formatted string to the current output.
 -- @param str C-like string (STRING)
 -- @param ... Variable number of arguments to interpolate str (VARS)
 function cimicida.printf (str, ...)
-  Lua.write(cimicida.strf(str, ...))
+  Lua.write(Lua.format(str, ...))
 end
 
 --- Output formatted string to a specified output.
@@ -58,7 +50,7 @@ end
 function cimicida.outf (fd, str, ...)
   local o = Lua.output()
   Lua.output(fd)
-  local ret, err = Lua.write(cimicida.strf(str, ...))
+  local ret, err = Lua.write(Lua.format(str, ...))
   Lua.output(o)
   return ret, err
 end
@@ -68,7 +60,7 @@ end
 -- @param a String to append to str (STRING)
 -- @return new string (STRING)
 function cimicida.appendln (str, a)
-  return cimicida.strf("%s\n%s", str, a)
+  return Lua.format("%s\n%s", str, a)
 end
 
 --- Output formatted string to STDERR and return 1 as the exit status.
@@ -314,7 +306,7 @@ end
 function cimicida.fopen (file)
   local str
   for s in Lua.lines(file, 2^12) do
-    str = cimicida.strf("%s%s", str or "", s)
+    str = Lua.format("%s%s", str or "", s)
   end
   if Lua.len(str) ~= 0 then
     return str
@@ -376,7 +368,7 @@ function cimicida.sub (str, tbl)
           V=V()
         end
       ]]
-      local lua = cimicida.strf(code, s)
+      local lua = Lua.format(code, s)
       local chunk, err = Lua.load(lua, lua, "t", Lua.setmetatable(t, {__index=tbl}))
       if chunk then
         chunk()
@@ -396,10 +388,10 @@ end
 -- @return a formatted string (STRING)
 function cimicida.exitstr (proc, status, code)
   if status == "exit" or status == "exited" then
-    return cimicida.strf("%s: Exited with code %s", proc, code)
+    return Lua.format("%s: Exited with code %s", proc, code)
   end
   if status == "signal" or status == "killed" then
-    return cimicida.strf("%s: Caught signal %s", proc, code)
+    return Lua.format("%s: Caught signal %s", proc, code)
   end
 end
 
@@ -449,9 +441,9 @@ function cimicida.popen (str, cwd, _ignore_error, _return_code)
   exec 0>&- 2>&1
   ]]
   if cwd then
-    str = cimicida.strf("%scd %s\n%s", header, cwd, str)
+    str = Lua.format("%scd %s\n%s", header, cwd, str)
   else
-    str = cimicida.strf("%s%s", header, str)
+    str = Lua.format("%s%s", header, str)
   end
   local pipe = Lua.popen(str, "re")
   Lua.flush(pipe)

@@ -425,7 +425,7 @@ T:start"file.attributes (modules/file.lua)"
     local stat = Psysstat.stat(testdir .. "file_attributes1")
     T:eq(stat.st_uid, nobody.pw_uid)
     T:eq(stat.st_gid, nogroup.gr_gid)
-    T:eq(Lc.strf("%o", stat.st_mode), "100600")
+    T:eq(string.format("%o", stat.st_mode), "100600")
     T:yes(os.remove(testdir .. "file_attributes1"))
   end
 T:done(N)

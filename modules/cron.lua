@@ -12,6 +12,7 @@ local Lua = {
   next = next,
   char = string.char,
   concat = table.concat,
+  format = string.format,
   remove = table.remove,
   find = string.find
 }
@@ -34,7 +35,7 @@ end
 Func.genjob = function (P)
   local minute, hour, day, month, weekday =
         P.minute or "*", P.hour or "*", P.day or "*", P.month or "*", P.weekday or "*"
-  return Lc.strf("%s %s %s %s %s %s", minute, hour, day, month, weekday, P.job)
+  return Lua.format("%s %s %s %s %s %s", minute, hour, day, month, weekday, P.job)
 end
 
 Func.list = function (P)
@@ -49,7 +50,7 @@ end
 
 Func.listed = function (P)
   local jobs = Func.list(P)
-  local name = Lc.strf("%s%s", tag, P.name)
+  local name = Lua.format("%s%s", tag, P.name)
   local n = Lc.tfind(jobs, "^" .. Lc.escape_pattern(name) .. "$")
   if n and jobs[n + 1] == P.job then
     return true
@@ -122,9 +123,9 @@ function cron.present (S)
   end
   -- Removes jobs[listed] (name) and the unmatching jobs[listed+1] (job)
   if listed then
-    Func.remove(jobs, Lc.strf("%s%s", tag, P.name))
+    Func.remove(jobs, Lua.format("%s%s", tag, P.name))
   end
-  jobs[#jobs + 1] = Lc.strf("%s%s", tag, P.name)
+  jobs[#jobs + 1] = Lua.format("%s%s", tag, P.name)
   jobs[#jobs + 1] = P.job
   jobs = Lua.concat(jobs, "\n") -- tostring(jobs)
   jobs = jobs .. "\n" -- vixie-cron needs a blank line at the end. Complains about a premature EOF.
@@ -156,7 +157,7 @@ function cron.absent (S)
     return F.kept(P.name)
   end
   P.job = Func.genjob(P)
-  jobs = Lua.concat(Func.remove(jobs, Lc.strf("%s%s", tag, P.name)), "\n")
+  jobs = Lua.concat(Func.remove(jobs, Lua.format("%s%s", tag, P.name)), "\n")
   jobs = jobs .. "\n"
   return F.result(P.name, F.run(Cmd["crontab"], { _stdin = jobs, "-u", P.user, "-"}))
 end

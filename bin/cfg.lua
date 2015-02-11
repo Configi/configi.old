@@ -4,6 +4,7 @@ local Lua = {
   exit = os.exit,
   next = next,
   tostring = tostring,
+  format = string.format,
   collectgarbage = collectgarbage
 }
 local Lib = require"configi"
@@ -40,7 +41,7 @@ while true do
       Lc.errorf("Failed!\n")
     end
     local t2 = Px.difftime(Psystime.gettimeofday(), t1)
-    t2 = Lc.strf("%s.%s", Lua.tostring(t2.sec), Lua.tostring(t2.usec))
+    t2 = Lua.format("%s.%s", Lua.tostring(t2.sec), Lua.tostring(t2.usec))
     if t2 == 0 or t2 == 1.0 then
       Lc.printf("Finished run in %.f second\n", 1.0)
     else
@@ -64,7 +65,7 @@ while true do
     local bail = function(sig)
       handle:rmwatch(wd)
       handle:close()
-      Lib.LOG(opts.syslog, opts.log, Lc.strf("Caught signal %s. Exiting.", Lua.tostring(sig)), Psyslog.LOG_ERR)
+      Lib.LOG(opts.syslog, opts.log, Lua.format("Caught signal %s. Exiting.", Lua.tostring(sig)), Psyslog.LOG_ERR)
       Lua.exit(255)
     end
     Psignal.signal(Psignal.SIGINT, bail)

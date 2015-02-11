@@ -40,7 +40,7 @@ local owner = function (F, P, R)
   }
   local stat = Pstat.stat(P.path)
   local u = Ppwd.getpwuid(stat.st_uid)
-  local uid = Lc.strf("%s(%s)", u.pw_uid, u.pw_name)
+  local uid = Lua.format("%s(%s)", u.pw_uid, u.pw_name)
   if P.owner == u.pw_name or P.owner == Lua.tostring(u.pw_uid) then
     return F.result(P.path, nil, Str.file_owner_skip .. uid .. ".")
   end
@@ -61,7 +61,7 @@ local group = function (F, P, R)
   }
   local stat = Pstat.stat(P.path)
   local g = Pgrp.getgrgid(stat.st_gid)
-  local cg = Lc.strf("%s(%s)", g.gr_gid, g.gr_name)
+  local cg = Lua.format("%s(%s)", g.gr_gid, g.gr_name)
   if P.group == g.gr_name or P.group == Lua.tostring(g.gr_gid) then
     return F.result(P.path, nil, Str.file_group_skip .. cg .. ".")
   end
@@ -184,7 +184,7 @@ function file.hard (S)
   local source = Pstat.stat(P.src)
   local link = Pstat.stat(P.path) or nil
   if not source then
-    return F.result(P.path, false, Lc.strf(" '%s' is missing", source))
+    return F.result(P.path, false, Lua.format(" '%s' is missing", source))
   end
   if source and link and (source.st_ino == link.st_ino) then
     F.msg(P.path, G.kept, nil)
