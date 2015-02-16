@@ -175,4 +175,43 @@ function iptables.disable (S)
   return F.result("iptables.disable", ok)
 end
 
+--- Default deny but allow incoming connections to port 22
+-- @param host IP of the local host [DEFAULT: 0.0.0.0]
+-- @param source IP of host to white list [DEFAULT: 0.0.0.0]
+-- @param ssh SSH port [DEFAULT: 22]
+-- @usage iptables.default[[]]
+function iptables.default (S)
+  local M = { "source", "host", "ssh" }
+  local G = {
+    repaired = "iptables.default: Successfully added rules.",
+    failed = "iptables.default: Error adding rules."
+  }
+  local F, P, R = main(S, M, G)
+  if P.source == nil then
+    P.source = "0/0"
+  end
+  if P.host == nil then
+    P.host = "0/0"
+  end
+  if P.ssh == nil then
+    P.ssh = "22"
+  end
+  local args = {
+    { "-F" },
+    { "-X" },
+    { "-P", "INPUT", "DROP" },
+    { "-P", "OUTPUT", "DROP" }
+    { "-P", "FORWARD", "DROP" }
+    { "-A", "INPUT", "-i", "lo", "-j", "ACCEPT" },
+    { "-A", "OUTPUT", "-o", "lo", "-j", "ACCEPT" },
+    { "-A", "INPUT", "-p", "tcp", "-s", P.source, "-d", P.host, "--sport", "513:65535", "--dport", P.ssh,
+      "-m", "state", "--state", "NEW,ESTABLISHED", "-j", "ACCEPT" },
+    { "-A", "OUTPUT", "-p", "tcp", "-s", P.host, "-d", P.source, "--sport", P.ssh, "--dport", "513:65535",
+      "-m", "state", "--state", "ESTABLISHED", "-j", "ACCEPT" }
+  }
+  for _, a in Lua.ipairs(args) do
+    Cmd.iptables(a)
+  end
+end
+
 return iptables
