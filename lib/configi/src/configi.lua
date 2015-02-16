@@ -86,13 +86,13 @@ function Lmod.dmsg (C)
     item = Lua.match(item, "([%S+]+)")
     if flag == true then
       flag = " ok "
-      msg = C.messages.ok
+      msg = C.messages.repaired
     elseif flag == nil then
       flag = "skip"
-      msg = C.messages.skip
+      msg = C.messages.kept
     elseif flag == false then
       flag = "fail"
-      msg = C.messages.fail
+      msg = C.messages.failed
       level = Psyslog.LOG_ERR
     elseif Lua.type(flag) == "string" then
       msg = flag
