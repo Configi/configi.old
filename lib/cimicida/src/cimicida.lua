@@ -23,6 +23,7 @@ local Lua = {
   load = load,
   setmetatable = setmetatable,
   pairs = pairs,
+  ipairs = ipairs,
   exit = os.exit,
   date = os.date,
   difftime = os.difftime,
@@ -614,7 +615,14 @@ end
 -- @return the result of table.insert() (VALUE)
 function cimicida.insertif (bool, list, pos, value)
   if bool then
-    return Lua.insert(list, pos, value)
+    if Lua.type(value) == "table" then
+      for n, i in Lua.ipairs(value) do
+        local p = n - 1
+        Lua.insert(list, pos + p, i)
+      end
+    else
+      Lua.insert(list, pos, value)
+    end
   end
 end
 
