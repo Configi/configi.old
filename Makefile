@@ -4,7 +4,7 @@ NULSTRING:=
 MAKEFLAGS= --silent
 LIB= cimicida px configi factid
 VENDOR= luaposix linotify crc32 sha2
-MODULES= unarchive authorized_keys cron file hostname shell textfile user git sha256 \
+MODULES= unarchive authorized_keys cron file hostname shell textfile user git sha256 iptables \
 	portage openrc \
 	yum systemd \
 	apk opkg sysvinit
