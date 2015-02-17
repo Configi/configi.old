@@ -2,6 +2,7 @@ local Lua = {
   setmetatable = setmetatable,
   pcall = pcall,
   type = type,
+  next = next,
   ipairs = ipairs,
   len = string.len,
   sub = string.sub,
@@ -230,7 +231,7 @@ function Px.exec (args)
     return nil, err
   end
   local fdcopy = function (fileno, std, output)
-    local buf, str
+    local buf, str = nil, {}
     local fd, res, msg
     if output then
       fd, msg = Px.open(output, (Pfcntl.O_CREAT | Pfcntl.F_WRLCK | Pfcntl.O_WRONLY))
@@ -249,14 +250,11 @@ function Px.exec (args)
           return nil, msg
         end
       else
-        if not str then
-          str = Lua.format("%s", buf)
-        else
-          str = Lua.format("%s%s", str, buf)
-        end
+        str[#str + 1] = buf
       end
     end
-    if str and not output then
+    if Lua.next(str) and not output then
+      str = Lua.concat(str) -- table to string
       for ln in Lua.gmatch(str, "([^\n]*)\n") do
         if ln ~= "" then result[std][#result[std] + 1] = ln end
       end
