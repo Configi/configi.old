@@ -73,12 +73,8 @@ function iptables.append (S)
   if P.ipv4 == nil then
     P.ipv4 = true -- on by default
   end
-  if P.chain == nil then
-    P.chain = "INPUT" -- default
-  end
-  if P.table == nil then
-    P.table = "filter" -- default
-  end
+  P.chain = P.chain or "INPUT"
+  P.table = P.table or "filter"
   if P.source then
     P.source = mask(P.source)
   end
@@ -187,21 +183,15 @@ function iptables.default (S)
     failed = "iptables.default: Error adding rules."
   }
   local F, P, R = main(S, M, G)
-  if P.source == nil then
-    P.source = "0/0"
-  end
-  if P.host == nil then
-    P.host = "0/0"
-  end
-  if P.ssh == nil then
-    P.ssh = "22"
-  end
+  P.source = P.source or "0/0"
+  P.host = P.host or "0/0"
+  P.ssh = P.ssh or "22"
   local args = {
     { "-F" },
     { "-X" },
     { "-P", "INPUT", "DROP" },
-    { "-P", "OUTPUT", "DROP" }
-    { "-P", "FORWARD", "DROP" }
+    { "-P", "OUTPUT", "DROP" },
+    { "-P", "FORWARD", "DROP" },
     { "-A", "INPUT", "-i", "lo", "-j", "ACCEPT" },
     { "-A", "OUTPUT", "-o", "lo", "-j", "ACCEPT" },
     { "-A", "INPUT", "-p", "tcp", "-s", P.source, "-d", P.host, "--sport", "513:65535", "--dport", P.ssh,
