@@ -14,6 +14,16 @@ if not Px.isdir(testdir) then
   Psysstat.mkdir(testdir)
 end
 
+T:start"Lua tests"
+  do
+    local Lua = dofile("test/lua.lua")
+    T:eq(Lua.sequence(), "12345")
+    T:eq(Lua.ipairsnil(), "123")
+    T:eq(Lua.forloopnil(), "1235")
+    T:eq(Lua.nextsequence(), "1235")
+  end
+T:done(N)
+
 T:start"debug test/core-debug.lua"
  do
    local _, out = cfg{ "-v",  "-f", "test/core-debug.lua"}
