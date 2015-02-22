@@ -104,13 +104,13 @@ T:start"list test/core-list.lua"
   end
 T:done(N)
 
-T:start"map test/core-map.lua"
+T:start"each test/core-each.lua"
   do
-    T:yes(Psysstat.mkdir(testdir .. "core-map.xxx"))
-    T:yes(Psysstat.mkdir(testdir .. "core-map.yyy"))
-    T:eq(cfg{ "-f", "test/core-map.lua"}, true)
-    T:no(Px.isdir(testdir .. "core-map.xxx"))
-    T:no(Px.isdir(testdir .. "core-map.yyy"))
+    T:yes(Psysstat.mkdir(testdir .. "core-each.xxx"))
+    T:yes(Psysstat.mkdir(testdir .. "core-each.yyy"))
+    T:eq(cfg{ "-f", "test/core-each.lua"}, true)
+    T:no(Px.isdir(testdir .. "core-each.xxx"))
+    T:no(Px.isdir(testdir .. "core-each.yyy"))
   end
 T:done(N)
 

@@ -478,7 +478,7 @@ function Lcli.main (opts)
       scripts[#scripts + 1] = PATH .. "/" .. f
     end
   end
-  env.map = function (f, t)
+  env.each = function (t, f)
     for i in Lscript.list(t) do
       f(i)
     end
