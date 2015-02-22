@@ -127,7 +127,7 @@ end
 -- @param tbl table to convert (TABLE)
 -- @param def default value for each field in the record (VALUE)
 -- @return the converted table (TABLE)
-function cimicida.arr2rec (tbl, def)
+function cimicida.arrtorec (tbl, def)
   local t = {}
   for n = 1, #tbl do t[tbl[n]] = def end
   return t
@@ -137,7 +137,7 @@ end
 -- Each line is a table value
 -- @param str string to convert (STRING)
 -- @return the table (TABLE)
-function cimicida.ln2tbl (str)
+function cimicida.lntotbl (str)
   local tbl = {}
   if not str then
     return tbl
@@ -151,7 +151,7 @@ end
 --- Split alphanumeric matches of a string into table values.
 -- @param str string to convert (STRING)
 -- @return the table (TABLE)
-function cimicida.split2tbl (str)
+function cimicida.wordtotbl (str)
   local t = {}
   for s in Lua.gmatch(str, "%w+") do
     t[#t + 1] = s
@@ -162,7 +162,7 @@ end
 --- Split non-space character matches of a string into table values.
 -- @param str string to convert (STRING)
 -- @return the table (TABLE)
-function cimicida.str2tbl (str)
+function cimicida.strtotbl (str)
   local t = {}
   for s in Lua.gmatch(str, "%S+") do
     t[#t + 1] = s
@@ -224,7 +224,7 @@ end
 -- Each line is a table value
 -- @param file file to convert (STRING)
 -- @return a table (TABLE)
-function cimicida.file2tbl (file)
+function cimicida.filetotbl (file)
   local _, fd = Lua.pcall(Lua.open, file, "re")
   if fd then
     Lua.flush(fd)
