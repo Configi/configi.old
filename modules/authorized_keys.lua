@@ -63,7 +63,7 @@ end
 
 Func.found = function (P)
   local file = Func.keyfile(P)
-  file = Lc.file2tbl(file)
+  file = Lc.filetotbl(file)
   local id = P.id or ""
   local line
   if P.options then
@@ -116,7 +116,7 @@ function authorized_keys.present (S)
     return F.kept(item)
   end
   -- first remove any matching key
-  local tfile = Lc.filtertval(Lc.file2tbl(file), P.key, true)
+  local tfile = Lc.filtertval(Lc.filetotbl(file), P.key, true)
   local id = P.id or ""
   if P.options then
     tfile[#tfile + 1] = Lua.format("%s %s %s %s", P.options, P["type"], P.key, id)
@@ -153,7 +153,7 @@ function authorized_keys.absent (S)
   if not file or not Func.found(P) then
     return F.kept(item)
   end
-  local tfile = Lc.filtertval(Lc.file2tbl(file), P.key, true)
+  local tfile = Lc.filtertval(Lc.filetotbl(file), P.key, true)
   return F.result(item, F.run(Px.awrite, file, Lua.concat(tfile), 384))
 end
 

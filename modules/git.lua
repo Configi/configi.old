@@ -26,7 +26,7 @@ Func.found = function (P)
   if not Pstat.stat(gitconfig) then
     return nil
   else
-    local config = Lc.file2tbl(gitconfig)
+    local config = Lc.filetotbl(gitconfig)
     P.repository = P.repository or "" -- to accomodate git.pull
     -- confident that Git URLs do not contain Lua magic characters
     if Lc.tfind(config, "url = " .. P.repository, true) then

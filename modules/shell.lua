@@ -238,7 +238,7 @@ function shell.popen3 (S)
   else
     str = P.string
   end
-  local args = Lc.str2tbl(str)
+  local args = Lc.strtotbl(str)
   args._bin = Lua.remove(args, 1)
   if P.stdin then args._stdin = P.stdin end
   if P.cwd then args._cwd = P.cwd end

@@ -162,7 +162,7 @@ function textfile.insert_line (S)
     line = P.line
     pattern = P.pattern
   end
-  local file = Lc.file2tbl(P.path)
+  local file = Lc.filetotbl(P.path)
   if not file then
     return F.result(P.path, false, G.missing)
   end
@@ -222,7 +222,7 @@ function textfile.remove_line (S)
   else
     pattern = P.pattern
   end
-  local file = Lc.file2tbl(P.path)
+  local file = Lc.filetotbl(P.path)
   if not file then
     return F.result(P.path, false, G.missing)
   end
