@@ -531,6 +531,28 @@ T:start"sha256.verify (modules/sha256.lua)"
   end
 T:done(N)
 
+T:start"iptables.append (modules/iptables.lua)"
+  do
+    T:eq(cfg{ "-f", "test/iptables_append.lua"}, true)
+    local a = Lc.strtotbl"_ INPUT -s 6.6.6.6/32 -p tcp -m tcp --sport 31337 --dport 31337 -m comment --comment 'Configi' -j ACCEPT"
+    a[1] = "-C"
+    T:eq(Cmd.iptables(a), true)
+    a[1] = "-D"
+    T:eq(Cmd.iptables(a), true)
+  end
+T:done(N)
+
+T:start"iptables.disable (modules/iptables.lua)"
+  do
+    T:eq(cfg{ "-f", "test/iptables_append.lua" }, true)
+    local _, cmd = Cmd.iptables{ "--list-rules" }
+    T:eq(#cmd.stdout, 4)
+    T:eq(cfg{ "-f", "test/iptables_disable.lua" }, true)
+    _, cmd = Cmd.iptables{ "--list-rules" }
+    T:eq(#cmd.stdout, 3)
+  end
+T:done(N)
+
 Lc.printf("\n  Summary: \n")
 Lc.printf("    %s Passed\n", N.successes)
 Lc.printf("    %s Failures\n\n", N.failures)
