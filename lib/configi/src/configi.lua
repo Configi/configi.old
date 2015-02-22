@@ -241,7 +241,7 @@ function Lmod.ignoredwarn (C)
   C.module[#C.module + 1] = "notify_failed"
   C.module[#C.module + 1] = "notify_kept"
   -- Now check for any undeclared module parameter
-  local Ps = Lc.arr2rec(C.module, 0)
+  local Ps = Lc.arrtorec(C.module, 0)
   for param, _ in Lua.pairs(C.parameters) do
     if Ps[param] == nil then
       Lc.warningf("%s Parameter '%s' ignored.\n", Lstr.WARN, param)
