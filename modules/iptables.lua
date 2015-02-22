@@ -26,6 +26,7 @@ _ENV = ENV
 local main = function (S, M, G)
   local C = Configi.start(S, M, G)
   C.required = { "chain" }
+  C.alias.match = { "module" }
   return Configi.finish(C)
 end
 
@@ -35,11 +36,8 @@ end
 -- @param source source specification. Default network mask is /32.
 -- @param destination destination specification. Default network mask is /32.
 -- @param protocol protocol of the rule to match for
--- @param dport destination port
--- @param sport source port
--- @param tcp-flags
--- @param tcp-option
 -- @param target target of the rule
+-- @param options space delimited string that is passed as extra options to iptables
 -- @param in incoming interface via which the rule to match for
 -- @param out outgoing interface via which the rule to match for
 -- @param ipv6 Use ip6tables
@@ -50,17 +48,14 @@ end
 --   target "accept"
 --   source "6.6.6.6"
 --   protocol "tcp"
---   sport "31337"
---   dport "31337"
+--   options "-m tcp --sport 31337 --dport 31337"
 -- ]]
 function iptables.append (S)
   -- -A INPUT -s P.source -d P.destination -i lo -p tcp -m tcp --sport 31337 --dport 8080 --tcp-option 16 --tcp-flags SYN FIN -j ACCEPT
-  local M = { "table", "chain", "source", "destination", "protocol",
-              "dport", "sport", "tcp-flags", "tcp-option", "target",
-              "in", "out", "ipv6", "ipv4" }
+  local M = { "table", "chain", "source", "destination", "protocol", "target", "options", "match", "in", "out", "ipv6", "ipv4" }
   local G = {
     repaired = "iptables.append: Successfully appended rule.",
-    kept = "iptables.append: Rule exists.",
+    kept = "iptables.append: Rule already present.",
     failed = "iptables.append: Failed to append rule."
   }
   local F, P, R = main(S, M, G)
@@ -81,19 +76,13 @@ function iptables.append (S)
   if P.destination then
     P.destination = mask(P.destination)
   end
-  -- ordering is prescribed
-  local rule = { "-A", Lua.upper(P.chain), "-j", Lua.upper(P.target) }
-  Lc.insertif(P["tcp-flags"], rule, 3, { "--tcp-flags", P["tcp-flags"] })
-  Lc.insertif(P["tcp-option"], rule, 3, { "--tcp-option", P["tcp-option"] })
-  Lc.insertif(P.dport, rule, 3, { "--dport", P.dport })
-  Lc.insertif(P.sport, rule, 3, { "--sport", P.sport })
-  Lc.insertif(P.protocol, rule, 3, { "-m", P.protocol })
+  local rule = { "", Lua.upper(P.chain), "-j", Lua.upper(P.target) }
+  Lc.insertif(P.options, rule, 3, Lc.strtotbl(P.options))
   Lc.insertif(P.protocol, rule, 3, { "-p", P.protocol })
   Lc.insertif(P.out, rule, 3, { "-o", P.out})
   Lc.insertif(P["in"], rule, 3, { "-i", P["in"]})
   Lc.insertif(P.destination, rule, 3, { "-d", P.destination })
   Lc.insertif(P.source, rule, 3, { "-s", P.source })
-  local rule_str = Lua.concat(rule, " ")
   local list = { iptables = {}, ip6tables = {} }
   local ipt = {}
   if P.ipv4 == true then
@@ -105,12 +94,11 @@ function iptables.append (S)
   local skip = false
   for _, i in Lua.ipairs(ipt) do
     skip = false -- reset
-    local _, res = Cmd[i]{ "--list-rules", Lua.upper(P.chain) }
-    if Lc.tfind(res.stdout, rule_str, true) then
+    rule[1] = "-C"
+    if Cmd[i](rule) then
       skip = true
     else
-      Lua.insert(rule, 1, P.table)
-      Lua.insert(rule, 1, "-t")
+      rule[1] = "-A"
       if not F.run(Cmd[i], rule) then
         return F.result("iptables.append", false)
       end
@@ -171,7 +159,8 @@ function iptables.disable (S)
   return F.result("iptables.disable", ok)
 end
 
---- Default deny but allow incoming connections to port 22
+--- Default deny but allow incoming connections to port 22.
+-- @note IPv4 only at the moment.
 -- @param host IP of the local host [DEFAULT: 0.0.0.0]
 -- @param source IP of host to white list [DEFAULT: 0.0.0.0]
 -- @param ssh SSH port [DEFAULT: 22]
@@ -180,6 +169,7 @@ function iptables.default (S)
   local M = { "source", "host", "ssh" }
   local G = {
     repaired = "iptables.default: Successfully added rules.",
+    kept = "iptables.default: Rules already present",
     failed = "iptables.default: Error adding rules."
   }
   local F, P, R = main(S, M, G)
@@ -194,13 +184,21 @@ function iptables.default (S)
     { "-P", "FORWARD", "DROP" },
     { "-A", "INPUT", "-i", "lo", "-j", "ACCEPT" },
     { "-A", "OUTPUT", "-o", "lo", "-j", "ACCEPT" },
-    { "-A", "INPUT", "-p", "tcp", "-s", P.source, "-d", P.host, "--sport", "513:65535", "--dport", P.ssh,
+    { "", "INPUT", "-p", "tcp", "-s", P.source, "-d", P.host, "--sport", "513:65535", "--dport", P.ssh,
       "-m", "state", "--state", "NEW,ESTABLISHED", "-j", "ACCEPT" },
-    { "-A", "OUTPUT", "-p", "tcp", "-s", P.host, "-d", P.source, "--sport", P.ssh, "--dport", "513:65535",
+    { "", "OUTPUT", "-p", "tcp", "-s", P.host, "-d", P.source, "--sport", P.ssh, "--dport", "513:65535",
       "-m", "state", "--state", "ESTABLISHED", "-j", "ACCEPT" }
   }
-  for _, a in Lua.ipairs(args) do
-    Cmd.iptables(a)
+  args[8][1] = "-C"
+  args[9][1] = "-C"
+  if Cmd.iptables(args[8]) and Cmd.iptables(args[9]) then
+    return F.kept("iptables.default")
+  else
+    args[8][1] = "-A"
+    args[9][1] = "-A"
+    for _, a in Lua.ipairs(args) do
+      Cmd.iptables(a)
+    end
   end
 end
 
