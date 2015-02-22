@@ -1,7 +1,7 @@
 t = {
-  { path = "test/tmp/core-map.xxx", comment = "test" },
-  { path = "test/tmp/core-map.yyy", comment = "test" }
+  { path = "test/tmp/core-each.xxx", comment = "test" },
+  { path = "test/tmp/core-each.yyy", comment = "test" }
 }
 
-map(file.absent, t)
+each(t, file.absent)
 
