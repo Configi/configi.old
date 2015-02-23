@@ -563,6 +563,15 @@ T:start"iptables.disable (modules/iptables.lua)"
   end
 T:done(N)
 
+T:start"make.install (modules/make.lua)"
+  do
+    T:eq(cfg{ "-f", "test/make_install.lua" }, true)
+    T:eq(Cmd.rm{ "test/tmp/root/bin/exe" }, true)
+    T:eq(Cmd.rm{ "-r", "-f", "test/tmp/root" }, true)
+    T:eq(Cmd.rm{ "-r", "-f", "test/tmp/make_install" }, true)
+  end
+T:done(N)
+
 Lc.printf("\n  Summary: \n")
 Lc.printf("    %s Passed\n", N.successes)
 Lc.printf("    %s Failures\n\n", N.failures)
