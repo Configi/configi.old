@@ -124,6 +124,9 @@ int luaopen_module_sha256(lua_State *L);
 #ifdef module_iptables
 int luaopen_module_iptables(lua_State *L);
 #endif
+#ifdef module_make
+int luaopen_module_make(lua_State *L);
+#endif
 
 /*
 ** these libs are loaded by lua.c and are readily available to any Lua
@@ -265,6 +268,9 @@ static const luaL_Reg preloadedlibs[] = {
 #endif
 #ifdef module_iptables
   {"module.iptables", luaopen_module_iptables},
+#endif
+#ifdef module_make
+  {"module.make", luaopen_module_make},
 #endif
 #if defined(LUA_COMPAT_BITLIB)
   {"bit32", luaopen_bit32},
