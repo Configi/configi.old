@@ -48,15 +48,17 @@ function make.install (S)
     P.environment = C.strtotbl(P.environment)
   end
   local args, result
-  if P.configure then
-    args = { _env = P.environment, _cwd = P.directory }
-    C.insertif(P.configure, args, 1, C.strtotbl(P.configure))
-    result = F.run(Cmd["./configure"], args)
-  else
-    result = F.run(Cmd["./configure"], { _env = P.environment, _cwd = P.directory })
-  end
-  if not result then
-    return F.result(P.directory, false, "`./configure` step failed")
+  if Pstat.stat(P.directory .. "/configure") then
+    if P.configure then
+      args = { _env = P.environment, _cwd = P.directory }
+      C.insertif(P.configure, args, 1, C.strtotbl(P.configure))
+      result = F.run(Cmd["./configure"], args)
+    else
+      result = F.run(Cmd["./configure"], { _env = P.environment, _cwd = P.directory })
+    end
+    if not result then
+      return F.result(P.directory, false, "`./configure` step failed")
+    end
   end
   if P.make then
     args = { _env = P.environment, _cwd = P.directory }
