@@ -9,8 +9,8 @@
 #define HAVE_INTTYPES_H 1
 #define HAVE_MEMORY_H 1
 #define HAVE_CURSES 0
-#define VERSION "33.2.0"
-#define PACKAGE_STRING "luaposix 33.2.0"
+#define VERSION "33.3.0"
+#define PACKAGE_STRING "luaposix 33.3.0"
 #define PACKAGE_NAME "luaposix"
 #ifndef _DARWIN_C_SOURCE
 #define HAVE_LINUX_NETLINK_H 1

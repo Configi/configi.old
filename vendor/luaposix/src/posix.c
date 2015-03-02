@@ -10,9 +10,7 @@
  * With documentation from Steve Donovan 2012
  */
 
-#include "bit32.c"
 #include "ctype.c"
-/* #include "curses.c" */
 #include "dirent.c"
 #include "errno.c"
 #include "fcntl.c"
@@ -37,7 +35,6 @@
 #include "sys/utsname.c"
 #include "sys/wait.c"
 #include "syslog.c"
-/* #include "termio.c" */
 #include "time.c"
 #include "unistd.c"
 #include "utime.c"

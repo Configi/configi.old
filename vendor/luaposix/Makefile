@@ -1,6 +1,6 @@
 posix_cSRC= vendor/luaposix/src/posix.c
 posix_cOBJ= vendor/luaposix/posix_c.o
-posixSRC= vendor/luaposix/src/posix.lua
+posixSRC= vendor/luaposix/src/init.lua
 posixOBJ= vendor/luaposix/posix.o
 posixC= vendor/luaposix/posix.c
 posixLUAC= vendor/luaposix/posix.luac

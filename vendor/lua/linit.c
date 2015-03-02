@@ -183,7 +183,6 @@ static const luaL_Reg preloadedlibs[] = {
   {"px_c", luaopen_px_c},
 #endif
 #ifdef lib_luaposix
-  {"posix.bit32", luaopen_posix_bit32},
   {"posix.ctype", luaopen_posix_ctype},
   {"posix.dirent", luaopen_posix_dirent},
   {"posix.errno", luaopen_posix_errno},
