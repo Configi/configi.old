@@ -674,7 +674,7 @@ function Lcli.opt (arg, version)
   end
   if opts.debug then
     Lc.printf("Started run %s\n", Lc.timestamp())
-    Lc.printf("Running script: %s\n", opts.script)
+    Lc.printf("Applying policy: %s\n", opts.script)
   end
   local source, hsource, runenv = Lcli.main(opts) -- arg[index]
   source.runs, source.tags = opts.runs, tags
