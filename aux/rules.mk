@@ -23,7 +23,7 @@ $(GLUE_T):
 	$(CC) -o $@ $(GLUE_SRC).c
 
 $(CFG_T): $(GLUE_T) $(SRLUA_T) $(LUA_T) $(CFG)
-	$(ECHOT) [OK] $@
+	$(ECHOT) [LN] $@
 	$(GLUE) $(SRLUA_T) $(CFG) $@
 	$(CHMOD) +x $@
 
