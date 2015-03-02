@@ -29,8 +29,8 @@ T:start"debug test/core-debug.lua"
    local _, out = cfg{ "-v",  "-f", "test/core-debug.lua"}
    out = table.concat(out.stdout, "\n")
    T:eq(string.find(out, "Started run", 1, true), 1)
-   T:eq(string.find(out, "Running", 1, true), 42)
-   T:eq(string.find(out, "Finished run", 1, true), 102)
+   T:eq(string.find(out, "Applying", 1, true), 42)
+   T:eq(string.find(out, "Finished run", 1, true), 103)
  end
 T:done(N)
 
