@@ -11,7 +11,7 @@ local Lua = {
 local Configi = require"configi"
 local Cmd = require"px".cmd
 local Pstat = require"posix.sys.stat"
-local C = require"cimicida"
+local Lc = require"cimicida"
 local make = {}
 local ENV = {}
 _ENV = ENV
@@ -45,13 +45,13 @@ function make.install (S)
     return F.kept(P.directory)
   end
   if P.environment then
-    P.environment = C.strtotbl(P.environment)
+    P.environment = Lc.strtotbl(P.environment)
   end
   local args, result
   if Pstat.stat(P.directory .. "/configure") then
     if P.configure then
       args = { _env = P.environment, _cwd = P.directory }
-      C.insertif(P.configure, args, 1, C.strtotbl(P.configure))
+      Lc.insertif(P.configure, args, 1, Lc.strtotbl(P.configure))
       result = F.run(Cmd["./configure"], args)
     else
       result = F.run(Cmd["./configure"], { _env = P.environment, _cwd = P.directory })
@@ -62,7 +62,7 @@ function make.install (S)
   end
   if P.make then
     args = { _env = P.environment, _cwd = P.directory }
-    C.insertif(P.make, args, 1, C.strtotbl(P.make))
+    Lc.insertif(P.make, args, 1, Lc.strtotbl(P.make))
     result = F.run(Cmd.make, args)
   else
     result = F.run(Cmd.make, { _env = P.environment, _cwd = P.directory })
@@ -73,7 +73,7 @@ function make.install (S)
   if P.make then
     args = { _env = P.environment, _cwd = P.directory }
     Lua.insert(args, 1, "install")
-    C.insertif(P.make, args, 1, C.strtotbl(P.make))
+    Lc.insertif(P.make, args, 1, Lc.strtotbl(P.make))
     result = F.run(Cmd.make, args)
   else
     result = F.run(Cmd.make, { "install",  _env = P.environment, _cwd = P.directory })
