@@ -1,4 +1,4 @@
-local version = "Configi 0.9.0"
+local version = "Configi 0.9.7"
 local arg = arg
 local Lua = {
   exit = os.exit,
