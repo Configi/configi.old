@@ -126,3 +126,30 @@ Included policies are stacked, for example the following policy inserts the cont
     include "test2.lua"
     file.touch [[ path "/etc/passwd" ]]
 
+---
+
+### each(t, f)
+
+Run a function `f` against each item from table `t`.
+
+The following:
+
+    t = {
+      { path = "test.xxx", comment = "test" },
+      { path = "test.yyy", comment = "test" }
+    }
+
+    each(t, file.absent)
+
+is equivalent to
+
+    file.absent[[
+      comment "test"
+      path "test.xxx"
+    ]]
+
+    file.absent[[
+      comment "test"
+      path "test.yyy"
+    ]]
+
