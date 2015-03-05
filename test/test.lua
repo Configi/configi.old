@@ -21,6 +21,9 @@ T:start"Lua tests"
     T:eq(Lua.ipairsnil(), "123")
     T:eq(Lua.forloopnil(), "1235")
     T:eq(Lua.nextsequence(), "1235")
+    T:eq(Lua.multiplereturn(), "145")
+    T:eq(Lua.updatetable1(), "12345")
+    T:eq(Lua.updatetable2(), "12345")
   end
 T:done(N)
 
