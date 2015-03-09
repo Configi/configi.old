@@ -1,4 +1,4 @@
--- The `configure; make; make install` sequence.
+--- The `configure; make; make install` sequence.
 -- @module make
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
