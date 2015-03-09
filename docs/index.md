@@ -34,10 +34,6 @@ Configi modules are compiled-in so you can choose the module apt for you policy 
 
 The ideal system would be a pull-based system but if needed Configi can also emulate a push-based system.
 
-* **Do not enforce a pure declarative policy**
-
-Configi policies can be written as mixed declarative and imperative. As much as possible it is desired to write policies to be declarative but policy authors can take advantage of the imperative features of Lua.
-
 * **No packaging required**
 
 You can just copy the Configi (cfg) executable to a host and have it configuring the host in no time.
