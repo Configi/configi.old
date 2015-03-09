@@ -12,13 +12,13 @@ See [Wikipedia](http://en.wikipedia.org/wiki/Configuration_management) for more 
 
 #### Why?
 
-There are numerous configuration management software in existence but I find most are bloated both in resource usage and features. The others in the minimalist camp also fall short due to complicated module or extension writing. They are usually not far off from shell script wrappers.
+There are several configuration management software in existence but I find most are bloated both in resource usage and features. The others in the minimalist camp also fall short due to complicated module or extension writing. The latter are usually not far off from shell script wrappers.
 
-Configi was inspired by CFEngine 3, Chef and Ansible. You may see some similarities with these configuration management software in Configi. Especially CFEngine 3, where we borrowed the concepts introduced by the Promise Theory and Computer Immunology). 
+Configi was inspired by CFEngine 3, Chef and Ansible. You may see some similarities with these configuration management software in Configi. Especially CFEngine 3, where we borrowed the concepts introduced by the Promise Theory and Computer Immunology.
 
 Visit M. Burgess' [page](http://markburgess.org/sysadmin.html) for essays, articles and papers regarding Promise Theory and system administration. I do not claim full compliance to the theory so Configi should not be considered a complete replacement for CFEngine 3.
 
-In my opinion Lua is the best configuration language. It's language features also lend to a concise core and module code. In the same spirit as Lua, the Configi core is very small. 
+In my opinion Lua is the best configuration language. It's language features also lend to a concise core and module code. In the same spirit as Lua, the Configi core is very small.
 
 Choosing the right tool is not a rational matter. If the design decisions outlined below aligns with your requirements then give Configi a try.
 
@@ -32,7 +32,7 @@ Configi modules are compiled-in so you can choose the module apt for you policy 
 
 * **Pull or push model**
 
-The ideal system would be a pull-based system but if needed Configi can also emulate a push-based system. 
+The ideal system would be a pull-based system but if needed Configi can also emulate a push-based system.
 
 * **Do not enforce a pure declarative policy**
 
@@ -50,7 +50,7 @@ This requires adding features that complicates and bloats the runtime.
 
 By avoiding parallel execution and being built in Lua we are guaranteeing very little resources required.
 
-* **Sequential**
+* **Deterministic ordering**
 
 By avoiding parallel execution policies are evaluated from top to bottom.
 
