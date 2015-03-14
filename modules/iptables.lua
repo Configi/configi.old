@@ -1,5 +1,5 @@
--- IPTables.
--- This module is for configuring rules on a host. The FORWARD chain is untested.
+--- IPTables.
+-- This module is for configuring rules on a host. Warning: the FORWARD chain is untested.
 -- @module iptables
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
@@ -112,6 +112,7 @@ end
 
 --- Disable IPTables.
 -- Flush, zero out counters and remove user-defined chains.
+-- @param NONE
 -- @usage iptables.disable[[]]
 function iptables.disable (S)
   S = [[ chain "dummy" ]]
