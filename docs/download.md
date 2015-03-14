@@ -19,7 +19,7 @@ Runs fine on OpenWRT mipsel and mips targets with little as 32MB RAM. Here's a m
 It should compile on any recent Linux distributions but it may lack the necessary modules to be useful. This should improve with module contributions for your distribution.
 
 # Download
-[configi-0.9.6](https://github.com/Configi/configi/releases/tag/v0.9.6)
+[configi-0.9.7](https://github.com/Configi/configi/releases/tag/v0.9.7)
 
 # Requirements
 
@@ -35,11 +35,11 @@ Runtime Dependencies will depend on the module that you want to compile in. Chec
 
 The build system is a non-recursive Makefile. Unpack the archive, change to the directory then run `make`.
 
-    # tar -xf configi-0.9.6.tar.gz
-    # cd configi-0.9.6
+    # tar -xf configi-0.9.7.tar.gz
+    # cd configi-0.9.7
     # make
 
 # Running
 
-    # cd configi-0.9.6
+    # cd configi-0.9.7
     # bin/cfg -vf path_to_your_policy
