@@ -1,5 +1,19 @@
 Configi
 
+CHANGES with 0.9.7
+    * Renamed module message keys.
+    * Compiled in policies.
+    * Improved module_unarchive, module_user
+    * Fix module_portage.
+    * Upgrade luaposix to 33.3.1
+    * Added module_iptables, module_make.
+    * Several improvements to building and compilation.
+    * Update documentation.
+    * New policy function each().
+    * Improved module function insertif().
+    * Fix output of debug messages.
+    * Several minor fixes.
+
 CHANGES with 0.9.6
     * tests: Equality tests are reversed.
     * makefile: Added make arguments for turning on AddressSanitizer.
