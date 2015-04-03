@@ -1,29 +1,29 @@
 
-cron.present [[
-  name "test"
-  minute "25"
-  hour "09"
-  job "/bin/ls"
-]]
+cron.present {
+  name = "test",
+  minute = "25",
+  hour = "09",
+  job = "/bin/ls"
+}
 
-cron.present [[
-  name "cut"
-  minute "30"
-  hour "11"
-  job "/bin/ls"
-]]
+cron.present {
+  name = "cut",
+  minute = "30",
+  hour = "11",
+  job = "/bin/ls"
+}
 
-cron.present [[
-  name "two"
-  minute "2"
-  hour "4"
-  job "/bin/ls"
-]]
+cron.present {
+  name = "two",
+  minute = "2",
+  hour = "4",
+  job = "/bin/ls"
+}
 
-cron.absent [[
-  name"whoah"
-  job"/bin/ls"
-]]
+cron.absent {
+  name = "whoah",
+  job = "/bin/ls"
+}
 
 
 cp = {
@@ -38,12 +38,12 @@ end
 
 name = "testing"
 
-cron.present[[
-  name "{{ name }}"
-  minute "1"
-  hour "6"
-  job "/bin/ls"
-]]
+cron.present {
+  name = name,
+  minute = "1",
+  hour = "6",
+  job = "/bin/ls"
+}
 
 gang = {
  name = "south",
@@ -52,12 +52,12 @@ gang = {
  job = "/bin/ls"
 }
 
-cron.present[[
- name"{{ gang.name }}"
- minute"{{ gang.minute }}"
- hour"{{ gang.hour }}"
- job"{{ gang.job }}"
-]]
+cron.present {
+ name = gang.name,
+ minute = gang.minute,
+ hour = gang.hour,
+ job = gang.job
+}
 
 
 p = {
@@ -65,7 +65,7 @@ p = {
 }
 
 xp = {
-  { name = "Rec", minute = "5", hour = "3", job = "{{ p.job }}" }
+  { name = "Rec", minute = "5", hour = "3", job = p.job }
 }
 
 for jobs in list(xp) do
