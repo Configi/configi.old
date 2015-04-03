@@ -1,4 +1,4 @@
 
-portage.present[[
-  atom "app-misc/supercat"
-]]
+portage.present {
+  atom = "app-misc/supercat"
+}

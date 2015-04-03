@@ -1,4 +1,4 @@
 
-yum.absent[[
-  package "mtr"
-]]
+yum.absent {
+  package = "mtr"
+}

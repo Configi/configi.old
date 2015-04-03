@@ -1,4 +1,4 @@
 
-openrc.stopped[[
-  service "rsyncd"
-]]
+openrc.stopped {
+  service = "rsyncd"
+}

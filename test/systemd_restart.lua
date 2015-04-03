@@ -1,4 +1,4 @@
 
-systemd.restart [[
-  service "tuned"
-]]
+systemd.restart {
+  service = "tuned"
+}

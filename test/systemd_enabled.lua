@@ -1,4 +1,4 @@
 
-systemd.enabled [[
-  service "tuned"
-]]
+systemd.enabled {
+  service = "tuned"
+}

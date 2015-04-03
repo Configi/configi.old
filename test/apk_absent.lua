@@ -1,4 +1,4 @@
 
-apk.absent[[
+apk.absent {
   package "mtr"
-]]
+}

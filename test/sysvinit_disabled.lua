@@ -1,4 +1,4 @@
 
-sysvinit.disabled[[
-  service "uhttpd"
-]]
+sysvinit.disabled {
+  service = "uhttpd"
+}

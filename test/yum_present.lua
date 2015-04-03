@@ -1,4 +1,4 @@
 
-yum.present [[
-  package "mtr"
-]]
+yum.present {
+  package = "mtr"
+}

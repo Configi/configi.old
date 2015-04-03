@@ -1,4 +1,4 @@
 
-sysvinit.stopped[[
-  service "telnet"
-]]
+sysvinit.stopped {
+  service = "telnet"
+}

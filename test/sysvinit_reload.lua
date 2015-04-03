@@ -1,4 +1,4 @@
 
-sysvinit.reload[[
-  service "uhttpd"
-]]
+sysvinit.reload {
+  service = "uhttpd"
+}

@@ -1,5 +1,5 @@
 
-user.absent[[
-  login "eduardo"
-]]
+user.absent {
+  login = "eduardo"
+}
 

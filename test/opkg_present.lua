@@ -1,5 +1,5 @@
 
-opkg.present[[
-  update "true"
-  package "mtr"
-]]
+opkg.present {
+  update  = "true",
+  package = "mtr"
+}

@@ -1,4 +1,4 @@
 
-portage.absent[[
-  atom "app-misc/supercat"
-]]
+portage.absent {
+  atom = "app-misc/supercat"
+}

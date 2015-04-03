@@ -1,4 +1,4 @@
 
-openrc.reload[[
-  service "sshd"
-]]
+openrc.reload {
+  service = "sshd"
+}

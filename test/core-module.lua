@@ -1,4 +1,4 @@
 
-file.absent[[
-  path "/tmp/Vexednymphsgoforquickwaltzjob"
-]]
+file.absent {
+  path = "/tmp/Vexednymphsgoforquickwaltzjob"
+}

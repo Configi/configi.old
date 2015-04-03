@@ -1,5 +1,5 @@
 
-user.present[[
-  login "eduardo"
-]]
+user.present {
+  login = "eduardo"
+}
 

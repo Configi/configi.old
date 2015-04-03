@@ -1,4 +1,4 @@
 
-sysvinit.restart[[
-  service "uhttpd"
-]]
+sysvinit.restart {
+  service = "uhttpd"
+}

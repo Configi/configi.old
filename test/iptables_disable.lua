@@ -1,1 +1,1 @@
-iptables.disable[[]]
+iptables.disable{}

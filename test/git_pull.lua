@@ -1,3 +1,3 @@
-git.pull [[
-  path "test/tmp/git"
-]]
+git.pull {
+  path = "test/tmp/git"
+}

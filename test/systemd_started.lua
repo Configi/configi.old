@@ -1,4 +1,4 @@
 
-systemd.started [[
-  service "tuned"
-]]
+systemd.started {
+  service = "tuned"
+}

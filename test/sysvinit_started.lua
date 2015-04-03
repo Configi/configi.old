@@ -1,4 +1,4 @@
 
-sysvinit.started[[
-  service "telnet"
-]]
+sysvinit.started {
+  service = "telnet"
+}

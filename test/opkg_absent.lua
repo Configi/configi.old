@@ -1,4 +1,4 @@
 
-opkg.absent[[
-  package "mtr"
-]]
+opkg.absent {
+  package = "mtr"
+}

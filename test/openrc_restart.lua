@@ -1,4 +1,4 @@
 
-openrc.restart[[
-  service "rsyncd"
-]]
+openrc.restart {
+  service = "rsyncd"
+}

@@ -1,4 +1,4 @@
 
-systemd.stopped [[
-  service "tuned"
-]]
+systemd.stopped {
+  service = "tuned"
+}

@@ -1,4 +1,4 @@
 
-apk.present [[
+apk.present {
   package "mtr"
-]]
+}
