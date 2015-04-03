@@ -396,15 +396,7 @@ function Lscript.list (tbl)
   return function ()
     i = i + 1
     if i > #tbl then return nil end
-    local str = ""
-    local p, v = nil, nil
-    while Lua.next(tbl[i]) do
-      p, v = Lua.next(tbl[i], p)
-      if p == nil then break end
-      str = Lua.format("%s%s \"%s\"\n", str, p, v)
-    end
-    str = Lua.format("%s\n", str)
-    return str
+    return tbl[i]
   end
 end
 
