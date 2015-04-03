@@ -148,7 +148,6 @@ T:start"cron.absent (modules/cron.lua) test/cron_absent.lua"
   do
     local temp = os.tmpname()
     T:eq(cfg{ "-f", "test/cron_present.lua"}, true)
-    T:eq(cfg{ "-f", "test/cron_absent.lua"}, true)
     local _, r = Cmd.crontab{ "-l" }
     local t = Lc.filtertval(r.stdout, "^#%s%g+") -- Remove comments
     local crontab = table.concat(t, "\n")
