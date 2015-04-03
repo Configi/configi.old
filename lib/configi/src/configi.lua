@@ -196,21 +196,16 @@ function Lmod.msg (C)
   end
 end
 
---- Load a string as Lua code under a custom environment
--- The string is a chunk of script code
--- Exit with code 1 if there is an error in the compiled chunk
--- @param T main table (TABLE)
--- @return tail-call to the chunk compilation (TAILCALL)
 function Lmod.pload (C)
-  local mt = { __index = function (_, k) return
-     function (v) C.parameters[k] = Lmod.setvalue(v, k) end
-  end }
-  Lua.setmetatable(C.environment, mt)
-  local chunk, err = Lua.load(C.source, C.source, "t", C.environment)
-  if not chunk then
-    Lc.errorf("pload: %s %s", Lstr.ERR, err)
+  for p, v in Lua.pairs(C.source) do
+    if Lc.truthy(v) then
+      C.parameters[p] = true
+    elseif Lc.falsy(v) then
+      C.parameters[p] = false
+    else
+      C.parameters[p] = v
+    end
   end
-  return chunk()
 end
 
 --- Check if a required parameter is set.
@@ -429,7 +424,6 @@ end
 function Lcli.compile(s, env)
   local chunk, err
   if Lua.type(PATH) == "table" then
-    Lc.warningf("HERE")
     if not PATH[s] then
       Lc.errorf("%s %s not found\n", Lstr.SERR, s)
     end
@@ -499,36 +493,19 @@ function Lcli.main (opts)
     end,
     __index = function (_, mod)
       local tbl = Lua.setmetatable({}, {
-      __call = function (_, str) -- func(), no interpolation here
-          if Lua.type(str) ~= "string" then
+      __call = function (_, param) -- func(), no interpolation here
+          if Lua.type(param) ~= "string" then
           Lc.errorf("%s bad argument #1 passed to %s()\n", Lstr.SERR, mod)
         end
-        source[#source + 1] = { mod = mod, func = false, str = str }
+        source[#source + 1] = { mod = mod, func = false, param = param }
       end, -- func()
       __index = function (_, func) return
-        function (str) -- mod.func [[ ]], interpolate strings inside [[ ]]
-          local qt = { environment = {}, parameters = {}, source = str }
-          local qload = function (q)
-            Lua.setmetatable(q.environment, { __index = function (_, k) return
-              function (v)
-                v = Lc.sub(v, textenv)
-                if k == "register" then
-                 Lua.rawset(env.global, v, true)
-                else
-                  q.parameters[k] = v
-                end
-              end
-            end })
-            if Lua.type(q.source) ~= "string" then
-              Lc.errorf("qload: %s %s\n", Lstr.SERR, "Non-string passed to a promise(function)")
+        function (ptbl) -- mod.func
+          local qt = { environment = {}, parameters = {} }
+            for p, v in Lua.pairs(ptbl) do
+              if p == register then Lua.rawset(env.global, v, true) end
+              qt.parameters[p] = v
             end
-            local chunk, err = Lua.load(q.source, q.source, "t", q.environment)
-            if not chunk then
-              Lc.errorf("qload: %s %s\n", Lstr.SERR, err)
-            end
-            return chunk()
-          end
-          qload(qt)
           -- if context "fact..." matched assign it to env.volatile
           if Lua.pcall(Lua.find, qt.parameters.context, "^fact") then
             local fload = function (s)
@@ -548,18 +525,16 @@ function Lcli.main (opts)
             env.volatile = nil
             if qt.parameters.handle then
               if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
-                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] = { mod = mod, func = func, str = str }
+                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] = { mod = mod, func = func, param = ptbl }
               else
                 hsource[qt.parameters.handle] = {}
-                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] = { mod = mod, func = func, str = str }
+                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] = { mod = mod, func = func, param = ptbl }
               end
-            elseif Lua.type(str) == "string" then
-              -- interpolate before adding to the 'source' queue
-              str = Lc.sub(str, textenv)
-              source[#source + 1] = {mod = mod, func = func, str = str}
+            elseif Lua.type(ptbl) == "table" then
+              source[#source + 1] = {mod = mod, func = func, param = ptbl}
             end
           end -- context
-        end -- mod.func [[ ]]
+        end -- mod.func
       end }) -- __index = function (_, func) return
       return tbl
     end -- __index = function (_, mod)
@@ -688,30 +663,30 @@ function Lcli.run (source, runenv) -- execution step
       -- auto-load the module
       runenv[s.mod] = Lscript.module(s.mod)
     end
-    local mod, func, str = runenv[s.mod], s.func, s.str
+    local mod, func, param = runenv[s.mod], s.func, s.param
     -- append debug and test arguments
     if source.debug == true then
-      str = Lc.appendln(str, "debug(true)")
+      param.debug = true
     end
     if source.test == true then
-      str = Lc.appendln(str, "test(true)")
+      param.test = true
     end
     if source.syslog == true then
-      str = Lc.appendln(str, "syslog(true)")
+      param.syslog = true
     end
     if source.log then
-      str = Lc.appendln(str, [[log"]] .. source.log .. [["]])
+      param.log = source.log
     end
     if not func then
       if not mod then
         Lc.errorf("Module error: '%s' not found\n", s.mod)
       end
-      rt[i] = mod(str)
+      rt[i] = mod(param)
     else
       if not mod[func] then
         Lc.errorf("Module error: function '%s' in module '%s' not found\n", s.func, s.mod)
       end
-      rt[i] = mod[func](str)
+      rt[i] = mod[func](param)
     end -- if not a module.function
   end -- for each line
   return rt
