@@ -115,7 +115,7 @@ end
 -- @param NONE
 -- @usage iptables.disable[[]]
 function iptables.disable (S)
-  S = [[ chain "dummy" ]]
+  local S = { chain = "iptables.disable" }
   local M = {}
   local G = {
     repaired = "iptables.disable: Successfully disabled iptables.",
