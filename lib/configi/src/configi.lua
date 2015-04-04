@@ -196,18 +196,6 @@ function Lmod.msg (C)
   end
 end
 
-function Lmod.pload (C)
-  for p, v in Lua.pairs(C.source) do
-    if Lc.truthy(v) then
-      C.parameters[p] = true
-    elseif Lc.falsy(v) then
-      C.parameters[p] = false
-    else
-      C.parameters[p] = v
-    end
-  end
-end
-
 --- Check if a required parameter is set.
 -- Produce an error (exit code 1) if a required parameter is missing.
 -- @param T main table (TABLE)
@@ -269,36 +257,25 @@ end
 -- @return parameters table
 -- @return results table
 function Lib.finish (C)
-  -- Process required parameters
-  for n = 1, #C.required do
-    C.environment[C.required[n]] = Lmod.setvalue(C, C.required[n])
-  end
-  -- Process valid module parameters
-  for n = 1, #C.module do
-    C.environment[C.module[n]] = Lmod.setvalue(C, C.module[n])
-  end
-  -- Process aliases
   if Lua.next(C.alias) then
-    for p, v in Lua.pairs(C.alias) do
-      for n = 1, #v do
-        C.environment[v[n]] = Lmod.setvalue(C, p)
+    for p, t in Lua.pairs(C.alias) do
+      for n = 1, #t do
+        C.environment[t[n]] = p
       end
     end
   end
-  -- Process core parameters
-  C.environment.comment = Lmod.setvalue(C, "comment")
-  C.environment.debug = Lmod.setvalue(C, "debug")
-  C.environment.test = Lmod.setvalue(C, "test")
-  C.environment.syslog = Lmod.setvalue(C, "syslog")
-  C.environment.log = Lmod.setvalue(C, "log")
-  C.environment.handle = Lmod.setvalue(C, "handle")
-  C.environment.register = Lmod.setvalue(C, "register")
-  C.environment.context = Lmod.setvalue(C, "context")
-  C.environment.notify = Lmod.setvalue(C, "notify")
-  C.environment.notify_kept = Lmod.setvalue(C, "notify_kept")
-  C.environment.notify_failed = Lmod.setvalue(C, "notify_failed")
-  -- Evaluate the promise chunk
-  Lmod.pload(C)
+  for p, v in Lua.pairs(C.source) do
+    if C.environment[p] then
+      p = C.environment[p]
+    end
+    if Lc.truthy(v) then
+      C.parameters[p] = true
+    elseif Lc.falsy(v) then
+      C.parameters[p] = false
+    else
+      C.parameters[p] = v
+    end
+  end
   -- Check for required parameters
   Lmod.required(C)
   C.parameters.comment = C.parameters.comment or ""
@@ -685,33 +662,33 @@ function Lcli.run (source, runenv) -- execution step
 end
 
 function Lcli.hrun (hsource, tag, runenv) -- execution step for handlers
-  local mod, func, str, r = nil, nil, nil, {}
+  local mod, func, param, r = nil, nil, nil, {}
   if hsource[tag] then
     for n = 1, #hsource[tag] do
       if runenv[hsource[tag][n].mod] == nil then
         -- auto-load the module
         runenv[hsource[tag][n].mod] = Lscript.module(hsource[tag][n].mod)
       end
-      mod, func, str = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].str
+      mod, func, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].param
       -- append debug and test arguments
       if hsource[1] == true then
-        str = Lc.appendln(str, "debug(true)")
+        param.debug = true
       end
       if hsource[2] == true then
-        str = Lc.appendln(str, "test(true)")
+        param.test = true
       end
       if hsource[3] == true then
-        str = Lc.appendln(str, "syslog(true)")
+        param.syslog = true
       end
       if hsource[4] then
-        str = Lc.appendln(str, [[log"]] .. hsource[4] .. [["]])
+        param.log = hsource[4]
       end
       if not func then
-        r[#r + 1] = mod(str)
+        r[#r + 1] = mod(param)
       elseif not mod[func] then
         Lc.errorf("Module error: function in module not found\n")
       end
-      r[#r + 1] = mod[func](str)
+      r[#r + 1] = mod[func](param)
     end -- for each tag
   end -- if a tag
   return r
