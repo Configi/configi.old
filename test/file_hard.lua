@@ -4,6 +4,6 @@ file.touch {
 }
 
 file.hard {
-  link = "test/tmp/file_hard_link",
+  link = "test/tmp/file_hard_link"
   src  = "test/tmp/file_hard_src"
 }

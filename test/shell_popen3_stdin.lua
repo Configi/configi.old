@@ -1,7 +1,7 @@
 
 shell.popen3 {
-  stdout  = "duck",
-  stdin   = "suck",
+  stdout  = "duck"
+  stdin   = "suck"
   command = "/bin/sed s/s/d/g"
 }
 

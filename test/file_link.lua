@@ -1,5 +1,5 @@
 
 file.link {
-  link = "test/tmp/file_link",
+  link = "test/tmp/file_link"
   src  = "/"
 }

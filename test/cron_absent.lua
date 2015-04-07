@@ -5,6 +5,6 @@
 ]]
 
 cron.absent {
-  name = "south",
+  name = "south"
   job  = "6 7 * * * /bin/ls"
 }

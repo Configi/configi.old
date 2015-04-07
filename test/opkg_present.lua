@@ -1,5 +1,5 @@
 
 opkg.present {
-  update  = "true",
+  update  = "true"
   package = "mtr"
 }

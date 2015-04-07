@@ -1,11 +1,11 @@
 
 file.touch {
-  path = "test/tmp/core-handler2-xfile",
+  path = "test/tmp/core-handler2-xfile"
   mode = "0700"
 }
 
 file.touch {
-  path   = "test/tmp/core-handler2-file",
+  path   = "test/tmp/core-handler2-file"
   handle = "testhandle"
 }
 

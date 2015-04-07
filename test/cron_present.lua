@@ -1,27 +1,27 @@
 
 cron.present {
-  name = "test",
-  minute = "25",
-  hour = "09",
+  name = "test"
+  minute = "25"
+  hour = "09"
   job = "/bin/ls"
 }
 
 cron.present {
-  name = "cut",
-  minute = "30",
-  hour = "11",
+  name = "cut"
+  minute = "30"
+  hour = "11"
   job = "/bin/ls"
 }
 
 cron.present {
-  name = "two",
-  minute = "2",
-  hour = "4",
+  name = "two"
+  minute = "2"
+  hour = "4"
   job = "/bin/ls"
 }
 
 cron.absent {
-  name = "whoah",
+  name = "whoah"
   job = "/bin/ls"
 }
 
@@ -39,23 +39,23 @@ end
 name = "testing"
 
 cron.present {
-  name = name,
-  minute = "1",
-  hour = "6",
+  name = name
+  minute = "1"
+  hour = "6"
   job = "/bin/ls"
 }
 
 gang = {
- name = "south",
- minute = "6",
- hour = "7",
+ name = "south"
+ minute = "6"
+ hour = "7"
  job = "/bin/ls"
 }
 
 cron.present {
- name = gang.name,
- minute = gang.minute,
- hour = gang.hour,
+ name = gang.name
+ minute = gang.minute
+ hour = gang.hour
  job = gang.job
 }
 
