@@ -18,7 +18,7 @@ $(posixA): $(posix_cOBJ) $(posixOBJ)
 
 $(posix_cOBJ): $(posix_cSRC) $(LINIT_T)
 	$(ECHOT) [CC] $@
-	$(CC) -o $@ $(DEFINES) $(INCLUDES) -Ivendor/luaposix/src $(CCWARN) $(CFLAGS) $(CCOPT) -c $<
+	$(CC) -o $@ $(DEFINES) $(luaposixDEFINES) $(INCLUDES) -Ivendor/luaposix/src $(CCWARN) $(CFLAGS) $(CCOPT) -c $<
 
 $(posixOBJ): $(posixC) $(LINIT_T)
 	$(ECHOT) [CC] $@

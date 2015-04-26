@@ -1,51 +1,63 @@
 $(LUAC_T):
 	$(ECHOT) [CC] $@
-	$(CC) -o $@ -DMAKE_LUAC $(DEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c $(DLDFLAGS)
+	$(CC) -o $@ -lm -DMAKE_LUAC $(DEFINES) $(INCLUDES) $(CCWARN) $(ONE).c
 
 $(LUAC2C_T): $(AUX_P)/luac2c.c
 	$(ECHOT) [CC] $@
-	cc -o $@ $(CCWARN) $(CFLAGS) $(CCOPT) $<
+	cc -o $@ $(CCWARN) $<
 
-bootstrap: $(LUAC_T) $(LUAC2C_T)
+bootstrap: $(BUILD_DEPS) $(LUAC_T) $(LUAC2C_T)
 
 deps: $(DEPS)
 
-$(LUA_T): $(DEPS)
+$(LUA_O): $(DEPS)
 	$(ECHOT) [CC] $@
-	$(CC) -o $@ -DMAKE_LUA $(DEFINES) $(LDEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c $(DLDFLAGS) $(LDLIBS)
+	$(CC) -o $@ -c -DMAKE_LIB $(DEFINES) $(luaDEFINES) $(LDEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c $(LDLIBS)
 
-$(SRLUA_T): $(DEPS)
+$(LUA_T): $(LUA_O) $(luawrapperA) $(libelfA)
 	$(ECHOT) [CC] $@
-	$(CC) -o $@ -DMAKE_LUA $(DEFINES) $(LDEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(SRLUA).c $(DLDFLAGS) $(LDLIBS)
+	$(CC) $(LUAWRAPPER) -o $@ $(CCWARN) $(CFLAGS) $(CCOPT) $(LDFLAGS) $(LDLIBS) $(LUA_O)
 
-$(GLUE_T):
-	$(ECHOT) [CC] $@
-	$(CC) -o $@ $(GLUE_SRC).c
+%LUA: $(LUA_T)
+	$(OBJCOPYA)$(*F)=vendor/$(*F)/$(*F).lua $(LUA_T) $(LUA_T)
 
-$(CFG_T): $(GLUE_T) $(SRLUA_T) $(LUA_T) $(CFG)
-	$(ECHOT) [LN] $@
-	$(GLUE) $(SRLUA_T) $(CFG) $@
-	$(CHMOD) +x $@
+lua: $(LUA_T) $(foreach m, $(VENDOR_LUA), $mLUA)
+	$(CP) $(LUA_T) $(EXE)
 
-interpreter: $(LUA_T) $(SRLUA_T) $(GLUE_T) $(CFG_T)
+sections: $(foreach m, $(VENDOR_LUA), $mLUA)
 
-strip: $(LUA_T) $(SRLUA_T)
+modules: $(foreach m, $(MODULES), module.$m)
+
+exe: $(LUA_T) lua sections modules
+	$(OBJCOPYA)main=$(MAIN) $(LUA_T) $(EXE)
+	$(ECHOT) [LN] $(EXE)
+
+strip: $(LUA_T)
 	$(STRIP) $(STRIPFLAGS) $^
 
-compress: $(LUA_T)
+compress: $(EXE)
 	$(UPX) $(UPXFLAGS) $<
 
-clean: $(CLEAN)
+clean: $(CLEAN) clean_luawrapper clean_libelf
 	$(ECHO) "Cleaning up..."
-	$(RM) $(RMFLAGS) $(LUA_O) $(VLUA_O) $(VLUA_T) $(LUA_T) $(LUAC_T) $(LUAC2C_T) \
-		$(SRLUA_T) $(GLUE_T) $(CFG_T) $(TESTLOG_F)
+	$(RM) $(RMFLAGS) $(LUA_O) $(LUA_T) $(LUAC_T) $(LUAC2C_T) $(EXE) $(TESTLOG_F)
 	$(RMRF) test/tmp
 	$(ECHO) "Done!"
 
-test_configi: $(LUA_T)
-	bin/lua test/test.lua | tee $(TESTLOG_F)
+print-%: ; @echo $*=$($*)
 
-test: test_configi $(TEST)
-	$(ECHO) "Tests done."
+vprint-%:
+	@echo '$*=$($*)'
+	@echo ' origin = $(origin $*)'
+	@echo ' flavor = $(flavor $*)'
+	@echo ' value = $(value $*)'
 
-.PHONY: all init bootstrap modules interpreter compress strip clean test test_lua
+has-%:
+	@command -v "${*}" >/dev/null 2>&1 || { \
+		echo "Missing build-time dependency: ${*}"; \
+		exit -1; \
+	}
+
+.PHONY: all init bootstrap deps modules compress strip clean lua sections exe print-% vprint-% has-% %LUA
+
+

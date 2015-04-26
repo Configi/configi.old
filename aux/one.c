@@ -95,16 +95,14 @@
 #include "lbitlib.c"
 #endif
 #include "lcorolib.c"
-#ifdef DEBUG
 #include "ldblib.c"
-#endif
 #include "liolib.c"
 #include "lmathlib.c"
 #include "loadlib.c"
 #include "loslib.c"
 #include "lstrlib.c"
 #include "ltablib.c"
-/* #include "lutf8lib.c" */
+#include "lutf8lib.c"
 #include "linit.c"
 #endif
 
