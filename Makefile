@@ -25,12 +25,12 @@ all: bootstrap deps lua sections exe
 luaDEFINES:= -DLUA_COMPAT_BITLIB -DLUA_USE_POSIX
 DLDFLAGS:= -Wl,-E -lm -lcrypt -lrt $(LDFLAGS)
 
-include aux/modules.mk
 include aux/tests.mk
 include aux/flags.mk
 include vendor/libelf/Makefile
 include vendor/luawrapper/Makefile
 include aux/std.mk
+include aux/modules.mk
 ifneq ($(LIB),)
   include $(eval _d:=lib/$(LIB) $(_d)) $(call _lget,$(LIB))
 endif
