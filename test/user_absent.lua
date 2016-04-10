@@ -1,5 +1,0 @@
-
-user.absent {
-  login = "eduardo"
-}
-

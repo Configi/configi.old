@@ -1,4 +1,0 @@
-
-yum.absent {
-  package = "mtr"
-}

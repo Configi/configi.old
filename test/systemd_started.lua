@@ -1,4 +1,0 @@
-
-systemd.started {
-  service = "tuned"
-}

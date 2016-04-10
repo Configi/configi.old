@@ -1,4 +1,0 @@
-
-sysvinit.started {
-  service = "telnet"
-}

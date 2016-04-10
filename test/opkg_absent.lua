@@ -1,4 +1,0 @@
-
-opkg.absent {
-  package = "mtr"
-}

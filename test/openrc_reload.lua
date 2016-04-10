@@ -1,4 +1,0 @@
-
-openrc.reload {
-  service = "sshd"
-}

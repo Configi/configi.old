@@ -1,4 +1,0 @@
-
-systemd.disabled {
-  service = "tuned"
-}

@@ -1,4 +1,0 @@
-
-apk.present {
-  package "mtr"
-}

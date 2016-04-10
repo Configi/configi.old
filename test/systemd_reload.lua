@@ -1,4 +1,0 @@
-
-systemd.reload {
-  service = "sshd"
-}

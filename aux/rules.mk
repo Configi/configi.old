@@ -1,47 +1,32 @@
 $(LUAC_T):
 	$(ECHOT) [CC] $@
-	$(CC) -o $@ -lm -DMAKE_LUAC $(DEFINES) $(INCLUDES) $(CCWARN) $(ONE).c
+	$(CC) -o $@ -DMAKE_LUAC $(DEFINES) $(INCLUDES) $(CCWARN) $(ONE).c -lm
 
-$(LUAC2C_T): $(AUX_P)/luac2c.c
+$(LUA_T):
 	$(ECHOT) [CC] $@
-	cc -o $@ $(CCWARN) $<
+	$(CC) -o $@ -DMAKE_LUA $(luaDEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c -lm
 
-bootstrap: $(BUILD_DEPS) $(LUAC_T) $(LUAC2C_T)
-
-deps: $(DEPS)
-
-$(LUA_O): $(DEPS)
+$(LUA_O): $(BUILD_DEPS) $(LUA_T)
 	$(ECHOT) [CC] $@
-	$(CC) -o $@ -c -DMAKE_LIB $(DEFINES) $(luaDEFINES) $(LDEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c $(LDLIBS)
+	$(CC) -o $@ -c -DMAKE_LIB $(DEFINES) $(luaDEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c
 
-$(LUA_T): $(LUA_O) $(luawrapperA) $(libelfA)
-	$(ECHOT) [CC] $@
-	$(CC) $(LUAWRAPPER) -o $@ $(CCWARN) $(CFLAGS) $(CCOPT) $(LDFLAGS) $(LDLIBS) $(LUA_O)
+$(LUA_A): $(LUA_O)
+	$(ECHOT) [AR] $@
+	$(AR) $(ARFLAGS) $@ $< >/dev/null 2>&1
+	$(RANLIB) $@
 
-%LUA: $(LUA_T)
-	$(OBJCOPYA)$(*F)=vendor/$(*F)/$(*F).lua $(LUA_T) $(LUA_T)
+$(EXE): $(LUA_A) $(CLUA_MODS)
+	$(ECHOT) [CP] $(LUA_MODS)
+	for f in $(VENDOR_LUA); do cp $(VENDOR_LUA_P)/$$f.lua .; done
+	for f in $(APP_LUA); do cp $(APP_LUA_P)/$$f.lua .; done
+	for d in $(VENDOR_SUBDIRS); do cp -R $(MODULES_P)/$$d .; done
+	$(ECHOT) [LN] $(MAIN)
+	$(LUA_T) $(LUASTATIC) $(MAIN) $(LUA_MODS) $(VENDOR_DEPS) $(CLUA_MODS) $(LUA_A) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(LDFLAGS) 2>&1 >/dev/null
 
-lua: $(LUA_T) $(foreach m, $(VENDOR_LUA), $mLUA)
-	$(CP) $(LUA_T) $(EXE)
-
-sections: $(foreach m, $(VENDOR_LUA), $mLUA)
-
-modules: $(foreach m, $(MODULES), module.$m)
-
-exe: $(LUA_T) lua sections modules
-	$(OBJCOPYA)main=$(MAIN) $(LUA_T) $(EXE)
-	$(ECHOT) [LN] $(EXE)
-
-strip: $(LUA_T)
-	$(STRIP) $(STRIPFLAGS) $^
-
-compress: $(EXE)
-	$(UPX) $(UPXFLAGS) $<
-
-clean: $(CLEAN) clean_luawrapper clean_libelf
+clean: $(CLEAN)
 	$(ECHO) "Cleaning up..."
-	$(RM) $(RMFLAGS) $(LUA_O) $(LUA_T) $(LUAC_T) $(LUAC2C_T) $(EXE) $(TESTLOG_F)
-	$(RMRF) test/tmp
+	$(RM) $(RMFLAGS) $(LUA_O) $(LUA_T) $(LUAC_T) $(EXE) $(LUA_A) $(MAIN).c $(LUA_MODS)
+	$(RMRF) $(VENDOR_SUBDIRS)
 	$(ECHO) "Done!"
 
 print-%: ; @echo $*=$($*)
@@ -58,6 +43,6 @@ has-%:
 		exit -1; \
 	}
 
-.PHONY: all init bootstrap deps modules compress strip clean lua sections exe print-% vprint-% has-% %LUA
+.PHONY: all clean sections exe print-% vprint-% has-% %LUA
 
 
