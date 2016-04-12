@@ -20,13 +20,13 @@ _ENV = ENV
 
 local retry = function (fn)
   return function (...)
-    local ret, err, errnum, errno, _
+    local ret, err, errnum, e, _
     repeat
       ret, err, errnum = fn(...)
       if ret == -1 then
-        _, errno = errno.errno()
+        _, e = errno.errno()
       end
-    until(errno ~= errno.EINTR)
+    until(e ~= errno.EINTR)
     return ret, err, errnum
   end
 end
