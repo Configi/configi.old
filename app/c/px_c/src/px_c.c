@@ -1,3 +1,8 @@
+/***
+ luaposix extensions and some unix utilities.
+@module px_c
+*/
+
 #define _LARGEFILE_SOURCE       1
 #define _FILE_OFFSET_BITS 64
 
@@ -28,7 +33,12 @@ static int pusherrno(lua_State *L, char *error)
         return 3;
 }
 
-
+/***
+chroot(2) wrapper.
+@function chroot
+@tparam string path or directory to chroot into.
+@return true if successful; otherwise nil
+*/
 static int Cchroot(lua_State *L)
 {
 	const char *path = luaL_checkstring(L, 1);
@@ -39,6 +49,12 @@ static int Cchroot(lua_State *L)
 	return 1;
 }
 
+/***
+close(2) a file descriptor.
+@function fdclose
+@param (userdata) file descriptor to close
+@return true if successful; otherwise nil
+/*
 static int Cfdclose (lua_State *L)
 {
 	FILE *f = *(FILE**)luaL_checkudata(L, 1, LUA_FILEHANDLE);
@@ -61,6 +77,12 @@ static LStream *newfile (lua_State *L)
 	return p;
 }
 
+/***
+Wrapper to flopen(3) -- Reliably open and lock a file.
+@function flopen
+@tparam string file to open and lock
+@return a new file handle, or, in case of errors, nil plus an error message
+*/
 static int Cflopen(lua_State *L)
 {
 	const char *path = luaL_checkstring(L, 1);
@@ -75,6 +97,12 @@ static int Cflopen(lua_State *L)
 	return (p->f == NULL) ? luaL_fileresult(L, 0, NULL) : 1;
 }
 
+/***
+Wrapper to fdopen(3).
+@function fdopen
+@tparam string file to open
+@return a new file handle, or, in case of errors, nil plus an error message
+*/
 static int Cfdopen (lua_State *L)
 {
 	int fd = luaL_checkinteger(L, 1);
@@ -84,6 +112,12 @@ static int Cfdopen (lua_State *L)
 	return (p->f == NULL) ? luaL_fileresult(L, 0, NULL) : 1;
 }
 
+/***
+Wrapper to closefrom(2) -- delete open file descriptors.
+@function closefrom
+@tparam int fd file descriptors greater or equal to this is deleted
+@return true always
+*/
 static int Cclosefrom (lua_State *L)
 {
 	int fd = luaL_optinteger(L, 2, 3);
@@ -92,6 +126,13 @@ static int Cclosefrom (lua_State *L)
 	return 1;
 }
 
+/***
+Wrapper to pipe2(2).
+@function pipe2
+@tparam int file descriptor
+@treturn int fd read end descriptor
+@treturn int fd write end descriptor
+*/
 static int Cpipe2(lua_State *L)
 {
 	int pipefd[2];
@@ -105,7 +146,7 @@ static int Cpipe2(lua_State *L)
 	return 2;
 }
 
-/* derived from luaposix runexec() */
+/* Derived from luaposix runexec(). Modified to take in the environment. */
 /***
 Execute a program using execve(2)
 @function execve
