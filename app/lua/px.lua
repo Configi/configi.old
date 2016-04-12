@@ -49,6 +49,11 @@ px.dup2 = retry(Punistd.dup2)
 px.wait = retry(Pwait.wait)
 px.open = retry(Pfcntl.open)
 
+--- Write to a file descriptor.
+-- Wrapper to luaposix unistd.write.
+-- @param fd file descriptor
+-- @param buf string to write
+-- @return true if successfully written.
 function px.write (fd, buf)
   local size = Lua.len(buf)
   local written, err
@@ -158,12 +163,19 @@ pipeline = function (t, pipe_fn)
   end
 end
 
+--- Checks the existence of a given path.
+-- @tparam string path the path to check for.
+-- @return the path if path exists.
 function px.retpath (path)
   if Pstat.stat(path) then
     return path
   end
 end
 
+--- Deduce the complete path name of an executable.
+-- Only checks standard locations.
+-- @tparam string bin executable name
+-- @treturn string full path name
 function px.binpath (bin)
   -- If executable is not in any of these directories then it should be using the complete path.
   local t = { "/usr/bin/", "/bin/", "/usr/sbin/", "/sbin/", "/usr/local/bin/", "/usr/local/sbin/" }
@@ -223,6 +235,9 @@ local pexec = function (args)
   return pid, err, fd0, fd1, fd2
 end
 
+--- Execute a file.
+-- @tparam table arguments
+-- @treturn table table of results, result.stdout and result.stderr.
 function px.exec (args)
   local result = { stdout = {}, stderr = {} }
   local sz = 4096
@@ -286,7 +301,10 @@ function px.exec (args)
   end
 end
 
+--- Execute a file.
 -- Use if caller does not care for STDIN, STDOUT or STDERR.
+-- @tparam table arguments
+-- @treturn table table of results, result.stdout and result.stderr.
 function px.qexec (args)
   local pid, err = Punistd.fork()
   local result = {}
@@ -317,7 +335,9 @@ function px.qexec (args)
   end
 end
 
--- read string from a polled STDIN
+--- Read string from a polled STDIN.
+-- @tparam number bytes to read
+-- @treturn string string read
 function px.readin (sz)
   local fd = Punistd.STDIN_FILENO
   local str = ""
@@ -333,6 +353,11 @@ function px.readin (sz)
   return str
 end
 
+--- Write to given path name.
+-- Wraps px.write.
+-- @tparam string path name 
+-- @tparam string string to write 
+-- @return true if successfully written; otherwise it returns nil
 function px.fwrite (path, str)
   local fd = px.open(path, (Pfcntl.O_RDWR))
   if not fd then
@@ -341,7 +366,13 @@ function px.fwrite (path, str)
   return px.write(fd, str)
 end
 
--- atomic write
+--- Write to give path name atomically.
+-- Wraps px.write.
+-- @tparam string path name
+-- @tparam string string to write
+-- @tparam number octal mode when opening file
+-- @return true when successfully writing; otherwise, return nil
+-- @return successful message string; otherwise, return a string describing the error
 function px.awrite (path, str, mode)
   mode = mode or 384
   local lock = {
@@ -372,6 +403,9 @@ function px.awrite (path, str, mode)
   return true, Lua.format("Successfully wrote %s", path)
 end
 
+--- Check if a given path name is a directory.
+-- @tparam string path name
+-- @return true if a directory; otherwise, return nil
 function px.isdir (path)
   local stat = Pstat.stat(path)
   if stat then
@@ -381,6 +415,9 @@ function px.isdir (path)
   end
 end
 
+--- Check if a given path name is a file.
+-- @tparam string path name
+-- @return true if a file; otherwise, return nil
 function px.isfile (path)
   local stat = Pstat.stat(path)
   if stat then
@@ -390,6 +427,9 @@ function px.isfile (path)
   end
 end
 
+--- Check if a given path name is a symbolic link.
+-- @tparam string path name
+-- @return true if a symbolic link; otherwise, return nil  
 function px.islink (path)
   local stat = Pstat.stat(path)
   if stat then
@@ -399,6 +439,13 @@ function px.islink (path)
   end
 end
 
+--- Write to the syslog and a file if given.
+-- @tparam string file path name to log to.
+-- @tparam string ident arbitrary identification string 
+-- @tparam string msg message body
+-- @tparam int option see luaposix syslog constants
+-- @tparam int facility see luaposix syslog constants
+-- @tparam int level see luaposix syslog constants
 function px.log (file, ident, msg, option, facility, level)
   local flog = Cimicida.log
   level = level or Psyslog.LOG_DEBUG
@@ -426,15 +473,24 @@ function px.difftime (finish, start)
   return { sec = sec, usec = usec }
 end
 
+--- Get effective username.
+-- @treturn string username
 function px.getename ()
  return Ppwd.getpwuid(Punistd.geteuid()).pw_name
 end
 
+--- Get real username.
+-- @treturn string username
 function px.getname ()
  return Ppwd.getpwuid(Punistd.getuid()).pw_name
 end
 
 px.pipeline = pipeline
+
+-- Wraps px.exec and px.qexec so you can execute a given executable like cmd["/bin/ls"]{ "/tmp" } 
+-- cmd["-/bin/ls"]{ "/tmp" } to ignore the output ala px.qexec.
+-- cmd.ls{"/tmp"} also works since px.binpath is called on the executable.
+-- Returns a table 'result' with tables stdout and stderr (result.stdout and result.stderr)
 px.cmd = Lua.setmetatable({}, { __index =
   function (_, key)
     local exec, bin
