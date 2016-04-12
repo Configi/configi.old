@@ -1,31 +1,18 @@
 --- luaposix extensions and some unix utilities
 -- @module px
 
-local Lua = {
-  setmetatable = setmetatable,
-  pcall = pcall,
-  type = type,
-  next = next,
-  ipairs = ipairs,
-  len = string.len,
-  sub = string.sub,
-  format = string.format,
-  gmatch = string.gmatch,
-  unpack = table.unpack,
-  concat = table.concat,
-  remove = table.remove,
-  rename = os.rename
-}
-local Cimicida = require"cimicida"
-local Ppwd = require"posix.pwd"
-local Punistd = require"posix.unistd"
-local Perrno = require"posix.errno"
-local Pwait = require"posix.sys.wait"
-local Pstat = require"posix.sys.stat"
-local Ppoll = require"posix.poll"
-local Pfcntl = require"posix.fcntl"
-local Pstdlib = require"posix.stdlib"
-local Psyslog = require"posix.syslog"
+local string, table, os = string, table, os
+local setmetatable, pcall, type, next, ipairs = setmetatable, pcall, type, next, ipairs 
+local lc = require"cimicida"
+local pwd = require"posix.pwd"
+local unistd = require"posix.unistd"
+local errno = require"posix.errno"
+local wait = require"posix.sys.wait"
+local stat = require"posix.sys.stat"
+local poll = require"posix.poll"
+local fcntl = require"posix.fcntl"
+local stdlib = require"posix.stdlib"
+local syslog = require"posix.syslog"
 local px_c = require"px_c"
 local px = px_c
 local ENV = {}
@@ -37,20 +24,20 @@ local retry = function (fn)
     repeat
       ret, err, errnum = fn(...)
       if ret == -1 then
-        _, errno = Perrno.errno()
+        _, errno = errno.errno()
       end
-    until(errno ~= Perrno.EINTR)
+    until(errno ~= errno.EINTR)
     return ret, err, errnum
   end
 end
 
 -- Handle EINTR
-px.fsync = retry(Punistd.fsync)
-px.chdir = retry(Punistd.chdir)
-px.fcntl = retry(Pfcntl.fcntl)
-px.dup2 = retry(Punistd.dup2)
-px.wait = retry(Pwait.wait)
-px.open = retry(Pfcntl.open)
+px.fsync = retry(unistd.fsync)
+px.chdir = retry(unistd.chdir)
+px.fcntl = retry(fcntl.fcntl)
+px.dup2 = retry(unistd.dup2)
+px.wait = retry(wait.wait)
+px.open = retry(fcntl.open)
 
 --- Write to a file descriptor.
 -- Wrapper to luaposix unistd.write.
@@ -58,13 +45,13 @@ px.open = retry(Pfcntl.open)
 -- @param buf string to write
 -- @return true if successfully written.
 function px.write (fd, buf)
-  local size = Lua.len(buf)
+  local size = string.len(buf)
   local written, err
   while (size > 0) do
-    written, err = Punistd.write(fd, buf)
+    written, err = unistd.write(fd, buf)
     if written == -1 then
-      local _, errno = Perrno.errno()
-      if errno == Perrno.EINTR then
+      local _, errno = errno.errno()
+      if errno == errno.EINTR then
         goto continue
       end
       return nil, err
@@ -77,17 +64,17 @@ end
 
 -- exec for pipeline
 function px.execp (t, ...)
-  local pid, err = Punistd.fork()
+  local pid, err = unistd.fork()
   local status, code, _
   if pid == nil or pid == -1 then
     return nil, err
   elseif pid == 0 then
-    if Lua.type(t) == "table" then
-      Punistd.exec(Lua.unpack(t))
-      local _, no = Perrno.errno()
-      Punistd._exit(no)
+    if type(t) == "table" then
+      unistd.exec(table.unpack(t))
+      local _, no = errno.errno()
+      unistd._exit(no)
     else
-      Punistd._exit(t(...) or 0)
+      unistd._exit(t(...) or 0)
     end
   else
     _, status, code = px.wait(pid)
@@ -117,52 +104,52 @@ pipeline = function (t, pipe_fn)
     end
   }
 
-  pipe_fn = pipe_fn or Punistd.pipe
+  pipe_fn = pipe_fn or unistd.pipe
   local pid, read_fd, write_fd, save_stdout
   if #t > 1 then
     read_fd, write_fd = pipe_fn()
     if not read_fd then
-      Cimicida.errorf("error opening pipe")
+      lc.errorf("error opening pipe")
     end
-    pid = Punistd.fork()
+    pid = unistd.fork()
     if pid == nil then
-      Cimicida.errorf("error forking")
+      lc.errorf("error forking")
     elseif pid == 0 then
-      if not px.dup2(read_fd, Punistd.STDIN_FILENO) then
-        Cimicida.errorf("error dup2-ing")
+      if not px.dup2(read_fd, unistd.STDIN_FILENO) then
+        lc.errorf("error dup2-ing")
       end
-      Punistd.close(read_fd)
-      Punistd.close(write_fd)
-      Punistd._exit(pipeline(list.sub(t, 2), pipe_fn))
+      unistd.close(read_fd)
+      unistd.close(write_fd)
+      unistd._exit(pipeline(list.sub(t, 2), pipe_fn))
     else
-      save_stdout = Punistd.dup(Punistd.STDOUT_FILENO)
+      save_stdout = unistd.dup(unistd.STDOUT_FILENO)
       if not save_stdout then
-        Cimicida.errorf("error dup-ing")
+        lc.errorf("error dup-ing")
       end
-      if not px.dup2(write_fd, Punistd.STDOUT_FILENO) then
-        Cimicida.errorf("error dup2-ing")
+      if not px.dup2(write_fd, unistd.STDOUT_FILENO) then
+        lc.errorf("error dup2-ing")
       end
-      Punistd.close(read_fd)
-      Punistd.close(write_fd)
+      unistd.close(read_fd)
+      unistd.close(write_fd)
     end
   end
 
   local code, status = px.execp(t[1])
-  Punistd.close(Punistd.STDOUT_FILENO)
+  unistd.close(unistd.STDOUT_FILENO)
 
   if #t > 1 then
-    Punistd.close(write_fd)
+    unistd.close(write_fd)
     px.wait(pid)
-    if not px.dup2 (save_stdout, Punistd.STDOUT_FILENO) then
-      Cimicida.errorf("error dup2-ing")
+    if not px.dup2 (save_stdout, unistd.STDOUT_FILENO) then
+      lc.errorf("error dup2-ing")
     end
-    Punistd.close(save_stdout)
+    unistd.close(save_stdout)
   end
 
   if code == 0 then
-    return true, Cimicida.exitstr("pipe", status, code)
+    return true, lc.exitstr("pipe", status, code)
   else
-    return nil, Cimicida.exitstr("pipe", status, code)
+    return nil, lc.exitstr("pipe", status, code)
   end
 end
 
@@ -170,7 +157,7 @@ end
 -- @tparam string path the path to check for.
 -- @return the path if path exists.
 function px.retpath (path)
-  if Pstat.stat(path) then
+  if stat.stat(path) then
     return path
   end
 end
@@ -182,8 +169,8 @@ end
 function px.binpath (bin)
   -- If executable is not in any of these directories then it should be using the complete path.
   local t = { "/usr/bin/", "/bin/", "/usr/sbin/", "/sbin/", "/usr/local/bin/", "/usr/local/sbin/" }
-  for _, p in Lua.ipairs(t) do
-    if Pstat.stat(p .. bin) then
+  for _, p in ipairs(t) do
+    if stat.stat(p .. bin) then
       return p .. bin
     end
   end
@@ -202,25 +189,25 @@ end
 ]]
 
 local pexec = function (args)
-  local stdin, fd0  = Punistd.pipe()
-  local fd1, stdout = Punistd.pipe()
-  local fd2, stderr = Punistd.pipe()
+  local stdin, fd0  = unistd.pipe()
+  local fd1, stdout = unistd.pipe()
+  local fd2, stderr = unistd.pipe()
   if not (fd0 and fd1 and fd2) then
     return nil, "error opening pipe"
   end
-  local _, res, no, pid, err = nil, nil, nil, Punistd.fork()
+  local _, res, no, pid, err = nil, nil, nil, unistd.fork()
   if pid == nil or pid == -1 then
     return nil, err
   elseif pid == 0 then
-    Punistd.close(fd0)
-    Punistd.close(fd1)
-    Punistd.close(fd2)
-    px.dup2(stdin, Punistd.STDIN_FILENO)
-    px.dup2(stdout, Punistd.STDOUT_FILENO)
-    px.dup2(stderr, Punistd.STDERR_FILENO)
-    Punistd.close(stdin)
-    Punistd.close(stdout)
-    Punistd.close(stderr)
+    unistd.close(fd0)
+    unistd.close(fd1)
+    unistd.close(fd2)
+    px.dup2(stdin, unistd.STDIN_FILENO)
+    px.dup2(stdout, unistd.STDOUT_FILENO)
+    px.dup2(stderr, unistd.STDERR_FILENO)
+    unistd.close(stdin)
+    unistd.close(stdout)
+    unistd.close(stderr)
     if args._cwd then
       res, err = px.chdir(args._cwd)
       if not res then
@@ -229,12 +216,12 @@ local pexec = function (args)
     end
     px.closefrom()
     px.execve(args._bin, args, args._env)
-    _, no = Perrno.errno()
-    Punistd._exit(no)
+    _, no = errno.errno()
+    unistd._exit(no)
   end
-  Punistd.close(stdin)
-  Punistd.close(stdout)
-  Punistd.close(stderr)
+  unistd.close(stdin)
+  unistd.close(stdout)
+  unistd.close(stderr)
   return pid, err, fd0, fd1, fd2
 end
 
@@ -252,14 +239,14 @@ function px.exec (args)
     local buf, str = nil, {}
     local fd, res, msg
     if output then
-      fd, msg = px.open(output, (Pfcntl.O_CREAT | Pfcntl.F_WRLCK | Pfcntl.O_WRONLY))
+      fd, msg = px.open(output, (fcntl.O_CREAT | fcntl.F_WRLCK | fcntl.O_WRONLY))
       if not fd then return nil, msg end
     end
     while true do
-      buf = Punistd.read(fileno, sz)
-      if buf == nil or Lua.len(buf) == 0 then
+      buf = unistd.read(fileno, sz)
+      if buf == nil or string.len(buf) == 0 then
         if output then
-          Punistd.close(fd)
+          unistd.close(fd)
         end
         break
       elseif output then
@@ -271,9 +258,9 @@ function px.exec (args)
         str[#str + 1] = buf
       end
     end
-    if Lua.next(str) and not output then
-      str = Lua.concat(str) -- table to string
-      for ln in Lua.gmatch(str, "([^\n]*)\n") do
+    if next(str) and not output then
+      str = table.concat(str) -- table to string
+      for ln in string.gmatch(str, "([^\n]*)\n") do
         if ln ~= "" then result[std][#result[std] + 1] = ln end
       end
       if #result[std] == 0 then
@@ -288,11 +275,11 @@ function px.exec (args)
       return nil, msg
     end
   end
-  Punistd.close(fd0)
+  unistd.close(fd0)
   fdcopy(fd1, "stdout", args._stdout)
-  Punistd.close(fd1)
+  unistd.close(fd1)
   fdcopy(fd2, "stderr", args._stderr)
-  Punistd.close(fd2)
+  unistd.close(fd2)
   result.pid, result.status, result.code = px.wait(pid)
   result.bin = args._bin
   if args._return_code then
@@ -309,7 +296,7 @@ end
 -- @tparam table arguments
 -- @treturn table table of results, result.stdout and result.stderr.
 function px.qexec (args)
-  local pid, err = Punistd.fork()
+  local pid, err = unistd.fork()
   local result = {}
   if pid == nil or pid == -1 then
     return nil, err
@@ -322,8 +309,8 @@ function px.qexec (args)
     end
     px.closefrom()
     px.execve(args._bin, args, args._env)
-    local _, no = Perrno.errno()
-    Punistd._exit(no)
+    local _, no = errno.errno()
+    unistd._exit(no)
   else
     result.pid, result.status, result.code = px.wait(pid)
     result.bin = args._bin
@@ -342,15 +329,15 @@ end
 -- @tparam number bytes to read
 -- @treturn string string read
 function px.readin (sz)
-  local fd = Punistd.STDIN_FILENO
+  local fd = unistd.STDIN_FILENO
   local str = ""
   sz = sz or 1024
   local fds = { [fd] = { events = { IN = true } } }
   while fds ~= nil do
-    Ppoll.poll(fds, -1)
+    poll.poll(fds, -1)
     if fds[fd].revents.IN then
-      local buf = Punistd.read(fd, sz)
-      if buf == "" then fds = nil else str = Lua.format("%s%s", str, buf) end
+      local buf = unistd.read(fd, sz)
+      if buf == "" then fds = nil else str = string.format("%s%s", str, buf) end
     end
   end
   return str
@@ -362,7 +349,7 @@ end
 -- @tparam string string to write 
 -- @return true if successfully written; otherwise it returns nil
 function px.fwrite (path, str)
-  local fd = px.open(path, (Pfcntl.O_RDWR))
+  local fd = px.open(path, (fcntl.O_RDWR))
   if not fd then
     return nil
   end
@@ -379,40 +366,40 @@ end
 function px.awrite (path, str, mode)
   mode = mode or 384
   local lock = {
-    l_type = Pfcntl.F_WRLCK,
-    l_whence = Punistd.SEEK_SET,
+    l_type = fcntl.F_WRLCK,
+    l_whence = unistd.SEEK_SET,
     l_start = 0,
     l_len = 0
   }
   local ok, err
-  local fd = px.open(path, (Pfcntl.O_CREAT | Pfcntl.O_WRONLY | Pfcntl.O_TRUNC), mode)
-  ok = Lua.pcall(px.fcntl, fd, Pfcntl.F_SETLK, lock)
+  local fd = px.open(path, (fcntl.O_CREAT | fcntl.O_WRONLY | fcntl.O_TRUNC), mode)
+  ok = pcall(px.fcntl, fd, fcntl.F_SETLK, lock)
   if not ok then
     return nil
   end
-  local tmp, temp = Pstdlib.mkstemp(Cimicida.split_path(path) .. "/._configiXXXXXX")
-  --local tmp = px.open(temp, Pfcntl.O_WRONLY)
+  local tmp, temp = stdlib.mkstemp(lc.split_path(path) .. "/._configiXXXXXX")
+  --local tmp = px.open(temp, fcntl.O_WRONLY)
   px.write(tmp, str)
   px.fsync(tmp)
-  ok, err = Lua.rename(temp, path)
+  ok, err = os.rename(temp, path)
   if not ok then
     return nil, err
   end
   px.fsync(fd)
-  lock.l_type = Pfcntl.F_UNLCK
-  px.fcntl(fd, Pfcntl.F_SETLK, lock)
-  Punistd.close(fd)
-  Punistd.close(tmp)
-  return true, Lua.format("Successfully wrote %s", path)
+  lock.l_type = fcntl.F_UNLCK
+  px.fcntl(fd, fcntl.F_SETLK, lock)
+  unistd.close(fd)
+  unistd.close(tmp)
+  return true, string.format("Successfully wrote %s", path)
 end
 
 --- Check if a given path name is a directory.
 -- @tparam string path name
 -- @return true if a directory; otherwise, return nil
 function px.isdir (path)
-  local stat = Pstat.stat(path)
+  local stat = stat.stat(path)
   if stat then
-    if Pstat.S_ISDIR(stat.st_mode) ~= 0 then
+    if stat.S_ISDIR(stat.st_mode) ~= 0 then
       return true
     end
   end
@@ -422,9 +409,9 @@ end
 -- @tparam string path name
 -- @return true if a file; otherwise, return nil
 function px.isfile (path)
-  local stat = Pstat.stat(path)
+  local stat = stat.stat(path)
   if stat then
-    if Pstat.S_ISREG(stat.st_mode) ~= 0 then
+    if stat.S_ISREG(stat.st_mode) ~= 0 then
       return true
     end
   end
@@ -434,9 +421,9 @@ end
 -- @tparam string path name
 -- @return true if a symbolic link; otherwise, return nil  
 function px.islink (path)
-  local stat = Pstat.stat(path)
+  local stat = stat.stat(path)
   if stat then
-    if Pstat.S_ISLNK(stat.st_mode) ~= 0 then
+    if stat.S_ISLNK(stat.st_mode) ~= 0 then
       return true
     end
   end
@@ -450,16 +437,16 @@ end
 -- @tparam int facility see luaposix syslog constants
 -- @tparam int level see luaposix syslog constants
 function px.log (file, ident, msg, option, facility, level)
-  local flog = Cimicida.log
-  level = level or Psyslog.LOG_DEBUG
-  option = option or Psyslog.LOG_NDELAY
-  facility = facility or Psyslog.LOG_USER
+  local flog = lc.log
+  level = level or syslog.LOG_DEBUG
+  option = option or syslog.LOG_NDELAY
+  facility = facility or syslog.LOG_USER
   if file then
     flog(file, ident, msg)
   end
-  Psyslog.openlog(ident, option, facility)
-  Psyslog.syslog(level, msg)
-  Psyslog.closelog()
+  syslog.openlog(ident, option, facility)
+  syslog.syslog(level, msg)
+  syslog.closelog()
 end
 
 -- From luaposix
@@ -479,13 +466,13 @@ end
 --- Get effective username.
 -- @treturn string username
 function px.getename ()
- return Ppwd.getpwuid(Punistd.geteuid()).pw_name
+ return pwd.getpwuid(unistd.geteuid()).pw_name
 end
 
 --- Get real username.
 -- @treturn string username
 function px.getname ()
- return Ppwd.getpwuid(Punistd.getuid()).pw_name
+ return pwd.getpwuid(unistd.getuid()).pw_name
 end
 
 px.pipeline = pipeline
@@ -494,19 +481,19 @@ px.pipeline = pipeline
 -- cmd["-/bin/ls"]{ "/tmp" } to ignore the output ala px.qexec.
 -- cmd.ls{"/tmp"} also works since px.binpath is called on the executable.
 -- Returns a table 'result' with tables stdout and stderr (result.stdout and result.stderr)
-px.cmd = Lua.setmetatable({}, { __index =
+px.cmd = setmetatable({}, { __index =
   function (_, key)
     local exec, bin
     -- silent execution (px.qexec) when prepended with "-".
-    if Lua.sub(key, 1, 1) == "-" then
+    if string.sub(key, 1, 1) == "-" then
       exec = px.qexec
-      bin = Lua.sub(key, 2)
+      bin = string.sub(key, 2)
     else
       exec = px.exec
       bin = key
     end
     -- Search common executable directories if not a full path.
-    if Lua.len(Cimicida.split_path(bin)) == 0 then
+    if string.len(lc.split_path(bin)) == 0 then
       bin = px.binpath(bin)
     end
     return function (args)
