@@ -356,7 +356,7 @@ function Px.awrite (path, str, mode)
   if not ok then
     return nil
   end
-  local tmp, temp = Pstdlib.mkstemp(Cimicida.splitp(path) .. "/._configiXXXXXX")
+  local tmp, temp = Pstdlib.mkstemp(Cimicida.split_path(path) .. "/._configiXXXXXX")
   --local tmp = Px.open(temp, Pfcntl.O_WRONLY)
   Px.write(tmp, str)
   Px.fsync(tmp)
@@ -447,7 +447,7 @@ Px.cmd = Lua.setmetatable({}, { __index =
       bin = key
     end
     -- Search common executable directories if not a full path.
-    if Lua.len(Cimicida.splitp(bin)) == 0 then
+    if Lua.len(Cimicida.split_path(bin)) == 0 then
       bin = Px.binpath(bin)
     end
     return function (args)
