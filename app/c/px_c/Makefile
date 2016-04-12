@@ -2,10 +2,10 @@ px_cSRC= app/c/px_c/src/px_c.c
 px_cOBJ= app/c/px_c/src/px_c.o
 px_depsSRC = app/c/px_c/src/flopen.c app/c/px_c/src/closefrom.c
 px_depsOBJ= app/c/px_c/src/flopen.o app/c/px_c/src/closefrom.o
-pxA= px.a
+px_cA= px_c.a
 CLEAN+= clean_px
 
-$(pxA): $(px_cOBJ) $(px_depsOBJ)
+$(px_cA): $(px_cOBJ) $(px_depsOBJ)
 	$(ECHOT) [AR] $@
 	$(AR) $(ARFLAGS) $@ $^ >/dev/null 2>&1
 	$(RANLIB) $@
