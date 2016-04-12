@@ -52,7 +52,7 @@ static int Cchroot(lua_State *L)
 /***
 close(2) a file descriptor.
 @function fdclose
-@param (userdata) file descriptor to close
+@param fd file descriptor to close
 @return true if successful; otherwise nil
 /*
 static int Cfdclose (lua_State *L)
