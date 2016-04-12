@@ -1,3 +1,6 @@
+--- luaposix extensions and some unix utilities
+-- @module px
+
 local Lua = {
   setmetatable = setmetatable,
   pcall = pcall,
@@ -512,4 +515,5 @@ px.cmd = Lua.setmetatable({}, { __index =
     end
   end
 })
+
 return px
