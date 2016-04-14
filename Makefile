@@ -1,13 +1,13 @@
 .POSIX:
 .SUFFIXES:
-EXE= cfg 
+EXE= cfg
 MAIN= $(EXE).lua
-VENDOR_C= linotify luaposix factid_c
-VENDOR_LUA= cimicida crc32 sha2 factid
+VENDOR_C= linotify luaposix factid_c px_c
+VENDOR_LUA= cimicida crc32 sha2 factid px
 VENDOR_SUBDIRS=
 VENDOR_DEPS=
-APP_C= px_c
-APP_LUA= configi px
+APP_C= 
+APP_LUA= configi
 MAKEFLAGS= --silent
 CC= cc
 export CC
