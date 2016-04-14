@@ -1,11 +1,7 @@
 local version = "Configi 0.9.7"
 local arg = arg
 local os, string = os, string
-local core = {
-  next = next,
-  tostring = tostring,
-  collectgarbage = collectgarbage
-}
+local next, tostring, collectgarbage = next, tostring, collectgarbage
 local cfg = require"configi"
 local c = require"cimicida"
 local cli = cfg.cli
@@ -40,7 +36,7 @@ while true do
       c.errorf("Failed!\n")
     end
     local t2 = px.difftime(systime.gettimeofday(), t1)
-    t2 = string.format("%s.%s", core.tostring(t2.sec), core.tostring(t2.usec))
+    t2 = string.format("%s.%s", tostring(t2.sec), tostring(t2.usec))
     if t2 == 0 or t2 == 1.0 then
       c.printf("Finished run in %.f second\n", 1.0)
     else
@@ -48,7 +44,7 @@ while true do
     end
   else
     if R.failed then
-      core.exit(1)
+      os.exit(1)
     end
   end
   if opts.daemon then
@@ -65,15 +61,15 @@ while true do
       handle:rmwatch(wd)
       handle:close()
       cfg.LOG(opts.syslog, opts.log, string.format("Caught signal %s. Exiting.", core.tostring(sig)), syslog.LOG_ERR)
-      core.exit(255)
+      os.exit(255)
     end
     signal.signal(signal.SIGINT, bail)
     signal.signal(signal.SIGTERM, bail)
     handle:read()
-    core.collectgarbage()
+    collectgarbage()
   elseif opts.periodic then
     unistd.sleep(opts.periodic)
-    core.collectgarbage()
+    collectgarbage()
     goto RUN
   else
     break
