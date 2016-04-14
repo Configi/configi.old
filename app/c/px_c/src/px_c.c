@@ -54,7 +54,7 @@ close(2) a file descriptor.
 @function fdclose
 @param fd file descriptor to close
 @return true if successful; otherwise nil
-/*
+*/
 static int Cfdclose (lua_State *L)
 {
 	FILE *f = *(FILE**)luaL_checkudata(L, 1, LUA_FILEHANDLE);
