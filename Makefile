@@ -1,9 +1,9 @@
 .POSIX:
 .SUFFIXES:
-EXE= main
+EXE= cfg 
 MAIN= $(EXE).lua
-VENDOR_C= linotify luaposix
-VENDOR_LUA= cimicida crc32 sha2
+VENDOR_C= linotify luaposix factid_c
+VENDOR_LUA= cimicida crc32 sha2 factid
 VENDOR_SUBDIRS=
 VENDOR_DEPS=
 APP_C= px_c
