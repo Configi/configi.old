@@ -1,5 +1,3 @@
-.POSIX:
-.SUFFIXES:
 EXE= cfg
 MAIN= $(EXE).lua
 VENDOR_C= linotify luaposix factid px
@@ -10,7 +8,6 @@ APP_C=
 APP_LUA= configi
 MAKEFLAGS= --silent
 CC= cc
-export CC
 LD= ld
 RANLIB= ranlib
 AR= ar

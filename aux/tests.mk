@@ -1,3 +1,6 @@
+.POSIX:
+.SUFFIXES:
+export CC
 NULSTRING:=
 CFLAGS_LRT= -lrt
 
