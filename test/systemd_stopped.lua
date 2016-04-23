@@ -1,0 +1,4 @@
+
+systemd.stopped {
+  service = "tuned"
+}

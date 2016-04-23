@@ -1,0 +1,4 @@
+
+apk.absent {
+  package "mtr"
+}

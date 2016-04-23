@@ -1,0 +1,4 @@
+
+sysvinit.disabled {
+  service = "uhttpd"
+}

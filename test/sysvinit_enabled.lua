@@ -1,0 +1,4 @@
+
+sysvinit.enabled {
+  service = "uhttpd"
+}

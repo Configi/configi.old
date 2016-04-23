@@ -1,0 +1,4 @@
+
+sysvinit.stopped {
+  service = "telnet"
+}

@@ -1,0 +1,4 @@
+
+openrc.restart {
+  service = "rsyncd"
+}

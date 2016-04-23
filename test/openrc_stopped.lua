@@ -1,0 +1,4 @@
+
+openrc.stopped {
+  service = "rsyncd"
+}
