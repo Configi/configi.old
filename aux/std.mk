@@ -2,7 +2,7 @@ all: $(EXE)
 
 MAIN= $(EXE).lua
 AUX_P= aux
-MODULES_P= vendor/lua
+MODULES_P= app/lua
 ONE= $(AUX_P)/one
 LUASTATIC= aux/luastatic.lua
 LUAC_T= luac
