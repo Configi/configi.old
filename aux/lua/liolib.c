@@ -39,6 +39,7 @@
 /* Check whether 'mode' matches '[rwa]%+?[L_MODEEXT]*' */
 #define l_checkmode(mode) \
 	(*mode != '\0' && strchr("rwa", *(mode++)) != NULL &&	\
+        (*mode != 'e' || (++mode, 1)) &&  /* skip if char is 'e' */ \
 	(*mode != '+' || (++mode, 1)) &&  /* skip if char is '+' */	\
 	(strspn(mode, L_MODEEXT) == strlen(mode)))
 
