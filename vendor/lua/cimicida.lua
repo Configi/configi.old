@@ -2,6 +2,9 @@
 -- @module cimicida
 local io, string, os, table = io, string, os, table
 local type, pcall, load, setmetatable, ipairs, next = type, pcall, load, setmetatable, ipairs, next
+local has_px, px = pcall(require, "px")
+if has_px then
+end
 local ENV = {}
 _ENV = ENV
 
@@ -278,10 +281,10 @@ end
 
 
 --- Check if a path is a file or not.
--- @function isfile
+-- @function test_open
 -- @param file path to the file (STRING)
 -- @return true if path is a file, nil otherwise (BOOLEAN)
-local isfile = function (file)
+local test_open = function (file)
   local fd = io.open(file, "rb")
   if fd then
     io.close(fd)
@@ -582,12 +585,12 @@ local escape_quotes = function (str)
 end
 
 --- Log to a file.
--- @function log
+-- @function flog
 -- @param file path name of the file (STRING)
 -- @param ident identification (STRING)
 -- @param msg string to log (STRING)
 -- @return a boolean value, true if not errors, nil otherwise (BOOLEAN)
-local log = function (file, ident, msg)
+local flog = function (file, ident, msg)
   local setvbuf = io.setvbuf
   local openlog = function (f)
     local fd = io.open(f, "ae+")
@@ -673,7 +676,7 @@ return {
   find_in_tbl = find_in_tbl,
   shallow_cp = shallow_cp,
   split_path = split_path,
-  isfile = isfile,
+  test_open = test_open,
   fopen = fopen,
   fwrite = fwrite,
   getln = getln,
@@ -688,7 +691,7 @@ return {
   pipeline = pipeline,
   time = time,
   escape_quotes = escape_quotes,
-  log = log,
+  flog = flog,
   insert_if = insert_if,
   return_if = return_if,
   return_if_not = return_if_not

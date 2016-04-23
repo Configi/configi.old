@@ -3,14 +3,14 @@ local arg = arg
 local os, string = os, string
 local next, tostring, collectgarbage = next, tostring, collectgarbage
 local cfg = require"configi"
-local c = require"cimicida"
+local lib = require"lib"
 local cli = cfg.cli
 local unistd = require"posix.unistd"
 local signal = require"posix.signal"
 local sysstat = require"posix.sys.stat"
 local syslog = require"posix.syslog"
 local systime = require"posix.sys.time"
-local px = require"px"
+local lib = require"lib"
 local inotify = require"inotify"
 local t1
 local ENV = {}
@@ -26,21 +26,21 @@ while true do
     R.kept = true
   end
   if opts.debug then
-    c.printf("------------\n")
+    lib.printf("------------\n")
     if R.kept then
-      c.printf("Kept: %s\n", R.kept)
+      lib.printf("Kept: %s\n", R.kept)
     elseif R.repaired then
-      c.printf("Repaired: %s\n", R.repaired)
+      lib.printf("Repaired: %s\n", R.repaired)
     elseif R.failed then
-      c.printf("Failed: %s\n", R.failed)
-      c.errorf("Failed!\n")
+      lib.printf("Failed: %s\n", R.failed)
+      lib.errorf("Failed!\n")
     end
-    local t2 = px.difftime(systime.gettimeofday(), t1)
+    local t2 = lib.difftime(systime.gettimeofday(), t1)
     t2 = string.format("%s.%s", tostring(t2.sec), tostring(t2.usec))
     if t2 == 0 or t2 == 1.0 then
-      c.printf("Finished run in %.f second\n", 1.0)
+      lib.printf("Finished run in %.f second\n", 1.0)
     else
-      c.printf("Finished run in %.f seconds\n", t2)
+      lib.printf("Finished run in %.f seconds\n", t2)
     end
   else
     if R.failed then
@@ -50,9 +50,9 @@ while true do
   if opts.daemon then
     if unistd.geteuid() == 0 then
       if sysstat.stat("/proc/self/oom_score_adj") then
-        px.fwrite("/proc/self/oom_score_adj", "-1000")
+        lib.fdwrite("/proc/self/oom_score_adj", "-1000")
       else
-        px.fwrite("/proc/self/oom_adj", "-1000")
+        lib.fdwrite("/proc/self/oom_adj", "-1000")
       end
     end
     handle = inotify.init()

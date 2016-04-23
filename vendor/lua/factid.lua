@@ -23,9 +23,8 @@ function factid.osfamily ()
     id = string.match(util.fopen("/etc/os-release"), "ID[%s]*=[%s%p]*([%w]+)")
   elseif sysstat.stat("/etc/openwrt_release") then
     id = "openwrt"
-  end
-  if string.len(id) == 0 then
-    return nil, "factid.osfamily: string.match failed."
+  else
+    id = "unknown"
   end
   return id
 end
@@ -38,9 +37,8 @@ function factid.operatingsystem ()
     name = string.match(util.fopen("/etc/os-release"), "NAME[%s]*=[%s%p]*([%w]+)")
   elseif sysstat.stat("/etc/openwrt_release") then
     name = "OpenWRT"
-  end
-  if string.len(name) == 0 then
-    return nil, "factid.operatingsystem: string.match failed."
+  else
+    name = "unknown"
   end
   return name
 end
@@ -51,7 +49,7 @@ end
 function factid.partitions ()
   local partitions = {}
   local sysfs = sysstat.stat("/sys/block")
-  if sysstat.S_ISDIR(sysfs.st_mode) == 0 then
+  if not sysfs or sysstat.S_ISDIR(sysfs.st_mode) == 0 then
     return nil, "factid.partitions: No sysfs support detected."
   end
   for partition in dirent.files("/sys/block/") do
@@ -200,11 +198,13 @@ function factid.gather ()
     -- string, number table
     -- { sda = 500000 }
     local partitions = factid.partitions()
-    fact.partitions = {}
-    fact.partitions.table = partitions
-    for p, s in core.pairs(partitions) do
-      fact.partitions[p] = {}
-      fact.partitions[p][s] = true
+    if partitions then
+      fact.partitions = {}
+      fact.partitions.table = partitions
+      for p, s in core.pairs(partitions) do
+        fact.partitions[p] = {}
+        fact.partitions[p][s] = true
+      end
     end
   end
 

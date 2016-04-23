@@ -22,27 +22,26 @@ local Lua = {
   format = string.format,
   tostring = tostring
 }
-local Lc = require"cimicida"
 local Factid = require"factid"
 local Psyslog = require"posix.syslog"
 local Pgetopt = require"posix.getopt"
 local Psystime = require"posix.sys.time"
-local Px = require"px"
-local Lib = {}
+local lib = require"lib"
+local cfg = {}
 local ENV = { PATH = "./" }
 _ENV = ENV
 
 --[[ Strings ]]
-Lib.str = { IDENT = "Configi", ERROR = "ERROR: ", WARN = "WARNING: ", SERR = "POLICY ERROR: ", OPERATION = "Operation" }
-local Lstr = Lib.str
+cfg.str = { IDENT = "Configi", ERROR = "ERROR: ", WARN = "WARNING: ", SERR = "POLICY ERROR: ", OPERATION = "Operation" }
+local Lstr = cfg.str
 
 -- Logging function for export too
-Lib.LOG = function (syslog, file, str, level)
+cfg.LOG = function (syslog, file, str, level)
   level = level or Psyslog.LOG_DEBUG
   if syslog then
-    return Px.log(file, Lstr.IDENT, str, Psyslog.LOG_NDELAY|Psyslog.LOG_PID, Psyslog.LOG_DAEMON, level)
+    return lib.log(file, Lstr.IDENT, str, Psyslog.LOG_NDELAY|Psyslog.LOG_PID, Psyslog.LOG_DAEMON, level)
   elseif not syslog and file then
-    return Lc.log(file, Lstr.IDENT, str)
+    return lib.log(file, Lstr.IDENT, str)
   end
 end
 
@@ -50,12 +49,12 @@ end
 local Lmod = {}
 
 --[[ Script functions ]]
-Lib.script = {}
-local Lscript = Lib.script
+cfg.script = {}
+local Lscript = cfg.script
 
 --[[ Cli functions ]]
-Lib.cli = {}
-local Lcli = Lib.cli
+cfg.cli = {}
+local cli = cfg.cli
 
 -- Set value of a specified field in a parameter record.
 -- Returns a function that converts strings yes, true and True to boolean true
@@ -66,9 +65,9 @@ local Lcli = Lib.cli
 -- @return function that sets the value (FUNCTION)
 function Lmod.setvalue (tbl, field)
   return function (v)
-    if Lc.truthy(v) then
+    if lib.truthy(v) then
       tbl.parameters[field] = true
-    elseif Lc.falsy(v) then
+    elseif lib.falsy(v) then
       tbl.parameters[field] = false
     else
       tbl.parameters[field] = v
@@ -132,7 +131,7 @@ function Lmod.dmsg (C)
     else
       lstr = Lua.format("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
     end
-    Lib.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
+    cfg.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
     C.results.msgt[#C.results.msgt + 1] = {
       item = item,
       msg = msg,
@@ -185,7 +184,7 @@ function Lmod.msg (C)
     else
       lstr = Lua.format("[%s]%s%s%s%s", flag, rs, msg, rs, item)
     end
-    Lib.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
+    cfg.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
     C.results.msgt[#C.results.msgt + 1] = {
       item = item,
       msg = msg,
@@ -202,7 +201,7 @@ end
 function Lmod.required (C)
   for n = 1, #C.required do
     if not C.parameters[C.required[n]] then
-      Lc.errorf("%s Required parameter '%s' missing.\n", Lstr.SERR, C.required[n])
+      lib.errorf("%s Required parameter '%s' missing.\n", Lstr.SERR, C.required[n])
     end
   end
 end
@@ -224,16 +223,16 @@ function Lmod.ignoredwarn (C)
   C.module[#C.module + 1] = "notify_failed"
   C.module[#C.module + 1] = "notify_kept"
   -- Now check for any undeclared module parameter
-  local Ps = Lc.arrtorec(C.module, 0)
+  local Ps = lib.arr_to_rec(C.module, 0)
   for param, _ in Lua.pairs(C.parameters) do
     if Ps[param] == nil then
-      Lc.warningf("%s Parameter '%s' ignored.\n", Lstr.WARN, param)
+      lib.warn("%s Parameter '%s' ignored.\n", Lstr.WARN, param)
     end
   end
 end
 
 -- Boiler-plate table
-function Lib.start (S, M, G)
+function cfg.start (S, M, G)
   local C = {
               source = S,
               module = M or {},
@@ -256,7 +255,7 @@ end
 -- @return functions table
 -- @return parameters table
 -- @return results table
-function Lib.finish (C)
+function cfg.finish (C)
   if Lua.next(C.alias) then
     for p, t in Lua.pairs(C.alias) do
       for n = 1, #t do
@@ -268,9 +267,9 @@ function Lib.finish (C)
     if C.environment[p] then
       p = C.environment[p]
     end
-    if Lc.truthy(v) then
+    if lib.truthy(v) then
       C.parameters[p] = true
-    elseif Lc.falsy(v) then
+    elseif lib.falsy(v) then
       C.parameters[p] = false
     else
       C.parameters[p] = v
@@ -285,7 +284,7 @@ function Lib.finish (C)
     local t1 = Psystime.gettimeofday()
     local stdout, stderr = "", ""
     local ok, rt = f(...)
-    local err = Lc.exitstr(rt.bin, rt.status, rt.code)
+    local err = lib.exit_string(rt.bin, rt.status, rt.code)
     if rt then
       if Lua.type(rt.stdout) == "table" then
         stdout = Lua.concat(rt.stdout, "\n")
@@ -294,7 +293,7 @@ function Lib.finish (C)
         stderr = Lua.concat(rt.stderr, "\n")
       end
     end
-    local secs = Px.difftime(Psystime.gettimeofday(), t1)
+    local secs = lib.difftime(Psystime.gettimeofday(), t1)
     secs = Lua.format("%s.%s", Lua.tostring(secs.sec), Lua.tostring(secs.usec))
     msg(Lstr.OPERATION, err, ok or false, secs, Lua.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
     return ok, rt
@@ -303,7 +302,7 @@ function Lib.finish (C)
     msg = Lmod.msg(C)
     C.functions.run = function (f, ...)
       local ok, rt = f(...)
-      local err = Lc.exitstr(rt.bin, rt.status, rt.code)
+      local err = lib.exit_string(rt.bin, rt.status, rt.code)
       local res = false
       if ok then
         res = true
@@ -354,7 +353,7 @@ function Lib.finish (C)
     if Lua.type(PATH) == "table" then
       f = PATH[f]
     else
-      f = Lc.fopen(PATH .. "/" .. f)
+      f = lib.fopen(PATH .. "/" .. f)
     end
     return f
   end
@@ -367,7 +366,7 @@ end
 -- @return iterator that results in a line terminated field "value" for each record (FUNCTION)
 function Lscript.list (tbl)
   if not tbl then
-    Lc.errorf("Error: cfg.list: Expected table but got nil.\n")
+    lib.errorf("Error: cfg.list: Expected table but got nil.\n")
   end
   local i = 0
   return function ()
@@ -384,32 +383,32 @@ end
 function Lscript.module (m)
   local rb, rm = Lua.pcall(Lua.require, "module." .. m)
   if not rb then
-    return Lc.errorf("Module error: %s\n%s\n", m, rm)
+    return lib.errorf("Module error: %s\n%s\n", m, rm)
   end
   return rm
 end
 
 --[[ CLI functions ]]
-function Lcli.compile(s, env)
+function cli.compile(s, env)
   local chunk, err
   if Lua.type(PATH) == "table" then
     if not PATH[s] then
-      Lc.errorf("%s %s not found\n", Lstr.SERR, s)
+      lib.errorf("%s %s not found\n", Lstr.SERR, s)
     end
     chunk, err = Lua.load(PATH[s], PATH[s], "t", env)
   else
-    if not Lc.isfile(s) then
-      Lc.errorf("%s %s not found\n", Lstr.SERR, s)
+    if not lib.isfile(s) then
+      lib.errorf("%s %s not found\n", Lstr.SERR, s)
     end
     chunk, err = Lua.loadfile(s, "t", env)
   end
   if not chunk then
-    Lc.errorf("%s%s%s\n", Lstr.ERR, s, err)
+    lib.errorf("%s%s%s\n", Lstr.ERR, s, err)
   end
   return chunk()
 end
 
-function Lcli.main (opts)
+function cli.main (opts)
   local source = {}
   local hsource = {}
   local runenv = {}
@@ -422,7 +421,7 @@ function Lcli.main (opts)
   env.ipairs = Lua.ipairs
   env.format = Lua.format
   env.list = Lscript.list
-  env.sub = Lc.sub
+  env.sub = lib.sub
   env.module = function (m)
     if m == "fact" then
       env.fact = Factid.gather()
@@ -430,9 +429,9 @@ function Lcli.main (opts)
       runenv[m] = Lscript.module(m)
     end
   end
-  env.debug = function (b) if Lc.truthy(b) then opts.debug = true end end
-  env.test = function (b) if Lc.truthy(b) then opts.test = true end end
-  env.syslog = function (b) if Lc.truthy(b) then opts.syslog = true end end
+  env.debug = function (b) if lib.truthy(b) then opts.debug = true end end
+  env.test = function (b) if lib.truthy(b) then opts.test = true end end
+  env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
   env.log = function (b) opts.log = b end
   env.include = function (f)
     if Lua.type(PATH) == "table" then
@@ -464,7 +463,7 @@ function Lcli.main (opts)
       local tbl = Lua.setmetatable({}, {
       __call = function (_, param) -- func(), no interpolation here
           if Lua.type(param) ~= "string" then
-          Lc.errorf("%s bad argument #1 passed to %s()\n", Lstr.SERR, mod)
+          lib.errorf("%s bad argument #1 passed to %s()\n", Lstr.SERR, mod)
         end
         source[#source + 1] = { mod = mod, func = false, param = param }
       end, -- func()
@@ -480,7 +479,7 @@ function Lcli.main (opts)
             local fload = function (s)
               local chunk, err = Lua.load(s, s, "t", env)
                  if not chunk then
-                   Lc.errorf("fload: %s %s", Lstr.ERR, err)
+                   lib.errorf("fload: %s %s", Lstr.ERR, err)
                  end
               return chunk()
             end
@@ -515,7 +514,7 @@ function Lcli.main (opts)
     i = i + 1
     temp, htemp = source, hsource
     source, hsource = {}, {}
-    Lcli.compile(scripts[Lua.next(scripts)], env)
+    cli.compile(scripts[Lua.next(scripts)], env)
     scripts[i] = nil
     -- main queue
     for n = 1, #temp do
@@ -542,7 +541,7 @@ function Lcli.main (opts)
   return source, hsource, runenv
 end
 
-function Lcli.opt (arg, version)
+function cli.opt (arg, version)
   local short = "hvtDsmjVl:p:g:r:f:"
   local long = {
     {"help", "none", "h"},
@@ -584,10 +583,10 @@ function Lcli.opt (arg, version)
     if r == "f" then
       opts.script = optarg
       local _, policy = Lua.pcall(Lua.require, "policy")
-      if not Px.isfile(opts.script) and Lua.type(policy) == "table" then
+      if not lib.isfile(opts.script) and Lua.type(policy) == "table" then
         PATH = policy
       else
-        PATH = Lc.splitp(opts.script)
+        PATH = lib.split_path(opts.script)
       end
     end
     if r == "m" then opts.msg = true end
@@ -596,7 +595,7 @@ function Lcli.opt (arg, version)
     if r == "s" then opts.syslog = true end
     if r == "r" then opts.runs = optarg or opts._runs end
     if r == "l" then opts.log = optarg end
-    if r == "?" then return Lc.errorf("Error: Unrecognized option passed\n") end
+    if r == "?" then return lib.errorf("Error: Unrecognized option passed\n") end
     if r == "p" then opts.periodic = optarg or opts._periodic end
     if r == "D" then opts.daemon = true end
     if r == "g" then
@@ -605,27 +604,27 @@ function Lcli.opt (arg, version)
       end
     end
     if r == "h" then
-      Lc.printf("%s", help)
+      lib.printf("%s", help)
       Lua.exit(0)
     end
     if r == "V" then
-      Lc.printf("%s\n", version)
+      lib.printf("%s\n", version)
       Lua.exit(0)
     end
   end
   if not opts.script then
-    Lc.errorf("%s", help)
+    lib.errorf("%s", help)
   end
   if opts.debug then
-    Lc.printf("Started run %s\n", Lc.timestamp())
-    Lc.printf("Applying policy: %s\n", opts.script)
+    lib.printf("Started run %s\n", lib.timestamp())
+    lib.printf("Applying policy: %s\n", opts.script)
   end
-  local source, hsource, runenv = Lcli.main(opts) -- arg[index]
+  local source, hsource, runenv = cli.main(opts) -- arg[index]
   source.runs, source.tags = opts.runs, tags
   return source, hsource, runenv, opts
 end
 
-function Lcli.run (source, runenv) -- execution step
+function cli.run (source, runenv) -- execution step
   local rt = {}
   for i, s in Lua.ipairs(source) do
     if runenv[s.mod] == nil then
@@ -648,12 +647,12 @@ function Lcli.run (source, runenv) -- execution step
     end
     if not func then
       if not mod then
-        Lc.errorf("Module error: '%s' not found\n", s.mod)
+        lib.errorf("Module error: '%s' not found\n", s.mod)
       end
       rt[i] = mod(param)
     else
       if not mod[func] then
-        Lc.errorf("Module error: function '%s' in module '%s' not found\n", s.func, s.mod)
+        lib.errorf("Module error: function '%s' in module '%s' not found\n", s.func, s.mod)
       end
       rt[i] = mod[func](param)
     end -- if not a module.function
@@ -661,7 +660,7 @@ function Lcli.run (source, runenv) -- execution step
   return rt
 end
 
-function Lcli.hrun (hsource, tag, runenv) -- execution step for handlers
+function cli.hrun (hsource, tag, runenv) -- execution step for handlers
   local mod, func, param, r = nil, nil, nil, {}
   if hsource[tag] then
     for n = 1, #hsource[tag] do
@@ -686,7 +685,7 @@ function Lcli.hrun (hsource, tag, runenv) -- execution step for handlers
       if not func then
         r[#r + 1] = mod(param)
       elseif not mod[func] then
-        Lc.errorf("Module error: function in module not found\n")
+        lib.errorf("Module error: function in module not found\n")
       end
       r[#r + 1] = mod[func](param)
     end -- for each tag
@@ -694,16 +693,16 @@ function Lcli.hrun (hsource, tag, runenv) -- execution step for handlers
   return r
 end
 
-function Lcli.try (source, hsource, runenv)
+function cli.try (source, hsource, runenv)
   local M, results, R = {}, nil, { repaired = false, failed = false, repaired = false, kept = false }
   local notify, handlers = nil, {}
   for this = 1, source.runs do
     if this > 1 and (source.debug or source.test or source.msg) then
-      Lc.printf("-- Retry #%.f\n", this - 1)
+      lib.printf("-- Retry #%.f\n", this - 1)
     end
     if #source.tags == 0 then
       -- Run and collect results into the results table
-      results = Lcli.run(source, runenv)
+      results = cli.run(source, runenv)
       -- Go over the results from the execution
       for _, result in Lua.ipairs(results) do
         -- immediately set the flags on the final results table
@@ -722,7 +721,7 @@ function Lcli.try (source, hsource, runenv)
         -- read the T.results.msg table if debugging is on or the last result failed
         if (result.failed or source.debug or source.test or source.msg) and result.msg then
           for ni = 1, #result.msg do
-            Lc.warningf("%s\n", result.msg[ni])
+            lib.warn("%s\n", result.msg[ni])
           end
         end
       end -- for each result
@@ -736,7 +735,7 @@ function Lcli.try (source, hsource, runenv)
     -- Run handlers
     if Lua.next(handlers) then
       for handler, _ in Lua.pairs(handlers) do
-        for _, rh in Lua.ipairs(Lcli.hrun(hsource, handler, runenv)) do
+        for _, rh in Lua.ipairs(cli.hrun(hsource, handler, runenv)) do
           if rh.repaired == true then
             R.repaired = true
             R.failed = false
@@ -745,7 +744,7 @@ function Lcli.try (source, hsource, runenv)
 	        end -- if repaired
           if (rh.failed or source.debug or source.test or source.msg) and rh.msg then
             for ni = 1, #rh.msg do
-              Lc.warningf("%s\n", rh.msg[ni])
+              lib.warn("%s\n", rh.msg[ni])
             end -- for handler messages
           end  -- if failed or debug
         end -- for each handler run
@@ -758,5 +757,5 @@ function Lcli.try (source, hsource, runenv)
   return R, M
 end
 
-return Lib
+return cfg
 
