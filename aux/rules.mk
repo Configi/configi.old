@@ -1,4 +1,4 @@
-$(LUAC_T):
+$(LUAC_T): 
 	$(ECHOT) [CC] $@
 	$(CC) -o $@ -DMAKE_LUAC $(DEFINES) $(INCLUDES) $(CCWARN) $(ONE).c -lm
 
@@ -6,7 +6,7 @@ $(LUA_T):
 	$(ECHOT) [CC] $@
 	$(CC) -o $@ -DMAKE_LUA $(luaDEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c -lm
 
-$(LUA_O): $(BUILD_DEPS) $(LUA_T)
+$(LUA_O): $(LUA_T)
 	$(ECHOT) [CC] $@
 	$(CC) -o $@ -c -DMAKE_LIB $(DEFINES) $(luaDEFINES) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(ONE).c
 
