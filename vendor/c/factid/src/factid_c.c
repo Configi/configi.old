@@ -450,7 +450,8 @@ static int Fifaddrs(lua_State *L)
 
 	if (getifaddrs(&ifaddr) == -1) return pusherrno(L, "getifaddrs(3) error");
 	lua_newtable(L);
-	for (i = ifaddr; i; i = i->ifa_next) {
+	for (i = ifaddr; i != 0 ; i = i->ifa_next) {
+		if (i->ifa_addr == 0) continue;
 		lua_newtable(L);
 		lua_pushstring(L, i->ifa_name);
 		lua_setfield(L, -2, "interface");
