@@ -662,18 +662,10 @@ function cli.hrun (hsource, tag, runenv) -- execution step for handlers
       end
       mod, func, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].param
       -- append debug and test arguments
-      if hsource[1] == true then
-        param.debug = true
-      end
-      if hsource[2] == true then
-        param.test = true
-      end
-      if hsource[3] == true then
-        param.syslog = true
-      end
-      if hsource[4] then
-        param.log = hsource[4]
-      end
+      param.debug = hsource[1] or param.debug
+      param.test = hsource[2] or param.test
+      param.syslog = hsource[3] or param.syslog
+      param.log = hsource[4] or param.log
       if not func then
         r[#r + 1] = mod(param)
       elseif not mod[func] then
