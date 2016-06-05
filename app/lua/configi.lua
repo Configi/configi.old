@@ -633,18 +633,10 @@ function cli.run (source, runenv) -- execution step
     end
     local mod, func, param = runenv[s.mod], s.func, s.param
     -- append debug and test arguments
-    if source.debug == true then
-      param.debug = true
-    end
-    if source.test == true then
-      param.test = true
-    end
-    if source.syslog == true then
-      param.syslog = true
-    end
-    if source.log then
-      param.log = source.log
-    end
+    param.debug = source.debug or param.debug
+    param.test = source.test or param.test
+    param.syslog = source.syslog or param.syslog
+    param.log = source.log or param.log
     if not func then
       if not mod then
         lib.errorf("Module error: '%s' not found\n", s.mod)
