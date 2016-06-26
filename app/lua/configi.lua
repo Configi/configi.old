@@ -718,10 +718,18 @@ function cli.try (source, hsource, runenv)
     end
 
     -- Run handlers
-    local hrun = coroutine.wrap(cli.hrun)
+    local hrun = function(hsource, tag, runenv)
+      local h = coroutine.create(function ()
+        cli.hrun(hsource, tag, runenv)
+      end)
+      return function()
+        local _, res = coroutine.resume(h)
+        return res
+      end
+    end
     if Lua.next(handlers) then
       for handler, _ in Lua.pairs(handlers) do
-        for _, rh in Lua.ipairs(hrun(hsource, handler, runenv)) do
+        for rh in hrun(hsource, handler, runenv) do
           if rh.repaired == true then
             R.repaired = true
             R.failed = false
