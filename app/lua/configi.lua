@@ -683,7 +683,7 @@ end
 
 function cli.try (source, hsource, runenv)
   local M, results, R = {}, nil, { repaired = false, failed = false, repaired = false, kept = false }
-  local notify, handlers = nil, {}
+  local notify, tags = nil, {}
   for this = 1, source.runs do
     if this > 1 and (source.debug or source.test or source.msg) then
       lib.printf("-- Retry #%.f\n", this - 1)
@@ -716,7 +716,7 @@ function cli.try (source, hsource, runenv)
     else
       -- handle/tags mode `cfg -g`
       for n = 1, #source.tags do
-        handlers[source.tags[n]] = true
+        tags[source.tags[n]] = true
       end
     end
 
@@ -730,8 +730,8 @@ function cli.try (source, hsource, runenv)
         return res
       end
     end
-    if Lua.next(handlers) then
-      for rh in hrun(hsource, handlers, runenv) do
+    if Lua.next(tags) then
+      for rh in hrun(hsource, tags, runenv) do
         if rh.repaired == true then
           R.repaired = true
           R.failed = false
