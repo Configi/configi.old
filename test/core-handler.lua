@@ -9,7 +9,7 @@ file.directory {
 
 file.absent {
   path   = "test/tmp/core-handler-directory"
-  notify = "touch_file"
+  notify = "delete_file"
 }
 
 

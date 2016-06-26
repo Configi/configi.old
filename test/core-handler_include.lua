@@ -5,7 +5,7 @@ file.touch {
 }
 
 file.absent {
-  handle = "touch_file"
+  handle = "delete_file"
   path   = "test/tmp/core-handler-file"
 }
 
