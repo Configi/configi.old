@@ -653,9 +653,8 @@ function cli.run (source, runenv) -- execution step
   return rt
 end
 
-function cli.hrun (hsource, tags, runenv) -- execution step for handlers
-  for n = 1, #tags do
-    local tag = tags[n]
+function cli.hrun (tags, hsource, runenv) -- execution step for handlers
+  for tag, _ in Lua.pairs(tags) do
     local mod, func, param, r = nil, nil, nil, {}
     if hsource[tag] then
       for n = 1, #hsource[tag] do
@@ -704,7 +703,7 @@ function cli.try (source, hsource, runenv)
         -- if P.notify is set, run the corresponding handlers and append the results.
         notify = result.notify or result.notify_failed or result.notify_kept -- notify on one flag only
         if notify then
-          handlers[notify] = true -- toggle handle "$tag"
+          tags[notify] = true -- toggle handle "$tag"
         end
         -- read the T.results.msg table if debugging is on or the last result failed
         if (result.failed or source.debug or source.test or source.msg) and result.msg then
@@ -721,9 +720,9 @@ function cli.try (source, hsource, runenv)
     end
 
     -- Run handlers
-    local hrun = function(hsource, tags, runenv)
+    local hrun = function(tags)
       local h = coroutine.create(function ()
-        cli.hrun(hsource, tags, runenv)
+        cli.hrun(tags, hsource, runenv)
       end)
       return function()
         local _, res = coroutine.resume(h)
@@ -731,7 +730,7 @@ function cli.try (source, hsource, runenv)
       end
     end
     if Lua.next(tags) then
-      for rh in hrun(hsource, tags, runenv) do
+      for rh in hrun(tags) do
         if rh.repaired == true then
           R.repaired = true
           R.failed = false
