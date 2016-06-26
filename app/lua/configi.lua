@@ -653,29 +653,32 @@ function cli.run (source, runenv) -- execution step
   return rt
 end
 
-function cli.hrun (hsource, tag, runenv) -- execution step for handlers
-  local mod, func, param, r = nil, nil, nil, {}
-  if hsource[tag] then
-    for n = 1, #hsource[tag] do
-      if runenv[hsource[tag][n].mod] == nil then
-        -- auto-load the module
-        runenv[hsource[tag][n].mod] = Lscript.module(hsource[tag][n].mod)
-      end
-      mod, func, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].param
-      -- append debug and test arguments
-      param.debug = hsource[1] or param.debug
-      param.test = hsource[2] or param.test
-      param.syslog = hsource[3] or param.syslog
-      param.log = hsource[4] or param.log
-      if not func then
-        r[#r + 1] = mod(param)
-      elseif not mod[func] then
-        lib.errorf("Module error: function in module not found\n")
-      end
-      r[#r + 1] = mod[func](param)
-      coroutine.yield(r)
-    end -- for each tag
-  end -- if a tag
+function cli.hrun (hsource, tags, runenv) -- execution step for handlers
+  for n = 1, #tags do
+    local tag = tags[n]
+    local mod, func, param, r = nil, nil, nil, {}
+    if hsource[tag] then
+      for n = 1, #hsource[tag] do
+        if runenv[hsource[tag][n].mod] == nil then
+          -- auto-load the module
+          runenv[hsource[tag][n].mod] = Lscript.module(hsource[tag][n].mod)
+        end
+        mod, func, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].param
+        -- append debug and test arguments
+        param.debug = hsource[1] or param.debug
+        param.test = hsource[2] or param.test
+        param.syslog = hsource[3] or param.syslog
+        param.log = hsource[4] or param.log
+        if not func then
+          r[#r + 1] = mod(param)
+        elseif not mod[func] then
+          lib.errorf("Module error: function in module not found\n")
+        end
+        r[#r + 1] = mod[func](param)
+        coroutine.yield(r)
+      end -- for each tag
+    end -- if a tag
+  end -- #tags
 end
 
 function cli.try (source, hsource, runenv)
@@ -718,9 +721,9 @@ function cli.try (source, hsource, runenv)
     end
 
     -- Run handlers
-    local hrun = function(hsource, tag, runenv)
+    local hrun = function(hsource, tags, runenv)
       local h = coroutine.create(function ()
-        cli.hrun(hsource, tag, runenv)
+        cli.hrun(hsource, tags, runenv)
       end)
       return function()
         local _, res = coroutine.resume(h)
@@ -728,21 +731,19 @@ function cli.try (source, hsource, runenv)
       end
     end
     if Lua.next(handlers) then
-      for handler, _ in Lua.pairs(handlers) do
-        for rh in hrun(hsource, handler, runenv) do
-          if rh.repaired == true then
-            R.repaired = true
-            R.failed = false
-          else
-            R.failed = rh.failed
-	        end -- if repaired
-          if (rh.failed or source.debug or source.test or source.msg) and rh.msg then
-            for ni = 1, #rh.msg do
-              lib.warn("%s\n", rh.msg[ni])
-            end -- for handler messages
-          end  -- if failed or debug
-        end -- for each handler run
-      end -- for each handlers
+      for rh in hrun(hsource, handlers, runenv) do
+        if rh.repaired == true then
+          R.repaired = true
+          R.failed = false
+        else
+          R.failed = rh.failed
+        end -- if repaired
+        if (rh.failed or source.debug or source.test or source.msg) and rh.msg then
+          for ni = 1, #rh.msg do
+            lib.warn("%s\n", rh.msg[ni])
+          end -- for handler messages
+        end  -- if failed or debug
+      end -- for each handler run
     end -- if handlers
     if R.failed == false then
       return R, M
