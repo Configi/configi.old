@@ -22,6 +22,7 @@ local Lua = {
   format = string.format,
   tostring = tostring
 }
+local coroutine = coroutine
 local Factid = require"factid"
 local Psyslog = require"posix.syslog"
 local Pgetopt = require"posix.getopt"
@@ -672,9 +673,9 @@ function cli.hrun (hsource, tag, runenv) -- execution step for handlers
         lib.errorf("Module error: function in module not found\n")
       end
       r[#r + 1] = mod[func](param)
+      coroutine.yield(r)
     end -- for each tag
   end -- if a tag
-  return r
 end
 
 function cli.try (source, hsource, runenv)
@@ -717,9 +718,10 @@ function cli.try (source, hsource, runenv)
     end
 
     -- Run handlers
+    local hrun = coroutine.wrap(cli.hrun)
     if Lua.next(handlers) then
       for handler, _ in Lua.pairs(handlers) do
-        for _, rh in Lua.ipairs(cli.hrun(hsource, handler, runenv)) do
+        for _, rh in Lua.ipairs(hrun(hsource, handler, runenv)) do
           if rh.repaired == true then
             R.repaired = true
             R.failed = false
