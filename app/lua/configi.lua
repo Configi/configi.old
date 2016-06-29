@@ -731,14 +731,14 @@ function cli.try (source, hsource, runenv)
     end
     if Lua.next(tags) then
       for rh in hrun(tags) do
-        if rh.repaired == true then
+        if rh[#rh].repaired == true then
           R.repaired = true
           R.failed = false
         end -- if repaired
-        R.failed = rh.failed or false
-        if (rh.failed or source.debug or source.test or source.msg) and rh.msg then
-          for ni = 1, #rh.msg do
-            lib.warn("%s\n", rh.msg[ni])
+        R.failed = rh[#rh].failed or false
+        if (rh[#rh].failed or source.debug or source.test or source.msg) and rh[#rh].msg then
+          for ni = 1, #rh[#rh].msg do
+            lib.warn("%s\n", rh[#rh].msg[ni])
           end -- for handler messages
         end  -- if failed or debug
       end -- for each handler run
