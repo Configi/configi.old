@@ -734,9 +734,8 @@ function cli.try (source, hsource, runenv)
         if rh.repaired == true then
           R.repaired = true
           R.failed = false
-        else
-          R.failed = rh.failed
         end -- if repaired
+        R.failed = rh.failed or false
         if (rh.failed or source.debug or source.test or source.msg) and rh.msg then
           for ni = 1, #rh.msg do
             lib.warn("%s\n", rh.msg[ni])
