@@ -106,7 +106,11 @@ function shell.command (S)
   if args[2] == nil then
     args[2] = true
   end
-  local code = F.run(lib.qexec, args)
+  if not P.test then
+    local code = F.run(lib.qexec, args)
+  else
+    local code = 0 
+  end
   return F.result(P.string, (code == 0))
 end
 
