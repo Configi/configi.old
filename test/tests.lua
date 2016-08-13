@@ -26,14 +26,23 @@ T:start"Lua tests"
   end
 T:done(N)
 
+T:start"moonscript test/core-moonscript.moon"
+  do
+    T:eq(cfg{ "-f", "test/core-moonscript.moon" }, true)
+    local info = stat.stat(testdir .. "file_directory")
+    T:neq(stat.S_ISDIR(info.st_mode), 0)
+    T:yes(os.remove(testdir .. "file_directory"))
+  end
+T:done(N)
+
 T:start"debug test/core-debug.lua"
- do
-   local _, out = cfg{ "-v",  "-f", "test/core-debug.lua"}
-   out = table.concat(out.stdout, "\n")
-   T:eq(string.find(out, "Started run", 1, true), 1)
-   T:eq(string.find(out, "Applying", 1, true), 42)
-   T:eq(string.find(out, "Finished run", 1, true), 103)
- end
+  do
+    local _, out = cfg{ "-v",  "-f", "test/core-debug.lua"}
+    out = table.concat(out.stdout, "\n")
+    T:eq(string.find(out, "Started run", 1, true), 1)
+    T:eq(string.find(out, "Applying", 1, true), 42)
+    T:eq(string.find(out, "Finished run", 1, true), 103)
+  end
 T:done(N)
 
 T:start"log test/core-log.lua"
