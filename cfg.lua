@@ -1,6 +1,6 @@
 local version = "Configi 0.9.7"
-local os, string, arg, next, tostring, collectgarbage =
-      os, string, arg, next, tostring, collectgarbage
+local ENV, os, string, arg, next, tostring, collectgarbage =
+       {}, os, string, arg, next, tostring, collectgarbage
 local cfg = require"configi"
 local lib = require"lib"
 local cli = cfg.cli
@@ -12,7 +12,6 @@ local systime = require"posix.sys.time"
 local lib = require"lib"
 local inotify = require"inotify"
 local t1
-local ENV = {}
 _ENV = ENV
 
 while true do
