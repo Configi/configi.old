@@ -1,7 +1,6 @@
 local version = "Configi 0.9.7"
-local arg = arg
-local os, string = os, string
-local next, tostring, collectgarbage = next, tostring, collectgarbage
+local os, string, arg, next, tostring, collectgarbage =
+      os, string, arg, next, tostring, collectgarbage
 local cfg = require"configi"
 local lib = require"lib"
 local cli = cfg.cli
