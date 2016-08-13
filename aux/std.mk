@@ -2,7 +2,6 @@ all: $(EXE)
 
 MAIN= $(EXE).lua
 AUX_P= aux
-MODULES_P= app/lua
 ONE= $(AUX_P)/one
 LUASTATIC= aux/luastatic.lua
 LUAC_T= luac
@@ -20,6 +19,8 @@ RM= rm
 RMFLAGS= -f
 RMRF= rm -rf
 VENDOR_LUA_P= vendor/lua
+VENDOR_SUBDIRS=
+VENDOR_DEPS=
 APP_LUA_P= app/lua
 
 _rest= $(wordlist 2,$(words $(1)),$(1))
