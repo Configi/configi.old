@@ -4,10 +4,10 @@ CLEAN+= clean_tests
 tests: $(LUA_A) $(CLUA_MODS)
 	$(CP) vendor/lua/cwtest.lua .
 	$(ECHOT) [LN] $@
-	$(LUA_T) $(LUASTATIC) test/tests.lua $(testDEPS) $(LUA_A) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(LDFLAGS) 
+	$(LUA_T) $(LUASTATIC) test/tests.lua $(testDEPS) $(LUA_A) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(LDFLAGS)
 	$(RM) $(RMFLAGS) cwtest.lua
 
 clean_tests:
-	$(RM) $(RMFLAGS) tests
+	$(RM) $(RMFLAGS) tests test/tests.lua.c
 
 .PHONY: clean_tests
