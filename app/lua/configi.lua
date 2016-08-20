@@ -590,11 +590,11 @@ function cli.opt (arg, version)
             -v, --debug                 Turn on debugging messages.
             -t, --test                  Dry-run mode. All operations are expected to succeed. Turns on debugging.
             -D, --daemon                Daemon mode. Watch for IN_MODIFY and IN_ATTRIB events to the policy file.
-            -p, --periodic          Do a run after N seconds.
+            -p, --periodic              Do a run after N seconds.
             -s, --syslog                Enable logging to syslog.
-            -l, --log                       Log to an specified file.
-            -m, --msg                       Show debug and test messages.
-            -g, --tag                       Only run specified tag(s).
+            -l, --log                   Log to an specified file.
+            -m, --msg                   Show debug and test messages.
+            -g, --tag                   Only run specified tag(s).
             -r, --runs                  Run the policy N times if a failure is encountered. Default is 3.
             -f, --file                  Path to the Configi policy.
 
