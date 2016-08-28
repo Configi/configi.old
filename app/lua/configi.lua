@@ -195,7 +195,7 @@ end
 -- Warn (stderr output) if a "module.function" parameter is ignored.
 -- @param T main table (TABLE)
 function Lmod.ignoredwarn (C)
-    for n = 1, #C.required do C.module[#C.module + 1] = C.required[n] end -- add C.required to M
+    for n = 1, #C._required do C.module[#C.module + 1] = C._required[n] end -- add C.required to M
     -- Core parameters are added as valid parameters
     C.module[#C.module + 1] = "comment"
     C.module[#C.module + 1] = "debug"
