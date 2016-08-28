@@ -659,7 +659,7 @@ end
 function cli.run (source, runenv) -- execution step
     local rt = {}
     if #source == 0 then
-      lib.errorf("Policy error: Check for space between module.function and promise subject\n")
+        lib.errorf("Policy error: Check for space between module.function and promise subject\n")
     end
     for i, s in ipairs(source) do
         if runenv[s.mod] == nil then
