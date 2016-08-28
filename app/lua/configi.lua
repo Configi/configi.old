@@ -491,8 +491,9 @@ function cli.main (opts)
                 end
                 source[#source + 1] = { mod = mod, func = false, param = param }
             end, -- func()
-            __index = function (_, func) return
-                function (ptbl) -- mod.func
+            __index = function (_, func)
+                return function(subject)
+                    return function (ptbl) -- mod.func
                     local qt = { environment = {}, parameters = {} }
                         for p, v in next, ptbl do
                             if p == register then rawset(env.global, v, true) end
@@ -523,10 +524,11 @@ function cli.main (opts)
                                 hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] = { mod = mod, func = func, param = ptbl }
                             end
                         elseif type(ptbl) == "table" then
-                            source[#source + 1] = {mod = mod, func = func, param = ptbl}
+                            source[#source + 1] = {mod = mod, func = func,subject=subject, param = ptbl}
                         end
                     end -- context
                 end -- mod.func
+            end
             end }) -- __index = function (_, func) return
             return tbl
         end -- __index = function (_, mod)
@@ -650,12 +652,15 @@ end
 
 function cli.run (source, runenv) -- execution step
     local rt = {}
+    if #source == 0 then
+      lib.errorf("Policy error: Check for space between module.function and promise subject\n")
+    end
     for i, s in ipairs(source) do
         if runenv[s.mod] == nil then
             -- auto-load the module
             runenv[s.mod] = Lscript.module(s.mod)
         end
-        local mod, func, param = runenv[s.mod], s.func, s.param
+        local mod, func, subject, param = runenv[s.mod], s.func, s.subject, s.param
         -- append debug and test arguments
         param.debug = source.debug or param.debug
         param.test = source.test or param.test
@@ -670,7 +675,7 @@ function cli.run (source, runenv) -- execution step
             if not mod[func] then
                 lib.errorf("Module error: function '%s' in module '%s' not found\n", s.func, s.mod)
             end
-            rt[i] = mod[func](param)
+            rt[i] = mod[func](subject)(param)
         end -- if not a module.function
     end -- for each line
     return rt
