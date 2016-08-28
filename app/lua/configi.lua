@@ -185,9 +185,9 @@ end
 -- Produce an error (exit code 1) if a required parameter is missing.
 -- @param T main table (TABLE)
 function Lmod.required (C)
-    for n = 1, #C.required do
-        if not C.parameters[C.required[n]] then
-            lib.errorf("%s Required parameter '%s' missing.\n", Lstr.SERR, C.required[n])
+    for n = 1, #C._required do
+        if not C.parameters[C._required[n]] then
+            lib.errorf("%s Required parameter '%s' missing.\n", Lstr.SERR, C._required[n])
         end
     end
 end
@@ -227,12 +227,12 @@ end
 -- @return results table
 function cfg.init(B, M)
     local C = {
-             source = B,
+        _parameters = B,
              module = M.parameters or {},
              report = M.report, -- cannot be unset
               alias = M.alias or {}
-           required = M.required or {},
-        environment = {},
+          _required = M.required or {},
+              _temp = {},
           functions = {},
          parameters = {},
             results = { repaired = false, failed = false, msg = {}, msgt = {} }
@@ -241,14 +241,14 @@ function cfg.init(B, M)
     if next(C.alias) then
         for p, t in next, C.alias do
             for n = 1, #t do
-                C.environment[t[n]] = p
+                C._temp[t[n]] = p
             end
         end
     end
     -- assign values
-    for p, v in next, C.source do
-        if C.environment[p] then
-            p = C.environment[p]
+    for p, v in next, C._parameters do
+        if C._temp[p] then
+            p = C._temp[p]
         end
         if lib.truthy(v) then
             C.parameters[p] = true
@@ -340,7 +340,7 @@ function cfg.init(B, M)
         end
         return f
     end
-    C.environment, C.required = nil, nil -- GC
+    C._temp, C._required, C._parameters = nil, nil, nil -- GC
 
     -- Methods available to P
     local insert_if = function(self, source, target, i)
