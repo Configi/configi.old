@@ -229,7 +229,6 @@ function cfg.init(P, M)
     local C = {
              module = M.parameters or {},
              report = M.report, -- cannot be unset
-              alias = M.alias or {}
           _required = M.required or {},
           functions = {},
          parameters = P,
@@ -238,7 +237,7 @@ function cfg.init(P, M)
     -- assign aliases
     local _temp = {}
     if next(M.alias) then
-        for p, t in next, C.alias do
+        for p, t in next, M.alias do
             for n = 1, #t do
                 _temp[t[n]] = p
             end
