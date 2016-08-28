@@ -225,30 +225,36 @@ end
 -- @return functions table
 -- @return parameters table
 -- @return results table
-function cfg.init(B, M)
+function cfg.init(P, M)
     local C = {
-        _parameters = B,
              module = M.parameters or {},
              report = M.report, -- cannot be unset
               alias = M.alias or {}
           _required = M.required or {},
-              _temp = {},
           functions = {},
-         parameters = {},
+         parameters = P,
             results = { repaired = false, failed = false, msg = {}, msgt = {} }
     }
     -- assign aliases
-    if next(C.alias) then
+    local _temp = {}
+    if next(M.alias) then
         for p, t in next, C.alias do
             for n = 1, #t do
-                C._temp[t[n]] = p
+                _temp[t[n]] = p
+            end
+        end
+        -- Preset found aliases to true since it's not ok to iterate and add at the same time.
+        for p, v in next, _temp do
+            if _temp[p] and C.parameters[p] then
+                C.parameters[v] = true
             end
         end
     end
     -- assign values
-    for p, v in next, C._parameters do
-        if C._temp[p] then
-            p = C._temp[p]
+    for p, v in next, C.parameters do
+        -- update p for each alias hit
+        if _temp[p] then
+            p = _temp[p]
         end
         if lib.truthy(v) then
             C.parameters[p] = true
@@ -340,7 +346,7 @@ function cfg.init(B, M)
         end
         return f
     end
-    C._temp, C._required, C._parameters = nil, nil, nil -- GC
+    _temp, C._required = nil, nil -- GC
 
     -- Methods available to P
     local insert_if = function(self, source, target, i)
