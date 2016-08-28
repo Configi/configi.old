@@ -195,21 +195,21 @@ end
 -- Warn (stderr output) if a "module.function" parameter is ignored.
 -- @param T main table (TABLE)
 function Lmod.ignoredwarn (C)
-    for n = 1, #C._required do C.module[#C.module + 1] = C._required[n] end -- add C.required to M
+    for n = 1, #C._required do C._module[#C._module + 1] = C._required[n] end -- add C.required to M
     -- Core parameters are added as valid parameters
-    C.module[#C.module + 1] = "comment"
-    C.module[#C.module + 1] = "debug"
-    C.module[#C.module + 1] = "test"
-    C.module[#C.module + 1] = "syslog"
-    C.module[#C.module + 1] = "log"
-    C.module[#C.module + 1] = "handle"
-    C.module[#C.module + 1] = "register"
-    C.module[#C.module + 1] = "context"
-    C.module[#C.module + 1] = "notify"
-    C.module[#C.module + 1] = "notify_failed"
-    C.module[#C.module + 1] = "notify_kept"
-    -- Now check for any undeclared module parameter
-    local Ps = lib.arr_to_rec(C.module, 0)
+    C._module[#C._module + 1] = "comment"
+    C._module[#C._module + 1] = "debug"
+    C._module[#C._module + 1] = "test"
+    C._module[#C._module + 1] = "syslog"
+    C._module[#C._module + 1] = "log"
+    C._module[#C._module + 1] = "handle"
+    C._module[#C._module + 1] = "register"
+    C._module[#C._module + 1] = "context"
+    C._module[#C._module + 1] = "notify"
+    C._module[#C._module + 1] = "notify_failed"
+    C._module[#C._module + 1] = "notify_kept"
+    -- Now check for any undeclared _module parameter
+    local Ps = lib.arr_to_rec(C._module, 0)
     for param, _ in next, C.parameters do
         if Ps[param] == nil then
             lib.warn("%s Parameter '%s' ignored.\n", Lstr.WARN, param)
@@ -227,7 +227,7 @@ end
 -- @return results table
 function cfg.init(P, M)
     local C = {
-             module = M.parameters or {},
+            _module = M.parameters or {},
              report = M.report, -- cannot be unset
           _required = M.required or {},
           functions = {},
@@ -345,7 +345,7 @@ function cfg.init(P, M)
         end
         return f
     end
-    _temp, C._required = nil, nil -- GC
+    _temp, C._module, C._required = nil, nil, nil -- GC
 
     -- Methods available to P
     local insert_if = function(self, source, target, i)
