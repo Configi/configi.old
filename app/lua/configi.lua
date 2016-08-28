@@ -499,6 +499,7 @@ function cli.main (opts)
             __index = function (_, func)
                 return function(subject)
                     return function (ptbl) -- mod.func
+                    ptbl = ptbl or {}
                     local qt = { environment = {}, parameters = {} }
                         for p, v in next, ptbl do
                             if p == register then rawset(env.global, v, true) end
