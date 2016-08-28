@@ -369,8 +369,8 @@ function cfg.init(P, M)
         set_if_not = set_if_not,
         set_if = set_if
     }
-
-    return C.functions, setmetatable(C.parameters, { __index = P_methods } ), C.results -- F, P, R
+    setmetatable(C.parameters, { __index = P_methods })
+    return C.functions, C.results -- F, R
 end
 
 --- Iterate a table (array) for records.
