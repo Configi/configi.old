@@ -12,6 +12,6 @@ for s, t in list(files) do
 end
 
 file.copy"test/tmp/file_copy_src" {
-  recurse = "true"
+  recurse = "true",
   dest    = "test/tmp/file_copy_dest"
 }

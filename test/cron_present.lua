@@ -46,7 +46,7 @@ cron.present(name) {
 }
 
 gang = {
- name = "south"
+ name = "south",
  minute = "6",
  hour = "7",
  job = "/bin/ls"

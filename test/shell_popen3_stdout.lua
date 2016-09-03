@@ -1,6 +1,6 @@
 
 shell.popen3"/bin/sed -es/s/d/g"{
-  stdout  = "duck"
+  stdout  = "duck",
   stdin   = "suck"
 }
 
