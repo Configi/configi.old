@@ -1,0 +1,1 @@
+openrc.stopped"rsyncd"()

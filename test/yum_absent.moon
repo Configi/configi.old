@@ -1,0 +1,2 @@
+
+yum.absent"mtr"()

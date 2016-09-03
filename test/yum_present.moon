@@ -1,0 +1,1 @@
+yum.present"mtr"()

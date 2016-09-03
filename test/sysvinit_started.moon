@@ -1,0 +1,2 @@
+
+sysvinit.started"telnet"()
