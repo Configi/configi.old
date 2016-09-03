@@ -548,7 +548,7 @@ static const luaL_Reg F[] =
 	{NULL, NULL}
 };
 
-LUALIB_API int luaopen_factid_c(lua_State *L)
+LUALIB_API int luaopen_factidC(lua_State *L)
 {
 	luaL_newlib(L, F);
 	return 1;

@@ -10,8 +10,7 @@ local sysstat = require"posix.sys.stat"
 local dirent = require"posix.dirent"
 local px = require"px"
 local cmd = px.cmd
-local factid_c = require"factid_c"
-local factid = factid_c
+local factid = require"factidC"
 local ENV = {}
 _ENV = ENV
 

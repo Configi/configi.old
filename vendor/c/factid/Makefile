@@ -1,6 +1,6 @@
-factidSRC= vendor/c/factid/src/factid_c.c
-factidOBJ= vendor/c/factid/src/factid_c.o
-factidA= factid_c.a
+factidSRC= vendor/c/factid/src/factidC.c
+factidOBJ= vendor/c/factid/src/factidC.o
+factidA= factidC.a
 CLUA_MODS+= $(factidA)
 CLUA_MODS:= $(filter-out factid.a,$(CLUA_MODS))
 VENDOR_LUA+= factid
