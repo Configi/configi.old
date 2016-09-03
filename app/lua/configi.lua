@@ -378,15 +378,14 @@ end
 --- Iterate a table (array) for records.
 -- @param tbl table to iterate (TABLE)
 -- @return iterator that results in a line terminated field "value" for each record (FUNCTION)
-function Lscript.list (tbl)
+function Lscript.list(tbl)
     if not tbl then
         lib.errorf("Error: cfg.list: Expected table but got nil.\n")
     end
-    local i = 0
-    return function ()
-        i = i + 1
-        if i > #tbl then return nil end
-        return tbl[i]
+    local i, v
+    return function()
+       i, v = next(tbl, i)
+       return i, v
     end
 end
 
@@ -472,8 +471,8 @@ function cli.main (opts)
         end
     end
     env.each = function (t, f)
-        for i in Lscript.list(t) do
-            f(i)
+        for str, tbl in Lscript.list(t) do
+            f(str)(tbl)
         end
     end
     -- Metatable for the script environment
