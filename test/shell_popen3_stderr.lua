@@ -1,7 +1,6 @@
 
-shell.popen3 {
+shell.popen3"/bin/cat --sdfssdf"{
   stderr  = "unrecognized option"
-  command = "/bin/cat --sdfssdf"
 }
 
 

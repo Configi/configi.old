@@ -4,7 +4,6 @@
 6 7 * * * /bin/ls
 ]]
 
-cron.absent {
-  name = "south"
+cron.absent"south"{
   job  = "/bin/ls"
 }

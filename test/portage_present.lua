@@ -1,4 +1,1 @@
-
-portage.present {
-  atom = "app-misc/supercat"
-}
+portage.present"app-misc/supercat"()

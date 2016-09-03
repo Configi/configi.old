@@ -1,1 +1,2 @@
-debug "true"
+debug"true"
+file.absent"/tmp/TESTDEBUG"()

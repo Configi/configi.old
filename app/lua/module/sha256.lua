@@ -22,29 +22,30 @@ M.alias.hash = { "digest", "signature" }
 -- @aliases check
 -- @param path path of file to hash [ALIAS: file] [REQUIRED]
 -- @param hash the 32-byte alphanumeric string to match for [ALIAS: digest,signature] [REQUIRED]
--- @usage sha256.verify {
---   path = "/etc/passwd"
---   hash = "09e40b7b232c4abb427f1344e636e44ebf5684f70fb6cd67507e88955064255d"
--- }
-function sha256.verify(B)
+-- @usage sha256.verify("/etc/passwd")
+--     hash: "09e40b7b232c4abb427f1344e636e44ebf5684f70fb6cd67507e88955064255d"
+function sha256.verify(S)
     M.report = {
         repaired = "sha256.verify: Hash matched.",
             kept = "sha256.verify: Hash matched.",
           failed = "sha256.verify: Hash mismatch.",
          missing = "sha256.verify: Missing path."
     }
-    local F, P, R = cfg.init(B, M)
-    if not stat.stat(P.path) then
-        return F.result(P.path, false, M.report.missing)
-    end
-    local S = sha2.new256()
-    for f in io.lines(P.path, 2^12) do
-        S:add(f)
-    end
-    if S:close() ==  P.hash then
-        return F.kept(P.path)
-    else
-        return F.result(P.path, false)
+    return function(P)
+        P.path = S
+        local F, R = cfg.init(P, M)
+        if not stat.stat(P.path) then
+            return F.result(P.path, false, M.report.missing)
+        end
+        local S = sha2.new256()
+        for f in io.lines(P.path, 2^12) do
+            S:add(f)
+        end
+        if S:close() ==  P.hash then
+            return F.kept(P.path)
+        else
+            return F.result(P.path, false)
+        end
     end
 end
 

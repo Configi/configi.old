@@ -1,4 +1,1 @@
-
-systemd.stopped {
-  service = "tuned"
-}
+systemd.stopped"crond"()

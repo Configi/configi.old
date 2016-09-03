@@ -1,4 +1,1 @@
-
-systemd.restart {
-  service = "tuned"
-}
+systemd.restart"crond"()

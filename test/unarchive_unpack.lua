@@ -1,5 +1,3 @@
-
-unarchive.unpack {
-  src  = "test/unarchive_unpack.tar"
+unarchive.unpack"test/unarchive_unpack.tar"{
   dest = "test/tmp"
 }

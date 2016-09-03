@@ -82,17 +82,11 @@ end
 -- @param sync perform an `emerge --sync` before installing package(s) [CHOICES: "yes","no"]
 -- @param update update package to the best version [CHOICES: "yes","no"]
 -- @param unmask enable auto-unmask and auto-unmask-write options [CHOICES: "yes","no"]
--- @usage portage.present {
---   package = "dev-util/strace"
---   version = "4.8"
--- }
--- portage.present {
---   atom = "=dev-util/strace-4.8"
--- }
--- portage.present {
---   package = "dev-util/strace"
--- }
-function portage.present(B)
+-- @usage portage.present("dev-util/strace")
+--     version: "4.8"
+-- portage.present("dev-util/strace-4.8")!
+-- portage.present("dev-util/strace")!
+function portage.present(S)
     M.parameters = {
         "deep", "newuse", "nodeps", "noreplace", "oneshot", "onlydeps", "sync", "unmask", "update", "version"
     }
@@ -101,69 +95,73 @@ function portage.present(B)
             kept = "portage.present: Package already installed.",
           failed = "portage.present: Error installing package."
     }
-    local F, P, R = cfg.init(B, M)
-    if P.oneshot == nil then
-        P.oneshot = true -- oneshot "yes" is default
-    end
-    -- `emerge --sync` mode
-    if P.sync == true then
-        if F.run(cmd["/usr/bin/emerge"], { "--sync" }) then
-            F.msg("sync", "Sync finished", true)
-        else
-            return F.result("sync", false, "Sync failed")
+    return function(P)
+        P.atom = S
+        local F, R = cfg.init(P, M)
+        if P.oneshot == nil then
+            P.oneshot = true -- oneshot "yes" is default
         end
-    end
-    if found(P) then
-        return F.kept(P.atom)
-    end
-    local A = decompose(P)
-    local atom = string.format("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
-    local args = { "--quiet", "--quiet-build", atom }
-    local set = {
-             deep = "--deep",
-           newuse = "--newuse",
-           nodeps = "--nodeps",
-        noreplace = "--noreplace",
-          oneshot = "-1",
-         onlydeps = "--onlydeps"
-    }
-    P:insert_if(set, args, 3)
-    if P.unmask then
-        table.insert(args, 3, "--auto-unmask-write")
-        table.insert(args, 3, "--auto-unmask")
-        if not F.run(cmd["/usr/bin/emerge"], args) then
-            return F.result(atom, false, G.failed)
+        -- `emerge --sync` mode
+        if P.sync == true then
+            if F.run(cmd["/usr/bin/emerge"], { "--sync" }) then
+                F.msg("sync", "Sync finished", true)
+            else
+                return F.result("sync", false, "Sync failed")
+            end
         end
-        table.remove(args, 3)
-        table.remove(args, 3)
+        if found(P) then
+            return F.kept(P.atom)
+        end
+        local A = decompose(P)
+        local atom = string.format("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
+        local args = { "--quiet", "--quiet-build", atom }
+        local set = {
+                 deep = "--deep",
+               newuse = "--newuse",
+               nodeps = "--nodeps",
+            noreplace = "--noreplace",
+              oneshot = "-1",
+             onlydeps = "--onlydeps"
+        }
+        P:insert_if(set, args, 3)
+        if P.unmask then
+            table.insert(args, 3, "--auto-unmask-write")
+            table.insert(args, 3, "--auto-unmask")
+            if not F.run(cmd["/usr/bin/emerge"], args) then
+                return F.result(atom, false, G.failed)
+            end
+            table.remove(args, 3)
+            table.remove(args, 3)
+        end
+        return F.result(atom, F.run(cmd["/usr/bin/emerge"], args))
     end
-    return F.result(atom, F.run(cmd["/usr/bin/emerge"], args))
 end
 
 --- Remove package atom.
 -- @aliases remove
 -- @param atom package atom to unmerge [REQUIRED] [ALIAS: package]
 -- @param depclean Remove packages not associated with explicitly installed packages [CHOICES: "yes","no"] [DEFAULT: "no"]
--- @usage portage.absent {
---   atom = "dev-util/atom"
--- }
-function portage.absent(B)
+-- @usage portage.absent("dev-util/strace")!
+function portage.absent(S)
     M.parameters = { "depclean" }
     M.report = {
         repaired = "portage.absent: Successfully removed package.",
             kept = "portage.absent: Package not installed.",
           failed = "portage.absent: Error removing package."
     }
-    local F, P, R = cfg.init(B, M)
-    if not found(P) then
-        return F.kept(P.atom)
+    return function(P)
+        P.atom = S
+        local F, R = cfg.init(P, M)
+        if not found(P) then
+            return F.kept(P.atom)
+        end
+        local env = { "CLEAN_DELAY=0", "PATH=/bin:/usr/bin:/sbin:/usr/sbin" } -- PORTAGE_BZIP2_COMMAND needs $PATH
+        local A = decompose(P)
+        local atom = string.format("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
+        local args = { _env = env, "--quiet", "-C", atom }
+        lib.insert_if(P.depclean, args, 2, "--depclean")
+        return F.result(atom, F.run(cmd["/usr/bin/emerge"], args))
     end
-    local env = { "CLEAN_DELAY=0", "PATH=/bin:/usr/bin:/sbin:/usr/sbin" } -- PORTAGE_BZIP2_COMMAND needs $PATH
-    local A = decompose(P)
-    local atom = string.format("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
-    local args = { _env = env, "--quiet", "-C", atom }
-    lib.insert_if(P.depclean, args, 2, "--depclean")
-    return F.result(atom, F.run(cmd["/usr/bin/emerge"], args))
 end
 
 portage.installed = portage.present

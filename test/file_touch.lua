@@ -1,4 +1,2 @@
 
-file.touch {
-  path = "test/tmp/file_touch"
-}
+file.touch"test/tmp/file_touch"()

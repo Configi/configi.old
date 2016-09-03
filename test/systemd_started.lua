@@ -1,4 +1,1 @@
-
-systemd.started {
-  service = "tuned"
-}
+systemd.started"crond"()

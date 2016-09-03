@@ -82,64 +82,66 @@ end
 -- @param day day value [DEFAULT: "*"]
 -- @param weekday weekday value [DEFAULT: "*"]
 -- @param month month value [DEFAULT: "*"]
--- @usage cron.present [[
---   name "example"
---   job "/bin/ls"
---   minute "5"
---   hour "3"
---   day "2"
---   weekday "2"
---   month "5"
---   user "ed"
--- ]
-function cron.present(B)
+-- @usage cron.present("example")
+--     job: "/bin/ls"
+--     minute: "5"
+--     hour: "3"
+--     day: "2"
+--     weekday: "2"
+--     month: "5"
+--     user "ed"
+function cron.present(S)
     M.parameters = { "minute", "hour", "day", "weekday", "month", "user" }
     M.report = {
         repaired = "cron.present: Successfully added Cron job.",
             kept = "cron.present: Cron job already present.",
           failed = "cron.present: Error adding Cron job"
     }
-    local F, P, R = cfg.init(B, M)
-    P:set_if_not("user", lib.getename())
-    local jobs = list(P)
-    P.cronjob = genjob(P) -- Replace P.job with prepended scheduling info. This is used by listed()
-    local islisted = listed(P)
-    if islisted == true then
-        return F.kept(P.name)
+    return function(P)
+        P.name = S
+        local F, R = cfg.init(P, M)
+        P:set_if_not("user", lib.getename())
+        local jobs = list(P)
+        P.cronjob = genjob(P) -- Replace P.job with prepended scheduling info. This is used by listed()
+        local islisted = listed(P)
+        if islisted == true then
+            return F.kept(P.name)
+        end
+        jobs[#jobs + 1] = string.format("%s%s", tag, P.name)
+        jobs[#jobs + 1] = P.cronjob
+        jobs = table.concat(jobs, "\n") -- tostring(jobs)
+        jobs = jobs .. "\n" -- vixie-cron needs a blank line at the end. Complains about a premature EOF.
+        return F.result(P.name, F.run(cmd["crontab"], { _stdin = jobs, "-u", P.user, "-" }))
     end
-    jobs[#jobs + 1] = string.format("%s%s", tag, P.name)
-    jobs[#jobs + 1] = P.cronjob
-    jobs = table.concat(jobs, "\n") -- tostring(jobs)
-    jobs = jobs .. "\n" -- vixie-cron needs a blank line at the end. Complains about a premature EOF.
-    return F.result(P.name, F.run(cmd["crontab"], { _stdin = jobs, "-u", P.user, "-" }))
 end
 
 --- Remove a job from a user's crontab.
 -- @param name tag string [REQUIRED]
 -- @param job the command or job string [REQUIRED]
 -- @param user user login to operate on [DEFAULT: "root"]
--- @usage cron.absent [[
---   name "example"
---   job "/bin/ls"
---   user "ed"
--- ]]
-function cron.absent(B)
+-- @usage cron.absent("example")
+--     job: "/bin/ls"
+--     user: "ed"
+function cron.absent(S)
     M.parameters = { "minute", "hour", "day", "weekday", "month", "user" }
     M.report = {
         repaired = "cron.absent: Successfully removed Cron job.",
             kept = "cron.absent: Cron job already absent.",
           failed = "cron.absent: Error removing Cron job."
     }
-    local F, P, R = cfg.init(B, M)
-    P:set_if_not("user", lib.getename())
-    local jobs = list(P)
-    if not next(jobs) or not listed(P) then
-        return F.kept(P.name)
+    return function(P)
+        P.name = S
+        local F, R = cfg.init(P, M)
+        P:set_if_not("user", lib.getename())
+        local jobs = list(P)
+        if not next(jobs) or not listed(P) then
+            return F.kept(P.name)
+        end
+        P.cronjob = genjob(P)
+        jobs = table.concat(remove(jobs, string.format("%s%s", tag, P.name)), "\n")
+        jobs = jobs .. "\n"
+        return F.result(P.name, F.run(cmd["crontab"], { _stdin = jobs, "-u", P.user, "-"}))
     end
-    P.cronjob = genjob(P)
-    jobs = table.concat(remove(jobs, string.format("%s%s", tag, P.name)), "\n")
-    jobs = jobs .. "\n"
-    return F.result(P.name, F.run(cmd["crontab"], { _stdin = jobs, "-u", P.user, "-"}))
 end
 
 return cron

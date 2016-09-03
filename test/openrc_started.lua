@@ -1,4 +1,1 @@
-
-openrc.started {
-  service = "rsyncd"
-}
+openrc.started"rsyncd"()

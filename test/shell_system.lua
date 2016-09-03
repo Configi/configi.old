@@ -1,7 +1,3 @@
-
-shell.system {
+shell.system"test/shell_system.sh"{
   creates = "test/tmp/shell_system.txt"
-  script  = "test/shell_system.sh"
 }
-
-

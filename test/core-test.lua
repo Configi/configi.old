@@ -1,5 +1,3 @@
 test "true"
 
-file.absent {
-  path = "test/tmp/core-test.txt"
-}
+file.absent"test/tmp/core-test.txt"()

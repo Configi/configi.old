@@ -1,62 +1,61 @@
 
-cron.present {
-  name = "test"
-  minute = "25"
-  hour = "09"
+cron.present"test"{
+  minute = "25",
+  hour = "09",
   job = "/bin/ls"
 }
 
-cron.present {
-  name = "cut"
-  minute = "30"
-  hour = "11"
+cron.present"cut"{
+  minute = "30",
+  hour = "11",
   job = "/bin/ls"
 }
 
-cron.present {
-  name = "two"
-  minute = "2"
-  hour = "4"
+cron.present"two"{
+  minute = "2",
+  hour = "4",
   job = "/bin/ls"
 }
 
-cron.absent {
-  name = "whoah"
+cron.absent"whoah"{
   job = "/bin/ls"
 }
 
 
 cp = {
-  { name = "Moe", minute = "12", hour = "6", job = "/bin/ls" },
-  { name = "Larry", minute = "2", hour = "3", job = "/bin/ls" },
-  { name = "Curly", minute = "43", hour = "12", job = "/bin/ls" }
+  Moe = { minute = "12", hour = "6", job = "/bin/ls" }
 }
+each(cp, cron.present)
 
-for jobs in list(cp) do
-  cron.present(jobs)
-end
+cp = {
+  Larry = { minute = "2", hour = "3", job = "/bin/ls" }
+}
+each(cp, cron.present)
+
+cp = {
+  Curly = { minute = "43", hour = "12", job = "/bin/ls" }
+}
+each(cp, cron.present)
 
 name = "testing"
 
-cron.present {
-  name = name
-  minute = "1"
-  hour = "6"
+cron.present(name) {
+  minute = "1",
+  hour = "6",
   job = "/bin/ls"
 }
 
 gang = {
  name = "south"
- minute = "6"
- hour = "7"
+ minute = "6",
+ hour = "7",
  job = "/bin/ls"
 }
 
-cron.present {
- name = gang.name
- minute = gang.minute
- hour = gang.hour
- job = gang.job
+cron.present(gang.name){
+ minute = gang.minute,
+ hour = gang.hour,
+ job = gang.job,
 }
 
 
@@ -65,9 +64,9 @@ p = {
 }
 
 xp = {
-  { name = "Rec", minute = "5", hour = "3", job = p.job }
+  Rec = { minute = "5", hour = "3", job = p.job }
 }
 
-for jobs in list(xp) do
-  cron.present(jobs)
+for names, jobs in list(xp) do
+  cron.present(names)(jobs)
 end

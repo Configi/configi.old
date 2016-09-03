@@ -1,7 +1,6 @@
 context = "fact.interfaces.lo.ipv4['127.0.0.11']"
 
-file.touch {
-  path = "test/tmp/core-context"
+file.touch "test/tmp/core-context"{
   context = context
 }
 

@@ -24,16 +24,17 @@ end
 --- Run clean mode.
 -- See yum(8) for possible options.
 -- @param option option to pass to `yum clean`
--- @usage yum.clean [[
---   option "all"
--- ]]
-function yum.clean(B)
+-- @usage yum.clean("all")!
+function yum.clean(S)
     M.report = {
         repaired = "yum.clean: Successfully executed `yum clean`.",
           failed = "yum.clean: Error running `yum clean`."
     }
-    local F, P, R = cfg.init(B, M)
-    return F.result(P.package, F.run(cmd.yum, { command = "clean", package = P.package }))
+    return function(P)
+        P.option = S
+        local F, R = cfg.init(P, M)
+        return F.result(P.package, F.run(cmd.yum, { command = "clean", package = P.package }))
+    end
 end
 
 --- Install a package via the Yum package manager.
@@ -49,11 +50,9 @@ end
 -- @param proxy HTTP proxy to use for connections. Passed as an environment variable.
 -- @param update update all packages to the latest version [CHOICES: "yes","no"]
 -- @param update_minimal only update to the version with a bugfix or security errata [CHOICES: "yes","no"]
--- @usage yum.present [[
---   package "strace"
---   update "yes"
--- ]]
-function yum.present(B)
+-- @usage yum.present("strace")
+--     update: "yes"
+function yum.present(S)
     M.parameters = {
         "clean_all", "config", "nogpgcheck", "security", "bugfix", "proxy", "update", "update_minimal"
     }
@@ -62,22 +61,39 @@ function yum.present(B)
             kept = "yum.present: Package already installed.",
           failed = "yum.present: Error installing package."
     }
-    local F, P, R = cfg.init(B, M)
-    local env, command
-    if P.proxy then
-        env = { "http_proxy=" .. P.proxy }
-    end
-    -- Update mode
-    if P.update == true or P.update_minimal == true then
-        if P.update_minimal == true then
-            command = "update-minimal"
-        elseif P.update == true then
-            command = "update"
+    return function(P)
+        P.package = S
+        local F, R = cfg.init(P, M)
+        local env, command
+        if P.proxy then
+            env = { "http_proxy=" .. P.proxy }
+        end
+        -- Update mode
+        if P.update == true or P.update_minimal == true then
+            if P.update_minimal == true then
+                command = "update-minimal"
+            elseif P.update == true then
+                command = "update"
+            end
+            return F.result(P.package, F.run(cmd.yum, {
+                      _env = env,
+                 assumeyes = true,
+                   command = command,
+                    config = P.config,
+                nogpgcheck = P.nogpgcheck,
+                  security = P.security,
+                    bugfix = P.bugfix,
+                   package = P.package
+            }))
+        end
+        -- Install mode
+        if found(P.package) then
+            return F.kept(P.package)
         end
         return F.result(P.package, F.run(cmd.yum, {
                   _env = env,
              assumeyes = true,
-               command = command,
+               command = "install",
                 config = P.config,
             nogpgcheck = P.nogpgcheck,
               security = P.security,
@@ -85,39 +101,30 @@ function yum.present(B)
                package = P.package
         }))
     end
-    -- Install mode
-    if found(P.package) then
-        return F.kept(P.package)
-    end
-    return F.result(P.package, F.run(cmd.yum, {
-              _env = env,
-         assumeyes = true,
-           command = "install",
-            config = P.config,
-        nogpgcheck = P.nogpgcheck,
-          security = P.security,
-            bugfix = P.bugfix,
-           package = P.package
-    }))
-  end
+end
 
 --- Remove a package via the Yum package manager.
 -- @aliases removed
 -- @aliases remove
 -- @param package name of the package to remove [REQUIRED]
 -- @param config yum config file location
-function yum.absent(B)
+-- @usage yum.absent("strace")
+--     config: "/etc/yum.conf"
+function yum.absent(S)
     M.parameters = { "config" }
     M.report = {
         repaired = "yum.absent: Successfully removed package.",
             kept = "yum.absent: Package not installed.",
           failed = "yum.absent: Error removing package."
     }
-    local F, P, R = cfg.init(B, M)
-    if not found(P.package) then
-        return F.kept(P.package)
+    return function(P)
+        P.package = S
+        local F, R = cfg.init(P, M)
+        if not found(P.package) then
+            return F.kept(P.package)
+        end
+        return F.result(P.package, F.run(cmd.yum, { assumeyes = true, command = "erase", package = P.package }))
     end
-    return F.result(P.package, F.run(cmd.yum, { assumeyes = true, command = "erase", package = P.package }))
 end
 
 yum.installed = yum.present

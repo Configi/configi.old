@@ -1,4 +1,1 @@
-
-systemd.reload {
-  service = "sshd"
-}
+systemd.reload"crond"()

@@ -1,5 +1,4 @@
-openrc.delete {
-  service  = "rsyncd"
+openrc.delete"rsyncd"{
   runlevel = "default"
 }
 

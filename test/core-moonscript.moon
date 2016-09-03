@@ -1,3 +1,2 @@
-file.directory
+file.directory"test/tmp/file_directory"
     comment: "creating directory"
-    path: "test/tmp/file_directory"

@@ -1,5 +1,4 @@
 
-file.link {
-  link = "test/tmp/file_link"
-  src  = "/"
+file.link"test/tmp/file_link"{
+  src = "/"
 }

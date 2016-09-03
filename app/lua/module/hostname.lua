@@ -16,20 +16,21 @@ M.alias.hostname = { "name" }
 
 --- Set hostname.
 -- @param hostname hostname to set [ALIAS: name]
--- @usage hostname.set {
---   name = "aardvark"
--- }
-function hostname.set(B)
+-- @usage hostname.set("aardvark")!
+function hostname.set(S)
     M.report = {
         repaired = "hostname.set: Successfully set hostname.",
             kept = "hostname.set: Hostname already set.",
           failed = "hostname.set: Error setting hostname.",
     }
-    local F, P, R = cfg.init(B, M)
-    if P.hostname == factid.hostname() then
-        return F.kept(P.hostname)
+    return function(P)
+        P.hostname = S
+        local F, R = cfg.init(P, M)
+        if P.hostname == factid.hostname() then
+            return F.kept(P.hostname)
+        end
+        return F.result(P.hostname, F.run(cmd.hostname{ P.hostname }))
     end
-    return F.result(P.hostname, F.run(cmd.hostname{ P.hostname }))
 end
 
 return hostname

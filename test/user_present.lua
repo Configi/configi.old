@@ -1,5 +1,1 @@
-
-user.present {
-  login = "eduardo"
-}
-
+user.present"eduardo"()

@@ -1,5 +1,4 @@
 
-opkg.present {
+opkg.present"mtr"{
   update  = "true"
-  package = "mtr"
 }

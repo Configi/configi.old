@@ -1,10 +1,10 @@
 
 d = {
-  { comment = "s", path ="test/tmp/core-list.xxx" },
-  { comment = "x", path ="test/tmp/core-list.yyy" }
+  ["test/tmp/core-list.xxx"] = { comment = "s" },
+  ["test/tmp/core-list.yyy"] = { comment = "x" }
 }
 
-for dirs in list(d) do
-  file.absent(dirs)
+for str, tbl in list(d) do
+  file.absent(str)(tbl)
 end
 

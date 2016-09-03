@@ -1,4 +1,1 @@
-
-file.directory {
-  path = "test/tmp/file_directory"
-}
+file.directory"test/tmp/file_directory"()

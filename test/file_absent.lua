@@ -1,4 +1,2 @@
 
-file.absent {
-  path = "test/tmp/file_absent"
-}
+file.absent"test/tmp/file_absent"()

@@ -32,11 +32,9 @@ end
 -- @param nodeps Do not install dependencies [CHOICES: "yes","no"]
 -- @param proxy HTTP proxy to use for connections
 -- @param update update package [CHOICES: "yes","no"]
--- @usage opkg.present {
---   package = "strace"
---   update = "yes"
--- }
-function opkg.present(B)
+-- @usage opkg.present("strace")
+--     update: "yes"
+function opkg.present(S)
     M.parameters = {
            "force_depends",
          "force_reinstall",
@@ -52,29 +50,32 @@ function opkg.present(B)
             kept = "opkg.present: Package already installed.",
           failed = "opkg.present: Error installing package."
     }
-    local F, P, R = cfg.init(B, M)
-    if P.proxy then
-        local env = { "http_proxy=" .. P.proxy }
+    return function(P)
+        P.package = S
+        local F, R = cfg.init(P, M)
+        if P.proxy then
+            local env = { "http_proxy=" .. P.proxy }
+        end
+        -- Update mode
+        if P.update == true then
+            return F.result(P.package, F.run(cmd.opkg, { _env = env, "update", P.package}))
+        end
+        -- Install mode
+        if found(P.package) then
+            return F.kept(P.package)
+        end
+        local args = { _env = env, "install", P.package }
+        local set = {
+               force_depends = "--force-depends",
+             force_reinstall = "--force-reinstall",
+             force_downgrade = "--force-downgrade",
+                force_remove = "--force-remove",
+            force_maintainer = "--force-maintainer",
+                      nodeps = "--nodeps",
+        }
+        P:insert_if(set, args, 1)
+        return F.result(P.package, F.run(cmd.opkg, args))
     end
-    -- Update mode
-    if P.update == true then
-        return F.result(P.package, F.run(cmd.opkg, { _env = env, "update", P.package}))
-    end
-    -- Install mode
-    if found(P.package) then
-        return F.kept(P.package)
-    end
-    local args = { _env = env, "install", P.package }
-    local set = {
-           force_depends = "--force-depends",
-         force_reinstall = "--force-reinstall",
-         force_downgrade = "--force-downgrade",
-            force_remove = "--force-remove",
-        force_maintainer = "--force-maintainer",
-                  nodeps = "--nodeps",
-    }
-    P:insert_if(set, args, 1)
-    return F.result(P.package, F.run(cmd.opkg, args))
 end
 
 --- Uninstall a package.
@@ -85,29 +86,30 @@ end
 -- @param force_remove Remove packages even if prerm hook fails [CHOICES: "yes","no"]
 -- @param autoremove Remove packages that were installed to satisfy dependencies [CHOICES: "yes","no"]
 -- @param force_removal_of_dependent_packages Remove package and all dependencies [CHOICES: "yes","no"]
--- @usage opkg.absent {
---   package = "ncurses"
---   force_remove = "yes"
--- }
-function opkg.absent(B)
+-- @usage opkg.absent("ncurses")
+--     force_remove: "yes"
+function opkg.absent(S)
     M.parameters = { "force_depends", "force_remove", "autoremove", "force_removal_of_dependent_packages" }
     M.report = {
         repaired = "opkg.absent: Successfully removed package.",
         kept = "opkg.absent: Package not installed.",
         failed = "opkg.absent: Error removing package."
     }
-    local F, P, R = cfg.init(B, M)
-    if not found(P.package) then
-        return F.kept(P.package)
+    return function(P)
+        P.package = S
+        local F, R = cfg.init(P, M)
+        if not found(P.package) then
+            return F.kept(P.package)
+        end
+        local args = { "remove", P.package }
+        local set = {
+                                   force_remove = "--force-remove",
+                                     autoremove = "--autoremove",
+            force_removal_of_dependent_packages = "--force-removal-of-dependent-packges"
+        }
+        P:prepend_if_set(set, args)
+        return F.result(P.package, F.run(cmd.opkg, args))
     end
-    local args = { "remove", P.package }
-    local set = {
-                               force_remove = "--force-remove",
-                                 autoremove = "--autoremove",
-        force_removal_of_dependent_packages = "--force-removal-of-dependent-packges"
-    }
-    P:prepend_if_set(set, args)
-    return F.result(P.package, F.run(cmd.opkg, args))
 end
 
 opkg.installed = opkg.present

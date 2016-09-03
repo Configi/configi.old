@@ -1,10 +1,10 @@
 
 dirlist = {
-  { comment = "useless", path ="test/tmp/CONFIGI_TEST_INCLUDE"}
+  ["test/tmp/CONFIGI_TEST_INCLUDE"] = { comment = "useless" }
 }
 
-for dirs in list(dirlist) do
-  file.absent(dirs)
+for k, v in list(dirlist) do
+  file.absent(k)(v)
 end
 
 

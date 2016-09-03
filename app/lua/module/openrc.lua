@@ -21,138 +21,146 @@ M.alias.service = { "daemon" }
 --- Start a service.
 -- @aliases present
 -- @param service service to start [REQUIRED]
--- @usage openrc.started {
---   service = "rsyncd"
--- }
-function openrc.started(B)
+-- @usage openrc.started("rsyncd")!
+function openrc.started(S)
     M.report = {
         repaired = "openrc.started: Successfully started service.",
             kept = "openrc.started: Service already started.",
           failed = "openrc.started: Error starting service"
     }
-    local F, P, R = cfg.init(B, M)
-    local code, out, test = F.run(cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
-    local pattern = "^%s" .. lib.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
-    if test or ((code ==0) and (lib.find_string(out.stdout, pattern))) then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        local code, out, test = F.run(cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
+        local pattern = "^%s" .. lib.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
+        if test or ((code ==0) and (lib.find_string(out.stdout, pattern))) then
+            return F.kept(P.service)
+        end
+        local start = F.run(cmd["/sbin/rc-service"],
+            { "--nocolor", "--quiet", P.service, "start", _return_code = true })
+        return F.result(P.service, (start == 0))
     end
-    local start = F.run(cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "start", _return_code = true })
-    return F.result(P.service, (start == 0))
 end
 
 --- Stop a service.
 -- @aliases absent
 -- @param service service to stop [REQUIRED]
--- @usage openrc.stopped {
---   service = "rsyncd"
--- }
-function openrc.stopped(B)
+-- @usage openrc.stopped("rsyncd")!
+function openrc.stopped(S)
     M.report = {
         repaired = "openrc.stopped: Successfully stopped service.",
             kept = "openrc.stopped: Service already stopped.",
           failed = "openrc.stopped: Error stopping service."
     }
-    local F, P, R = cfg.init(B, M)
-    local code, out, test = F.run(cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
-    local pattern = "^%s" .. lib.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
-    if test or ((code == 0) and not (lib.find_string(out.stdout, pattern))) then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        local code, out, test = F.run(cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
+        local pattern = "^%s" .. lib.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
+        if test or ((code == 0) and not (lib.find_string(out.stdout, pattern))) then
+            return F.kept(P.service)
+        end
+        local stop = F.run(cmd["/sbin/rc-service"],
+            { "--nocolor", "--quiet", P.service, "stop", _return_code = true })
+        return F.result(P.service, (stop == 0))
     end
-    local stop = F.run(cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "stop", _return_code = true })
-    return F.result(P.service, (stop == 0))
 end
 
 --- Restart a service.
 -- @param service service to restart [REQUIRED]
--- @usage openrc.restart {
---   service = "rsyncd"
--- }
-function openrc.restart(B)
+-- @usage openrc.restart("rsyncd")!
+function openrc.restart(S)
     M.report = {
         repaired = "openrc.restart: Successfully restarted service.",
         failed = "openrc.restart: Error restarting service."
     }
-    local F, P, R = cfg.init(B, M)
-    local code, _, test =
-        F.run(cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "restart", _return_code = true })
-    if test or (code == 0) then
-        return F.result(P.service, true)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        local code, _, test =
+            F.run(cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "restart", _return_code = true })
+        if test or (code == 0) then
+            return F.result(P.service, true)
+        end
     end
 end
 
 --- Reload a service.
 -- @param service service to reload [REQUIRED]
--- @usage openrc.reload {
---   service = "sshd"
--- }
-function openrc.reload(B)
+-- @usage openrc.reload("sshd")!
+function openrc.reload(S)
     M.report = {
         repaired = "openrc.reload: Successfully reloaded service",
           failed = "openrc.reload: Error reloading service."
     }
-    local F, P, R = cfg.init(B, M)
-    local code, _, test =
-        F.run(cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "reload", _return_code = true })
-    if test or (code == 0) then
-        return F.result(P.service, true)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        local code, _, test =
+            F.run(cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "reload", _return_code = true })
+        if test or (code == 0) then
+            return F.result(P.service, true)
+        end
     end
 end
 
 --- Add a service to runlevel.
 -- @param service service to add [REQUIRED]
 -- @param runlevel runlevel to add to [REQUIRED] [DEFAULT: default]
--- @usage openrc.add {
---   service = "rsyncd"
---   runlevel = "default"
--- }
-function openrc.add(B)
+-- @usage openrc.add("rsyncd")
+--     runlevel: "default"
+function openrc.add(S)
     M.parameters = { "runlevel" }
     M.report = {
         repaired = "openrc.add: Successfully added service to runlevel.",
             kept = "openrc.add: Service already in the runlevel.",
           failed = "openrc.add: Error adding service to runlevel."
     }
-    local F, P, R = cfg.init(B, M)
-    P.runlevel = P.runlevel or "default"
-    local _
-    local code, out, test =
-        F.run(cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
-    local pattern = "^%s*" .. lib.escape_pattern(P.service) .. "%s|%s" .. P.runlevel .. "%s*$"
-    if test or ((code == 0) and lib.find_string(out.stdout, pattern)) then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        P.runlevel = P.runlevel or "default"
+        local _
+        local code, out, test =
+            F.run(cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
+        local pattern = "^%s*" .. lib.escape_pattern(P.service) .. "%s|%s" .. P.runlevel .. "%s*$"
+        if test or ((code == 0) and lib.find_string(out.stdout, pattern)) then
+            return F.kept(P.service)
+        end
+        code, _, test =
+            F.run(cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "add", P.service, P.runlevel, _return_code = true })
+        return F.result(P.service, (test or (code == 0)))
     end
-    code, _, test =
-        F.run(cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "add", P.service, P.runlevel, _return_code = true })
-    return F.result(P.service, (test or (code == 0)))
 end
 
 --- Remove a service from a runlevel.
 -- @aliases del
 -- @param service service to remove [REQUIRED] [ALIAS: daemon]
 -- @param runlevel runlevel to remove from [REQUIRED] [DEFAULT: default]
--- @usage openrc.delete {
---   service = "rsyncd"
---   runlevel = "default"
--- }
-function openrc.delete(B)
+-- @usage openrc.delete("rsyncd")
+--     runlevel: "default"
+function openrc.delete(S)
     M.parameters = { "runlevel" }
     M.report = {
         repaired = "openrc.delete: Successfully deleted service from runlevel.",
             kept = "openrc.delete: Service already absent from runlevel.",
           failed = "openrc.delete: Error deleting service from runlevel."
     }
-    local F, P, R = cfg.init(B, M)
-    P.runlevel = P.runlevel or "default"
-    local _
-    local code, out, test =
-        F.run(cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
-    local pattern = "^%s*" .. lib.escape_pattern(P.service) .. "%s|%s" .. P.runlevel .. "%s*$"
-    if test or ((code == 0) and not (lib.find_string(out.stdout, pattern))) then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        P.runlevel = P.runlevel or "default"
+        local _
+        local code, out, test =
+            F.run(cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "show", P.runlevel, _return_code = true })
+        local pattern = "^%s*" .. lib.escape_pattern(P.service) .. "%s|%s" .. P.runlevel .. "%s*$"
+        if test or ((code == 0) and not (lib.find_string(out.stdout, pattern))) then
+            return F.kept(P.service)
+        end
+        code, _, test =
+            F.run(cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "del", P.service, P.runlevel, _return_code = true })
+        return F.result(P.service, (test or (code == 0)))
     end
-    code, _, test =
-        F.run(cmd["/sbin/rc-update"], { "--nocolor", "--quiet", "del", P.service, P.runlevel, _return_code = true })
-    return F.result(P.service, (test or (code == 0)))
 end
 
 openrc.present = openrc.started

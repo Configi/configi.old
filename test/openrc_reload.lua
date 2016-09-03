@@ -1,4 +1,1 @@
-
-openrc.reload {
-  service = "sshd"
-}
+openrc.reload"sshd"()

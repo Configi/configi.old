@@ -1,4 +1,1 @@
-
-yum.present {
-  package = "mtr"
-}
+yum.present"mtr"()

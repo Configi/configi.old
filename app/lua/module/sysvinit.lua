@@ -13,7 +13,7 @@ _ENV = ENV
 
 M.required = { "service" }
 M.alias = {}
-M.alias.srvice = { "daemon" }
+M.alias.service = { "daemon" }
 
 local pgrep = function(service)
   local ok, ret = cmd.pgrep{ service }
@@ -25,124 +25,130 @@ end
 --- Start a service.
 -- @aliases present
 -- @param service service to start [REQUIRED]
--- @usage sysvinit.started {
---   service = "ntpd"
--- }
-function sysvinit.started(B)
+-- @usage sysvinit.started("ntpd")!
+function sysvinit.started(S)
     M.report = {
         repaired = "sysvinit.started: Successfully started service.",
             kept = "sysvinit.started: Service already started.",
           failed = "sysvinit.started: Error restarting service."
     }
-    local F, P, R = cfg.init(B, M)
-    if pgrep(P.service) then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        if pgrep(P.service) then
+            return F.kept(P.service)
+        end
+        F.run(cmd["-/etc/init.d/" .. P.service], { "start", _ignore_error = true })
+        return F.result(P.service, pgrep(P.service))
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "start", _ignore_error = true })
-    return F.result(P.service, pgrep(P.service))
 end
 
 --- Stop a service.
 -- @aliases absent
 -- @param service service to stop [REQUIRED]
--- @usage sysvinit.stopped {
---   service = "telnetd"
--- }
-function sysvinit.stopped(B)
+-- @usage sysvinit.stopped("telnetd")!
+function sysvinit.stopped(S)
     M.report = {
         repaired = "sysvinit.stopped: Successfully stopped service.",
             kept = "sysvinit.stopped: Service already stopped.",
           failed = "sysvinit.stopped: Error stopping service."
     }
-    local F, P, R = cfg.init(B, M)
-    if not pgrep(P.service) then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        if not pgrep(P.service) then
+            return F.kept(P.service)
+        end
+        F.run(cmd["-/etc/init.d/" .. P.service], { "stop", _ignore_error = true })
+        return F.result(P.service, (pgrep(P.service) == nil))
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "stop", _ignore_error = true })
-    return F.result(P.service, (pgrep(P.service) == nil))
 end
 
 --- Restart a service.
 -- @param service service to restart [REQUIRED]
--- @usage sysvinit.restart {
---   service = "ntpd"
--- }
-function sysvinit.restart(B)
+-- @usage sysvinit.restart("ntpd")!
+function sysvinit.restart(S)
     M.report = {
         repaired = "sysvinit.restart: Successfully restarted service.",
             kept = "sysvinit.restart: Service not yet started.",
           failed = "sysvinit.restart: Error restarting service."
     }
-    local F, P, R = cfg.init(B, M)
-    local _, pid = pgrep(P.service)
-    if not pid then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        local _, pid = pgrep(P.service)
+        if not pid then
+            return F.kept(P.service)
+        end
+        F.run(cmd["-/etc/init.d/" .. P.service], { "restart", _ignore_error = true })
+        local _, npid = pgrep(P.service)
+        return F.result(P.service, (pid ~= npid))
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "restart", _ignore_error = true })
-    local _, npid = pgrep(P.service)
-    return F.result(P.service, (pid ~= npid))
 end
 
 --- Reload a service.
 -- @note OpenWRT sysvinit can not detect reload failures
 -- @param service service to reload [REQUIRED]
--- @usage sysvinit.reload {
---   service = "ntpd"
--- }
-function sysvinit.reload(B)
+-- @usage sysvinit.reload("ntpd")!
+function sysvinit.reload(S)
     M.report = {
         repaired = "sysvinit.reload: Successfully reloaded service.",
             kept = "sysvinit.reload: Service not yet started.",
           failed = "sysvinit.reload: Error reloading service."
     }
-    local F, P, R = cfg.init(B, M)
-    local _, pid = pgrep(P.service)
-    if not pid then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        local _, pid = pgrep(P.service)
+        if not pid then
+            return F.kept(P.service)
+        end
+        -- Assumed to always succeed
+        F.run(cmd["-/etc/init.d/" .. P.service], { "reload", _ignore_error = true })
+        return F.result(P.service, true)
     end
-    -- Assumed to always succeed
-    F.run(cmd["-/etc/init.d/" .. P.service], { "reload", _ignore_error = true })
-    return F.result(P.service, true)
 end
 
 --- Enable a service
 -- @param service service to enable [REQUIRED]
--- @usage sysvinit.enabled {
---   service = "ntpd"
--- }
-function sysvinit.enabled(B)
+-- @usage sysvinit.enabled("ntpd")!
+function sysvinit.enabled(S)
     M.report = {
         repaired = "sysvinit.enabled: Successfully enabled service.",
             kept = "sysvinit.enabled: Service already enabled.",
           failed = "sysvinit.enabled: Error enabling service."
     }
-    local F, P, R = cfg.init(B, M)
-    if F.run(cmd["-/etc/init.d/" .. P.service], { "enabled" }) then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        if F.run(cmd["-/etc/init.d/" .. P.service], { "enabled" }) then
+            return F.kept(P.service)
+        end
+        F.run(cmd["-/etc/init.d/" .. P.service], { "enable", _ignore_error = true })
+        return F.result(P.service, F.run(cmd["-/etc/init.d/" .. P.service], { "enabled"}))
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "enable", _ignore_error = true })
-    return F.result(P.service, F.run(cmd["-/etc/init.d/" .. P.service], { "enabled"}))
 end
 
 --- Disable a service.
 -- @param service service to disable [REQUIRED]
--- @usage sysvinit.disabled {
---   service = "ntpd"
--- }
-function sysvinit.disabled(B)
+-- @usage sysvinit.disabled("ntpd")!
+function sysvinit.disabled(S)
     M.report = {
         repaired = "sysvinit.disabled: Successfully disabled service.",
             kept = "sysvinit.disabled: Service already disabled.",
           failed = "sysvinit.disabled: Error disabling service."
     }
-    local F, P, R = cfg.init(B, M)
-    local ok = cmd["-/etc/init.d/" .. P.service]{ "enabled" }
-    if not ok then
-        return F.kept(P.service)
+    return function(P)
+        P.service = S
+        local F, R = cfg.init(P, M)
+        local ok = cmd["-/etc/init.d/" .. P.service]{ "enabled" }
+        if not ok then
+            return F.kept(P.service)
+        end
+        F.run(cmd["-/etc/init.d/" .. P.service], { "disable", _ignore_error = true })
+        ok = cmd["-/etc/init.d/" .. P.service]{ "enabled" }
+        return F.result(P.service, (not ok))
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "disable", _ignore_error = true })
-    ok = cmd["-/etc/init.d/" .. P.service]{ "enabled" }
-    return F.result(P.service, (not ok))
 end
 
 sysvinit.present = sysvinit.started

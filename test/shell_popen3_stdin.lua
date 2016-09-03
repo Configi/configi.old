@@ -1,8 +1,7 @@
 
-shell.popen3 {
+shell.popen3"/bin/sed s/s/d/g"{
   stdout  = "duck"
   stdin   = "suck"
-  command = "/bin/sed s/s/d/g"
 }
 
 

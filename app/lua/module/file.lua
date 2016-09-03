@@ -103,7 +103,6 @@ local attrib = function(F, P, R)
 end
 
 --- Set path attributes such as the mode, owner or group.
--- @param path path to modify [REQUIRED]
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
@@ -125,7 +124,6 @@ end
 
 --- Create a symlink.
 -- @param src path where the symlink points to [REQUIRED]
--- @param path the symlink [REQUIRED] [ALIAS: link]
 -- @param force remove existing symlink [CHOICES: "yes","no"]
 -- @usage file.link("/home/ed/root")
 --     src: "/"
@@ -141,7 +139,7 @@ function file.link(S)
         local F, R = cfg.init(P, M)
         local symlink = unistd.readlink(P.path)
         if symlink == P.src then
-            F.msg(P.src, G.kept, nil)
+            F.msg(P.src, M.report.kept, nil)
             return attrib(F, P, R)
         end
         local args = { "-s", P.src, P.path }
@@ -157,7 +155,6 @@ end
 
 --- Create a hard link.
 -- @param src path where the hard link points to [REQUIRED]
--- @param path the hard link [REQUIRED] [ALIAS: link]
 -- @param force remove existing hard link [CHOICES: "yes","no"]
 -- @usage file.hard("/home/ed/root")
 --     src: "/"
@@ -192,7 +189,6 @@ function file.hard(S)
 end
 
 --- Create a directory.
--- @param path path of the directory [REQUIRED]
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
@@ -231,7 +227,6 @@ function file.directory(S)
 end
 
 --- Touch a path.
--- @param path path to 'touch' [REQUIRED]
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
@@ -255,7 +250,6 @@ function file.touch(S)
 end
 
 --- Remove a path.
--- @param path path to delete [REQUIRED]
 -- @usage file.absent("/home/ed/.xinitrc")!
 function file.absent(S)
     M.report = {
@@ -275,13 +269,12 @@ end
 
 --- Copy a path.
 -- @param path destination path [REQUIRED] [ALIAS: dest,target]
--- @param src source path to copy [REQUIRED]
 -- @param recurse recursively copy source [CHOICES: "yes","no"] [DEFAULT: "no"]
 -- @param force remove existing destination before copying [CHOICES: "yes","no"] [DEFAULT: "no"]
 -- @param backup rename existing path and prepend '._configi_' to the name [CHOICES: "yes","no"] [DEFAULT: "no"]
 -- @usage file.copy("/home/ed")
 --     dest: "/mnt/backups"
-function file.copy(B)
+function file.copy(S)
     M.parameters = { "src", "path", "recurse", "force", "backup" }
     M.report = {
         repaired = "file.copy: Copy succeeded.",
@@ -289,7 +282,7 @@ function file.copy(B)
           failed = "file.copy: Error copying."
     }
     return function(P)
-        P.path = S
+        P.src = S
         local F, R = cfg.init(P, M)
         local dir, file = lib.split_path(P.path)
         local backup = dir .. "/._configi_" .. file

@@ -71,42 +71,43 @@ end
 -- @param env space separated environment variables
 -- @param creates a filename, if found will not run the command
 -- @param removes a filename, if not found will not run the command
--- shell.command {
---   cwd = "/tmp"
---   env = "test=this whatever=youwant"
---   command = "touch test"
---   creates = "test"
--- }
-function shell.command(B)
+-- shell.command("touch test")
+--     cwd: "/tmp"
+--     env: "test=this whatever=youwant"
+--     creates: "test"
+function shell.command(S)
     M.parameters = { "cwd", "creates", "removes" }
     M.report = {
         repaired = "shell.command: Command successfully executed.",
             kept = "shell.command: `creates` or `removes` parameter satisfied.",
           failed = "shell.command: Error executing command."
     }
-    local F, P, R = cfg.init(B, M)
-    if rc(F, P) then
-        return F.kept(P.string)
+    return function(P)
+        P.string = S
+        local F, R = cfg.init(P, M)
+        if rc(F, P) then
+            return F.kept(P.string)
+        end
+        local args = {}
+        for c in string.gmatch(P.string, "%S+") do
+            args[#args + 1] = c
+        end
+        args._bin = table.remove(args, 1)
+        args._cwd = P.cwd
+        args._return_code = true
+        if P.env then
+            args._env = envt(P)
+        end
+        -- passing a dummy arg if no arguments
+        args[2] = args[2] or true
+        local rt
+        if not P.test then
+            _, rt = F.run(lib.qexec, args)
+        else
+            rt = { code = 0 }
+        end
+        return F.result(P.string, (rt.code == 0))
     end
-    local args = {}
-    for c in string.gmatch(P.string, "%S+") do
-        args[#args + 1] = c
-    end
-    args._bin = table.remove(args, 1)
-    args._cwd = P.cwd
-    args._return_code = true
-    if P.env then
-        args._env = envt(P)
-    end
-    -- passing a dummy arg if no arguments
-    args[2] = args[2] or true
-    local rt
-    if not P.test then
-        _, rt = F.run(lib.qexec, args)
-    else
-        rt = { code = 0 }
-    end
-    return F.result(P.string, (rt.code == 0))
 end
 
 --- Run a script or command via os.execute.
@@ -116,25 +117,26 @@ end
 -- @param string script or command to execute [REQUIRED] [ALIAS: script,command]
 -- @param creates a filename, if found will not run the script
 -- @param removes a filename, if not found will not run the script
--- @usage shell.system {
---   script = "/root/test.sh"
--- }
-function shell.system(B)
+-- @usage shell.system("/root/test.sh")!
+function shell.system(S)
     M.parameters = { "creates", "removes" }
     M.report = {
         repaired = "shell.system: Script successfully executed.",
             kept = "shell.system: `creates` or `removes` parameter satisfied.",
           failed = "shell.system: Error executing script."
     }
-    local F, P, R = cfg.init(B, M)
-    local script = lib.fopen(P.string)
-    if not script then
-        return F.result(P.string, false, "shell.system: script not found")
+    return function(P)
+        P.string = S
+        local F, R = cfg.init(P, M)
+        local script = lib.fopen(P.string)
+        if not script then
+            return F.result(P.string, false, "shell.system: script not found")
+        end
+        if rc(F, P) then
+            return F.kept(P.string)
+        end
+        return F.result(P.string, F.run(lib.execute, script))
     end
-    if rc(F, P) then
-        return F.kept(P.string)
-    end
-    return F.result(P.string, F.run(lib.execute, script))
 end
 
 --- Run a command via io.popen.
@@ -143,12 +145,10 @@ end
 -- @param creates a filename, if found will not run the command
 -- @param removes a filename, if not found will not run the command
 -- @param expects instead of the exit code, use a string match as a test for success
--- @usage shell.popen {
---   cwd = "/tmp"
---   command = "ls -la"
---   expects = ".X11-unix"
--- }
-function shell.popen(B)
+-- @usage shell.popen("ls -la")
+--     cwd: "/tmp"
+--     expects: ".X11-unix"
+function shell.popen(S)
     local report = {
         shell_popenexpect_ok = "expects: Expected pattern found.",
         shell_popenexpect_fail = "expects: Expected pattern not found."
@@ -159,39 +159,42 @@ function shell.popen(B)
             kept = "shell.popen: `creates` or `removes` parameter satisfied.",
           failed = "shell.popen: Command or script error."
     }
-    local F, P, R = cfg.init(B, M)
-    if rc(F, P) then
-        return F.kept(P.string)
-    end
-    local str
-    if lib.isfile(P.string) then
-        str = lib.fopen(P.string)
-    else
-        str = P.string
-    end
-    str = F.run(lib.popen, str, P.cwd)
-    local res, ok = false, false
-    if P.expects then
-        if P.test then
-            F.msg(P.expects, report.shell_popenexpect_ok, true)
-        else
-            if lib.find_string(str, P.expects, true) then
-                res = true
-                F.msg(P.expects, report.shell_popenexpect_ok, true)
-            end
-            if not res then
-                F.msg(P.expects, report.shell_popenexpect_fail, false)
-            end
+    return function(P)
+        P.string = S
+        local F, R = cfg.init(P, M)
+        if rc(F, P) then
+            return F.kept(P.string)
         end
-    else
-        res = str
+        local str
+        if lib.isfile(P.string) then
+            str = lib.fopen(P.string)
+        else
+            str = P.string
+        end
+        str = F.run(lib.popen, str, P.cwd)
+        local res, ok = false, false
+        if P.expects then
+            if P.test then
+                F.msg(P.expects, report.shell_popenexpect_ok, true)
+            else
+                if lib.find_string(str, P.expects, true) then
+                    res = true
+                    F.msg(P.expects, report.shell_popenexpect_ok, true)
+                end
+                if not res then
+                    F.msg(P.expects, report.shell_popenexpect_fail, false)
+                end
+            end
+        else
+            res = str
+        end
+        if P.test then
+            ok = true
+        else
+            ok = res
+        end
+        return F.result(P.string, ok)
     end
-    if P.test then
-        ok = true
-    else
-        ok = res
-    end
-    return F.result(P.string, ok)
 end
 
 --- Run a command via lib.exec which can expect strings from STDIN, STDOUT or STDERR
@@ -204,12 +207,10 @@ end
 -- @param stdout test for a string from STDOUT
 -- @param stderr test for a string from STDERR
 -- @param error ignore errors when set to "ignore" [CHOICES: "yes","no"]
--- @usage shell.popen3 {
---   cwd = "/tmp"
---   command = "ls"
---   stdout = ".X11-unix"
--- }
-function shell.popen3(B)
+-- @usage shell.popen3("ls")
+--     cwd: "/tmp"
+--     stdout: ".X11-unix"
+function shell.popen3(S)
     local report = {
           shell_popen3stdout_ok = "stdout: Expected stdout pattern found.",
         shell_popen3stdout_fail = "stdout: Expectd stdout pattern not found.",
@@ -222,56 +223,59 @@ function shell.popen3(B)
             kept = "shell.popen3: `creates` or `removes` parameter satisfied.",
           failed = "shell.popen3: Command or script error."
     }
-    local F, P, R = cfg.init(B, M)
-    if rc(F, P) then
-        return F.kept(P.string)
-    end
-    local str
-    if lib.isfile(P.string) then
-        str = lib.fopen(P.string)
-    else
-        str = P.string
-    end
-    local args = lib.str_to_tbl(str)
-    args._bin = table.remove(args, 1)
-    if P.stdin then args._stdin = P.stdin end
-    if P.cwd then args._cwd = P.cwd end
-    if P.env then args._env = envt(P) end
-    if P.error == "ignore" then args._ignore_error = true end
-    local res, rt = lib.exec(args)
-    local err = lib.exit_string(rt.bin, rt.status, rt.code)
-    F.msg(args[1], err, res or false)
-    if P.stdout then
-        if P.test then
-            F.msg(P.stdout, report.shell_popen3stdout_ok, true)
+    return function(P)
+        P.string = S
+        local F, R = cfg.init(P, M)
+        if rc(F, P) then
+            return F.kept(P.string)
+        end
+        local str
+        if lib.isfile(P.string) then
+            str = lib.fopen(P.string)
         else
-            if lib.find_string(rt.stdout, P.stdout, true) then
+            str = P.string
+        end
+        local args = lib.str_to_tbl(str)
+        args._bin = table.remove(args, 1)
+        if P.stdin then args._stdin = P.stdin end
+        if P.cwd then args._cwd = P.cwd end
+        if P.env then args._env = envt(P) end
+        if P.error == "ignore" then args._ignore_error = true end
+        local res, rt = lib.exec(args)
+        local err = lib.exit_string(rt.bin, rt.status, rt.code)
+        F.msg(args[1], err, res or false)
+        if P.stdout then
+            if P.test then
                 F.msg(P.stdout, report.shell_popen3stdout_ok, true)
             else
-                res = false
-                F.msg(P.stdout, report.shell_popen3stdout_fail, false)
+                if lib.find_string(rt.stdout, P.stdout, true) then
+                    F.msg(P.stdout, report.shell_popen3stdout_ok, true)
+                else
+                    res = false
+                    F.msg(P.stdout, report.shell_popen3stdout_fail, false)
+                end
             end
         end
-    end
-    if P.stderr then
-        if P.test then
-            F.msg(P.stderr, report.shell_popen3stderr_ok, true)
-        else
-            if lib.find_string(rt.stderr, P.stderr, true) then
-                res = true
+        if P.stderr then
+            if P.test then
                 F.msg(P.stderr, report.shell_popen3stderr_ok, true)
             else
-                F.msg(P.stderr, report.shell_popen3stderr_fail, false)
+                if lib.find_string(rt.stderr, P.stderr, true) then
+                    res = true
+                    F.msg(P.stderr, report.shell_popen3stderr_ok, true)
+                else
+                    F.msg(P.stderr, report.shell_popen3stderr_fail, false)
+                end
             end
         end
+        local ok
+        if P.test or P["error"] == "ignore" then
+            ok = true
+        else
+            ok = res
+        end
+        return F.result(P.string, ok)
     end
-    local ok
-    if P.test or P["error"] == "ignore" then
-        ok = true
-    else
-        ok = res
-    end
-    return F.result(P.string, ok)
 end
 
 shell.script = shell.system

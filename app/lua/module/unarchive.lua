@@ -41,31 +41,32 @@ end
 -- @param src path to archive [REQUIRED] [ALIASES: archive, tar, zip, rar]
 -- @param dest path where the archive should unpacked [REQUIRED] [ALIAS: directory]
 -- @param creates path to a file, if already existing will skip the unpacking step
--- @usage unarchive.unpack {
---   src = "/tmp/file.tar"
---   dest = "/tmp/test"
---   creates = "/tmp/test/file.1"
--- }
-function unarchive.unpack(B)
+-- @usage unarchive.unpack("/tmp/file.tar")
+--     dest: "/tmp/test"
+--     creates: "/tmp/test/file.1"
+function unarchive.unpack(S)
     M.parameters = { "creates" }
     M.report = {
         repaired = "unarchive.unpack: Successfully unpacked archive.",
             kept = "unarchive.unpack: Archive already unpacked.",
           failed = "unarchive.unpack: Error unpacking archive.",
     }
-    local F, P, R = cfg.init(B, M)
-    if P.creates and stat.stat(P.creates) then
-        return F.kept(P.src)
+    return function(P)
+        P.src = S
+        local F, R = cfg.init(P, M)
+        if P.creates and stat.stat(P.creates) then
+            return F.kept(P.src)
+        end
+        local code
+        if extension(P.src) == "tar" then
+            code = F.run(cmd.tar, { "-x", "-C", P.dest, "-f", P.src, _return_code = true })
+        elseif extension(P.src) == "zip" then
+            code = F.run(cmd.unzip, { "-qq", P.src, "-d", P.dest, _return_code = true })
+        elseif extension(P.src) == "rar" then
+            code = F.run(cmd.unrar, { "x", P.src, "-inul", P.dest, _return_code = true })
+        end
+        return F.result(P.src, (code == 0))
     end
-    local code
-    if extension(P.src) == "tar" then
-        code = F.run(cmd.tar, { "-x", "-C", P.dest, "-f", P.src, _return_code = true })
-    elseif extension(P.src) == "zip" then
-        code = F.run(cmd.unzip, { "-qq", P.src, "-d", P.dest, _return_code = true })
-    elseif extension(P.src) == "rar" then
-        code = F.run(cmd.unrar, { "x", P.src, "-inul", P.dest, _return_code = true })
-    end
-    return F.result(P.src, (code == 0))
 end
 
 unarchive.unzip = unarchive.unpack

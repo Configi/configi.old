@@ -23,43 +23,45 @@ end
 -- See `apk help` for full description of options and parameters
 -- @aliases installed
 -- @aliases install
--- @param package name of the package to install [REQUIRED]
 -- @param update_cache update cache before adding package [CHOICES: true, false, "yes", "no"] [DEFAULT: "no", false]
--- @usage apk.present {
---   package = "strace"
---   update_cache = true
--- }
-function apk.present(B)
+-- @usage apk.present("strace")
+--     update_cache: true
+function apk.present(S)
     M.parameters = { "update_cache" }
     M.report = {
         repaired = "apk.present: Successfully installed package.",
             kept = "apk.present: Package already installed.",
           failed = "apk.present: Error installing package."
     }
-    local F, P, R = cfg.init(B, M)
-    if found(P.package) then
-        return F.kept(P.package)
+    return function(P)
+        P.package = S
+        local F, R = cfg.init(P, M)
+        if found(P.package) then
+            return F.kept(P.package)
+        end
+        local args = { "add", "--no-progress", "--quiet", P.package }
+        lib.insert_if(P.update_cache, args, 2, "--update-cache")
+        return F.result(P.package, F.run(cmd["/sbin/apk"], args))
     end
-    local args = { "add", "--no-progress", "--quiet", P.package }
-    lib.insert_if(P.update_cache, args, 2, "--update-cache")
-    return F.result(P.package, F.run(cmd["/sbin/apk"], args))
 end
 
 --- Remove a package
 -- @aliases removed
 -- @aliases remove
--- @param package name of the package to remove [REQUIRED]
-function apk.absent(B)
+function apk.absent(S)
     M.report = {
         repaired = "apk.absent: Successfully removed package",
             kept = "apk.absent: Package not installed.",
           failed = "apk.absent: Error removing package."
     }
-    local F, P, R = cfg.init(B, M)
-    if not found(P.package) then
-        return F.kept(P.package)
+    return function(P)
+        P.package = S
+        local F, R = cfg.init(P, M)
+        if not found(P.package) then
+            return F.kept(P.package)
+        end
+        return F.result(P.package, F.run(cmd["/sbin/apk"], { "del", "--no-progress", "--quiet", P.package }))
     end
-    return F.result(P.package, F.run(cmd["/sbin/apk"], { "del", "--no-progress", "--quiet", P.package }))
 end
 
 apk.installed = apk.present

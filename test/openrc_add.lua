@@ -1,6 +1,5 @@
 
-openrc.add {
-  service  = "rsyncd"
+openrc.add"rsyncd"{
   runlevel = "default"
 }
 

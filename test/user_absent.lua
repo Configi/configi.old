@@ -1,5 +1,1 @@
-
-user.absent {
-  login = "eduardo"
-}
-
+user.absent"eduardo"()

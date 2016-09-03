@@ -1,6 +1,4 @@
-
-user.present {
-  login = "eduardo"
+user.present"eduardo"{
   uid   = "666"
   gid   = "80"
   home  = "/tmp/ed"

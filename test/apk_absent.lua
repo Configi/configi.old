@@ -1,4 +1,2 @@
 
-apk.absent {
-  package "mtr"
-}
+apk.absent"mtr"()
