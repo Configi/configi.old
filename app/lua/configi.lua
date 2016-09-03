@@ -236,23 +236,25 @@ function cfg.init(P, M)
     }
     -- assign aliases
     local _temp = {}
-    if next(M.alias) then
-        for p, t in next, M.alias do
-            for n = 1, #t do
-                _temp[t[n]] = p
+    if pcall(next, M.alias) then
+        for param, aliases in next, M.alias do
+            for n = 1, #aliases do
+                _temp[aliases[n]] = param
             end
         end
         -- Preset found aliases to true since it's not ok to iterate and add at the same time.
-        for p, v in next, _temp do
-            if _temp[p] and C.parameters[p] then
-                C.parameters[v] = true
+        for alias, param in next, _temp do
+            if C.parameters[alias] then
+                C.parameters[param] = true
             end
         end
     end
     -- assign values
     for p, v in next, C.parameters do
-        -- update p for each alias hit
         if _temp[p] then
+            -- remove alias so it won't warn about an ignored parameter
+            C.parameters[p] = nil
+            -- reuse and update p for each alias hit
             p = _temp[p]
         end
         if lib.truthy(v) then
