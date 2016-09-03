@@ -500,44 +500,44 @@ function cli.main (opts)
             __index = function (_, func)
                 return function(subject)
                     return function (ptbl) -- mod.func
-                    ptbl = ptbl or {}
-                    local qt = { environment = {}, parameters = {} }
-                        for p, v in next, ptbl do
-                            if p == register then rawset(env.global, v, true) end
-                            qt.parameters[p] = v
-                        end
-                    -- if context "fact..." matched assign it to env.volatile
-                    if pcall(string.find, qt.parameters.context, "^fact") then
-                        local fload = function (s)
-                            local chunk, err = load(s, s, "t", env)
-                                 if not chunk then
-                                     lib.errorf("fload: %s %s", Lstr.ERR, err)
-                                 end
-                            return chunk()
-                        end
-                        -- auto-load the fact module
-                        if not next(env.fact) then
-                            env.fact = Factid.gather()
-                        end
-                        fload("volatile=" .. qt.parameters.context)
-                    end
-                    if rawget(env.global, qt.parameters.context) == true or env.volatile == true or not qt.parameters.context then
-                        env.volatile = nil
-                        if qt.parameters.handle then
-                            if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
-                                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
-					{ mod = mod, func = func, subject = subject, param = ptbl }
-                            else
-                                hsource[qt.parameters.handle] = {}
-                                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
-					{ mod = mod, func = func, subject = subject, param = ptbl }
+                        ptbl = ptbl or {}
+                        local qt = { environment = {}, parameters = {} }
+                            for p, v in next, ptbl do
+                                if p == register then rawset(env.global, v, true) end
+                                qt.parameters[p] = v
                             end
-                        elseif type(ptbl) == "table" then
-                            source[#source + 1] = {mod = mod, func = func,subject=subject, param = ptbl}
+                        -- if context "fact..." matched assign it to env.volatile
+                        if pcall(string.find, qt.parameters.context, "^fact") then
+                            local fload = function (s)
+                                local chunk, err = load(s, s, "t", env)
+                                     if not chunk then
+                                         lib.errorf("fload: %s %s", Lstr.ERR, err)
+                                     end
+                                return chunk()
+                            end
+                            -- auto-load the fact module
+                            if not next(env.fact) then
+                                env.fact = Factid.gather()
+                            end
+                            fload("volatile=" .. qt.parameters.context)
                         end
-                    end -- context
-                end -- mod.func
-            end
+                        if rawget(env.global, qt.parameters.context) == true or env.volatile == true or not qt.parameters.context then
+                            env.volatile = nil
+                            if qt.parameters.handle then
+                                if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
+                                    hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
+                        { mod = mod, func = func, subject = subject, param = ptbl }
+                                else
+                                    hsource[qt.parameters.handle] = {}
+                                    hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
+                        { mod = mod, func = func, subject = subject, param = ptbl }
+                                end
+                            elseif type(ptbl) == "table" then
+                                source[#source + 1] = {mod = mod, func = func,subject=subject, param = ptbl}
+                            end
+                        end -- context
+                    end -- mod.func
+                end
             end }) -- __index = function (_, func) return
             return tbl
         end -- __index = function (_, mod)
