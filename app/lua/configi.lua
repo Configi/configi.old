@@ -525,10 +525,12 @@ function cli.main (opts)
                         env.volatile = nil
                         if qt.parameters.handle then
                             if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
-                                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] = { mod = mod, func = func, param = ptbl }
+                                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
+					{ mod = mod, func = func, subject = subject, param = ptbl }
                             else
                                 hsource[qt.parameters.handle] = {}
-                                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] = { mod = mod, func = func, param = ptbl }
+                                hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
+					{ mod = mod, func = func, subject = subject, param = ptbl }
                             end
                         elseif type(ptbl) == "table" then
                             source[#source + 1] = {mod = mod, func = func,subject=subject, param = ptbl}
@@ -690,14 +692,14 @@ end
 
 function cli.hrun (tags, hsource, runenv) -- execution step for handlers
     for tag, _ in next, tags do
-        local mod, func, param, r = nil, nil, nil, {}
+        local mod, func, subject, param, r = nil, nil, nil, nil, {}
         if hsource[tag] then
             for n = 1, #hsource[tag] do
                 if runenv[hsource[tag][n].mod] == nil then
                     -- auto-load the module
                     runenv[hsource[tag][n].mod] = Lscript.module(hsource[tag][n].mod)
                 end
-                mod, func, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].param
+                mod, func, subject, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].subject, hsource[tag][n].param
                 -- append debug and test arguments
                 param.debug = hsource[1] or param.debug
                 param.test = hsource[2] or param.test
@@ -708,7 +710,7 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
                 elseif not mod[func] then
                     lib.errorf("Module error: function in module not found\n")
                 end
-                r[#r + 1] = mod[func](param)
+                r[#r + 1] = mod[func](subject)(param)
                 coroutine.yield(r)
             end -- for each tag
         end -- if a tag
