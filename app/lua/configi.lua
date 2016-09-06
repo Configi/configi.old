@@ -285,7 +285,7 @@ function cfg.init(P, M)
     end
     local secs = lib.difftime(Psystime.gettimeofday(), t1)
         secs = string.format("%s.%s", tostring(secs.sec), tostring(secs.usec))
-        msg(Lstr.OPERATION, err, ok or false, secs, string.format("stdout:\n%s\n                stderr:\n%s\n", stdout, stderr))
+        msg(Lstr.OPERATION, err, ok or false, secs, string.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
         return ok, rt
     end -- functime()
     if not (C.parameters.test or C.parameters.debug) then
