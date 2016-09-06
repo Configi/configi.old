@@ -86,7 +86,7 @@ function hostname.set(S)
             if P.hostname == factid.hostname() then
                 return F.kept(P.hostname)
             end
-            F.result(P.hostname, F.run(cmd.hostname{ P.hostname }))
+            return F.result(P.hostname, F.run(cmd.hostname{ P.hostname }))
         end
     end
 end
