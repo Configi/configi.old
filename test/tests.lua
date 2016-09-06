@@ -173,6 +173,64 @@ T:start"each test/core-each.lua"
     end
 T:done(N)
 
+T:start"hostname.set (modules/hostname.lua)"
+    do
+        if lib.binpath"hostnamectl" then
+            -- XXX duplicate copy from module.hostname
+            local current_hostnames = function()
+                local _, hostnamectl = cmd.hostnamectl{}
+                local hostnames = {
+                    Pretty = false,
+                    Static = false,
+                    Transient = false
+                }
+                local _k, _v
+                for ln = 1, #hostnamectl.stdout do
+                    for type, _ in next, hostnames do
+                        _k, _v = string.match(hostnamectl.stdout[ln], "^%s*(" .. type .. " hostname):%s([%g%s]*)$")
+                        if _k then
+                            -- New keys that starts with lower case characters.
+                            hostnames[string.lower(type)] = _v
+                        end
+                    end
+                end
+                return hostnames
+            end
+            local hostnames = current_hostnames()
+            local before = {
+                transient = hostnames.transient,
+                pretty = hostnames.pretty,
+                static = hostnames.static
+            }
+            local hostname = function(policy)
+                cfg{ "-f", policy }
+                local after = current_hostnames()
+                T:eq(after.transient, "testing.configi.org")
+                T:eq(after.pretty, "Testing Configi")
+                T:eq(after.static, "static")
+                for type, hostname in next, before do
+                    cmd.hostnamectl{ "--" .. type, "set-hostname", hostname }
+                end
+            end
+            hostname"test/hostname_set.lua"
+            hostname"test/hostname_set.moon"
+        else
+            local _, hostname = cmd.hostname{}
+            local before = hostname.stdout[1]
+            local hostname = function(policy)
+                cfg{ "-f", policy }
+                local _,  out = cmd.hostname{}
+                T:eq(out.stdout[1], "testing")
+                cmd.hostname(before)
+                _, out = cmd.hostname{}
+                T:eq(out.stdout[1], before)
+            end
+            hostname"test/hostname_set.lua"
+            hostname"test/hostname_set.moon"
+        end
+    end
+T:done(N)
+
 T:start"cron.present (modules/cron.lua) test/cron_present.lua"
     do
         local cron = function(policy)
