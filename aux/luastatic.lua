@@ -72,7 +72,7 @@ for i, name in ipairs(arg) do
       extension == "dylib" 
     then
       -- the library either a Lua module or a library dependency
-      local nmout = shellout("nm " .. info.path)
+      local nmout = shellout("gcc-nm " .. info.path)
       if not nmout then
         print("nm not found")
         os.exit(1)
