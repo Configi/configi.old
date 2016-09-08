@@ -10,7 +10,7 @@ local lib = require"lib"
 local cmd = lib.cmd
 _ENV = ENV
 
-M.required = { "packages" }
+M.required = { "package" }
 
 local found = function(package)
     local _, out = cmd["/sbin/apk"]{ "version", package }
