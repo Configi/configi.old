@@ -106,14 +106,10 @@ function user.present(S)
             ret = F.run(cmd.useradd, args)
         else -- busybox systems such as Alpine Linux
             args = { "-D", P.login }
-            set = {
-                       uid = "-u "..P.uid,
-                       gid = "-g "..P.gid,
-                     shell = "-s "..P.shell,
-                      home = "-d "..P.home,
-                user_group = "-U"
-            }
-            P:insert_if(set, args)
+            lib.insert_if(P.uid, args, 1, { "-u ", P.uid })
+            lib.insert_if(P.gid, args, 1, { "-g ", P.gid })
+            lib.insert_if(P.shell, args, 1, { "-s ", P.shell })
+            lib.insert_if(P.home, args, 1, { "-d ", P.home })
             ret = F.run(cmd.adduser, args)
         end
         return F.result(P.login, ret)
