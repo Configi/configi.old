@@ -94,11 +94,12 @@ end
 -- @function find_string
 -- @param tbl table to search (TABLE)
 -- @param string value to look for in tbl (STRING)
+-- @param bool plain if true, turns off pattern matching facilities (BOOLEAN)
 -- @return a boolean value, true if v is found, nil otherwise (BOOLEAN)
-local find_string = function (tbl, value)
+local find_string = function (tbl, value, plain)
   for _, tval in next, tbl do
     tval = string.gsub(tval, '[%c]', '')
-    if tval == value then return true end
+    if string.find(tval, value, 1, plain) then return true end
   end
 end
 
