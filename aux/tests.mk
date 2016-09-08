@@ -29,6 +29,7 @@ ifeq ($(shell aux/test-gcc47.sh $(CC)), GCC47)
     LDFLAGS+= -fwhole-program -flto
     RANLIB:= gcc-ranlib
     AR:= gcc-ar
+    NM:= gcc-nm
   endif
 endif
 
