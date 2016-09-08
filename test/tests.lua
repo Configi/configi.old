@@ -215,13 +215,13 @@ T:start"hostname.set (modules/hostname.lua)"
             hostname"test/hostname_set.lua"
             hostname"test/hostname_set.moon"
         else
-            local _, hostname = cmd.hostname{}
-            local before = hostname.stdout[1]
+            local _, out = cmd.hostname{}
+            local before = out.stdout[1]
             local hostname = function(policy)
                 cfg{ "-f", policy }
-                local _,  out = cmd.hostname{}
+                _, out = cmd.hostname{}
                 T:eq(out.stdout[1], "testing")
-                cmd.hostname(before)
+                cmd.hostname{ before }
                 _, out = cmd.hostname{}
                 T:eq(out.stdout[1], before)
             end
