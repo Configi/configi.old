@@ -667,6 +667,7 @@ return {
   dateymd = dateymd,
   timestamp = timestamp,
   find_string = find_string,
+  string_find = find_string,
   arr_to_rec = arr_to_rec,
   ln_to_tbl = ln_to_tbl,
   word_to_tbl = word_to_tbl,
