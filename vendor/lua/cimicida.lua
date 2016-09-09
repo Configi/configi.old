@@ -9,18 +9,16 @@ local ENV = {}
 _ENV = ENV
 
 --- Output formatted string to the current output.
--- @function printf
--- @param str C-like string (STRING)
--- @param ... Variable number of arguments to interpolate str (VARARGS)
+-- @tparam string str C-like string
+-- @tparam varargs ... Variable number of arguments to interpolate str
 local printf = function (str, ...)
   io.write(string.format(str, ...))
 end
 
 --- Output formatted string to a specified output.
--- @function fprintf
--- @param fd stream/descriptor
--- @param str C-like string (STRING)
--- @param ... Variable number of arguments to interpolate str (VARARGS)
+-- @tparam userdata fd stream/descriptor
+-- @tparam string str C-like string
+-- @tparam varargs ... Variable number of arguments to interpolate str
 local fprintf = function (fd, str, ...)
   local o = io.output()
   io.output(fd)
@@ -30,27 +28,24 @@ local fprintf = function (fd, str, ...)
 end
 
 --- Output formatted string to STDERR.
--- @function warn
--- @param str C-like string (STRING)
--- @param ... Variable number of arguments to interpolate str (VARARGS)
+-- @tparam string str C-like string
+-- @tparam varargs ... Variable number of arguments to interpolate str
 local warn = function (str, ...)
   fprintf(io.stderr, str, ...)
 end
 
 --- Output formatted string to STDERR and return 1 as the exit status.
--- @function errorf
--- @param str C-like string (STRING)
--- @param ... Variable number of arguments to interpolate str (VARARGS)
+-- @tparam string str C-like string
+-- @tparam varargs ... Variable number of arguments to interpolate str
 local errorf = function (str, ...)
   warn(str, ...)
   os.exit(1)
 end
 
 --- Call cimicida.errorf if the first argument is false (i.e. nil or false).
--- @function assertf
--- @param v value to evaluate
--- @param str C-like string (STRING)
--- @param ... Variable number of arguments to interpolate str (VARARGS)
+-- @tparam bool v value to evaluate
+-- @tparam string str C-like string
+-- @tparam varargs ... Variable number of arguments to interpolate str
 local assertf = function (v, str, ...)
   if v then
     return true
@@ -59,57 +54,51 @@ local assertf = function (v, str, ...)
   end
 end
 
--- Append a line break and string to an input string.
--- @function append
--- @param str Input string (STRING)
--- @param a String to append to str (STRING)
--- @return new string (STRING)
+--- Append a line break and string to an input string.
+-- @tparam string str input string
+-- @tparam string a string to append to str
+-- @treturn string new string
 local append = function (str, a)
   return string.format("%s\n%s", str, a)
 end
 
 --- Time in the strftime(3) format %H:%M.
--- @function timehm
--- @return the time as a string (STRING)
+-- @treturn string the time as a string
 local timehm = function ()
   return os.date("%H:%M")
 end
 
 
 --- Date in the strftime(3) format %Y-%m-%d.
--- @function dateymd
--- @return the date as a string (STRING)
+-- @treturn string the date as a string
 local dateymd = function ()
   return os.date("%Y-%m-%d")
 end
 
 --- Timestamp in the strftime(3) format %Y-%m-%d %H:%M:%S %Z%z.
--- @function timestamp
--- @return the timestamp as a string (STRING)
+-- @treturn string the timestamp as a string
 local timestamp = function ()
   return os.date("%Y-%m-%d %H:%M:%S %Z%z")
 end
 
 --- Check if a table has an specified string.
--- @function find_string
--- @param tbl table to search (TABLE)
--- @param string value to look for in tbl (STRING)
--- @param bool plain if true, turns off pattern matching facilities (BOOLEAN)
--- @return a boolean value, true if v is found, nil otherwise (BOOLEAN)
-local find_string = function (tbl, value, plain)
+-- @tparam table tbl table to search
+-- @tparam string str plain string or pattern to look for in tbl
+-- @tparam bool plain if true, turns off pattern matching facilities
+-- @treturn bool a boolean value, true if v is found, nil otherwise
+local find_string = function (tbl, str, plain)
   for _, tval in next, tbl do
     tval = string.gsub(tval, '[%c]', '')
-    if string.find(tval, value, 1, plain) then return true end
+    if string.find(tval, str, 1, plain) then return true end
   end
 end
 
 --- Convert an array to a record.
--- Array values are converted into field names
--- @function arr_to_rec
+-- Array values are converted into field names.
 -- @warning Does not check if input table is a sequence.
--- @param tbl the properly sequenced table to convert (TABLE)
--- @param def default value for each field in the record (VALUE)
--- @return the converted table (TABLE)
+-- @tparam table tbl the properly sequenced table to convert
+-- @param def default value for each field in the record. Should not be nil
+-- @treturn table the converted table
 local arr_to_rec = function (tbl, def)
   local t = {}
   for n = 1, #tbl do t[tbl[n]] = def end
@@ -117,10 +106,9 @@ local arr_to_rec = function (tbl, def)
 end
 
 --- Convert string to table.
--- Each line is a table value
--- @function ln_to_tbl
--- @param str string to convert (STRING)
--- @return the table (TABLE)
+-- Each line is a table value.
+-- @tparam string str string to convert
+-- @treturn table a new table
 local ln_to_tbl = function (str)
   local tbl = {}
   if not str then
@@ -133,9 +121,8 @@ local ln_to_tbl = function (str)
 end
 
 --- Split alphanumeric matches of a string into table values.
--- @function word_to_tbl
--- @param str string to convert (STRING)
--- @return the table (TABLE)
+-- @tparam string str string to convert
+-- @treturn table a new
 local word_to_tbl = function (str)
   local t = {}
   for s in string.gmatch(str, "%w+") do
@@ -145,9 +132,8 @@ local word_to_tbl = function (str)
 end
 
 --- Split non-space character matches of a string into table values.
--- @function str_to_tbl
--- @param str string to convert (STRING)
--- @return the table (TABLE)
+-- @tparam string str string to convert
+-- @treturn table a new table
 local str_to_tbl = function (str)
   local t = {}
   for s in string.gmatch(str, "%S+") do
@@ -156,11 +142,10 @@ local str_to_tbl = function (str)
   return t
 end
 
---- Escape a string for pattern usage
+--- Escape a string for pattern usage.
 -- From lua-nucleo.
--- @function escape_pattern
--- @param str string to escape (STRING)
--- @return a new string (STRING)
+-- @tparam string str string to escape
+-- @treturn string a new string
 local escape_pattern = function (str)
   local matches =
   {
@@ -183,11 +168,10 @@ end
 
 --- Filter table values.
 -- Adapted from <http://stackoverflow.com/questions/12394841/safely-remove-items-from-an-array-table-while-iterating>
--- @function filter_tbl_value
--- @param tbl table to operate on (TABLE)
--- @param patt pattern to filter (STRING)
--- @param plain set to true if doing plain matching (BOOLEAN)
--- @return modified table (TABLE)
+-- @tparam table tbl table to operate on
+-- @tparam string patt pattern to filter
+-- @tparam bool plain set to true if true, turns of pattern matching facilities
+-- @treturn table modified table
 local filter_tbl_value = function (tbl, patt, plain)
   plain = plain or nil
   local s, c = #tbl, 0
@@ -210,9 +194,8 @@ end
 
 --- Convert file into a table.
 -- Each line is a table value
--- @function file_to_tbl
--- @param file file to convert (STRING)
--- @return a table (TABLE)
+-- @tparam string file file to convert
+-- @treturn table a new table
 local file_to_tbl = function (file)
   local _, fd = pcall(io.open, file, "re")
   if fd then
@@ -228,16 +211,15 @@ end
 
 --- Find a string in a table value.
 -- string is a plain string not a pattern
--- @function find_in_tbl
--- @param tbl properly sequenced table to traverse (TABLE)
--- @param str string to find (STRING)
--- @param patt boolean setting for plain strings (BOOLEAN)
--- @return the matching index if string is found, nil otherwise (NUMBER)
-local find_in_tbl = function (tbl, str, patt)
-  patt = patt or nil
+-- @tparam table tbl properly sequenced table to traverse
+-- @tparam string str string or pattern to look for
+-- @tparam bool plain set to true if true, turns of pattern matching facilities
+-- @treturn number the matching index if string is found, nil otherwise
+local find_in_tbl = function (tbl, str, plain)
+  plain = plain or nil
   local ok, found
   for n = 1, #tbl do
-    ok, found = pcall(Lua.find, tbl[n], str, 1, patt)
+    ok, found = pcall(Lua.find, tbl[n], str, 1, plain)
     if ok and found then
       return n
     end
@@ -246,9 +228,8 @@ end
 
 --- Do a shallow copy of a table.
 -- An empty table is created in the copy when a table is encountered
--- @function shallow_cp
--- @param tbl table to be copied (TABLE)
--- @return the copy as a table (TABLE)
+-- @tparam table tbl table to be copied
+-- @treturn table a new table
 local shallow_cp = function (tbl)
   local copy = {}
   for f, v in next, tbl do
@@ -262,10 +243,9 @@ local shallow_cp = function (tbl)
 end
 
 --- Split a path into its immediate location and file/directory components.
--- @function split_path
--- @param path path to split (STRING)
--- @return location (STRING)
--- @return file/directory (STRING)
+-- @tparam string path path to split
+-- @treturn string location
+-- @treturn string file/directory
 local split_path = function (path)
   local l = string.len(path)
   local c = string.sub(path, l, l)
@@ -282,9 +262,8 @@ end
 
 
 --- Check if a path is a file or not.
--- @function test_open
--- @param file path to the file (STRING)
--- @return true if path is a file, nil otherwise (BOOLEAN)
+-- @tparam string file path to the file
+-- @return true if path is a file, nil otherwise
 local test_open = function (file)
   local fd = io.open(file, "rb")
   if fd then
@@ -294,9 +273,8 @@ local test_open = function (file)
 end
 
 --- Read a file/path.
--- @function fopen
--- @param file path to the file (STRING)
--- @return the contents of the file, nil if the file cannot be read or opened (STRING or NIL)
+-- @tparam string file path to the file
+-- @treturn string the contents of the file, nil if the file cannot be read or opened
 local fopen = function (file)
   local str
   for s in io.lines(file, 2^12) do
@@ -308,11 +286,10 @@ local fopen = function (file)
 end
 
 --- Write a string to a file/path.
--- @function fwrite
--- @param path path to the file (STRING)
--- @param str string to write (STRING)
--- @param mode io.open mode (STRING)
--- @return true if the write succeeded, nil and the error message otherwise (BOOLEAN)
+-- @tparam string path path to the file
+-- @tparam string str string to write
+-- @tparam string mode io.open mode
+-- @return true if the write succeeded, nil and the error message otherwise
 local fwrite = function (path, str, mode)
   local setvbuf, write = io.setvbuf, io.write
   mode = mode or "we+"
@@ -331,10 +308,9 @@ end
 
 --- Get line.
 -- Given a line number return the line as a string.
--- @function getln
--- @param ln line number (NUMBER)
--- @param file (STRING)
--- @return the line (STRING)
+-- @tparam number ln line number
+-- @tparam string file
+-- @treturn string the line
 local getln = function (ln, file)
   local str = fopen(file)
   local i = 0
@@ -350,10 +326,9 @@ end
 -- tbl = { "field" = "value" }
 -- str = [[ this is the {{ field }} ]]
 -- If passed with these arguments 'this is the {{ field }}' becomes 'this is the value'
--- @function sub
--- @param str string to interpolate (STRING)
--- @param tbl table (record) to deduce values from (TABLE)
--- @return processed string (STRING)
+-- @tparam string str string to interpolate
+-- @tparam table tbl table (record) to deduce values from
+-- @treturn string processed string
 local sub = function (str, tbl)
   local t, _ = {}, nil
   _, str = pcall(string.gsub, str, "{{[%s]-([%g]+)[%s]-}}",
@@ -378,11 +353,10 @@ local sub = function (str, tbl)
 end
 
 --- Generate a string based on the values returned by os.execute or px.exec.
--- @function exit_string
--- @param proc process name (STRING)
--- @param status exit status (STRING)
--- @param code exit code (NUMBER)
--- @return a formatted string (STRING)
+-- @tparam string proc process name
+-- @tparam string status exit status
+-- @tparam number code exit code
+-- @treturn string a formatted string
 local exit_string = function (proc, status, code)
   if status == "exit" or status == "exited" then
     return string.format("%s: Exited with code %s", proc, code)
@@ -392,10 +366,9 @@ local exit_string = function (proc, status, code)
   end
 end
 
---- Check if "yes" or a "true" was passed.
--- @function truthy
--- @param s string (STRING)
--- @return the boolean true if the string matches, nil otherwise (BOOLEAN)
+--- Convert the string "yes" or "true" to boolean true.
+-- @tparam string s string to evaluate
+-- @treturn bool the boolean true if the string matches, nil otherwise
 local truthy = function (s)
   if s == "yes" or
      s == "YES" or
@@ -406,10 +379,9 @@ local truthy = function (s)
   end
 end
 
---- Convert a "no" or a "false" was passed.
--- @function falsy
--- @param s string (STRING)
--- @return the boolean true if the string matches, nil otherwise (BOOLEAN)
+--- Convert the string "no" or "false" to boolean false.
+-- @tparam string s string to evaluate
+-- @treturn bool the boolean true if the string matches, nil otherwise
 local falsy = function (s)
   if s == "no" or
      s == "NO" or
@@ -420,20 +392,20 @@ local falsy = function (s)
   end
 end
 
---- Wrap io.popen also known as popen(3)
--- The command has a script preamble.
--- 1. Exit immediately if a command exits with a non-zero status
--- 2. Pathname expansion is disabled.
--- 3. STDIN is closed
--- 4. Copy STDERR to STDOUT
+--- Wrap io.popen also known as popen(3).
+-- <br/>
+-- 1. Exit immediately if a command exits with a non-zero status<br/>
+-- 2. Pathname expansion is disabled<br/>
+-- 3. STDIN is closed<br/>
+-- 4. Copy STDERR to STDOUT<br/>
 -- 5. Finally replace the shell with the command
--- @function popen
--- @param str command to popen(3) (STRING)
--- @param cwd current working directory (STRING)
--- @param ignore_error boolean setting to ignore errors (BOOLEAN)
--- @param return_code boolean setting to return exit code (BOOLEAN)
--- @return the output as a string if the command exits with a non-zero status, nil otherwise (STRING or BOOLEAN)
--- @return a status output from cimicida.exitstr as a string (STRING)
+-- @warning The command has a script preamble
+-- @tparam string str command to popen(3)
+-- @tparam string cwd current working directory
+-- @tparam bool _ignore_error boolean setting to ignore errors
+-- @tparam bool _return_code boolean setting to return exit code
+-- @treturn string the output as a string if the command exits with a non-zero status, nil otherwise
+-- @treturn string a status output from cimicida.exit_string as a string
 local popen = function (str, cwd, _ignore_error, _return_code)
   local result = {}
   local header = [[  set -ef
@@ -463,19 +435,18 @@ local popen = function (str, cwd, _ignore_error, _return_code)
   end
 end
 
---- Wrap io.popen also known as popen(3)
--- Unlike cimicida.popen this writes to the pipe
--- The command has a script preamble.
--- 1. Exit immediately if a command exits with a non-zero status
--- 2. Pathname expansion is disabled.
--- 3. STDOUT is closed
--- 4. STDERR is closed
+--- Wrap io.popen also known as popen(3).
+-- Unlike cimicida.popen this writes to the pipe.
+-- The command has a script preamble.<br/>
+-- 1. Exit immediately if a command exits with a non-zero status<br/>
+-- 2. Pathname expansion is disabled<br/>
+-- 3. STDOUT is closed<br/>
+-- 4. STDERR is closed<br/>
 -- 5. Finally replace the shell with the command
--- @function pwrite
--- @param str command to popen(3) (STRING)
--- @param data string to feed to the pipe (STRING)
--- @return the true if the command exits with a non-zero status, nil otherwise (BOOLEAN)
--- @return a status output from cimicida.exitstr as a string (STRING)
+-- @tparam string str command to popen(3)
+-- @tparam string data string to feed to the pipe
+-- @treturn bool true if the command exits with a non-zero status, nil otherwise
+-- @treturn string a status output from cimicida.exit_string as a string
 local pwrite = function (str, data)
   local result = {}
   local write = io.write
@@ -495,16 +466,15 @@ local pwrite = function (str, data)
 end
 
 --- Wrap os.execute also known as system(3).
--- The command has a script preamble.
--- 1. Exit immediately if a command exits with a non-zero status
--- 2. Pathname expansion is disabled.
--- 3. STDERR and STDIN are closed
--- 4. STDOUT is piped to /dev/null
+-- The command has a script preamble.<br/>
+-- 1. Exit immediately if a command exits with a non-zero status<br/>
+-- 2. Pathname expansion is disabled<br/>
+-- 3. STDERR and STDIN are closed<br/>
+-- 4. STDOUT is piped to /dev/null<br/>
 -- 5. Finally replace the shell with the command
--- @function system
--- @param str command to pass to system(3) (STRING)
--- @return true if exit code is equal to zero, nil otherwise (BOOLEAN)
--- @return a status output from cimicida.exitstr as a string (STRING)
+-- @tparam string str command to pass to system(3)
+-- @treturn bool true if exit code is equal to zero, nil otherwise
+-- @treturn string a status output from cimicida.exit_string as a string
 local system = function (str)
   local result = {}
   local set = [[  set -ef
@@ -525,10 +495,9 @@ end
 --- Wrap os.execute also known as system(3).
 -- Similar to cimicida.system but it does not replace the shell.
 -- Suitable for scripts.
--- @function execute
--- @param str string to pass to system(3) (STRING)
--- @return true if exit code is equal to zero, nil otherwise (BOOLEAN)
--- @return a status output from cimicida.exitstr as a string (STRING)
+-- @tparam string str string to pass to system(3)
+-- @treturn bool true if exit code is equal to zero, nil otherwise
+-- @treturn string a status output from cimicida.exit_string as a string
 local execute = function (str)
   local result = {}
   local set = [[  set -ef
@@ -544,9 +513,8 @@ local execute = function (str)
 end
 
 --- Run a shell pipe.
--- @function pipeline
--- @param ... a vararg containing the command pipe. The first argument should be popen or execute
--- @return the output from cimicida.popen or cimicida.execute, nil if popen or execute was not passed (STRING or BOOLEAN)
+-- @tparam varargs ... a vararg containing the command pipe. The first argument should be popen or execute
+-- @treturn string the output from cimicida.popen or cimicida.execute, nil if popen or execute was not passed
 local pipeline = function (...)
   local pipe = {}
   local cmds = {...}
@@ -564,11 +532,10 @@ local pipeline = function (...)
 end
 
 --- Time a function run.
--- @function time
--- @param f the function (FUNCTION)
--- @param ... a vararg containing the arguments for the function (VARARGS)
--- @return the return values of the function (VALUE)
--- @return the seconds elapsed as a number (NUMBER)
+-- @tparam func f the function
+-- @tparam varargs ... a vararg containing the arguments for the function
+-- @return the return value(s) of f(...)
+-- @treturn number the seconds elapsed as a number
 local time = function (f, ...)
   local t1 = os.time()
   local fn = {f(...)}
@@ -576,9 +543,8 @@ local time = function (f, ...)
 end
 
 --- Escape quotes ",'.
--- @function escape_quotes
--- @param str string to quote (STRING)
--- @return quoted string (STRING)
+-- @tparam string str string to quote
+-- @treturn string quoted string
 local escape_quotes = function (str)
   str = string.gsub(str, [["]], [[\"]])
   str = string.gsub(str, [[']], [[\']])
@@ -586,11 +552,10 @@ local escape_quotes = function (str)
 end
 
 --- Log to a file.
--- @function flog
--- @param file path name of the file (STRING)
--- @param ident identification (STRING)
--- @param msg string to log (STRING)
--- @return a boolean value, true if not errors, nil otherwise (BOOLEAN)
+-- @tparam string file path name of the file
+-- @tparam string ident identification
+-- @tparam string msg string to log (STRING)
+-- @treturn bool a boolean value, true if no errors, nil otherwise
 local flog = function (file, ident, msg)
   local setvbuf = io.setvbuf
   local openlog = function (f)
@@ -614,12 +579,10 @@ end
 
 --- Insert a value to a table position if the first argument is not nil or not false.
 -- Wraps table.insert().
--- @function insert_if
--- @param bool value to evaluate (VALUE)
--- @param list table to insert to (TABLE)
--- @param pos position in the table (NUMBER)
+-- @tparam bool bool value to evaluate
+-- @tparam table list table to insert into
+-- @tparam number pos position index in the table
 -- @param value value to insert (VALUE)
--- @return the result of table.insert() (VALUE)
 local insert_if = function (bool, list, pos, value)
   if bool then
     if type(value) == "table" then
@@ -635,10 +598,9 @@ end
 
 --- Return the second argument if the first argument is not nil or not false.
 -- For value functions there should be no evaluation in the arguments.
--- @function return_if
--- @param bool value to evaluate (VALUE)
--- @param value to return (VALUE)
--- @return the value if bool is not nil or not false
+-- @param bool value to evaluate
+-- @param value value to return if first argument does not evaluate to nil or false
+-- @return value if first argument does not evaluate to nil or false
 local return_if = function (bool, value)
   if bool then
     return (value)
@@ -646,16 +608,16 @@ local return_if = function (bool, value)
 end
 
 --- Return the second argument if the first argument is nil or false.
--- @function return_if_not
--- @param bool value to evaluate (VALUE)
--- @param value to return (VALUE)
--- @return the value if bool is nil or false
+-- @param bool value to evaluate
+-- @param value value to return if first argument evaluates to nil or false
+-- @return value if first argument evaluates to nil or false
 local return_if_not = function (bool, value)
   if bool == false or bool == nil then
     return value
   end
 end
 
+--- @export
 return {
   printf = printf,
   fprintf = fprintf,
