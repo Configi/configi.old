@@ -1,12 +1,12 @@
 factidSRC= vendor/c/factid/src/factidC.c
 factidOBJ= vendor/c/factid/src/factidC.o
 factidA= factidC.a
-CLUA_MODS+= $(factidA)
-CLUA_MODS:= $(filter-out factid.a,$(CLUA_MODS))
-VENDOR_LUA+= factid
+C_MODULES+= $(factidA)
+C_MODULES:= $(filter-out factid.a,$(C_MODULES))
+VENDOR+= factid
 CLEAN+= clean_factid
 
-$(factidA): $(factidOBJ) 
+$(factidA): $(factidOBJ)
 	$(ECHOT) [AR] $@
 	$(AR) $(ARFLAGS) $@ $^ >/dev/null 2>&1
 	$(RANLIB) $@
@@ -16,7 +16,7 @@ $(factidOBJ): $(factidSRC)
 	$(CC) -o $@ $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) -c $<
 
 clean_factid:
-	$(RM) $(RMFLAGS) $(factidA) $(factidOBJ) 
+	$(RM) $(RMFLAGS) $(factidA) $(factidOBJ)
 
 .PHONY: clean_factid
 

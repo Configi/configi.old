@@ -1,17 +1,16 @@
 linotifySRC= vendor/c/linotify/linotify.c
 linotifyOBJ= vendor/c/linotify/linotify.o
 linotifyA= inotify.a
-CLUA_MODS+= $(linotifyA)
-CLUA_MODS:= $(filter-out linotify.a,$(CLUA_MODS))
+C_MODULES+= $(linotifyA)
+C_MODULES:= $(filter-out linotify.a,$(C_MODULES))
 CLEAN+= clean_linotify
-CCWARN=
 
 $(linotifyA): $(linotifyOBJ)
 	$(ECHOT) [AR] $@
 	$(AR) $(ARFLAGS) $@ $< >/dev/null 2>&1
 	$(RANLIB) $@
 
-$(linotifyOBJ): $(linotifySRC) $(LINIT_T)
+$(linotifyOBJ): $(linotifySRC)
 	$(ECHOT) [CC] $@
 	$(CC) -o $@ $(INCLUDES) -Ivendor/c/linotify $(CCWARN) $(CFLAGS) $(CCOPT) -c $<
 

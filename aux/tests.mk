@@ -1,6 +1,7 @@
 .POSIX:
 .SUFFIXES:
-export CC NM
+export CC
+export NM
 NULSTRING:=
 CFLAGS_LRT= -lrt
 
@@ -57,10 +58,10 @@ ifeq ($(shell aux/test-F_CLOSEM.sh $(CC)), true)
 endif
 
 ifeq ($(DEBUG), 1)
+  CCWARN:= -Wall
   CFLAGS:= -O1 -fno-omit-frame-pointer -g
   CCOPT:= $(NULSTRING)
   LDFLAGS:= $(NULSTRING)
-  LUACFLAGS:= $(NULSTRING)
   MAKEFLAGS:= $(NULSTRING)
 else
   DEFINES+= -DNDEBUG
@@ -75,5 +76,3 @@ ifeq ($(ASAN), 1)
   CCOPT:= $(NULSTRING)
   LDFLAGS:= $(NULSTRING)
 endif
-
-
