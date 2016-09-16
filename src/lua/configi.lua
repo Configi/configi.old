@@ -506,7 +506,7 @@ function cli.main (opts)
                                 if p == register then rawset(env.global, v, true) end
                                 qt.parameters[p] = v
                             end
-                        if rawget(env.global, qt.parameters.context) == true or (qt.parameters.context == nil) then
+                        if qt.parameters.context == true or (qt.parameters.context == nil) then
                             if qt.parameters.handle then
                                 if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
                                     hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
