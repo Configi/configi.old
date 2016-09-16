@@ -9,7 +9,7 @@ local osfamily = factid.osfamily()
 local testdir = "test/tmp/"
 local cfg = cmd["./cfg"]
 
-if not lib.isdir(testdir) then
+if not lib.is_dir(testdir) then
     stat.mkdir(testdir)
 end
 
@@ -100,7 +100,7 @@ T:start"include test/core-include1.lua, test/core-include2.lua"
         local include = function(first, second)
             local dir = testdir .. "CONFIGI_TEST_INCLUDE"
             cfg{ "-f", first }
-            T:yes(lib.isdir(dir))
+            T:yes(lib.is_dir(dir))
             cfg{ "-f", second }
             T:no(stat.stat(dir))
         end
@@ -151,8 +151,8 @@ T:start"list test/core-list.lua"
             T:yes(stat.mkdir(testdir .. "core-list.xxx"))
             T:yes(stat.mkdir(testdir .. "core-list.yyy"))
             cfg{ "-f", policy }
-            T:no(lib.isdir(testdir .. "core-list.xxx"))
-            T:no(lib.isdir(testdir .. "core-list.yyy"))
+            T:no(lib.is_dir(testdir .. "core-list.xxx"))
+            T:no(lib.is_dir(testdir .. "core-list.yyy"))
         end
         list"test/core-list.lua"
         list"test/core-list.moon"
@@ -165,8 +165,8 @@ T:start"each test/core-each.lua"
 	    cmd.mkdir{ "-p", testdir .. "core-each.xxx" }
 	    cmd.mkdir{ "-p", testdir .. "core-each.yyy" }
             cfg{ "-f", policy }
-            T:no(lib.isdir(testdir .. "core-each.xxx"))
-            T:no(lib.isdir(testdir .. "core-each.yyy"))
+            T:no(lib.is_dir(testdir .. "core-each.xxx"))
+            T:no(lib.is_dir(testdir .. "core-each.yyy"))
         end
         each"test/core-each.lua"
         each"test/core-each.moon"
@@ -175,7 +175,7 @@ T:done(N)
 
 T:start"hostname.set (modules/hostname.lua)"
     do
-        if lib.binpath"hostnamectl" then
+        if lib.bin_path"hostnamectl" then
             -- XXX duplicate copy from module.hostname
             local current_hostnames = function()
                 local _, hostnamectl = cmd.hostnamectl{}
@@ -340,7 +340,7 @@ T:start"shell.command (modules/shell.lua)"
     do
         local shell = function(policy)
             cfg{ "-f", policy }
-            T:yes(lib.isfile(testdir .. "shell_command.txt"))
+            T:yes(lib.is_file(testdir .. "shell_command.txt"))
             os.remove(testdir .. "shell_command.txt")
         end
         shell"test/shell_command.lua"
@@ -352,7 +352,7 @@ T:start"shell.system (modules/shell.lua)"
     do
         local shell = function(policy)
             cfg{ "-f", policy }
-            T:yes(lib.isfile(testdir .. "shell_system.txt"))
+            T:yes(lib.is_file(testdir .. "shell_system.txt"))
             os.remove(testdir .. "shell_system.txt")
         end
         shell"test/shell_system.lua"
@@ -364,7 +364,7 @@ T:start"shell.popen (modules/shell.lua)"
     do
         local shell = function(p1, p2)
             cfg{ "-f", p1 }
-            T:yes(lib.isfile(testdir .. "shell_popen.txt"))
+            T:yes(lib.is_file(testdir .. "shell_popen.txt"))
             os.remove(testdir .. "shell_popen.txt")
             cmd.touch{ testdir .. "The wizard quickly jinxed the gnomes before they vaporized" }
             T:eq(cfg{ "-f", p2 }, true)
@@ -822,7 +822,7 @@ T:start"unarchive.unpack (modules/unarchive.lua)"
     end
 T:done(N)
 
-if lib.binpath("git") then
+if lib.bin_path("git") then
     T:start"git.clone (modules/git.lua)"
         do
             local git = function(policy)
