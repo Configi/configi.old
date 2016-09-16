@@ -365,7 +365,7 @@ function lib.qexec (args)
 end
 
 --- Read string from a polled STDIN.
--- @tparam int bytes to read
+-- @tparam int sz bytes to read
 -- @treturn string string read
 function lib.readin (sz)
   local fd = unistd.STDIN_FILENO
@@ -385,7 +385,7 @@ end
 --- Write to given path name.
 --  Wraps lib.write().
 -- @tparam string path name
--- @tparam string string to write
+-- @tparam string str string to write
 -- @treturn bool true if successfully written; otherwise it returns nil
 function lib.fdwrite (path, str)
   local fd = lib.open(path, (fcntl.O_RDWR))
@@ -398,8 +398,8 @@ end
 --- Write to give path name atomically.
 -- Wraps lib.write().
 -- @tparam string path name
--- @tparam string string to write
--- @tparam number octal mode when opening file
+-- @tparam string str string to write
+-- @tparam number mode octal mode when opening file
 -- @treturn bool true when successfully writing; otherwise, return nil
 -- @treturn string successful message string; otherwise, return a string describing the error
 function lib.awrite (path, str, mode)
