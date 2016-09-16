@@ -165,7 +165,7 @@ function shell.popen(S)
             return F.kept(P.string)
         end
         local str
-        if lib.isfile(P.string) then
+        if lib.is_file(P.string) then
             str = lib.fopen(P.string)
         else
             str = P.string
@@ -229,7 +229,7 @@ function shell.popen3(S)
             return F.kept(P.string)
         end
         local str
-        if lib.isfile(P.string) then
+        if lib.is_file(P.string) then
             str = lib.fopen(P.string)
         else
             str = P.string

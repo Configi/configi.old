@@ -49,7 +49,7 @@ end
 
 local found = function(P)
     local A = decompose(P)
-    if lib.isdir("/var/db/pkg/" .. A.category) then
+    if lib.is_dir("/var/db/pkg/" .. A.category) then
         if A.lead == "" then
             -- package "net-misc/rsync"
             for packages in dirent.files("/var/db/pkg/" .. A.category) do

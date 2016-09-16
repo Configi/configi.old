@@ -24,7 +24,7 @@ M.alias.pattern = { "match" }
 
 local write = function(F, P, R)
     -- ignore P.diff if diffutils is not found
-    if not lib.binpath"diff" then P.diff = false end
+    if not lib.bin_path"diff" then P.diff = false end
     if (P.debug or P.test) and P.diff then
         local temp = os.tmpname()
         if lib.awrite(temp, P._input, 384) then

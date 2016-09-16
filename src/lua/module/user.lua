@@ -86,7 +86,7 @@ function user.present(S)
             return R
         end
         local set, args, ret
-        if lib.binpath"useradd" then
+        if lib.bin_path"useradd" then
             args = { P.login }
             set = {
                    user_group = "-U",
@@ -135,7 +135,7 @@ function user.absent(S)
         end
         local ret
         local args = { P.login }
-        if lib.binpath"userdel" then
+        if lib.bin_path"userdel" then
             lib.insert_if(P.remove, args, 1, "-r")
             ret = F.run(cmd.userdel, args)
         else
