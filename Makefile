@@ -1,7 +1,7 @@
 EXE:= cfg
-APP:= configi
-APP_DIR:= module
-APP_C:=
+SRC:= configi
+SRC_DIR:= module
+SRC_C:=
 VENDOR:= cimicida crc32 sha2 lib
 VENDOR_DIR:= moonscript moonscript/parse moonscript/compile moonscript/transform
 VENDOR_C:= linotify luaposix factid px lpeg
