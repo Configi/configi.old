@@ -1,8 +1,9 @@
---- Lua extensions and some unix utilities
+--- Configi standard library.
+-- Lua extensions and some unix utilities.
 -- @module lib
 
 local string, table, os = string, table, os
-local setmetatable, pcall, type, next, ipairs = setmetatable, pcall, type, next, ipairs 
+local setmetatable, pcall, type, next, ipairs = setmetatable, pcall, type, next, ipairs
 local lc = require"cimicida"
 local pwd = require"posix.pwd"
 local unistd = require"posix.unistd"
@@ -44,9 +45,9 @@ lib.wait = retry(wait.wait)
 lib.open = retry(fcntl.open)
 
 --- Write to a file descriptor.
--- Wrapper to luaposix unistd.write.
--- @param fd file descriptor
--- @param buf string to write
+--  Wrapper to luaposix unistd.write.
+-- @tparam int fd file descriptor
+-- @tparam string buf string to write
 -- @return true if successfully written.
 function lib.write (fd, buf)
   local size = string.len(buf)
@@ -158,8 +159,8 @@ pipeline = function (t, pipe_fn)
 end
 
 --- Checks the existence of a given path.
--- @tparam string path the path to check for.
--- @return the path if path exists.
+-- @tparam string path the path to check for
+-- @treturn string the path if path exists.
 function lib.retpath (path)
   if stat.stat(path) then
     return path
@@ -167,7 +168,7 @@ function lib.retpath (path)
 end
 
 --- Deduce the complete path name of an executable.
--- Only checks standard locations.
+--  Only checks standard locations.
 -- @tparam string bin executable name
 -- @treturn string full path name
 function lib.binpath (bin)
@@ -230,8 +231,25 @@ local pexec = function (args)
 end
 
 --- Execute a file.
--- @tparam table arguments
--- @treturn table table of results, result.stdout and result.stderr.
+-- The sequence part of args are the arguments passed to the executable <br/>
+-- The dictionary part of args has options and override. See the following.<br/>
+-- @tparam table args
+-- @param args._bin override path to binary
+-- @param args._env environment variables
+-- @param args._cwd current working directory
+-- @param args._stdin string as standard input
+-- @param args._stdout path to file as standard output
+-- @param args._stderr path to file as standard error
+-- @param args._return_code return the exit code instead of boolean true
+-- @param args._ignore_error always return boolean true
+-- @treturn bool true if no errors, nil otherwise
+-- @treturn table result
+-- @return result.stdout (table) sequence of stdout lines
+-- @return result.stderr (table) sequence of stderr lines
+-- @return result.pid (int) pid of terminated executable, if successful; nil otherwise
+-- @return result.status (string) status: "exited", "killed" or "stopped"; otherwise, an error message
+-- @return result.code (int) exit status, or signal number responsible for "killed" or "stopped"; otherwise, an errnum
+-- @return result.bin (string) executable path
 function lib.exec (args)
   local result = { stdout = {}, stderr = {} }
   local sz = 4096
@@ -296,9 +314,26 @@ function lib.exec (args)
 end
 
 --- Execute a file.
--- Use if caller does not care for STDIN, STDOUT or STDERR.
--- @tparam table arguments
--- @treturn table table of results, result.stdout and result.stderr.
+--  Use if caller does not care for STDIN, STDOUT or STDERR. <br/>
+-- The sequence part of args are the arguments passed to the executable <br/>
+-- The dictionary part of args has options and override. See the following.<br/>
+-- @tparam table args
+-- @param args._bin override path to binary
+-- @param args._env environment variables
+-- @param args._cwd current working directory
+-- @param args._stdin string as standard input
+-- @param args._stdout path to file as standard output
+-- @param args._stderr path to file as standard error
+-- @param args._return_code return the exit code instead of boolean true
+-- @param args._ignore_error always return boolean true
+-- @treturn bool true if no errors, nil otherwise
+-- @treturn table result
+-- @return result.stdout (table) sequence of stdout lines
+-- @return result.stderr (table) sequence of stderr lines
+-- @return result.pid (int) pid of terminated executable, if successful; nil otherwise
+-- @return result.status (string) status: "exited", "killed" or "stopped"; otherwise, an error message
+-- @return result.code (int) exit status, or signal number responsible for "killed" or "stopped"; otherwise, an errnum
+-- @return result.bin (string) executable path
 function lib.qexec (args)
   local pid, err = unistd.fork()
   local result = {}
@@ -330,7 +365,7 @@ function lib.qexec (args)
 end
 
 --- Read string from a polled STDIN.
--- @tparam number bytes to read
+-- @tparam int bytes to read
 -- @treturn string string read
 function lib.readin (sz)
   local fd = unistd.STDIN_FILENO
@@ -348,10 +383,10 @@ function lib.readin (sz)
 end
 
 --- Write to given path name.
--- Wraps lib.write.
--- @tparam string path name 
--- @tparam string string to write 
--- @return true if successfully written; otherwise it returns nil
+--  Wraps lib.write().
+-- @tparam string path name
+-- @tparam string string to write
+-- @treturn bool true if successfully written; otherwise it returns nil
 function lib.fdwrite (path, str)
   local fd = lib.open(path, (fcntl.O_RDWR))
   if not fd then
@@ -361,12 +396,12 @@ function lib.fdwrite (path, str)
 end
 
 --- Write to give path name atomically.
--- Wraps lib.write.
+-- Wraps lib.write().
 -- @tparam string path name
 -- @tparam string string to write
 -- @tparam number octal mode when opening file
--- @return true when successfully writing; otherwise, return nil
--- @return successful message string; otherwise, return a string describing the error
+-- @treturn bool true when successfully writing; otherwise, return nil
+-- @treturn string successful message string; otherwise, return a string describing the error
 function lib.awrite (path, str, mode)
   mode = mode or 384
   local lock = {
@@ -399,7 +434,7 @@ end
 
 --- Check if a given path name is a directory.
 -- @tparam string path name
--- @return true if a directory; otherwise, return nil
+-- @treturn bool true if a directory; otherwise, return nil
 function lib.isdir (path)
   local path_stat = stat.stat(path)
   if path_stat then
@@ -411,7 +446,7 @@ end
 
 --- Check if a given path name is a file.
 -- @tparam string path name
--- @return true if a file; otherwise, return nil
+-- @treturn bool true if a file; otherwise, return nil
 function lib.isfile (path)
   local path_stat = stat.stat(path)
   if path_stat then
@@ -423,7 +458,7 @@ end
 
 --- Check if a given path name is a symbolic link.
 -- @tparam string path name
--- @return true if a symbolic link; otherwise, return nil  
+-- @treturn bool true if a symbolic link; otherwise, return nil
 function lib.islink (path)
   local stat = stat.stat(path)
   if stat then
@@ -435,7 +470,7 @@ end
 
 --- Write to the syslog and a file if given.
 -- @tparam string file path name to log to.
--- @tparam string ident arbitrary identification string 
+-- @tparam string ident arbitrary identification string
 -- @tparam string msg message body
 -- @tparam int option see luaposix syslog constants
 -- @tparam int facility see luaposix syslog constants
@@ -453,7 +488,11 @@ function lib.log (file, ident, msg, option, facility, level)
   syslog.closelog()
 end
 
--- From luaposix
+--- Calculate difference in time.
+-- From luaposix.
+-- @tparam int finish end time
+-- @tparam int start start time
+-- @treturn {sec, usec} a table of results
 function lib.difftime (finish, start)
   local sec, usec = 0, 0
   if finish.tv_sec then sec = finish.tv_sec end
@@ -481,10 +520,16 @@ end
 
 lib.pipeline = pipeline
 
--- Wraps lib.exec and lib.qexec so you can execute a given executable like cmd["/bin/ls"]{ "/tmp" } 
--- cmd["-/bin/ls"]{ "/tmp" } to ignore the output ala lib.qexec.
--- cmd.ls{"/tmp"} also works since lib.binpath is called on the executable.
--- Returns a table 'result' with tables stdout and stderr (result.stdout and result.stderr)
+--- Execute command or executable as the key for this function-table.
+-- @function cmd
+-- Wraps lib.exec and lib.qexec so you can execute a given executable as the index to `cmd`.
+-- See lib.exec() and lib.qexec() for the possible options and results.<br/><br/>
+-- The invocation `cmd.ls` should also work since lib.binpath() is called on the command.
+-- Prepend '-' to the command to ignore the output ala lib.qexec(). <br/>
+-- @usage cmd["/bin/ls"]{ "/tmp" }
+-- @usage cmd.ls{"/tmp"}
+-- @usage cmd["-/bin/ls"]{ "/tmp" }
+
 lib.cmd = setmetatable({}, { __index =
   function (_, key)
     local exec, bin
@@ -507,4 +552,4 @@ lib.cmd = setmetatable({}, { __index =
   end
 })
 
-return lib 
+return lib

@@ -1,4 +1,4 @@
---- Lua utilities
+--- Additional functions. Can also be called from the `lib` module.
 -- @module cimicida
 local io, string, os, table = io, string, os, table
 local type, pcall, load, setmetatable, ipairs, next = type, pcall, load, setmetatable, ipairs, next
