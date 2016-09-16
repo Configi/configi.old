@@ -64,14 +64,14 @@ end
 
 --- Time in the strftime(3) format %H:%M.
 -- @treturn string the time as a string
-local timehm = function ()
+local time_hm = function ()
   return os.date("%H:%M")
 end
 
 
 --- Date in the strftime(3) format %Y-%m-%d.
 -- @treturn string the date as a string
-local dateymd = function ()
+local date_ymd = function ()
   return os.date("%Y-%m-%d")
 end
 
@@ -311,7 +311,7 @@ end
 -- @tparam number ln line number
 -- @tparam string file
 -- @treturn string the line
-local getln = function (ln, file)
+local get_ln = function (ln, file)
   local str = fopen(file)
   local i = 0
   for line in string.gmatch(str, "([^\n]*)\n") do
@@ -539,7 +539,7 @@ end
 local time = function (f, ...)
   local t1 = os.time()
   local fn = {f(...)}
-  return table.unpack(fn), os.difftime(os.time() , t1)
+  return table.unpack(fn), os.diff_time(os.time() , t1)
 end
 
 --- Escape quotes ",'.
@@ -625,8 +625,8 @@ return {
   assertf = assertf,
   warn = warn,
   append = append,
-  timehm = timehm,
-  dateymd = dateymd,
+  time_hm = time_hm,
+  date_ymd = date_ymd,
   timestamp = timestamp,
   find_string = find_string,
   string_find = find_string,
@@ -643,7 +643,7 @@ return {
   test_open = test_open,
   fopen = fopen,
   fwrite = fwrite,
-  getln = getln,
+  get_ln = get_ln,
   sub = sub,
   exit_string = exit_string,
   truthy = truthy,

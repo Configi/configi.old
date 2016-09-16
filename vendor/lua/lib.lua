@@ -161,7 +161,7 @@ end
 --- Checks the existence of a given path.
 -- @tparam string path the path to check for
 -- @treturn string the path if path exists.
-function lib.retpath (path)
+function lib.ret_path (path)
   if stat.stat(path) then
     return path
   end
@@ -171,7 +171,7 @@ end
 --  Only checks standard locations.
 -- @tparam string bin executable name
 -- @treturn string full path name
-function lib.binpath (bin)
+function lib.bin_path (bin)
   -- If executable is not in any of these directories then it should be using the complete path.
   local t = { "/usr/bin/", "/bin/", "/usr/sbin/", "/sbin/", "/usr/local/bin/", "/usr/local/sbin/" }
   for _, p in ipairs(t) do
@@ -435,7 +435,7 @@ end
 --- Check if a given path name is a directory.
 -- @tparam string path name
 -- @treturn bool true if a directory; otherwise, return nil
-function lib.isdir (path)
+function lib.is_dir (path)
   local path_stat = stat.stat(path)
   if path_stat then
     if stat.S_ISDIR(path_stat.st_mode) ~= 0 then
@@ -447,7 +447,7 @@ end
 --- Check if a given path name is a file.
 -- @tparam string path name
 -- @treturn bool true if a file; otherwise, return nil
-function lib.isfile (path)
+function lib.is_file (path)
   local path_stat = stat.stat(path)
   if path_stat then
     if stat.S_ISREG(path_stat.st_mode) ~= 0 then
@@ -459,7 +459,7 @@ end
 --- Check if a given path name is a symbolic link.
 -- @tparam string path name
 -- @treturn bool true if a symbolic link; otherwise, return nil
-function lib.islink (path)
+function lib.is_link (path)
   local stat = stat.stat(path)
   if stat then
     if stat.S_ISLNK(stat.st_mode) ~= 0 then
@@ -493,7 +493,7 @@ end
 -- @tparam int finish end time
 -- @tparam int start start time
 -- @treturn {sec, usec} a table of results
-function lib.difftime (finish, start)
+function lib.diff_time (finish, start)
   local sec, usec = 0, 0
   if finish.tv_sec then sec = finish.tv_sec end
   if start.tv_sec then sec = sec - start.tv_sec end
@@ -508,13 +508,13 @@ end
 
 --- Get effective username.
 -- @treturn string username
-function lib.getename ()
+function lib.ename ()
  return pwd.getpwuid(unistd.geteuid()).pw_name
 end
 
 --- Get real username.
 -- @treturn string username
-function lib.getname ()
+function lib.rname ()
  return pwd.getpwuid(unistd.getuid()).pw_name
 end
 
@@ -524,7 +524,7 @@ lib.pipeline = pipeline
 -- @function cmd
 -- Wraps lib.exec and lib.qexec so you can execute a given executable as the index to `cmd`.
 -- See lib.exec() and lib.qexec() for the possible options and results.<br/><br/>
--- The invocation `cmd.ls` should also work since lib.binpath() is called on the command.
+-- The invocation `cmd.ls` should also work since lib.bin_path() is called on the command.
 -- Prepend '-' to the command to ignore the output ala lib.qexec(). <br/>
 -- @usage cmd["/bin/ls"]{ "/tmp" }
 -- @usage cmd.ls{"/tmp"}
@@ -543,7 +543,7 @@ lib.cmd = setmetatable({}, { __index =
     end
     -- Search common executable directories if not a full path.
     if string.len(lc.split_path(bin)) == 0 then
-      bin = lib.binpath(bin)
+      bin = lib.bin_path(bin)
     end
     return function (args)
       args._bin = bin
