@@ -152,9 +152,9 @@ pipeline = function (t, pipe_fn)
   end
 
   if code == 0 then
-    return true, lc.exitstr("pipe", status, code)
+    return true, lc.exit_string("pipe", status, code)
   else
-    return nil, lc.exitstr("pipe", status, code)
+    return nil, lc.exit_string("pipe", status, code)
   end
 end
 
