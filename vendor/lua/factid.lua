@@ -8,8 +8,8 @@ local string = string
 local util = require"cimicida"
 local sysstat = require"posix.sys.stat"
 local dirent = require"posix.dirent"
-local px = require"px"
-local cmd = px.cmd
+local lib = require"lib"
+local cmd = lib.cmd
 local factid = require"factidC"
 local ENV = {}
 _ENV = ENV
@@ -78,7 +78,7 @@ end
 
 function factid.aws_instance_id ()
   local ok, err, res
-  local curl, wget = px.binpath("curl"), px.binpath("wget")
+  local curl, wget = lib.bin_path("curl"), lib.bin_path("wget")
   local url = "http://169.254.169.254/latest/meta-data/instance-id"
   if curl then
     ok, err, res = cmd[curl]{ url }
