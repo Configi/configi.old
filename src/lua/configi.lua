@@ -506,23 +506,7 @@ function cli.main (opts)
                                 if p == register then rawset(env.global, v, true) end
                                 qt.parameters[p] = v
                             end
-                        -- if context "fact..." matched assign it to env.volatile
-                        if pcall(string.find, qt.parameters.context, "^fact") then
-                            local fload = function (s)
-                                local chunk, err = load(s, s, "t", env)
-                                     if not chunk then
-                                         lib.errorf("fload: %s %s", Lstr.ERR, err)
-                                     end
-                                return chunk()
-                            end
-                            -- auto-load the fact module
-                            if not next(env.fact) then
-                                env.fact = Factid.gather()
-                            end
-                            fload("volatile=" .. qt.parameters.context)
-                        end
-                        if rawget(env.global, qt.parameters.context) == true or env.volatile == true or not qt.parameters.context then
-                            env.volatile = nil
+                        if rawget(env.global, qt.parameters.context) == true or (qt.parameters.context == nil) then
                             if qt.parameters.handle then
                                 if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
                                     hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
