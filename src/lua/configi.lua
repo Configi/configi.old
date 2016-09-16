@@ -283,7 +283,7 @@ function cfg.init(P, M)
             stderr = table.concat(rt.stderr, "\n")
         end
     end
-    local secs = lib.difftime(Psystime.gettimeofday(), t1)
+    local secs = lib.diff_time(Psystime.gettimeofday(), t1)
         secs = string.format("%s.%s", tostring(secs.sec), tostring(secs.usec))
         msg(Lstr.OPERATION, err, ok or false, secs, string.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
         return ok, rt
@@ -410,7 +410,7 @@ function cli.compile(s, env)
         end
         chunk, err = load(PATH[s], PATH[s], "t", env)
     else
-        if not lib.isfile(s) then
+        if not lib.is_file(s) then
             lib.errorf("%s %s not found\n", Lstr.SERR, s)
         end
         local ext = string.match(s, "%w?", -1)
@@ -618,7 +618,7 @@ function cli.opt (arg, version)
         if r == "f" then
             opts.script = optarg
             local _, policy = pcall(require, "policy")
-            if not lib.isfile(opts.script) and type(policy) == "table" then
+            if not lib.is_file(opts.script) and type(policy) == "table" then
                 PATH = policy
             else
                 PATH = lib.split_path(opts.script)
