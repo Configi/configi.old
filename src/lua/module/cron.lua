@@ -1,6 +1,6 @@
 --- Ensure that a cron job is present or absent in a user's crontab.
 -- <br />
--- Only tested with vixie-cron and Busybox cron.
+-- Only tested with vixie-cron, Busybox cron, Alpine dcron.
 -- @module cron
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
@@ -74,7 +74,7 @@ end
 --- Add a job to a user's crontab. <br />
 -- Cron jobs that does not match its tag are replaced. <br />
 -- See crontab(5)
--- @param name tag to track jobs [REQUIRED]
+-- @Subject tag to track jobs
 -- @param job the command or job to add [REQUIRED]
 -- @param user user login to operate on [DEFAULT: "root"]
 -- @param minute minute value [DEFAULT: "*"]
@@ -116,7 +116,7 @@ function cron.present(S)
 end
 
 --- Remove a job from a user's crontab.
--- @param name tag string [REQUIRED]
+-- @Subject tag to track jobs
 -- @param job the command or job string [REQUIRED]
 -- @param user user login to operate on [DEFAULT: "root"]
 -- @usage cron.absent("example")

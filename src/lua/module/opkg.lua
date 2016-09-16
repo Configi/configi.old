@@ -21,9 +21,9 @@ end
 
 --- Install a package.
 -- See `opkg --help`
--- @aliases installed
--- @aliases install
--- @param package package to install [REQUIRED]
+-- @Aliases installed
+-- @Aliases install
+-- @Subject package
 -- @param force_depends install despite failed dependencies [CHOICES: "yes","no"]
 -- @param force_reinstall reinstall package [CHOICES: "yes","no"]
 -- @param force_overwrite overwrite files from other packages [CHOICES: "yes","no"]
@@ -79,9 +79,9 @@ function opkg.present(S)
 end
 
 --- Uninstall a package.
--- @aliases removed
--- @aliases remove
--- @param package package to remove [REQUIRED]
+-- @Subject package
+-- @Aliases removed
+-- @Aliases remove
 -- @param force_depends remove despite failed dependencies [CHOICES: "yes","no"]
 -- @param force_remove Remove packages even if prerm hook fails [CHOICES: "yes","no"]
 -- @param autoremove Remove packages that were installed to satisfy dependencies [CHOICES: "yes","no"]

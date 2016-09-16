@@ -11,12 +11,11 @@ local cmd = lib.cmd
 _ENV = ENV
 
 M.required = { "service" }
-M.alias = {}
-M.alias.service = { "daemon" }
 
 --- Start a service.
--- @aliases present
--- @param service service to start [REQUIRED]
+-- @Subject service
+-- @Aliases present
+-- @param None
 -- @usage systemd.started("rsyncd")!
 function systemd.started(S)
     M.report = {
@@ -36,8 +35,9 @@ function systemd.started(S)
 end
 
 --- Stop a service.
--- @aliases absent
--- @param service service to stop [REQUIRED]
+-- @Subject service
+-- @Aliases absent
+-- @param None
 -- @usage systemd.stopped("rsyncd")!
 function systemd.stopped(S)
     M.report = {
@@ -57,8 +57,9 @@ function systemd.stopped(S)
 end
 
 --- Restart a service.
--- @note skips restart if service is not yet active.
--- @param service service to restart [REQUIRED]
+-- @Subject service
+-- @Note skips restart if service is not yet active.
+-- @param None
 -- @usage systemd.restart("rsyncd")!
 function systemd.restart(S)
     M.report = {
@@ -78,7 +79,8 @@ function systemd.restart(S)
 end
 
 --- Reload a service.
--- @param service service to reload [REQUIRED]
+-- @Subject service
+-- @param None
 -- @usage systemd.reload("sshd")!
 function systemd.reload(S)
     M.report = {
@@ -98,7 +100,8 @@ function systemd.reload(S)
 end
 
 --- Enable a service.
--- @param service service to enable [REQUIRED]
+-- @Subject service
+-- @param None
 -- @usage systemd.enabled("rsyncd")!
 function systemd.enabled(S)
     M.report = {
@@ -118,7 +121,8 @@ function systemd.enabled(S)
 end
 
 --- Disable a service.
--- @param service service to disable [REQUIRED]
+-- @Subject service
+-- @param None
 -- @usage systemd.disabled("rsyncd")!
 function systemd.disabled(S)
     M.report = {

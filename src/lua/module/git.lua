@@ -1,4 +1,4 @@
--- Ensure that a Git repository is cloned or pull.
+--- Ensure that a Git repository is cloned or pull.
 -- @module git
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
@@ -9,7 +9,6 @@ local cfg = require"configi"
 local lib = require"lib"
 local stat = require"posix.sys.stat"
 local cmd = lib.cmd
-local print=print
 _ENV = ENV
 
 M.required = { "path" }
@@ -32,11 +31,11 @@ local found = function(P)
     end
 end
 
---- Ensure that a Git repository is cloned into a specified path.
--- @aliases repo
--- @aliases cloned
+--- Ensure that a Git repository is cloned into a specified path
+-- @Subject path where to clone the repository
+-- @Aliases repo
+-- @Aliases cloned
 -- @param repository The URL of the repository. [ALIAS: url,repo] [REQUIRED]
--- @param path absolute path where to clone the repository [REQUIRED]
 -- @usage git.repo"/home/user/work"
 --     repo: "https://github.com/torvalds/linux.git"
 function git.clone(S)
@@ -69,8 +68,8 @@ end
 
 --- Run `git pull` for a repository.
 -- This always attempts to run the command. Useful as a handler.
+-- @Subject path where to clone the repository
 -- @param repository The URL of the repository. [ALIAS: url,repo] [REQUIRED]
--- @param path absolute path where to run the pull command [REQUIRED]
 -- @usage git.pull("/home/user/work")
 --     repo: "https://github.com/torvalds/linux.git"
 function git.pull(S)

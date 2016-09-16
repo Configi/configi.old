@@ -15,12 +15,11 @@ local cmd = lib.cmd
 _ENV = ENV
 
 M.required = { "service" }
-M.alias = {}
-M.alias.service = { "daemon" }
 
 --- Start a service.
--- @aliases present
--- @param service service to start [REQUIRED]
+-- @Subject service
+-- @Aliases present
+-- @param None
 -- @usage openrc.started("rsyncd")!
 function openrc.started(S)
     M.report = {
@@ -43,8 +42,9 @@ function openrc.started(S)
 end
 
 --- Stop a service.
--- @aliases absent
--- @param service service to stop [REQUIRED]
+-- @Subject service
+-- @Aliases absent
+-- @param None
 -- @usage openrc.stopped("rsyncd")!
 function openrc.stopped(S)
     M.report = {
@@ -67,7 +67,8 @@ function openrc.stopped(S)
 end
 
 --- Restart a service.
--- @param service service to restart [REQUIRED]
+-- @Subject service
+-- @param None
 -- @usage openrc.restart("rsyncd")!
 function openrc.restart(S)
     M.report = {
@@ -86,7 +87,8 @@ function openrc.restart(S)
 end
 
 --- Reload a service.
--- @param service service to reload [REQUIRED]
+-- @Subject service
+-- @param None
 -- @usage openrc.reload("sshd")!
 function openrc.reload(S)
     M.report = {
@@ -105,7 +107,7 @@ function openrc.reload(S)
 end
 
 --- Add a service to runlevel.
--- @param service service to add [REQUIRED]
+-- @Subject service
 -- @param runlevel runlevel to add to [REQUIRED] [DEFAULT: default]
 -- @usage openrc.add("rsyncd")
 --     runlevel: "default"
@@ -134,8 +136,8 @@ function openrc.add(S)
 end
 
 --- Remove a service from a runlevel.
--- @aliases del
--- @param service service to remove [REQUIRED] [ALIAS: daemon]
+-- @Subject service
+-- @Aliases del
 -- @param runlevel runlevel to remove from [REQUIRED] [DEFAULT: default]
 -- @usage openrc.delete("rsyncd")
 --     runlevel: "default"

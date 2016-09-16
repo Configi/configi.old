@@ -1,4 +1,4 @@
--- Ensure that an apk managed package is present, absent or updated.
+--- Ensure that an apk managed package is present, absent or updated.
 -- @module apk
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
@@ -21,9 +21,10 @@ end
 
 --- Install a package via apk
 -- See `apk help` for full description of options and parameters
--- @aliases installed
--- @aliases install
--- @param update_cache update cache before adding package [CHOICES: true, false, "yes", "no"] [DEFAULT: "no", false]
+-- @Subject package
+-- @Aliases installed
+-- @Aliases install
+-- @param update_cache update cache before adding package [DEFAULT: "no", false]
 -- @usage apk.present("strace")
 --     update_cache: true
 function apk.present(S)
@@ -46,8 +47,11 @@ function apk.present(S)
 end
 
 --- Remove a package
--- @aliases removed
--- @aliases remove
+-- @Subject package
+-- @Aliases removed
+-- @Aliases remove
+-- @param None
+-- @usage apk.absent"strace"!
 function apk.absent(S)
     M.report = {
         repaired = "apk.absent: Successfully removed package",

@@ -14,13 +14,12 @@ _ENV = ENV
 
 M.required = { "path", "hash" }
 M.alias = {}
-M.alias.path = { "file" }
 M.alias.hash = { "digest", "signature" }
 
 --- Check that a given hash matches the actual SHA256 hash of a file.
 -- Useful for alerting on changed hashes.
--- @aliases check
--- @param path path of file to hash [ALIAS: file] [REQUIRED]
+-- @Subject path of file to hash
+-- @Aliases check
 -- @param hash the 32-byte alphanumeric string to match for [ALIAS: digest,signature] [REQUIRED]
 -- @usage sha256.verify("/etc/passwd")
 --     hash: "09e40b7b232c4abb427f1344e636e44ebf5684f70fb6cd67507e88955064255d"

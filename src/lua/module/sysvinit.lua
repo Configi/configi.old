@@ -12,8 +12,6 @@ local cmd = lib.cmd
 _ENV = ENV
 
 M.required = { "service" }
-M.alias = {}
-M.alias.service = { "daemon" }
 
 local pgrep = function(service)
   local ok, ret = cmd.pgrep{ service }
@@ -23,8 +21,9 @@ local pgrep = function(service)
 end
 
 --- Start a service.
--- @aliases present
--- @param service service to start [REQUIRED]
+-- @Subject service
+-- @Aliases present
+-- @param None
 -- @usage sysvinit.started("ntpd")!
 function sysvinit.started(S)
     M.report = {
@@ -44,8 +43,9 @@ function sysvinit.started(S)
 end
 
 --- Stop a service.
--- @aliases absent
--- @param service service to stop [REQUIRED]
+-- @Subject service
+-- @Aliases absent
+-- @param None
 -- @usage sysvinit.stopped("telnetd")!
 function sysvinit.stopped(S)
     M.report = {
@@ -65,7 +65,8 @@ function sysvinit.stopped(S)
 end
 
 --- Restart a service.
--- @param service service to restart [REQUIRED]
+-- @Subject service
+-- @param None
 -- @usage sysvinit.restart("ntpd")!
 function sysvinit.restart(S)
     M.report = {
@@ -87,8 +88,9 @@ function sysvinit.restart(S)
 end
 
 --- Reload a service.
--- @note OpenWRT sysvinit can not detect reload failures
--- @param service service to reload [REQUIRED]
+-- @Subject service
+-- @Note OpenWRT sysvinit can not detect reload failures
+-- @param None
 -- @usage sysvinit.reload("ntpd")!
 function sysvinit.reload(S)
     M.report = {
@@ -110,7 +112,8 @@ function sysvinit.reload(S)
 end
 
 --- Enable a service
--- @param service service to enable [REQUIRED]
+-- @Subject service
+-- @param None
 -- @usage sysvinit.enabled("ntpd")!
 function sysvinit.enabled(S)
     M.report = {
@@ -130,7 +133,8 @@ function sysvinit.enabled(S)
 end
 
 --- Disable a service.
--- @param service service to disable [REQUIRED]
+-- @Subject service
+-- @param None
 -- @usage sysvinit.disabled("ntpd")!
 function sysvinit.disabled(S)
     M.report = {

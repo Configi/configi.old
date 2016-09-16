@@ -13,8 +13,6 @@ local cmd = lib.cmd
 _ENV = ENV
 
 M.required = { "hostname" }
-M.alias = {}
-M.alias.hostname = { "name" }
 
 local current_hostnames = function()
     local _, hostnamectl = cmd.hostnamectl{}
@@ -38,7 +36,7 @@ end
 
 --- Set hostname.
 -- On systems that support hostnamectl(1) you can omit the `static` parameter since the subject is used to set the static hostname.
--- @param hostname hostname to set [ALIAS: name]
+-- @Subject hostname
 -- @usage hostname.set("aardvark")!
 -- @usage hostname.set("aardvark")
 --     transient: "aardvark.configi.org"

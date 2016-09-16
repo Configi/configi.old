@@ -14,7 +14,6 @@ _ENV = ENV
 
 M.required = { "src", "dest" }
 M.alias = {}
-M.alias.src = { "archive", "tar", "zip", "rar" }
 M.alias.dest = { "directory" }
 
 local extension = function(filename)
@@ -34,11 +33,11 @@ local extension = function(filename)
 end
 
 --- Unpack a tar, zip or rar archive.
--- @aliases untar
--- @aliases unzip
--- @aliases unrar
--- @note detects archive type using the 3 letter filename extension e.g. tar, zip, rar
--- @param src path to archive [REQUIRED] [ALIASES: archive, tar, zip, rar]
+-- @Subject path of archive
+-- @Aliases untar
+-- @Aliases unzip
+-- @Aliases unrar
+-- @Note detects archive type using the 3 letter filename extension e.g. tar, zip, rar
 -- @param dest path where the archive should unpacked [REQUIRED] [ALIAS: directory]
 -- @param creates path to a file, if already existing will skip the unpacking step
 -- @usage unarchive.unpack("/tmp/file.tar")

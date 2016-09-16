@@ -21,11 +21,13 @@ M.alias.installs = { "creates" }
 M.alias.environment = { "env" }
 
 --- Install a program via the `configure; make; make install` sequence of commands.
--- @param directory path to directory containing the root of the configure script [REQUIRED]
+-- @Subject path to directory containing the root of the configure script
 -- @param configure options to pass to `./configure` [ALIAS: options]
 -- @param make usually DEFINES that it passed to `make` [ALIAS: defines]
 -- @param installs path of installed executable. Considered kept if it exists [ALIAS: creates]
 -- @param environment space delimited string that contains environment variables passed to `./configure` and `make` [ALIAS: env]
+-- @usage make.install"/home/ed/Downloads/something-1.0.0"
+--     make: "-DNDEBUG"
 function make.install(S)
     M.parameters = { "configure", "make", "installs", "environment" }
     M.report = {

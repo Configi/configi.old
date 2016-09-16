@@ -65,11 +65,13 @@ end
 -- <br />
 -- All matching base64 encoded keys are removed first before adding the specificied key.
 -- See the AUTHORIZED_KEYS FILE FORMAT section in sshd(8)
+-- @Subject base64 encoded key
+-- @Note this note
 -- @param user user to operate on [ALIAS: login] [DEFAULT: Effective user ID]
 -- @param id a string usually used to comment or identify a key
 -- @param type SSH key type [REQUIRED]
 -- @param options a comma-separated options specifications
--- @param create ~/.ssh directory or not [CHOICES: true, false, "yes","no"] [DEFAULT: "yes", true]
+-- @param create create ~/.ssh directory or not [DEFAULT: "yes", true]
 -- @usage authorized_keys.present("AAAAA....")
 --     options: "yaaaya"
 --     user: "ed"
@@ -116,17 +118,13 @@ function authorized_keys.present(S)
 end
 
 --- Remove key from a user's authorized_keys file.
+-- @Subject base64 encoded key
 -- @param user user to operate on
 -- [ALIAS: login] [DEFAULT: Effective user ID]
 -- @param type SSH key type
--- [REQUIRED]
--- @param key the actual base64 encoded key
--- [REQUIRED]
--- @usage authorized_keys.absent {
---   user = "ed"
---   type = "ssh-rsa"
---   key = "AAAAAA......"
--- }
+-- @usage authorized_keys.absent"AAAAA..."
+--     user: "ed"
+--     type: "ssh-rsa"
 function authorized_keys.absent(S)
     M.parameters =  { "user", "options", "id", "create" } -- make it easier to toggle a key
     M.report = {

@@ -13,8 +13,6 @@ local dirent = require"posix.dirent"
 _ENV = ENV
 
 M.required = { "atom" }
-M.alias = {}
-M.alias.atom = { "package" }
 
 local decompose = function(P)
     local A = {}
@@ -69,9 +67,9 @@ end
 
 --- Install package atom.
 --- See emerge(1).
--- @aliases installed
--- @aliases install
--- @param atom package atom to install. Can be "category/package" or "category/package-version" [REQUIRED] [ALIAS: package]
+-- @Subject package atom. Can be "category/package" or "category/package-version"
+-- @Aliases installed
+-- @Aliases install
 -- @param version package version
 -- @param deep evaluate entire dependency tree [CHOICES: "yes","no"]
 -- @param newuse reinstall packages that had a change in its USE flags [CHOICES: "yes","no"]
@@ -138,7 +136,8 @@ function portage.present(S)
 end
 
 --- Remove package atom.
--- @aliases remove
+-- @Subject package atom. Can be "category/package" or "category/package-version"
+-- @Aliases remove
 -- @param atom package atom to unmerge [REQUIRED] [ALIAS: package]
 -- @param depclean Remove packages not associated with explicitly installed packages [CHOICES: "yes","no"] [DEFAULT: "no"]
 -- @usage portage.absent("dev-util/strace")!

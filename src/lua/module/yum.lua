@@ -23,7 +23,8 @@ end
 
 --- Run clean mode.
 -- See yum(8) for possible options.
--- @param option option to pass to `yum clean`
+-- @Subject option to pass to `yum clean`
+-- @param None
 -- @usage yum.clean("all")!
 function yum.clean(S)
     M.report = {
@@ -39,9 +40,9 @@ end
 
 --- Install a package via the Yum package manager.
 -- See yum(8) for full description of options and parameters
--- @aliases installed
--- @aliases install
--- @param package name of the package to install [REQUIRED]
+-- @Subject package
+-- @Aliases installed
+-- @Aliases install
 -- @param cleanall run `yum clean all` before proceeding [CHOICES: "yes", "no"]
 -- @param config yum config file location
 -- @param nogpgcheck disable GPG signature checking [CHOICES: "yes","no"]
@@ -104,9 +105,9 @@ function yum.present(S)
 end
 
 --- Remove a package via the Yum package manager.
--- @aliases removed
--- @aliases remove
--- @param package name of the package to remove [REQUIRED]
+-- @Subject package
+-- @Aliases removed
+-- @Aliases remove
 -- @param config yum config file location
 -- @usage yum.absent("strace")
 --     config: "/etc/yum.conf"

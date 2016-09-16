@@ -18,6 +18,7 @@ M.alias = {}
 M.alias.match = { "module" }
 
 --- Add iptables rules.
+-- @Subject tag
 -- @param table packet matching table [DEFAULT: filter]
 -- @param chain [DEFAULT: INPUT]
 -- @param source source specification. Default network mask is /32.
@@ -61,7 +62,7 @@ function iptables.append(S)
           failed = "iptables.append: Failed to append rule."
     }
     return function(P)
-        P.comment = S -- currently unused
+        P.tag = S -- currently unused
         local F, R = cfg.init(P, M)
         local mask = function (ip)
             if ip and not string.find(ip, "/", -3) and not string.find(ip, "/", -2) then
@@ -107,6 +108,7 @@ end
 
 --- Disable IPTables.
 -- Flush, zero out counters and remove user-defined chains.
+-- @Subject tag
 -- @param NONE
 -- @usage iptables.disable("comment")!
 function iptables.disable(S)
@@ -116,7 +118,7 @@ function iptables.disable(S)
     }
     return function(P)
         P.chain = "iptables.disable"
-        P.comment = S -- currently unused
+        P.tag = S -- currently unused
         local F, R = cfg.init(P, M)
         local disable = function(tables)
             local ipt
@@ -158,7 +160,8 @@ function iptables.disable(S)
 end
 
 --- Default deny but allow incoming connections to port 22.
--- @note IPv4 only at the moment.
+-- @Subject tag
+-- @Note IPv4 only at the moment.
 -- @param host IP of the local host [DEFAULT: 0.0.0.0]
 -- @param source IP of host to white list [DEFAULT: 0.0.0.0]
 -- @param ssh SSH port [DEFAULT: 22]
@@ -175,6 +178,7 @@ function iptables.default(S)
         P.source = P.source or "0/0"
         P.host = P.host or "0/0"
         P.ssh = P.ssh or "22"
+        P.tag = S
         local args = {
             { "-F" },
             { "-X" },

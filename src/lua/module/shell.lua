@@ -14,7 +14,6 @@ _ENV = ENV
 M.required = { "string" }
 M.alias = {}
 M.alias.cwd = { "chdir" }
-M.alias.string = { "command", "script" }
 M.alias.expects = { "match" }
 
 local envt = function(P)
@@ -66,12 +65,12 @@ local rc = function(F, P)
 end
 
 --- Run a command via execve(3).
--- @param string command to execute [REQUIRED] [ALIAS: command]
+-- @Subject command to execute
 -- @param cwd current working directory
 -- @param env space separated environment variables
 -- @param creates a filename, if found will not run the command
 -- @param removes a filename, if not found will not run the command
--- shell.command("touch test")
+-- @usage shell.command("touch test")
 --     cwd: "/tmp"
 --     env: "test=this whatever=youwant"
 --     creates: "test"
@@ -113,8 +112,8 @@ end
 --- Run a script or command via os.execute.
 -- <br />
 -- STDIN and STDERR are closed and STDOUT is piped to /dev/null
--- @aliases script
--- @param string script or command to execute [REQUIRED] [ALIAS: script,command]
+-- @Subject script or command to execute
+-- @Aliases script
 -- @param creates a filename, if found will not run the script
 -- @param removes a filename, if not found will not run the script
 -- @usage shell.system("/root/test.sh")!
@@ -140,7 +139,7 @@ function shell.system(S)
 end
 
 --- Run a command via io.popen.
--- @param string command to execute [REQUIRED] [ALIAS: command]
+-- @Subject command to execute
 -- @param cwd current working directory
 -- @param creates a filename, if found will not run the command
 -- @param removes a filename, if not found will not run the command
@@ -198,7 +197,7 @@ function shell.popen(S)
 end
 
 --- Run a command via lib.exec which can expect strings from STDIN, STDOUT or STDERR
--- @param string command to execute [REQUIRED] [ALIAS: command]
+-- @Subject command to execute
 -- @param cwd current working directory
 -- @param env space separated string of environment variables
 -- @param creates a filename, if found will not run the command

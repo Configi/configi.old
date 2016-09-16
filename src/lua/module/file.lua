@@ -103,6 +103,7 @@ local attrib = function(F, P, R)
 end
 
 --- Set path attributes such as the mode, owner or group.
+-- @Subject path to file
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
@@ -123,8 +124,9 @@ function file.attributes(S)
 end
 
 --- Create a symlink.
+-- @Subject symlink path
 -- @param src path where the symlink points to [REQUIRED]
--- @param force remove existing symlink [CHOICES: "yes","no"]
+-- @param force remove existing symlink
 -- @usage file.link("/home/ed/root")
 --     src: "/"
 function file.link(S)
@@ -154,8 +156,9 @@ function file.link(S)
 end
 
 --- Create a hard link.
+-- @Subject hard link path
 -- @param src path where the hard link points to [REQUIRED]
--- @param force remove existing hard link [CHOICES: "yes","no"]
+-- @param force remove existing hard link
 -- @usage file.hard("/home/ed/root")
 --     src: "/"
 function file.hard(S)
@@ -189,11 +192,12 @@ function file.hard(S)
 end
 
 --- Create a directory.
+-- @Subject directory path
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
--- @param force remove existing path before creating directory [CHOICES: "yes","no"] [DEFAULT: "no"]
--- @param backup rename existing path and prepend '._configi_' to the name [CHOICES: "yes","no"] [DEFAULT: "no"]
+-- @param force remove existing path before creating directory [DEFAULT: "no"]
+-- @param backup rename existing path and prepend '._configi_' to the name [DEFAULT: "no"]
 -- @usage file.directory("/usr/portage")!
 function file.directory(S)
     M.parameters = { "mode", "owner", "group", "force", "backup" }
@@ -227,6 +231,7 @@ function file.directory(S)
 end
 
 --- Touch a path.
+-- @Subject path
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
@@ -250,6 +255,7 @@ function file.touch(S)
 end
 
 --- Remove a path.
+-- @Subject path
 -- @usage file.absent("/home/ed/.xinitrc")!
 function file.absent(S)
     M.report = {
@@ -268,10 +274,11 @@ function file.absent(S)
 end
 
 --- Copy a path.
+-- @Subject path
 -- @param path destination path [REQUIRED] [ALIAS: dest,target]
--- @param recurse recursively copy source [CHOICES: "yes","no"] [DEFAULT: "no"]
--- @param force remove existing destination before copying [CHOICES: "yes","no"] [DEFAULT: "no"]
--- @param backup rename existing path and prepend '._configi_' to the name [CHOICES: "yes","no"] [DEFAULT: "no"]
+-- @param recurse recursively copy source [DEFAULT: "no"]
+-- @param force remove existing destination before copying [DEFAULT: "no"]
+-- @param backup rename existing path and prepend '._configi_' to the name [DEFAULT: "no"]
 -- @usage file.copy("/home/ed")
 --     dest: "/mnt/backups"
 function file.copy(S)

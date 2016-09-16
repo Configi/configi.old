@@ -1,4 +1,4 @@
--- Render a textfile.
+--- Render a textfile.
 -- @module textfile
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
@@ -17,7 +17,6 @@ _ENV = ENV
 M.required = { "path" }
 M.alias = {}
 M.alias.src = { "template" }
-M.alias.path = { "dest", "file", "textfile" }
 M.alias.lua = { "data" }
 M.alias.table = { "view" }
 M.alias.line = { "text" }
@@ -48,8 +47,8 @@ local write = function(F, P, R)
 end
 
 --- Render a textfile.
--- @note Requires the diffutils package for the diff parameter to work
--- @param path output file [REQUIRED] [ALIAS: dest,file,textfile]
+-- @Subject output file
+-- @Note Requires the diffutils package for the diff parameter to work
 -- @param src source template [REQUIRED] [ALIAS: template]
 -- @param table [REQUIRED] [ALIAS: view]
 -- @param lua [ALIAS: data]
@@ -111,7 +110,7 @@ function textfile.render(S)
 end
 
 --- Insert lines into an existing file.
--- @param path path of textfile to modify [REQUIRED] [ALIAS: dest,file,textfile]
+-- @Subject path of text file to modify
 -- @param line text to insert [REQUIRED] [ALIAS: text]
 -- @param inserts a line (string) if found, skips the operation
 -- @param pattern line is added before or after this pattern [ALIAS: match]
@@ -182,7 +181,7 @@ function textfile.insert_line(S)
 end
 
 --- Remove lines from an existing file.
--- @param path path of textfile to modify [REQUIRED] [ALIAS: dest,file,textfile]
+-- @Subject path of text file to modify
 -- @param pattern text pattern to remove [REQUIRED] [ALIAS: match]
 -- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
 -- @usage textfile.remove_line("/etc/sysctl.conf")

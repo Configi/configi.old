@@ -13,15 +13,13 @@ local cmd = lib.cmd
 _ENV = ENV
 
 M.required = { "login" }
-M.alias = {}
-M.alias.login = { "username", "user" }
 
 --- Add a system user account.
--- @aliases add
--- @note On OpenWRT: requires the shadow-useradd package
--- @note This module can only check attributes returned by posix.getpasswd.
--- @note Available parameters limited when used on Busybox systems such as Alpine Linux.
--- @param login username of the user account [REQUIRED]
+-- @Subject username
+-- @Aliases add
+-- @Note On OpenWRT: requires the shadow-useradd package
+-- @Note This module can only check attributes returned by posix.getpasswd.
+-- @Note Available parameters limited when used on Busybox systems such as Alpine Linux.
 -- @param uid uid of the new user account
 -- @param gid gid of the new user account
 -- @param shell shell of the new user account
@@ -117,9 +115,9 @@ function user.present(S)
 end
 
 --- Remove a system user account.
--- @aliases remove
+-- @Subject username
+-- @Aliases remove
 -- @param remove delete home directory [CHOICES: "yes","no"]
--- @param login username of the user account [REQUIRED]
 -- @usage user.absent("ed")
 --     remove: "yes"
 function user.absent(S)
