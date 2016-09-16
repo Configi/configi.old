@@ -33,7 +33,7 @@ while true do
             lib.printf("Failed: %s\n", R.failed)
             lib.errorf("Failed!\n")
         end
-        local t2 = lib.difftime(systime.gettimeofday(), t1)
+        local t2 = lib.diff_time(systime.gettimeofday(), t1)
         t2 = string.format("%s.%s", tostring(t2.sec), tostring(t2.usec))
         if t2 == 0 or t2 == 1.0 then
             lib.printf("Finished run in %.f second\n", 1.0)
