@@ -1,6 +1,6 @@
 /***
  luaposix extensions and some unix utilities.
-@module px
+@module lib
 */
 
 #define _LARGEFILE_SOURCE       1
@@ -37,7 +37,7 @@ static int pusherrno(lua_State *L, char *error)
 chroot(2) wrapper.
 @function chroot
 @tparam string path or directory to chroot into.
-@return true if successful; otherwise nil
+@treturn bool true if successful; otherwise nil
 */
 static int Cchroot(lua_State *L)
 {
@@ -52,8 +52,8 @@ static int Cchroot(lua_State *L)
 /***
 close(2) a file descriptor.
 @function fdclose
-@param fd file descriptor to close
-@return true if successful; otherwise nil
+@tparam int fd file descriptor to close
+@treturn bool true if successful; otherwise nil
 */
 static int Cfdclose (lua_State *L)
 {
@@ -81,7 +81,7 @@ static LStream *newfile (lua_State *L)
 Wrapper to flopen(3) -- Reliably open and lock a file.
 @function flopen
 @tparam string file to open and lock
-@return a new file handle, or, in case of errors, nil plus an error message
+@treturn int a new file handle, or, in case of errors, nil plus an error message
 */
 static int Cflopen(lua_State *L)
 {
@@ -101,7 +101,7 @@ static int Cflopen(lua_State *L)
 Wrapper to fdopen(3).
 @function fdopen
 @tparam string file to open
-@return a new file handle, or, in case of errors, nil plus an error message
+@treturn int a new file handle, or, in case of errors, nil plus an error message
 */
 static int Cfdopen (lua_State *L)
 {
@@ -116,7 +116,7 @@ static int Cfdopen (lua_State *L)
 Wrapper to closefrom(2) -- delete open file descriptors.
 @function closefrom
 @tparam int fd file descriptors greater or equal to this is deleted
-@return true always
+@treturn bool true always
 */
 static int Cclosefrom (lua_State *L)
 {
@@ -150,12 +150,11 @@ static int Cpipe2(lua_State *L)
 /***
 Execute a program using execve(2)
 @function execve
-@string path
+@tparam string path of executable
 @tparam table argt arguments (table can include index 0)
 @tparam table arge environment
-@return nil
+@return nil or
 @treturn string error message
-@see execve(2)
 */
 static int Cexecve(lua_State *L)
 {
