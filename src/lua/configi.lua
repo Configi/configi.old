@@ -491,38 +491,40 @@ function cli.main (opts)
         end,
         __index = function (_, mod)
             local tbl = setmetatable({}, {
-            __call = function (_, param) -- func(), no interpolation here
+                __call = function (_, param) -- func(), no interpolation here
                     if type(param) ~= "string" then
-                    lib.errorf("%s bad argument #1 passed to %s()\n", Lstr.SERR, mod)
-                end
-                source[#source + 1] = { mod = mod, func = false, param = param }
-            end, -- func()
-            __index = function (_, func)
-                return function(subject)
-                    return function (ptbl) -- mod.func
-                        ptbl = ptbl or {}
-                        local qt = { environment = {}, parameters = {} }
-                            for p, v in next, ptbl do
-                                if p == register then rawset(env.global, v, true) end
-                                qt.parameters[p] = v
-                            end
-                        if qt.parameters.context == true or (qt.parameters.context == nil) then
-                            if qt.parameters.handle then
-                                if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
-                                    hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
-                        { mod = mod, func = func, subject = subject, param = ptbl }
-                                else
-                                    hsource[qt.parameters.handle] = {}
-                                    hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
-                        { mod = mod, func = func, subject = subject, param = ptbl }
+                        lib.errorf("%s bad argument #1 passed to %s()\n", Lstr.SERR, mod)
+                    end
+                    source[#source + 1] = { mod = mod, func = false, param = param }
+                end, -- func()
+                __index = function (_, func)
+                    return function (subject)
+                        return function (ptbl) -- mod.func
+                            ptbl = ptbl or {}
+                            local qt = { environment = {}, parameters = {} }
+                                for p, v in next, ptbl do
+                                    if p == register then
+                                        rawset(env.global, v, true)
+                                    end
+                                    qt.parameters[p] = v
                                 end
-                            elseif type(ptbl) == "table" then
-                                source[#source + 1] = {mod = mod, func = func,subject=subject, param = ptbl}
-                            end
-                        end -- context
-                    end -- mod.func
-                end
-            end }) -- __index = function (_, func) return
+                            if qt.parameters.context == true or (qt.parameters.context == nil) then
+                                if qt.parameters.handle then
+                                    if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
+                                        hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
+                                            { mod = mod, func = func, subject = subject, param = ptbl }
+                                    else
+                                        hsource[qt.parameters.handle] = {}
+                                        hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
+                                            { mod = mod, func = func, subject = subject, param = ptbl }
+                                    end
+                                elseif type(ptbl) == "table" then
+                                    source[#source + 1] = {mod = mod, func = func,subject=subject, param = ptbl}
+                                end
+                            end -- context
+                        end -- mod.func
+                    end -- function (subject)
+                end }) -- __index = function (_, func)
             return tbl
         end -- __index = function (_, mod)
     })
