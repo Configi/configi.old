@@ -443,7 +443,7 @@ function cli.main (opts)
     local hsource = {}
     local runenv = {}
     local scripts = { opts.script }
-    local env = { volatile = nil, fact = {}, global = {} }
+    local env = { fact = {}, global = {} }
 
     -- Built-in functions inside scripts --
     env.pairs = pairs
