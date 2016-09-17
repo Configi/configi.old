@@ -478,12 +478,6 @@ function cli.main (opts)
     setmetatable(env, {
         __index = function (_, mod)
             local tbl = setmetatable({}, {
-                __call = function (_, param) -- func(), no interpolation here
-                    if type(param) ~= "string" then
-                        lib.errorf("%s bad argument #1 passed to %s()\n", Lstr.SERR, mod)
-                    end
-                    source[#source + 1] = { mod = mod, func = false, param = param }
-                end, -- func()
                 __index = function (_, func)
                     return function (subject)
                         return function (ptbl) -- mod.func
