@@ -1,9 +1,3 @@
-local core = {
-  ipairs   = ipairs,
-  pairs    = pairs,
-  tonumber = tonumber,
-  next     = next
-}
 local string = string
 local util = require"cimicida"
 local sysstat = require"posix.sys.stat"
@@ -11,6 +5,8 @@ local dirent = require"posix.dirent"
 local lib = require"lib"
 local cmd = lib.cmd
 local factid = require"factidC"
+local return_false = { __index = function() return false end }
+local ipairs, pairs, tonumber, next, setmetatable = ipairs, pairs, tonumber, next, setmetatable
 local ENV = {}
 _ENV = ENV
 
@@ -53,11 +49,11 @@ function factid.partitions ()
   end
   for partition in dirent.files("/sys/block/") do
     if not string.find(partition, "^%.") then
-      local size = core.tonumber(util.fopen("/sys/block/" .. partition .. "/size" ))
+      local size = tonumber(util.fopen("/sys/block/" .. partition .. "/size" ))
       partitions[partition] = size*512
     end
   end
-  if not core.next(partitions) then
+  if not next(partitions) then
     return nil, "factid.partitions: posix.dirent failed."
   end
   return partitions
@@ -65,7 +61,7 @@ end
 
 function factid.interfaces ()
   local ifs = {}
-  for _, y in core.ipairs(factid.ifaddrs()) do
+  for _, y in ipairs(factid.ifaddrs()) do
     if y.ipv4 then
       ifs[y.interface] = {}
       ifs[y.interface]["ipv4"] = y.ipv4
@@ -86,7 +82,7 @@ function factid.aws_instance_id ()
     ok, err, res = cmd[wget]{ "-q", "-O-", url }
   end
   if ok then
-    if not core.next(res.stdout) then
+    if not next(res.stdout) then
       return nil, "factid.aws_instance_id: No stdout."
     end
     local id = res.stdout[1]
@@ -100,50 +96,50 @@ function factid.aws_instance_id ()
   end
 end
 
--- XXX TODO WORK IN PROGRESS
+-- WORK IN PROGRESS
 function factid.gather ()
   local fact = {}
   fact.version = "0.1.0"
 
   do
     local hostname = factid.hostname()
-    fact.hostname = {}
+    fact.hostname = setmetatable({}, return_false)
     fact.hostname.string = hostname
     fact.hostname[hostname] = true
   end
 
   do
     local uniqueid = factid.hostid()
-    fact.uniqueid = {}
+    fact.uniqueid = setmetatable({}, return_false)
     fact.uniqueid.string = uniqueid
     fact.uniqueid[uniqueid] = true
   end
 
   do
     local timezone = factid.timezone()
-    fact.timezone = {}
+    fact.timezone = setmetatable({}, return_false)
     fact.timezone.string = timezone
     fact.timezone[timezone] = true
   end
 
   do
     local procs = factid.sysconf().procs
-    procs = core.tonumber(procs)
-    fact.physicalprocessorcount = {}
+    procs = tonumber(procs)
+    fact.physicalprocessorcount = setmetatable({}, return_false)
     fact.physicalprocessorcount.number = procs
     fact.physicalprocessorcount[procs] = true
   end
 
   do
     local osfamily = factid.osfamily()
-    fact.osfamily = {}
+    fact.osfamily = setmetatable({}, return_false)
     fact.osfamily.string = osfamily
     fact.osfamily[osfamily] = true
   end
 
   do
     local operatingsystem = factid.operatingsystem()
-    fact.operatingsystem = {}
+    fact.operatingsystem = setmetatable({}, return_false)
     fact.operatingsystem.string = operatingsystem
     fact.operatingsystem[operatingsystem] = true
   end
@@ -151,25 +147,25 @@ function factid.gather ()
   do
     local uname = factid.uname()
     local kernel = uname.sysname
-    fact.kernel = {}
+    fact.kernel = setmetatable({}, return_false)
     fact.kernel.string = kernel
     fact.kernel[kernel] = true
     local architecture = uname.machine
-    fact.architecture = {}
+    fact.architecture = setmetatable({}, return_false)
     fact.architecture.string = architecture
     fact.architecture[architecture] = true
     -- kernel version information are strings
     local v1, v2, v3 = string.match(uname.release, "(%d+).(%d+).(%d+)")
     kernelmajversion = string.format("%d.%d", v1, v2)
-    fact.kernelmajversion = {}
+    fact.kernelmajversion = setmetatable({}, return_false)
     fact.kernelmajversion.string = kernelmajversion
     fact.kernelmajversion[kernelmajversion] = true
     kernelrelease = uname.release
-    fact.kernelrelease = {}
+    fact.kernelrelease = setmetatable({}, return_false)
     fact.kernelrelease.string = kernelrelease
     fact.kernelrelease[kernelrelease] = true
     kernelversion = string.format("%d.%d.%d", v1, v2, v3)
-    fact.kernelversion = {}
+    fact.kernelversion = setmetatable({}, return_false)
     fact.kernelversion.string = kernelversion
     fact.kernelversion[kernelversion] = true
   end
@@ -179,16 +175,16 @@ function factid.gather ()
     -- fields: days, hours, totalseconds, totalminutes
     local uptime = factid.uptime()
     fact.uptime = {}
-    fact.uptime.days = {}
+    fact.uptime.days = setmetatable({}, return_false)
     fact.uptime.days.number = uptime.days
     fact.uptime.days[uptime.days] = true
-    fact.uptime.hours = {}
+    fact.uptime.hours = setmetatable({}, return_false)
     fact.uptime.hours.number = uptime.hours
     fact.uptime.hours[uptime.hours] = true
-    fact.uptime.totalseconds = {}
+    fact.uptime.totalseconds = setmetatable({}, return_false)
     fact.uptime.totalseconds.number = uptime.totalseconds
     fact.uptime.totalseconds[uptime.totalseconds] = true
-    fact.uptime.totalminutes = {}
+    fact.uptime.totalminutes = setmetatable({}, return_false)
     fact.uptime.totalminutes.number = uptime.totalminutes
     fact.uptime.totalminutes[uptime.totalminutes] = true
   end
@@ -200,8 +196,8 @@ function factid.gather ()
     if partitions then
       fact.partitions = {}
       fact.partitions.table = partitions
-      for p, s in core.pairs(partitions) do
-        fact.partitions[p] = {}
+      for p, s in pairs(partitions) do
+        fact.partitions[p] = setmetatable({}, return_false)
         fact.partitions[p][s] = true
       end
     end
@@ -213,8 +209,8 @@ function factid.gather ()
     local ipaddress = factid.ipaddress()
     fact.ipaddress = {}
     fact.ipaddress.table = ipaddress
-    for p, i in core.pairs(ipaddress) do
-      fact.ipaddress[p] = {}
+    for p, i in pairs(ipaddress) do
+      fact.ipaddress[p] = setmetatable({}, return_false)
       fact.ipaddress[p][i] = true
     end
   end
@@ -225,8 +221,8 @@ function factid.gather ()
     local memory = factid.mem()
     fact.memory = {}
     fact.memory.table = memory
-    for k, v in core.pairs(memory) do
-      fact.memory[k] = {}
+    for k, v in pairs(memory) do
+      fact.memory[k] = setmetatable({}, return_false)
       fact.memory[k][v] = true
     end
   end
@@ -236,10 +232,10 @@ function factid.gather ()
     local interfaces = factid.interfaces()
     fact.interfaces = {}
     fact.interfaces.table = interfaces
-    for interface, prototbl in core.pairs(interfaces) do
+    for interface, prototbl in pairs(interfaces) do
       fact.interfaces[interface] = {}
-      for proto, ip in core.pairs(prototbl) do
-        fact.interfaces[interface][proto] = {}
+      for proto, ip in pairs(prototbl) do
+        fact.interfaces[interface][proto] = setmetatable({}, return_false)
         fact.interfaces[interface][proto][ip] = true
       end
     end
