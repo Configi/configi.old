@@ -1,7 +1,7 @@
-LUAPOSIX= ctype dirent errno fcntl fnmatch getopt glob grp \
-  libgen poll pwd sched signal stdio stdlib sys.msg \
-  sys.resource sys.socket sys.stat sys.statvfs sys.time \
-  sys.times sys.utsname sys.wait syslog termio time \
+LUAPOSIX= dirent errno fcntl fnmatch getopt glob grp \
+  libgen poll pwd signal stdio stdlib sys.msg \
+  sys.resource sys.stat sys.statvfs sys.time \
+  sys.times sys.utsname sys.wait syslog time \
   unistd utime
 luaposix_P= vendor/c/luaposix/src
 C_MODULES+= $(foreach m, $(LUAPOSIX), posix.$m.a)
