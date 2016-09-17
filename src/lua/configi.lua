@@ -476,10 +476,6 @@ function cli.main (opts)
     end
     -- Metatable for the script environment
     setmetatable(env, {
-        __newindex = function (_, var, value) -- var = "something"
-             -- assign value to var inside env
-             rawset(env, var, value)
-        end,
         __index = function (_, mod)
             local tbl = setmetatable({}, {
                 __call = function (_, param) -- func(), no interpolation here
