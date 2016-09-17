@@ -444,7 +444,6 @@ function cli.main (opts)
     local runenv = {}
     local scripts = { opts.script }
     local env = { volatile = nil, fact = {}, global = {} }
-    local textenv = {} -- used to store variables for interpolation
 
     -- Built-in functions inside scripts --
     env.pairs = pairs
@@ -480,14 +479,6 @@ function cli.main (opts)
         __newindex = function (_, var, value) -- var = "something"
              -- assign value to var inside env
              rawset(env, var, value)
-             -- store strings and table into the textenv
-             local y = type(value)
-             if y == "number" then
-                 value = tostring(value)
-             end
-             if y == "string" or y == "table" then
-                 textenv[var] = value
-             end
         end,
         __index = function (_, mod)
             local tbl = setmetatable({}, {
@@ -558,7 +549,7 @@ function cli.main (opts)
     opts.debug, opts.test, opts.log, opts.syslog, opts.msg
     hsource[1], hsource[2], hsource[3], hsource[4] =
         opts.debug, opts.test, opts.syslog, opts.log -- source.msg already handles the msg output
-    scripts, textenv, env = nil, nil, nil -- GC
+    scripts, env = nil, nil -- GC
     return source, hsource, runenv
 end
 
