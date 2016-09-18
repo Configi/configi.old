@@ -642,17 +642,10 @@ function cli.run (source, runenv) -- execution step
         param.test = source.test or param.test
         param.syslog = source.syslog or param.syslog
         param.log = source.log or param.log
-        if not func then
-            if not mod then
-                lib.errorf("Module error: '%s' not found\n", s.mod)
-            end
-            rt[i] = mod(param)
-        else
-            if not mod[func] then
-                lib.errorf("Module error: function '%s' in module '%s' not found\n", s.func, s.mod)
-            end
-            rt[i] = mod[func](subject)(param)
-        end -- if not a module.function
+        if not mod[func] then
+           lib.errorf("Module error: function '%s' in module '%s' not found\n", s.func, s.mod)
+        end
+        rt[i] = mod[func](subject)(param)
     end -- for each line
     return rt
 end
