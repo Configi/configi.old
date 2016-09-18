@@ -8,7 +8,8 @@ local Pgetopt = require"posix.getopt"
 local Psystime = require"posix.sys.time"
 local lib = require"lib"
 local cfg = {}
-local ENV = { PATH = "./" }
+local PATH = "./"
+local ENV = {}
 _ENV = ENV
 
 --[[ Strings ]]
