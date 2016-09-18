@@ -464,7 +464,7 @@ function cli.main (opts)
     env.log = function (b) opts.log = b end
     env.include = function (f)
         if type(PATH) == "table" then
-            scripts[#scripts + 1] = f
+            scripts[#scripts + 1] = PATH.f
         else
             scripts[#scripts + 1] = PATH .. "/" .. f
         end
