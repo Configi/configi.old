@@ -588,7 +588,7 @@ function cli.opt (arg, version)
             if not lib.is_file(opts.script) and type(policy) == "table" then
                 PATH = policy
             else
-                PATH = lib.split_path(opts.script)
+                PATH = lib.dirname(opts.script)
             end
         end
         if r == "m" then opts.msg = true end
