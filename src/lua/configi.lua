@@ -668,7 +668,7 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
                 if not mod[func] then
                     lib.errorf("Module error: function '%s' in module '%s' not found\n", func, mod)
                 end
-                r[#r + 1] = mod[func](subject)(param)
+                r[n] = mod[func](subject)(param)
                 coroutine.yield(r)
             end -- for each tag
         end -- if a tag
