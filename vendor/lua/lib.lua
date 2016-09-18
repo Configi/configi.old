@@ -14,6 +14,7 @@ local poll = require"posix.poll"
 local fcntl = require"posix.fcntl"
 local stdlib = require"posix.stdlib"
 local syslog = require"posix.syslog"
+local libgen = require"posix.libgen"
 local px = require"px"
 local lib = px
 -- copy cimicida
@@ -551,5 +552,19 @@ lib.cmd = setmetatable({}, { __index =
     end
   end
 })
+
+--- File part of a path.
+-- @function basename
+-- Same as posix.libgen.basename. Copied here for convenience.
+-- @tparam string file to act on
+-- @treturn string filename part of path
+lib.basename = libgen.basename
+
+--- Directory name of path.
+-- @function dirname
+-- Same as posix.libgen.dirname. Copied here for convenience.
+-- @tparam string file to act on
+-- @treturn string directory parth of path
+lib.dirname = libgen.dirname
 
 return lib
