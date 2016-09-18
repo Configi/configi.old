@@ -665,9 +665,7 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
                 param.test = hsource[2] or param.test
                 param.syslog = hsource[3] or param.syslog
                 param.log = hsource[4] or param.log
-                if not func then
-                    r[#r + 1] = mod(param)
-                elseif not mod[func] then
+                if not mod[func] then
                     lib.errorf("Module error: function '%s' in module '%s' not found\n", func, mod)
                 end
                 r[#r + 1] = mod[func](subject)(param)
