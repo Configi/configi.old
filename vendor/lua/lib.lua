@@ -567,4 +567,16 @@ lib.basename = libgen.basename
 -- @treturn string directory parth of path
 lib.dirname = libgen.dirname
 
+--- Split a file name.
+-- @tparam string str policy name
+-- @treturn string path Directory component
+-- @treturn string base Basename minus the extension
+-- @treturn string ext The extension
+function lib.decomp_path(str)
+    local path = libgen.dirname(str)
+    local basename = libgen.basename(str)
+    local base, ext = string.match(basename, "([%g%s]*)%.([%g]+)$")
+    return path, base, ext
+end
+
 return lib
