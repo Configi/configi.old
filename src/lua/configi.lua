@@ -9,6 +9,10 @@ local Psystime = require"posix.sys.time"
 local lib = require"lib"
 local cfg = {}
 local PATH = "./"
+local loaded, policy = pcall(require, "policy")
+if not loaded then
+    policy = { moon = {}, lua = {} }
+end
 local ENV = {}
 _ENV = ENV
 
@@ -341,12 +345,26 @@ function cfg.init(P, M)
         return C.results
     end -- F.kept()
     C.functions.open = function (f)
-        if type(PATH) == "table" then
-            f = PATH[f]
+        local path, base, ext = lib.decomp_path(f)
+        local file
+        if path and not (path == ".") then
+            file = f
         else
-            f = lib.fopen(PATH .. "/" .. f)
+            file = PATH .. "/" .. f
         end
-        return f
+        if not (PATH == false) and file then
+            if lib.is_file(file) then
+                return lib.fopen(file)
+            else
+                lib.errorf("%s %s not found\n", Lstr.SERR, file)
+            end
+        elseif PATH == false then
+            if policy[ext][base] then
+                return policy[ext][base]
+            else
+                lib.errorf("%s %s not found\n", Lstr.SERR, base .. "." .. ext)
+            end
+        end
     end
     _temp, C._module, C._required = nil, nil, nil -- GC
 
@@ -405,33 +423,22 @@ end
 --[[ CLI functions ]]
 function cli.compile(s, env)
     local chunk, err
-    if type(PATH) == "table" then
-        if not PATH[s] then
-            lib.errorf("%s %s not found\n", Lstr.SERR, s)
+    local _, base, ext = lib.decomp_path(s)
+    local script = policy[ext][base]
+    if ext == "moon" then
+        local parse = require"moonscript.parse"
+        local tree, err = parse.string(script)
+        if not tree then
+            lib.errorf("%s%s\n", Lstr.SERR, err)
         end
-        chunk, err = load(PATH[s], PATH[s], "t", env)
-    else
-        if not lib.is_file(s) then
-            lib.errorf("%s %s not found\n", Lstr.SERR, s)
+        local compile = require"moonscript.compile"
+        local code, posmap_or_err, err_pos = compile.tree(tree)
+        if not code then
+            lib.errorf("%s%s\n", Lstr.SERR, compile.format_error(posmap_or_err, err_pos, script))
         end
-        local ext = string.match(s, "%w?", -1)
-        if ext == "a" then
-            chunk, err = loadfile(s, "t", env)
-        end
-        if ext == "n" then
-            local script = lib.fopen(s)
-            local parse = require "moonscript.parse"
-            local tree, err = parse.string(script)
-            if not tree then
-                lib.errorf("%s%s\n", Lstr.SERR, err)
-            end
-            local compile = require "moonscript.compile"
-            local code, posmap_or_err, err_pos = compile.tree(tree)
-            if not code then
-                lib.errorf("%s%s\n", Lstr.SERR, compile.format_error(posmap_or_err, err_pos, script))
-            end
-            chunk, err = load(code, code, "t", env)
-        end
+        chunk, err = load(code, code, "t", env)
+    elseif ext == "lua" then
+        chunk, err = load(script, script, "t", env)
     end
     if not chunk then
         lib.errorf("%s%s%s\n", Lstr.SERR, s, err)
@@ -443,7 +450,7 @@ function cli.main (opts)
     local source = {}
     local hsource = {}
     local runenv = {}
-    local scripts = { opts.script }
+    local scripts = { opts.base .. "." .. opts.ext }
     local env = { fact = {}, global = {} }
 
     -- Built-in functions inside scripts --
@@ -464,11 +471,31 @@ function cli.main (opts)
     env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
     env.log = function (b) opts.log = b end
     env.include = function (f)
-        if type(PATH) == "table" then
-            scripts[#scripts + 1] = PATH[f]
-        else
-            scripts[#scripts + 1] = PATH .. "/" .. f
+        local path, base, ext = lib.decomp_path(f)
+        -- Only include files relative to the same directory as opts.script.
+        -- Includes with path information has priority.
+        local include
+        if path and not (path == ".") then
+            include = f
+        elseif PATH then
+            include = PATH .. "/" .. f
         end
+        local include_name = base .. "." .. ext
+        if not (PATH == false) and include then
+            if lib.is_file(include) then
+                policy[ext][base] = lib.fopen(include)
+            else
+                lib.errorf("%s %s missing for inclusion\n", Lstr.SERR, include)
+            end
+        elseif PATH == false then
+            if not policy[ext][base] then
+                lib.errorf("%s %s missing for inclusion\n", Lstr.SERR, include_name)
+            end
+        else
+            -- Should not be reached. Just in case.
+            include_name = nil
+        end
+        scripts[#scripts + 1] = include_name
     end
     env.each = function (t, f)
         for str, tbl in Lscript.list(t) do
@@ -545,7 +572,7 @@ function cli.main (opts)
 end
 
 function cli.opt (arg, version)
-    local short = "hvtDsmjVl:p:g:r:f:"
+    local short = "hvtDsmjVl:p:g:r:f:e:"
     local long = {
         {"help", "none", "h"},
         {"debug", "none", "v"},
@@ -558,10 +585,11 @@ function cli.opt (arg, version)
         {"version", "none", "V"},
         {"tag", "required", "g"},
         {"runs", "required", "r"},
-        {"file", "required", "f"}
+        {"file", "required", "f"},
+        {"embedded","required", "e"}
     }
     local help = [[
-    cfg [-h] [-V] [-v] [-t] [-D] [-p N] [-s] [-l FILE] [-m] [-g TAG] [-r N] -f "CONFIGI POLICY"
+    cfg [-h] [-V] [-v] [-t] [-D] [-p N] [-s] [-l FILE] [-m] [-g TAG] [-r N] [-f "CONFIGI POLICY"] [-e "CONFIGI POLICY"]
 
         Options:
             -h, --help                  This help text.
@@ -576,6 +604,7 @@ function cli.opt (arg, version)
             -g, --tag                   Only run specified tag(s).
             -r, --runs                  Run the policy N times if a failure is encountered. Default is 3.
             -f, --file                  Path to the Configi policy.
+            -e, --embedded              Name of the embedded Configi policy.
 
 ]]
     -- Defaults. runs field is always used
@@ -584,12 +613,30 @@ function cli.opt (arg, version)
     -- optind and li are unused
     for r, optarg, optind, li in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
-            opts.script = optarg
-            local _, policy = pcall(require, "policy")
-            if not lib.is_file(opts.script) and type(policy) == "table" then
-                PATH = policy
+            local path, base, ext = lib.decomp_path(optarg)
+            opts.ext = ext
+            opts.base = base
+            if path and not (path == ".") then
+                opts.script = optarg
             else
-                PATH = lib.dirname(opts.script)
+                opts.script = PATH .. optarg
+            end
+            if lib.is_file(opts.script) then
+                PATH = path
+                -- overwrite [ext][base] with the contents of opts.script
+                policy[ext][base] = lib.fopen(opts.script)
+            else
+                lib.errorf("%s %s not found\n", Lstr.SERR, opts.script)
+            end
+        end
+        if r == "e" then
+            PATH = false
+            local _, base, ext = lib.decomp_path(optarg)
+            opts.script = base .. "." .. ext
+            opts.ext = ext
+            opts.base = base
+            if not policy[ext][base] then
+                lib.errorf("%s %s not found\n", Lstr.SERR, optarg)
             end
         end
         if r == "m" then opts.msg = true end
