@@ -697,14 +697,21 @@ T:start"file.attributes (module/file.lua)"
             local nobody = pwd.getpwnam("nobody")
             local nogroup = grp.getgrnam("nobody")
             cfg{ "-f", policy }
-            local stat = stat.stat(testdir .. "file_attributes1")
-            T:eq(stat.st_uid, nobody.pw_uid)
-            T:eq(stat.st_gid, nogroup.gr_gid)
-            T:eq(string.format("%o", stat.st_mode), "100600")
+            local stat1 = stat.stat(testdir .. "file_attributes1")
+            T:eq(stat1.st_uid, nobody.pw_uid)
+            T:eq(stat1.st_gid, nogroup.gr_gid)
+            T:eq(string.format("%o", stat1.st_mode), "100600")
             os.remove(testdir .. "file_attributes1")
+            local stat2 = stat.stat(testdir .. "file_attributes2")
+            T:eq(string.format("%o", stat2.st_mode), "100755")
+            os.remove(testdir .. "file_attributes2")
+            local stat3 = stat.stat(testdir .. "file_attributes3")
+            T:eq(string.format("%o", stat3.st_mode), "100444")
+            os.remove(testdir .. "file_attributes3")
+
         end
-        attributes"test/file_attributes1.lua"
-        attributes"test/file_attributes1.moon"
+        attributes"test/file_attributes.lua"
+        attributes"test/file_attributes.moon"
     end
 T:done(N)
 

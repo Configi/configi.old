@@ -71,8 +71,10 @@ local mode = function(F, P, R)
         file_mode_fail = "file.mode: Error setting mode."
     }
     local info = stat.stat(P.path)
-    local mode = string.sub(tostring(string.format("%o", info.st_mode)), -3, -1)
-    if mode == string.sub(P.mode, -3, -1) then
+    local mode = tostring(P.mode)
+    local len = 0 - string.len(mode)
+    local current_mode = string.sub(tostring(string.format("%o", info.st_mode)), len, -1)
+    if current_mode == string.sub(mode, len, -1) then
         return F.result(P.path, nil, report.file_mode_skip)
     end
     local args = { P.mode, P.path }
