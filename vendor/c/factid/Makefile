@@ -7,13 +7,13 @@ VENDOR+= factid
 CLEAN+= clean_factid
 
 $(factidA): $(factidOBJ)
-	$(ECHOT) [AR] $@
-	$(AR) $(ARFLAGS) $@ $^ >/dev/null 2>&1
-	$(RANLIB) $@
+	$(ECHOT) AR $@
+	$(TARGET_AR) $(ARFLAGS) $@ $^ >/dev/null 2>&1
+	$(TARGET_RANLIB) $@
 
 $(factidOBJ): $(factidSRC)
-	$(ECHOT) [CC] $@
-	$(CC) -o $@ $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) -c $<
+	$(ECHOT) CC $@
+	$(TARGET_DYNCC) -o $@ $(TARGET_FLAGS) -c $<
 
 clean_factid:
 	$(RM) $(RMFLAGS) $(factidA) $(factidOBJ)

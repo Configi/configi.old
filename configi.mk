@@ -3,11 +3,11 @@ CLEAN+= clean_tests
 
 tests: $(EXE)
 	$(CP) vendor/lua/cwtest.lua .
-	$(ECHOT) [LN] $@
-	CC=$(CC) NM=$(NM) $(LUA_T) $(LUASTATIC) test/tests.lua $(testDEPS) $(LUA_A) $(INCLUDES) $(CCWARN) $(CFLAGS) $(CCOPT) $(LDFLAGS)
-	$(RM) $(RMFLAGS) cwtest.lua
+	$(ECHOT) LN $@
+	CC=$(TARGET_STCC) NM=$(TARGET_NM) $(LUA_T) $(LUASTATIC) test/tests.lua $(testDEPS) $(LUA_A) $(TARGET_FLAGS) $(PIE) $(TARGET_LDFLAGS) 2>&1 >/dev/null
+	$(RM) $(RMFLAGS) bin/tests.lua.c cwtest.lua cimicida.lua crc32.lua lib.lua factid.lua
 
 clean_tests:
-	$(RM) $(RMFLAGS) tests test/tests.lua.c
+	$(RM) $(RMFLAGS) bin/tests
 
 .PHONY: clean_tests
