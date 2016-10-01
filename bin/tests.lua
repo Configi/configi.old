@@ -7,7 +7,7 @@ local ct = require"cwtest"
 local T, N=ct.new(), nil
 local osfamily = factid.osfamily()
 local testdir = "test/tmp/"
-local cfg = cmd["./cfg"]
+local cfg = cmd["bin/cfg"]
 
 if not lib.is_dir(testdir) then
     stat.mkdir(testdir)
