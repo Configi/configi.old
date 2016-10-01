@@ -2,7 +2,6 @@ local type, rawset, rawget, loadfile, pcall, next, setmetatable, load, pairs, ip
       type, rawset, rawget, loadfile, pcall, next, setmetatable, load, pairs, ipairs, require, tostring
 local coroutine, os, string, table = coroutine, os, string, table
 local Factid = require"factid"
-local moonscript = require"moonscript"
 local Psyslog = require"posix.syslog"
 local Pgetopt = require"posix.getopt"
 local Psystime = require"posix.sys.time"
