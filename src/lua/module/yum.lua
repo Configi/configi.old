@@ -15,7 +15,7 @@ M.alias = {}
 M.alias.package = { "option" } -- for clean mode
 
 local found = function(package)
-    local _, ret = cmd.yum{ command = "info", package = package, cacheonly = true }
+    local _, ret = cmd.yum{ "-C", "info", package }
     if lib.find_string(ret.stdout, "Installed Packages", true) then
         return true
     end
@@ -34,7 +34,7 @@ function yum.clean(S)
     return function(P)
         P.option = S
         local F, R = cfg.init(P, M)
-        return F.result(P.package, F.run(cmd.yum, { command = "clean", package = P.package }))
+        return F.result(P.package, F.run(cmd.yum, { "clean", P.option }))
     end
 end
 
@@ -55,7 +55,7 @@ end
 --     update: "yes"
 function yum.present(S)
     M.parameters = {
-        "clean_all", "config", "nogpgcheck", "security", "bugfix", "proxy", "update", "update_minimal"
+        "config", "nogpgcheck", "security", "bugfix", "proxy", "update", "update_minimal"
     }
     M.report = {
         repaired = "yum.present: Successfully installed package.",
@@ -76,31 +76,27 @@ function yum.present(S)
             elseif P.update == true then
                 command = "update"
             end
-            return F.result(P.package, F.run(cmd.yum, {
-                      _env = env,
-                 assumeyes = true,
-                   command = command,
-                    config = P.config,
-                nogpgcheck = P.nogpgcheck,
-                  security = P.security,
-                    bugfix = P.bugfix,
-                   package = P.package
-            }))
+            local args = { _env = env, "--quiet", "--assumeyes", command }
+            local set = {
+                nogpgcheck = "--nogpgcheck",
+                  security = "--security",
+                    bugfix = "--bugfix"
+            }
+            P:insert_if(set, args, 3)
+            lib.insert_if(P.config, args, 3, "--config=" .. P.config)
+            return F.result(P.package, F.run(cmd.yum, args))
         end
         -- Install mode
         if found(P.package) then
             return F.kept(P.package)
         end
-        return F.result(P.package, F.run(cmd.yum, {
-                  _env = env,
-             assumeyes = true,
-               command = "install",
-                config = P.config,
-            nogpgcheck = P.nogpgcheck,
-              security = P.security,
-                bugfix = P.bugfix,
-               package = P.package
-        }))
+        local args = { _env = env, "--quiet", "--assumeyes", "install", P.package }
+        local set = {
+            nogpgcheck = "--nogpgcheck"
+        }
+        P:insert_if(set, args, 3)
+        lib.insert_if(P.config, args, 3, "--config=" .. P.config)
+        return F.result(P.package, F.run(cmd.yum, args))
     end
 end
 
@@ -124,7 +120,13 @@ function yum.absent(S)
         if not found(P.package) then
             return F.kept(P.package)
         end
-        return F.result(P.package, F.run(cmd.yum, { assumeyes = true, command = "erase", package = P.package }))
+        local args = { _env = env, "--quiet", "--assumeyes", "remove", P.package }
+        local set = {
+            nogpgcheck = "--nogpgcheck"
+        }
+        P:insert_if(set, args, 3)
+        lib.insert_if(P.config, args, 3, "--config=" .. P.config)
+        return F.result(P.package, F.run(cmd.yum, args))
     end
 end
 
