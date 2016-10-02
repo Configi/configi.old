@@ -195,6 +195,9 @@ end
 ]]
 
 local pexec = function (args)
+  if args._bin == nil then
+    return nil, "no executable passed"
+  end
   local stdin, fd0  = unistd.pipe()
   local fd1, stdout = unistd.pipe()
   local fd2, stderr = unistd.pipe()
