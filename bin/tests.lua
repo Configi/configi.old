@@ -23,6 +23,8 @@ T:start"Lua tests"
         T:eq(Lua.multiplereturn(), "145")
         T:eq(Lua.updatetable1(), "12345")
         T:eq(Lua.updatetable2(), "12345")
+        T:eq(Lua.mixedtable1(), "012")
+        T:eq(Lua.mixedtable2(), "123")
     end
 T:done(N)
 

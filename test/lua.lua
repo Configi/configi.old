@@ -65,5 +65,15 @@ function lua.updatetable2()
   end
   return table.concat(result)
 end
+function lua.mixedtable1()
+  local tbl={e=true,1,2}
+  table.insert(tbl, 1, 0)
+  return table.concat(tbl)
+end
+function lua.mixedtable2()
+  local tbl={e=true,1,2}
+  table.insert(tbl, 3, 3)
+  return table.concat(tbl)
+end
 return lua
 
