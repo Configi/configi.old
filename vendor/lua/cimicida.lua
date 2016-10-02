@@ -410,7 +410,7 @@ local popen = function (str, cwd, _ignore_error, _return_code)
   local result = {}
   local header = [[  set -ef
   export LC_ALL=C
-  exec 0>&- 2>&1
+  exec -c 0>&- 2>&1
   ]]
   if cwd then
     str = string.format("%scd %s\n%s", header, cwd, str)
@@ -480,7 +480,7 @@ local system = function (str)
   local set = [[  set -ef
   export LC_ALL=C
   exec 0>&- 2>&- 1>/dev/null
-  exec ]]
+  exec -c ]]
   local redir = [[ 0>&- 2>&- 1>/dev/null ]]
   local _
   _, result.status, result.code = os.execute(set .. str .. redir)
@@ -501,7 +501,7 @@ end
 local execute = function (str)
   local result = {}
   local set = [[  set -ef
-  exec 0>&- 2>&- 1>/dev/null
+  exec -c 0>&- 2>&- 1>/dev/null
   ]]
   local _
   _, result.status, result.code = os.execute(set .. str)
