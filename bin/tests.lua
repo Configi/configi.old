@@ -449,6 +449,9 @@ if osfamily == "centos" then
             yum"test/yum_absent.moon"
         end
     T:done(N)
+end
+
+if lib.bin_path"systemctl" then
     T:start"systemd.started (modules/systemd.lua)"
         do
             local systemd = function(policy)
@@ -461,11 +464,11 @@ if osfamily == "centos" then
     T:start"systemd.restart (modules/systemd.lua)"
         do
             local systemd = function(policy)
-                local ok, pgrep = cmd.pgrep{ "crond" }
+                local ok, pgrep = cmd.pgrep{ "lighttpd" }
 		        T:yes(ok)
                 local first = pgrep.stdout[1]
                 cfg{ "-f", policy }
-                ok, pgrep = cmd.pgrep{ "crond" }
+                ok, pgrep = cmd.pgrep{ "lighttpd" }
 		        T:yes(ok)
                 local second = pgrep.stdout[1]
                 if first == second then
@@ -490,7 +493,7 @@ if osfamily == "centos" then
         do
             local systemd = function(policy)
                 cfg{ "-f", policy }
-                T:eq(cmd.pgrep{ "crond" }, nil)
+                T:eq(cmd.pgrep{ "lighttpd" }, nil)
             end
             systemd"test/systemd_stopped.lua"
             systemd"test/systemd_stopped.moon"
