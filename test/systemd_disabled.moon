@@ -1,1 +1,1 @@
-systemd.disabled"crond"()
+systemd.disabled"lighttpd"()

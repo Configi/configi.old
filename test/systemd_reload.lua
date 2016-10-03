@@ -1,1 +1,1 @@
-systemd.reload"crond"()
+systemd.reload"lighttpd"()
