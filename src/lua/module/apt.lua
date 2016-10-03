@@ -26,10 +26,10 @@ end
 -- @Subject package
 -- @Aliases installed
 -- @Aliases install
--- @param only_upgrade
--- @param update_cache
+-- @param update_cache Run `apt-get update` before any operation [DEFAULT: false]
+-- @param no_upgrade Prevent upgrade of specified package if already installed [DEFAULT: false]
 -- @usage apt.present("strace")
---     update: "yes"
+--     update_cache: true
 function apt.present(S)
     M.parameters = {
         "update_cache", "no_upgrade"
@@ -71,8 +71,6 @@ end
 -- @Subject package
 -- @Aliases removed
 -- @Aliases remove
--- @param purge
--- @param autoremove
 -- @usage apt.absent("strace")!
 function apt.absent(S)
     M.report = {
