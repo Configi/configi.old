@@ -409,7 +409,7 @@ T:start"user.absent (modules/user.lua)"
     end
 T:done(N)
 
-if osfamily == "debian" then
+if lib.bin_path"apt-get" then
     T:start"apt.present (modules/apt.lua)"
         do
             local apt = function(policy)
@@ -430,7 +430,7 @@ if osfamily == "debian" then
     T:done(N)
 end
 
-if osfamily == "centos" then
+if lib.bin_path"yum" then
     T:start"yum.present (modules/yum.lua)"
         do
             local yum = function(policy)
