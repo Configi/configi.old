@@ -129,7 +129,9 @@ function yum.absent(S)
             nogpgcheck = "--nogpgcheck"
         }
         P:insert_if(set, args, 3)
-        lib.insert_if(P.config, args, 3, "--config=" .. P.config)
+        if P.config then
+            lib.insert_if(P.config, args, 3, "--config=" .. P.config)
+        end
         return F.result(P.package, F.run(cmd.yum, args))
     end
 end
