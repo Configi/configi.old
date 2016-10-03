@@ -409,6 +409,27 @@ T:start"user.absent (modules/user.lua)"
     end
 T:done(N)
 
+if osfamily == "debian" then
+    T:start"apt.present (modules/apt.lua)"
+        do
+            local apt = function(policy)
+                T:eq(cfg{ "-f", policy }, true)
+            end
+            apt"test/apt_present.lua"
+            apt"test/apt_present.moon"
+        end
+    T:done(N)
+    T:start"apt.absent (modules/apt.lua)"
+        do
+            local apt = function(policy)
+                T:eq(cfg{ "-f", policy }, true)
+            end
+            apt"test/apt_absent.lua"
+            apt"test/apt_absent.moon"
+        end
+    T:done(N)
+end
+
 if osfamily == "centos" then
     T:start"yum.present (modules/yum.lua)"
         do
