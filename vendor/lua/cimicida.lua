@@ -410,7 +410,8 @@ local popen = function (str, cwd, _ignore_error, _return_code)
   local result = {}
   local header = [[  set -ef
   export LC_ALL=C
-  exec -c 0>&- 2>&1
+  export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin
+  exec 0>&- 2>&1
   ]]
   if cwd then
     str = string.format("%scd %s\n%s", header, cwd, str)
@@ -479,8 +480,9 @@ local system = function (str)
   local result = {}
   local set = [[  set -ef
   export LC_ALL=C
+  export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin
   exec 0>&- 2>&- 1>/dev/null
-  exec -c ]]
+  exec ]]
   local redir = [[ 0>&- 2>&- 1>/dev/null ]]
   local _
   _, result.status, result.code = os.execute(set .. str .. redir)
@@ -501,7 +503,8 @@ end
 local execute = function (str)
   local result = {}
   local set = [[  set -ef
-  exec -c 0>&- 2>&- 1>/dev/null
+  export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin
+  exec 0>&- 2>&- 1>/dev/null
   ]]
   local _
   _, result.status, result.code = os.execute(set .. str)
