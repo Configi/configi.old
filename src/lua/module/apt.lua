@@ -63,7 +63,7 @@ function apt.present(S)
             return F.kept(P.package)
         end
         P:insert_if(set, args, 3)
-        return F.result(P.package, F.run(cmd["apt-get"], args,))
+        return F.result(P.package, F.run(cmd["apt-get"], args))
     end
 end
 
