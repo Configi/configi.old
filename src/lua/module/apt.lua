@@ -71,6 +71,7 @@ end
 -- @Subject package
 -- @Aliases removed
 -- @Aliases remove
+-- @param None
 -- @usage apt.absent("strace")!
 function apt.absent(S)
     M.report = {
