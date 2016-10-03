@@ -26,11 +26,11 @@ function systemd.started(S)
     return function(P)
         P.service = S
         local F, R = cfg.init(P, M)
-        local code = F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "is-active", P.service, _return_code = true })
+        local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _return_code = true })
         if code == 0 then
             return F.kept(P.service)
         end
-        return F.result(P.service, F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "start", P.service }))
+        return F.result(P.service, F.run(cmd["systemctl"], { "--quiet", "start", P.service }))
     end
 end
 
@@ -48,11 +48,11 @@ function systemd.stopped(S)
     return function(P)
         P.service = S
         local F, R = cfg.init(P, M)
-        local code = F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "is-active", P.service, _return_code = true })
+        local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _return_code = true })
         if code ~= 0 then
             return F.kept(P.service)
         end
-        return F.result(P.service, F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "stop", P.service}))
+        return F.result(P.service, F.run(cmd["systemctl"], { "--quiet", "stop", P.service}))
     end
 end
 
@@ -70,11 +70,11 @@ function systemd.restart(S)
     return function(P)
         P.service = S
         local F, R = cfg.init(P, M)
-        local code = F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "is-active", P.service, _return_code = true})
+        local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _return_code = true})
         if code ~= 0 then
             return F.kept(P.service)
         end
-        return F.result(P.service, F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "restart", P.service }))
+        return F.result(P.service, F.run(cmd["systemctl"], { "--quiet", "restart", P.service }))
     end
 end
 
@@ -91,11 +91,11 @@ function systemd.reload(S)
     return function(P)
         P.service = S
         local F, R = cfg.init(P, M)
-        local code = F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "is-active", P.service, _return_code = true})
+        local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _return_code = true})
         if code ~= 0 then
             return F.kept(P.service)
         end
-        return F.result(P.service, F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "reload", P.service }))
+        return F.result(P.service, F.run(cmd["systemctl"], { "--quiet", "reload", P.service }))
     end
 end
 
@@ -112,11 +112,11 @@ function systemd.enabled(S)
     return function(P)
         P.service = S
         local F, R = cfg.init(P, M)
-        local code = F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "is-enabled", P.service, _return_code = true})
+        local code = F.run(cmd["systemctl"], { "--quiet", "is-enabled", P.service, _return_code = true})
         if code == 0 then
             return F.kept(P.service)
         end
-        return F.result(P.service, F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "enable", P.service}))
+        return F.result(P.service, F.run(cmd["systemctl"], { "--quiet", "enable", P.service}))
     end
 end
 
@@ -133,11 +133,11 @@ function systemd.disabled(S)
     return function(P)
         P.service = S
         local F, R = cfg.init(P, M)
-        local code = F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "is-enabled", P.service, _return_code = true })
+        local code = F.run(cmd["systemctl"], { "--quiet", "is-enabled", P.service, _return_code = true })
         if code ~= 0 then
             return F.kept(P.service)
         end
-        return F.result(P.service, F.run(cmd["-/usr/bin/systemctl"], { "--quiet", "disable", P.service}))
+        return F.result(P.service, F.run(cmd["systemctl"], { "--quiet", "disable", P.service}))
     end
 end
 
