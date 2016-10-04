@@ -90,13 +90,13 @@ local find_string = function (tbl, str, plain)
   end
 end
 
---- Convert an array to a record.
--- Array values are converted into field names.
+--- Convert a sequence into a dictionary.
+-- Sequence values are converted into field names.
 -- @warning Does not check if input table is a sequence.
 -- @tparam table tbl the properly sequenced table to convert
 -- @param def default value for each field in the record. Should not be nil
 -- @treturn table the converted table
-local arr_to_rec = function (tbl, def)
+local seq_to_dict = function (tbl, def)
   local t = {}
   for n = 1, #tbl do t[tbl[n]] = def end
   return t
@@ -660,8 +660,8 @@ return {
   timestamp = timestamp,
   find_string = find_string,
   string_find = find_string,
-  arr_to_rec = arr_to_rec,
-  seq_to_dict = arr_to_rec,
+  seq_to_dict = seq_to_dict,
+  arr_to_rec = seq_to_dict,
   ln_to_tbl = ln_to_tbl,
   word_to_tbl = word_to_tbl,
   str_to_tbl = str_to_tbl,
