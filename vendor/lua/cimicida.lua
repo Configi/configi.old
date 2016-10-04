@@ -1,7 +1,8 @@
 --- Additional functions. Can also be called from the `lib` module.
 -- @module lib
 local io, string, os, table = io, string, os, table
-local type, pcall, load, setmetatable, ipairs, next = type, pcall, load, setmetatable, ipairs, next
+local type, pcall, load, setmetatable, ipairs, next, pairs =
+      type, pcall, load, setmetatable, ipairs, next, pairs
 local ENV = {}
 _ENV = ENV
 
