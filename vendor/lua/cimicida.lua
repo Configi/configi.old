@@ -635,7 +635,7 @@ local auto_meta = {
     return t[k]
   end
 }
-function autotable(t)
+autotable = function(t)
   t = t or {}
   local meta = getmetatable(t)
   if meta then
