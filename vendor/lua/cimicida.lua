@@ -645,6 +645,7 @@ return {
   find_string = find_string,
   string_find = find_string,
   arr_to_rec = arr_to_rec,
+  seq_to_dict = arr_to_rec,
   ln_to_tbl = ln_to_tbl,
   word_to_tbl = word_to_tbl,
   str_to_tbl = str_to_tbl,
