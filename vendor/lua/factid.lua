@@ -15,7 +15,7 @@ _ENV = ENV
 function factid.osfamily ()
   local id
   if sysstat.stat("/etc/os-release") then
-    id = string.match(util.fopen("/etc/os-release"), "ID[%s]*=[%s%p]*([%w]+)")
+    id = util.match_from_file("/etc/os-release", [[^ID=[%p](%w+)[%p]$]])
   elseif sysstat.stat("/etc/openwrt_release") then
     id = "openwrt"
   else
@@ -29,7 +29,7 @@ end
 function factid.operatingsystem ()
   local name
   if sysstat.stat("/etc/os-release") then
-    name = string.match(util.fopen("/etc/os-release"), "NAME[%s]*=[%s%p]*([%w]+)")
+    name = util.match_from_file("/etc/os-release", [[^NAME[%s]*=[%s%p]*([%w]+)]])
   elseif sysstat.stat("/etc/openwrt_release") then
     name = "OpenWRT"
   else
