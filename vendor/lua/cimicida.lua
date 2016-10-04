@@ -2,9 +2,6 @@
 -- @module lib
 local io, string, os, table = io, string, os, table
 local type, pcall, load, setmetatable, ipairs, next = type, pcall, load, setmetatable, ipairs, next
-local has_px, px = pcall(require, "px")
-if has_px then
-end
 local ENV = {}
 _ENV = ENV
 
