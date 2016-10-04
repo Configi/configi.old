@@ -139,28 +139,21 @@ local str_to_tbl = function (str)
   return t
 end
 
---- Escape a string for pattern usage.
--- From lua-nucleo.
+--- Escape magic characters of the string so that it can be used as a pattern to string matching functions.
+-- Escapes embedded zeroes as the %z pattern.<br/>
+-- From Luapower/glue.
 -- @tparam string str string to escape
--- @treturn string a new string
-local escape_pattern = function (str)
-  local matches =
-  {
-    ["^"] = "%^",
-    ["$"] = "%$",
-    ["("] = "%(",
-    [")"] = "%)",
-    ["%"] = "%%",
-    ["."] = "%.",
-    ["["] = "%[",
-    ["]"] = "%]",
-    ["*"] = "%*",
-    ["+"] = "%+",
-    ["-"] = "%-",
-    ["?"] = "%?",
-    ["\0"] = "%z"
-  }
-  return string.gsub(str, ".", matches)
+-- @tparam string mode optional mode argument (*i) if passed, also escapes alphabetical characters to that it matches both lowercase and uppercase
+-- @treturn string a new escaped string
+local escape_pattern = function(str, mode)
+  local format_ci_pat = function(c)
+    return string.format('[%s%s]', c:lower(), c:upper())
+  end
+  str = str:gsub('%%','%%%%'):gsub('%z','%%z'):gsub('([%^%$%(%)%.%[%]%*%+%-%?])', '%%%1')
+  if mode == '*i' then
+    str = str:gsub('[%a]', format_ci_pat)
+  end
+  return str
 end
 
 --- Filter table values.
@@ -629,6 +622,29 @@ local return_if_not = function (bool, value)
   if bool == false or bool == nil then
     return value
   end
+
+
+--- Set up a table so that missing keys are created automatically as autotables.
+-- From Luapower/glue
+-- @return a new table with automatic keys
+local autotable
+local auto_meta = {
+  __index = function(t, k)
+    t[k] = autotable()
+    return t[k]
+  end
+}
+function autotable(t)
+  t = t or {}
+  local meta = getmetatable(t)
+  if meta then
+    assert(not meta.__index or meta.__index == auto_meta.__index,
+      '__index already set')
+    meta.__index = auto_meta.__index
+  else
+    setmetatable(t, auto_meta)
+  end
+  return t
 end
 
 --- @export
@@ -674,5 +690,6 @@ return {
   flog = flog,
   insert_if = insert_if,
   return_if = return_if,
-  return_if_not = return_if_not
+  return_if_not = return_if_not,
+  autotable = autotable
 }
