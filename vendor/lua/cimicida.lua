@@ -647,6 +647,25 @@ function autotable(t)
   return t
 end
 
+--- Count the number of keys in table.
+-- From Luapower/glue.<br/>
+-- @tparam table t table to count keys from
+-- @tparam number maxn only count up to this number of keys
+local count_keys = function(t, maxn)
+  local n = 0
+  if maxn then
+    for _ in pairs(t) do
+      n = n + 1
+      if n >= maxn then break end
+    end
+  else
+    for _ in pairs(t) do
+      n = n + 1
+    end
+  end
+  return n
+end
+
 --- @export
 return {
   printf = printf,
@@ -691,5 +710,6 @@ return {
   insert_if = insert_if,
   return_if = return_if,
   return_if_not = return_if_not,
-  autotable = autotable
+  autotable = autotable,
+  count_keys = count_keys
 }
