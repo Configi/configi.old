@@ -18,7 +18,7 @@ end
 -- From http://lua-users.org/wiki/FinalizedExceptions
 -- @tparam function function to wrap
 -- @treturn function a function that follows the Lua return value convention
-local protect = function(f)
+local pcall_f = function(f)
   return function(...)
     return fix_return_values(pcall(f, ...))
   end
@@ -28,7 +28,7 @@ end
 -- From http://lua-users.org/wiki/FinalizedExceptions
 -- @tparam function finalizer function
 -- @treturn function wrapped function
-local newtry = function(f)
+local try_f = function(f)
     return function(ok, ...)
         if ok then
             return ok, ...
@@ -702,6 +702,8 @@ end
 
 --- @export
 return {
+  pcall_f = pcall_f,
+  try_f = try_f,
   printf = printf,
   fprintf = fprintf,
   errorf = errorf,
