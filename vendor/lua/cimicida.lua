@@ -1,10 +1,43 @@
 --- Additional functions. Can also be called from the `lib` module.
 -- @module lib
 local io, string, os, table = io, string, os, table
-local type, pcall, load, setmetatable, ipairs, next, pairs =
-      type, pcall, load, setmetatable, ipairs, next, pairs
+local type, pcall, load, setmetatable, ipairs, next, pairs, error =
+      type, pcall, load, setmetatable, ipairs, next, pairs, error
 local ENV = {}
 _ENV = ENV
+
+local fix_return_values = function(ok, ...)
+  if ok then
+    return ...
+  else
+    return nil, (...)
+  end
+end
+
+--- Receives a function that might raise exceptions and returns a function that follows the Lua return value convention.
+-- From http://lua-users.org/wiki/FinalizedExceptions
+-- @tparam function function to wrap
+-- @treturn function a function that follows the Lua return value convention
+local protect = function(f)
+  return function(...)
+    return fix_return_values(pcall(f, ...))
+  end
+end
+
+--- Returns a function similar to assert but does not mess with the error message and takes an optional finalizer closure.
+-- From http://lua-users.org/wiki/FinalizedExceptions
+-- @tparam function finalizer function
+-- @treturn function wrapped function
+local newtry = function(f)
+    return function(ok, ...)
+        if ok then
+            return ok, ...
+        else
+            if f then f() end
+            error((...), 0)
+        end
+    end
+end
 
 --- Output formatted string to the current output.
 -- @tparam string str C-like string
