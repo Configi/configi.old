@@ -1,10 +1,10 @@
---- Render a textfile.
--- @module textfile
+--- Render a template.
+-- @module template
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, textfile = {}, {}, {}
+local ENV, M, template = {}, {}, {}
 local io, load, tonumber, pcall, table, os, string, require =
       io, load, tonumber, pcall, table, os, string, require
 local cfg = require"configi"
@@ -46,7 +46,7 @@ local write = function(F, P, R)
     return F.result(P.path, lib.awrite(P.path, P._input, P.mode))
 end
 
---- Render a textfile.
+--- Render a template.
 -- @Subject output file
 -- @Note Requires the diffutils package for the diff parameter to work
 -- @param src source template [REQUIRED] [ALIAS: template]
@@ -54,18 +54,18 @@ end
 -- @param lua [ALIAS: data]
 -- @param mode mode bits for output file [DEFAULT: "0600"]
 -- @param diff show diff [CHOICES: "yes","no"]
--- @usage textfile.render("/etc/something/config")
+-- @usage template.render("/etc/something/config")
 --     template: "/etc/something/config.template"
 --     view: "view_model"
 --     data: "/etc/something/config.lua"
-function textfile.render(S)
+function template.render(S)
     M.parameters = { "src", "lua", "table", "mode", "diff" }
     M.report = {
-          repaired = "textfile.render: Successfully rendered textfile.",
-              kept = "textfile.render: No difference detected, not overwriting existing destination.",
-            failed = "textfile.render: Error rendering textfile.",
-        missingsrc = "textfile.render: Can't access or missing source file.",
-        missinglua = "textfile.render: Can't access or missing lua file."
+          repaired = "template.render: Successfully rendered textfile.",
+              kept = "template.render: No difference detected, not overwriting existing destination.",
+            failed = "template.render: Error rendering textfile.",
+        missingsrc = "template.render: Can't access or missing source file.",
+        missinglua = "template.render: Can't access or missing lua file."
     }
     return function(P)
         P.path = S
@@ -117,18 +117,18 @@ end
 -- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
 -- @param before [CHOICES: "yes","no"] [DEFAULT: "no"]
 -- @param after [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @usage textfile.insert_line("/etc/sysctl.conf")
+-- @usage template.insert_line("/etc/sysctl.conf")
 --     pattern: "# http://cr.yp.to/syncookies.html"
 --     text: "net.ipv4.tcp_syncookies = 1"
 --     after: "true"
 --     plain: "true"
-function textfile.insert_line(S)
+function template.insert_line(S)
     M.parameters = { "diff", "line", "plain", "pattern", "before", "after", "inserts" }
     M.report = {
-        repaired = "textfile.insert_line: Successfully inserted line.",
-        kept = "textfile.insert_line: Insert cancelled, found a matching line.",
-        failed = "textfile.insert_line: Error inserting line.",
-        missing = "textfile.insert_line: Can't access or missing file."
+        repaired = "template.insert_line: Successfully inserted line.",
+        kept = "template.insert_line: Insert cancelled, found a matching line.",
+        failed = "template.insert_line: Error inserting line.",
+        missing = "template.insert_line: Can't access or missing file."
     }
     return function(P)
         P.path = S
@@ -184,16 +184,16 @@ end
 -- @Subject path of text file to modify
 -- @param pattern text pattern to remove [REQUIRED] [ALIAS: match]
 -- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @usage textfile.remove_line("/etc/sysctl.conf")
+-- @usage template.remove_line("/etc/sysctl.conf")
 --     match: "net.ipv4.ip_forward = 1"
 --     plain: "true"
-function textfile.remove_line(S)
+function template.remove_line(S)
     M.parameters = { "pattern", "plain", "diff" }
     M.report = {
-        repaired = "textfile.remove_line: Successfully removed line.",
-            kept = "textfile.remove_line: Line not found.",
-          failed = "textfile.remove_line: Error removing line.",
-         missing = "textfile.remove_line: Can't access or missing file."
+        repaired = "template.remove_line: Successfully removed line.",
+            kept = "template.remove_line: Line not found.",
+          failed = "template.remove_line: Error removing line.",
+         missing = "template.remove_line: Can't access or missing file."
     }
     return function(P)
         P.path = S
@@ -218,4 +218,4 @@ function textfile.remove_line(S)
     end
 end
 
-return textfile
+return template
