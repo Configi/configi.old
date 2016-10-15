@@ -1,8 +1,8 @@
 --- Additional functions. Can also be called from the `lib` module.
 -- @module lib
 local io, string, os, table = io, string, os, table
-local type, pcall, load, setmetatable, ipairs, next, pairs, error =
-      type, pcall, load, setmetatable, ipairs, next, pairs, error
+local type, pcall, load, setmetatable, ipairs, next, pairs, error, require =
+      type, pcall, load, setmetatable, ipairs, next, pairs, error, require
 local ENV = {}
 _ENV = ENV
 
@@ -37,6 +37,14 @@ local try_f = function(f)
             error((...), 0)
         end
     end
+end
+
+--- ADA-style case insensitive calls to modules with lower case functions.
+-- @tparam string module name
+-- @treturn table module functions
+local xrequire = function(m)
+  local module = require(m)
+  return setmetatable({}, { __index = function(_, func) return module[string.lower(func)] end })
 end
 
 --- Output formatted string to the current output.
