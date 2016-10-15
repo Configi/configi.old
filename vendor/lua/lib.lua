@@ -606,4 +606,4 @@ function lib.retry_f(on_fail, delay, retries)
     end
 end
 
-return lib
+return setmetatable(lib, { __index = function(_, func) return lib[string.lower(func)] end })
