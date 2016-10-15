@@ -1,3 +1,5 @@
+-- Module for gathering system "facts"
+-- @module factid
 local string = string
 local util = require"cimicida"
 local sysstat = require"posix.sys.stat"
