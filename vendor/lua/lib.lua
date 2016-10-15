@@ -605,8 +605,6 @@ function lib.retry_f(on_fail, delay, retries)
     end
 end
 
-return setmetatable(lib, { __index =
-    function(_, func)
-        return lib[string.lower(func)] or lc[func] or lc[string.lower(func)]
-    end
-})
+return setmetatable(lib, { __index = function(_, func)
+    return lib[string.lower(func)] or lc[func] or lc[string.lower(func)]
+end})
