@@ -587,8 +587,8 @@ end
 -- @tparam number delay seconds to sleep after a failure. Default is 30 seconds.
 -- @tparam number retries number of tries. Default is to retry indefinitely.
 -- @treturn function a function that runs ...
--- @usage Run = Retry_F(function() end, 3, 1)
--- Run(string.match, "match", "match")
+-- @usage run = retry_f(function() end, 3, 1)
+-- run(string.match, "match", "match")
 function lib.retry_f(on_fail, delay, retries)
     return function(fn, ...)
         fn = lc.pcall_f(fn)
