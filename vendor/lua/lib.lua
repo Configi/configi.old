@@ -419,7 +419,6 @@ function lib.awrite (path, str, mode)
         return nil, "lib.awrite: fcntl(2) error."
     end
     local tmp, temp = stdlib.mkstemp(lc.split_path(path) .. "/._configiXXXXXX")
-    --local tmp = lib.open(temp, fcntl.O_WRONLY)
     lib.write(tmp, str)
     lib.fsync(tmp)
     ok, err = os.rename(temp, path)
