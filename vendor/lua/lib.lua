@@ -582,4 +582,28 @@ function lib.decomp_path(str)
     return path, base, ext
 end
 
+--- Retry factory.
+-- @tparam function on_fail function to run in case of failure. Takes in the second return value from the retried function.
+-- @tparam number delay seconds to sleep after a failure. Default is 30 seconds.
+-- @tparam number retries number of tries. Default is to retry indefinitely.
+-- @treturn function a function that runs ...
+-- @usage Run = Retry_F(function() end, 3, 1)
+-- Run(string.match, "match", "match")
+function lib.retry_f(on_fail, delay, retries)
+    return function(fn, ...)
+        fn = lc.pcall_f(fn)
+        delay = delay or 30
+        retries = retries or 0
+        local i = 0
+        repeat
+            local ok, err = fn(...)
+            if not ok then
+                i = i + 1
+                on_fail(err)
+                unistd.sleep(delay)
+            end
+        until(ok or (i == retries))
+    end
+end
+
 return lib
