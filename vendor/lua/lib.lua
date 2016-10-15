@@ -18,8 +18,7 @@ local fcntl = require"posix.fcntl"
 local stdlib = require"posix.stdlib"
 local syslog = require"posix.syslog"
 local libgen = require"posix.libgen"
-local px = require"px"
-local lib = px
+local lib = require"px"
 local ENV = {}
 _ENV = ENV
 
