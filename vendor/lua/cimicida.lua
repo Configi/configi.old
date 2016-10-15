@@ -2,7 +2,7 @@
 -- @module lib
 local io, string, os, table = io, string, os, table
 local type, pcall, load, setmetatable, ipairs, next, pairs, error, require =
-            type, pcall, load, setmetatable, ipairs, next, pairs, error, require
+      type, pcall, load, setmetatable, ipairs, next, pairs, error, require
 local ENV = {}
 _ENV = ENV
 
