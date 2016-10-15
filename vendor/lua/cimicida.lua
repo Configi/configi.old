@@ -664,7 +664,7 @@ local return_if_not = function (bool, value)
   if bool == false or bool == nil then
     return value
   end
-
+end
 
 --- Set up a table so that missing keys are created automatically as autotables.
 -- From Luapower/glue
