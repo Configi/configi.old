@@ -416,7 +416,7 @@ function lib.awrite (path, str, mode)
     local fd = lib.open(path, (fcntl.O_CREAT | fcntl.O_WRONLY | fcntl.O_TRUNC), mode)
     ok = pcall(lib.fcntl, fd, fcntl.F_SETLK, lock)
     if not ok then
-        return nil
+        return nil, "lib.awrite: fcntl(2) error."
     end
     local tmp, temp = stdlib.mkstemp(lc.split_path(path) .. "/._configiXXXXXX")
     --local tmp = lib.open(temp, fcntl.O_WRONLY)
