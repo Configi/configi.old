@@ -604,7 +604,6 @@ end
 
 return setmetatable(lib, { __index =
     function(_, func)
-        local fn = lib[string.lower(func)] or lc[string.lower(func)]
-        return fn
+        return lib[string.lower(func)] or lc[string.lower(func)]
     end
 })
