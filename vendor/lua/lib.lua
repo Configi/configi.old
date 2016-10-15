@@ -17,10 +17,6 @@ local syslog = require"posix.syslog"
 local libgen = require"posix.libgen"
 local px = require"px"
 local lib = px
--- copy cimicida
-for k, v in next, lc do
-    lib[k] = v
-end
 local ENV = {}
 _ENV = ENV
 
@@ -606,4 +602,9 @@ function lib.retry_f(on_fail, delay, retries)
     end
 end
 
-return setmetatable(lib, { __index = function(_, func) return lib[string.lower(func)] end })
+return setmetatable(lib, { __index =
+    function(_, func)
+        local fn = lib[string.lower(func)] or lc[string.lower(func)]
+        return fn
+    end
+})
