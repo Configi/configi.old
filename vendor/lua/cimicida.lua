@@ -24,16 +24,18 @@ local pcall_f = function(f)
     end
 end
 
---- Returns a function similar to assert but does not mess with the error message and takes an optional finalizer closure.
+--- Returns a function similar to assert but does not mess with the error message and takes an optional finalizer function.
 -- From http://lua-users.org/wiki/FinalizedExceptions
 -- @tparam function finalizer function
 -- @treturn function wrapped function
-local try_f = function(f)
+local try_f = function(finalizer)
     return function(ok, ...)
         if ok then
             return ok, ...
         else
-            if f then f() end
+            if finalizer then
+                finalizer()
+            end
             error((...), 0)
         end
    end
