@@ -457,6 +457,7 @@ end
 local popen = function (str, cwd, _ignore_error, _return_code)
     local result = {}
     local header = [[  set -ef
+    unset IFS
     export LC_ALL=C
     export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin
     exec 0>&- 2>&1
@@ -500,6 +501,7 @@ local pwrite = function (str, data)
     local result = {}
     local write = io.write
     str = [[    set -ef
+    unset IFS
     export LC_ALL=C
     exec ]] .. str
     local pipe = io.popen(str, "we")
@@ -527,6 +529,7 @@ end
 local system = function (str)
     local result = {}
     local set = [[  set -ef
+    unset IFS
     export LC_ALL=C
     export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin
     exec 0>&- 2>&- 1>/dev/null
