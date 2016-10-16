@@ -581,7 +581,7 @@ local pipeline = function (...)
     elseif cmds[1] == "execute" then
         return execute(table.concat(pipe))
     else
-        return
+        return nil, "pipeline: First argument should be 'popen' or 'execute'."
     end
 end
 
