@@ -161,12 +161,11 @@ static int Cexecve(lua_State *L)
 	char **argv;
 	char **env;
 	const char *path = luaL_checkstring(L, 1);
-	int i, n, e;
 
 	if (lua_type(L, 2) != LUA_TTABLE)
 		return pusherror(L, "bad argument #2 to 'execve' (table expected)");
 
-	n = lua_rawlen(L, 2);
+	int n = lua_rawlen(L, 2);
 	argv = lua_newuserdata(L, (n + 2) * sizeof(char*));
 
 	argv[0] = (char*) path;
@@ -176,7 +175,7 @@ static int Cexecve(lua_State *L)
 		argv[0] = (char*)lua_tostring(L, -1);
 	else
 		lua_pop(L, 1);
-
+	int i;
 	for (i=1; i<=n; i++)
 	{
 		lua_pushinteger(L, i);
@@ -187,7 +186,7 @@ static int Cexecve(lua_State *L)
 
 	if (lua_type(L, 3) == LUA_TTABLE)
 	{
-		e = lua_rawlen(L, 3);
+		int e = lua_rawlen(L, 3);
 		env = lua_newuserdata(L, (e + 2) * sizeof(char*));
 		for (i=0; i<=e; i++)
 		{
