@@ -162,43 +162,42 @@ static int Cexecve(lua_State *L)
 	char **env;
 	const char *path = luaL_checkstring(L, 1);
 
-	if (lua_type(L, 2) != LUA_TTABLE)
+	if (lua_type(L, 2) != LUA_TTABLE) {
 		return pusherror(L, "bad argument #2 to 'execve' (table expected)");
+	}
 
 	int n = lua_rawlen(L, 2);
 	argv = lua_newuserdata(L, (n + 2) * sizeof(char*));
-
 	argv[0] = (char*) path;
 	lua_pushinteger(L, 0);
 	lua_gettable(L, 2);
-	if (lua_type(L, -1) == LUA_TSTRING)
+
+	if (lua_type(L, -1) == LUA_TSTRING) {
 		argv[0] = (char*)lua_tostring(L, -1);
-	else
+	} else {
 		lua_pop(L, 1);
+	}
+
 	int i;
-	for (i=1; i<=n; i++)
-	{
+	for (i=1; i<=n; i++) {
 		lua_pushinteger(L, i);
 		lua_gettable(L, 2);
 		argv[i] = (char*)lua_tostring(L, -1);
 	}
+
 	argv[n+1] = NULL;
 
-	if (lua_type(L, 3) == LUA_TTABLE)
-	{
+	if (lua_type(L, 3) == LUA_TTABLE) {
 		int e = lua_rawlen(L, 3);
 		env = lua_newuserdata(L, (e + 2) * sizeof(char*));
-		for (i=0; i<=e; i++)
-		{
+		for (i=0; i<=e; i++) {
 			lua_pushinteger(L, i + 1);
 			lua_gettable(L, 3);
 			env[i] = (char*)lua_tostring(L, -1);
 		}
 		env[e+1] = NULL;
 		execve(path, argv, env);
-	}
-	else
-	{
+	} else {
 		execv(path, argv);
 	}
 	return pusherror(L, path);
