@@ -216,9 +216,9 @@ static const luaL_Reg syslib[] =
 
 };
 
-LUALIB_API int luaopen_px(lua_State *L)
+int
+luaopen_px(lua_State *L)
 {
 	luaL_newlib(L, syslib);
 	return 1;
 }
-
