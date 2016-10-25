@@ -45,7 +45,7 @@ end
 -- @tparam string module name
 -- @treturn table module functions
 local xrequire = function(m)
-    local module = require(m)
+    local module = require(string.lower(m))
     return setmetatable({}, { __index = function(_, func) return module[string.lower(func)] end })
 end
 
