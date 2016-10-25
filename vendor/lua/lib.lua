@@ -599,7 +599,9 @@ function lib.retry_f(on_fail, delay, retries)
             if not ok then
                 i = i + 1
                 on_fail(err)
-                unistd.sleep(delay)
+                if delay > 0 then
+                    unistd.sleep(delay)
+                end
             end
         until(ok or (i == retries))
     end
