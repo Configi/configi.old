@@ -740,8 +740,8 @@ end
 
 --- @export
 return {
-    pcall_f = pcall_f, Pcall_F = pcall_f,
-    try_f = try_f, Try_F = try_f,
+    pcall_f = pcall_f, Pcall_Factory = pcall_f,
+    try_f = try_f, Try_Factory = try_f,
     require = xrequire, Require = xrequire,
     printf = printf, Print = printf,
     fprintf = fprintf, Fprint = fprintf,
