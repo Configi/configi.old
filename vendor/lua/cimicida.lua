@@ -336,7 +336,7 @@ end
 -- @treturn string the contents of the file, nil if the file cannot be read or opened
 local fopen = function (file)
     local str
-    for s in io.lines(file, 2^12) do
+    for s in io.lines(file) do
         str = string.format("%s%s", str or "", s)
     end
     if string.len(str) ~= 0 then
@@ -350,7 +350,7 @@ end
 -- @treturn string results of string.match, nil otherwise
 local match_from_file = function(file, pattern)
     local str
-    for s in io.lines(file, 2^12) do
+    for s in io.lines(file) do
         str = string.match(s, pattern)
         if str then
             return str
