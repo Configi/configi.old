@@ -13,7 +13,7 @@ $(factidA): $(factidOBJ)
 
 $(factidOBJ): $(factidSRC)
 	$(ECHOT) CC $@
-	$(TARGET_DYNCC) -o $@ $(TARGET_FLAGS) -c $<
+	$(TARGET_DYNCC) -o $@ -I vendor/c/auxlib $(TARGET_FLAGS) -c $<
 
 clean_factid:
 	$(RM) $(RMFLAGS) $(factidA) $(factidOBJ)
