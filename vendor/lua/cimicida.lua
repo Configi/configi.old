@@ -155,7 +155,7 @@ local ln_to_tbl = function (str)
     if not str then
         return tbl
     end
-    for ln in string.gmatch(str, "([^\n]*)\n") do
+    for ln in string.gmatch(str, "([^\n]*)\n*") do
         tbl[#tbl + 1] = ln
     end
     return tbl
