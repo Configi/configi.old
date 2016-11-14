@@ -1,6 +1,6 @@
-textfile.render"test/tmp/textfile_render_test.txt"{
-  src = "textfile_render_string.txt",
+template.render"test/tmp/template_render_test.txt"{
+  src = "template_render_string.txt",
   view = "view_model",
-  lua = "textfile_render_data.lua",
+  lua = "template_render_data.lua",
   diff = "true"
 }
