@@ -18,8 +18,8 @@ _ENV = ENV
 function factid.osfamily ()
     local id
     if sysstat.stat("/etc/os-release") then
-        id = util.match_from_file("/etc/os-release", [[^ID_LIKE=[%p]*(%w+)[%p]*$]])
-            or util.match_from_file("/etc/os-release", [[^ID=[%p]*(%w+)[%p]*$]])
+        id = util.match_from_file("/etc/os-release", [[^ID_LIKE=[%p]*(%w+)[%p]*]])
+            or util.match_from_file("/etc/os-release", [[^ID=[%p]*(%w+)[%p]*]])
     elseif sysstat.stat("/etc/openwrt_release") then
         id = "openwrt"
     else
