@@ -336,7 +336,7 @@ end
 -- @treturn string the contents of the file, nil if the file cannot be read or opened
 local fopen = function (file)
     local str
-    for s in io.lines(file) do
+    for s in io.lines(file, 2^12) do
         str = string.format("%s%s", str or "", s)
     end
     if string.len(str) ~= 0 then
