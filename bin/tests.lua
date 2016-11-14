@@ -271,70 +271,70 @@ T:start"cron.absent (modules/cron.lua) test/cron_absent.lua"
     end
 T:done(N)
 
-T:start"textfile.render (modules/textfile.lua) test/textfile_render.lua"
+T:start"template.render (modules/template.lua) test/template_render.lua"
     do
-        local textfile = function(policy)
-            local out = testdir .. "textfile_render_test.txt"
+        local template = function(policy)
+            local out = testdir .. "template_render_test.txt"
             cfg{ "-f", policy }
-            T:eq(crc(lib.fopen("test/textfile_render.txt")), crc(lib.fopen(out)))
+            T:eq(crc(lib.fopen("test/template_render.txt")), crc(lib.fopen(out)))
             os.remove(out)
         end
-        textfile"test/textfile_render.lua"
-        textfile"test/textfile_render.moon"
+        template"test/template_render.lua"
+        template"test/template_render.moon"
     end
 T:done(N)
 
-T:start"textfile.insert_line (modules/textfile.lua) test/textfile_insert.lua"
+T:start"template.insert_line (modules/template.lua) test/template_insert.lua"
     do
-        local textfile = function(p1, p2)
-            local out = testdir .. "textfile_insert_test.txt"
-            cfg{ "-f", "test/textfile_insert.lua"}
-            T:eq(crc(lib.fopen("test/textfile_insert.txt")), crc(lib.fopen(out)))
-            cfg{ "-f", "test/textfile_insert_inserts.lua"}
-            T:eq(crc(lib.fopen("test/textfile_insert.txt")), crc(lib.fopen(out)))
+        local template = function(p1, p2)
+            local out = testdir .. "template_insert_test.txt"
+            cfg{ "-f", "test/template_insert.lua"}
+            T:eq(crc(lib.fopen("test/template_insert.txt")), crc(lib.fopen(out)))
+            cfg{ "-f", "test/template_insert_inserts.lua"}
+            T:eq(crc(lib.fopen("test/template_insert.txt")), crc(lib.fopen(out)))
             os.remove(out)
         end
-        textfile("test/textfile_insert.lua", "test/textfile_insert_inserts.lua")
-        textfile("test/textfile_insert.moon", "test/textfile_insert_inserts.moon")
+        template("test/template_insert.lua", "test/template_insert_inserts.lua")
+        template("test/template_insert.moon", "test/template_insert_inserts.moon")
     end
 T:done(N)
 
-T:start"textfile.insert_line_before (modules/textfile.lua) test/textfile_insert_line_before.lua"
+T:start"template.insert_line_before (modules/template.lua) test/template_insert_line_before.lua"
     do
-        local textfile = function(policy)
+        local template = function(policy)
             cfg{ "-f", policy }
-            T:eq(crc(lib.fopen("test/textfile_insert_line_before.txt")),
-                crc(lib.fopen("test/tmp/textfile_insert_line_test.txt")))
+            T:eq(crc(lib.fopen("test/template_insert_line_before.txt")),
+                crc(lib.fopen("test/tmp/template_insert_line_test.txt")))
         end
-        textfile"test/textfile_insert_line_before.lua"
-        textfile"test/textfile_insert_line_before.moon"
+        template"test/template_insert_line_before.lua"
+        template"test/template_insert_line_before.moon"
     end
 T:done(N)
 
-T:start"textfile.insert_line_after (modules/textfile.lua) test/textfile_insert_line_after.lua"
+T:start"template.insert_line_after (modules/template.lua) test/template_insert_line_after.lua"
     do
-        local textfile = function(policy)
+        local template = function(policy)
             cfg{ "-f", policy }
-            T:eq(crc(lib.fopen("test/textfile_insert_line_after.txt")),
-                crc(lib.fopen("test/tmp/textfile_insert_line_test.txt")))
-            cmd.rm { "-f", testdir .. "textfile_insert_line_test.txt" }
-            cmd.rm { "-f", testdir .. "._configi_textfile_insert_line_test.txt" }
+            T:eq(crc(lib.fopen("test/template_insert_line_after.txt")),
+                crc(lib.fopen("test/tmp/template_insert_line_test.txt")))
+            cmd.rm { "-f", testdir .. "template_insert_line_test.txt" }
+            cmd.rm { "-f", testdir .. "._configi_template_insert_line_test.txt" }
         end
-        textfile"test/textfile_insert_line_after.lua"
-        textfile"test/textfile_insert_line_after.moon"
+        template"test/template_insert_line_after.lua"
+        template"test/template_insert_line_after.moon"
     end
 T:done(N)
 
-T:start"textfile.remove_line (modules/textfile.lua) test/textfile_remove_line.lua"
+T:start"template.remove_line (modules/template.lua) test/template_remove_line.lua"
     do
-        local textfile = function(policy)
+        local template = function(policy)
             cfg{ "-f", policy }
-            T:eq(crc(lib.fopen("test/textfile_remove_line.txt")),
-                crc(lib.fopen("test/tmp/textfile_remove_line_test.txt")))
-            cmd.rm { "-f", testdir .. "textfile_remove_line_test.txt" }
+            T:eq(crc(lib.fopen("test/template_remove_line.txt")),
+                crc(lib.fopen("test/tmp/template_remove_line_test.txt")))
+            cmd.rm { "-f", testdir .. "template_remove_line_test.txt" }
         end
-        textfile"test/textfile_remove_line.lua"
-        textfile"test/textfile_remove_line.moon"
+        template"test/template_remove_line.lua"
+        template"test/template_remove_line.moon"
     end
 T:done(N)
 
