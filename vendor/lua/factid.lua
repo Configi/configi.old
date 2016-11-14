@@ -232,7 +232,7 @@ function factid.gather ()
     end
 
     do
-        local id = factid.aws_instance_id()
+        local id = factid.aws_instance_id() or factid.hostname()
         fact.aws_instance_id = setmetatable({}, return_false)
         fact.aws_instance_id.string = id
         fact.aws_instance_id[id] = true
