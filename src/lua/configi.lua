@@ -11,7 +11,7 @@ local cfg = {}
 local PATH = "./"
 local loaded, policy = pcall(require, "policy")
 if not loaded then
-    policy = { moon = {}, lua = {} }
+    policy = { lua = {} }
 end
 local ENV = {}
 _ENV = ENV
@@ -425,21 +425,7 @@ function cli.compile(s, env)
     local chunk, err
     local _, base, ext = lib.decomp_path(s)
     local script = policy[ext][base]
-    if ext == "moon" then
-        local parse = require"moonscript.parse"
-        local tree, err = parse.string(script)
-        if not tree then
-            lib.errorf("%s%s\n", Lstr.SERR, err)
-        end
-        local compile = require"moonscript.compile"
-        local code, posmap_or_err, err_pos = compile.tree(tree)
-        if not code then
-            lib.errorf("%s%s\n", Lstr.SERR, compile.format_error(posmap_or_err, err_pos, script))
-        end
-        chunk, err = load(code, code, "t", env)
-    elseif ext == "lua" then
-        chunk, err = load(script, script, "t", env)
-    end
+    chunk, err = load(script, script, "t", env)
     if not chunk then
         lib.errorf("%s%s%s\n", Lstr.SERR, s, err)
     end
