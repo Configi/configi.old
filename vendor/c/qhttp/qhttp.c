@@ -4,6 +4,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <sys/select.h>
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -49,9 +51,23 @@ get(lua_State *L)
 	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		return luaX_pusherrno(L, "socket(2) error.");
 	}
+
+	struct timeval timeout;
+	timeout.tv_sec = 10;
+	timeout.tv_usec = 0;
+	fd_set set;
+	FD_ZERO(&set);
+	FD_SET(fd, &set);
+	fcntl(fd, F_SETFL, O_NONBLOCK);
 	if (connect(fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
-		return luaX_pusherrno(L, "connect(2) error.");
+		if (errno != EINPROGRESS) {
+			return luaX_pusherrno(L, "connect(2) error.");
+		}
 	}
+	if (select(fd + 1, NULL, &set, NULL, &timeout) < 0) {
+		return luaX_pusherrno(L, "select(2) error.");
+	}
+	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) & ~O_NONBLOCK);
 
 	ssize_t send_bytes = strlen(uri) + 19;
 	ssize_t sent_bytes;
