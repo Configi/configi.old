@@ -346,7 +346,7 @@ function cfg.init(P, M)
     C.functions.open = function (f)
         local path, base, ext = lib.decomp_path(f)
         local file
-        if path and not (path == ".") then
+        if path and string.find(path, "^/.*") and not (path == ".") then
             file = f
         else
             file = PATH .. "/" .. f
