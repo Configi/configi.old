@@ -74,11 +74,11 @@ function template.render(S)
         P.mode = tonumber(P.mode, 8)
         local ti = F.open(P.src)
         if not ti then
-            return F.result(P.src, false, G.missingsrc)
+            return F.result(P.src, false, M.report.missingsrc)
         end
         local lua = F.open(P.lua)
         if not lua then
-            return F.result(P.lua, false, G.missinglua)
+            return F.result(P.lua, false, M.report.missinglua)
         end
         local env = { require = require }
         local tbl
@@ -146,7 +146,7 @@ function template.insert_line(S)
         end
         local file = lib.file_to_tbl(P.path)
         if not file then
-            return F.result(P.path, false, G.missing)
+            return F.result(P.path, false, M.report.missing)
         end
         P.mode = stat.stat(P.path).st_mode
         if P.inserts then
@@ -207,7 +207,7 @@ function template.remove_line(S)
         end
         local file = lib.file_to_tbl(P.path)
         if not file then
-            return F.result(P.path, false, G.missing)
+            return F.result(P.path, false, M.report.missing)
         end
         P.mode = stat.stat(P.path).st_mode
         if not lib.find_string(file, pattern, P.plain) then
