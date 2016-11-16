@@ -213,6 +213,8 @@ function Lmod.ignoredwarn (C)
     C._module[#C._module + 1] = "notify"
     C._module[#C._module + 1] = "notify_failed"
     C._module[#C._module + 1] = "notify_kept"
+    C._module[#C._module + 1] = "requires"
+    C._module[#C._module + 1] = "wants" -- alias to requires
     -- Now check for any undeclared _module parameter
     local Ps = lib.arr_to_rec(C._module, 0)
     for param, _ in next, C.parameters do
