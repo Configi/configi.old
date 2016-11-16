@@ -64,7 +64,12 @@ get(lua_State *L)
 			return luaX_pusherrno(L, "connect(2) error.");
 		}
 	}
-	if (select(fd + 1, NULL, &set, NULL, &timeout) < 0) {
+	int status;
+	status = select(fd + 1, NULL, &set, NULL, &timeout);
+	if (status == 0) {
+		return luaX_pusherror(L, "select(2) timeout.");
+	}
+	if (status < 0) {
 		return luaX_pusherrno(L, "select(2) error.");
 	}
 	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) & ~O_NONBLOCK);
