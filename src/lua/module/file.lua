@@ -28,8 +28,8 @@ local owner = function(F, P, R)
         file_owner_skip = "file.owner: Owner/uid already matches ",
         file_owner_fail = "file.owner: Error setting owner/uid."
     }
-    local stat = stat.stat(P.path)
-    local u = pwd.getpwuid(stat.st_uid)
+    local info = stat.stat(P.path)
+    local u = pwd.getpwuid(info.st_uid)
     local uid = string.format("%s(%s)", u.pw_uid, u.pw_name)
     if P.owner == u.pw_name or P.owner == tostring(u.pw_uid) then
         return F.result(P.path, nil, report.file_owner_skip .. uid .. ".")
