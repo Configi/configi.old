@@ -28,15 +28,6 @@ T:start"Lua tests"
     end
 T:done(N)
 
-T:start"moonscript test/core-moonscript.moon"
-    do
-        cfg{ "-f", "test/core-moonscript.moon" }
-        local info = stat.stat(testdir .. "file_directory")
-        T:neq(stat.S_ISDIR(info.st_mode), 0)
-        os.remove(testdir .. "file_directory")
-    end
-T:done(N)
-
 T:start"debug test/core-debug.lua"
     do
         local debug = function(policy)
@@ -45,7 +36,6 @@ T:start"debug test/core-debug.lua"
             T:eq(string.find(out, "TESTDEBUG", 1, true), 75)
         end
         debug"test/core-debug.lua"
-        debug"test/core-debug.moon"
     end
 T:done(N)
 
@@ -58,7 +48,6 @@ T:start"log test/core-log.lua"
             os.remove(log)
         end
         log"test/core-log.lua"
-        log"test/core-log.moon"
     end
 T:done(N)
 
@@ -69,7 +58,6 @@ T:start"fact test/core-fact.lua"
             T:eq(out.code, 0)
         end
         fact"test/core-fact.lua"
-        fact"test/core-fact.moon"
     end
 T:done(N)
 
@@ -83,7 +71,6 @@ T:start"test test/core-test.lua"
             os.remove(tempname)
         end
         test"test/core-test.lua"
-        test"test/core-test.moon"
     end
 T:done(N)
 
@@ -93,7 +80,6 @@ T:start"module test/core-module.lua"
             T:eq(cfg{ "-f", policy }, true)
         end
         module"test/core-module.lua"
-        module"test/core-module.moon"
     end
 T:done(N)
 
@@ -107,7 +93,6 @@ T:start"include test/core-include1.lua, test/core-include2.lua"
             T:no(stat.stat(dir))
         end
         include("test/core-include1.lua", "test/core-include2.lua")
-        include("test/core-include1.moon", "test/core-include2.moon")
     end
 T:done(N)
 
@@ -124,7 +109,6 @@ T:start"handler,notify test/core-handler.lua"
             os.remove(file)
         end
         h("test/core-handler.lua", "test/core-handler_include.lua", "test/core-handler2.lua")
-        h("test/core-handler.moon", "test/core-handler_include.moon", "test/core-handler2.moon")
     end
 T:done(N)
 
@@ -143,7 +127,6 @@ T:start"comment test/core-comment.lua"
             T:eq(string.find(out, "TEST COMMENT", 1, true), 55)
         end
         comment"test/core-comment.lua"
-        comment"test/core-comment.moon"
     end
 T:done(N)
 
@@ -157,7 +140,6 @@ T:start"list test/core-list.lua"
             T:no(lib.is_dir(testdir .. "core-list.yyy"))
         end
         list"test/core-list.lua"
-        list"test/core-list.moon"
     end
 T:done(N)
 
@@ -171,7 +153,6 @@ T:start"each test/core-each.lua"
             T:no(lib.is_dir(testdir .. "core-each.yyy"))
         end
         each"test/core-each.lua"
-        each"test/core-each.moon"
     end
 T:done(N)
 
@@ -215,7 +196,6 @@ T:start"hostname.set (modules/hostname.lua)"
                 end
             end
             hostname"test/hostname_set.lua"
-            hostname"test/hostname_set.moon"
         else
             local _, out = cmd.hostname{}
             local before = out.stdout[1]
@@ -228,7 +208,6 @@ T:start"hostname.set (modules/hostname.lua)"
                 T:eq(out.stdout[1], before)
             end
             hostname"test/hostname_set.lua"
-            hostname"test/hostname_set.moon"
         end
     end
 T:done(N)
@@ -251,23 +230,6 @@ T:start"cron.present (modules/cron.lua) test/cron_present.lua"
             cmd.crontab{ "-d" }
         end
         cron"test/cron_present.lua"
-        cron"test/cron_present.moon"
-    end
-T:done(N)
-
-T:start"cron.absent (modules/cron.lua) test/cron_absent.lua"
-    do
-        local cron = function(policy)
-            cfg{ "-f", "test/cron_present.lua"}
-            cfg{ "-f", policy }
-            local _, r = cmd.crontab{ "-l" }
-            local crontab = table.concat(r.stdout, "\n")
-            T:eq(string.find(crontab, "6 7 * * * /bin/ls", 1, true), nil)
-            cmd.crontab{ "-r" }
-            cmd.crontab{ "-d" }
-        end
-        cron"test/cron_absent.lua"
-        cron"test/cron_absent.moon"
     end
 T:done(N)
 
@@ -280,7 +242,6 @@ T:start"template.render (modules/template.lua) test/template_render.lua"
             os.remove(out)
         end
         template"test/template_render.lua"
-        template"test/template_render.moon"
     end
 T:done(N)
 
@@ -295,7 +256,6 @@ T:start"template.insert_line (modules/template.lua) test/template_insert.lua"
             os.remove(out)
         end
         template("test/template_insert.lua", "test/template_insert_inserts.lua")
-        template("test/template_insert.moon", "test/template_insert_inserts.moon")
     end
 T:done(N)
 
@@ -307,7 +267,6 @@ T:start"template.insert_line_before (modules/template.lua) test/template_insert_
                 crc(lib.fopen("test/tmp/template_insert_line_test.txt")))
         end
         template"test/template_insert_line_before.lua"
-        template"test/template_insert_line_before.moon"
     end
 T:done(N)
 
@@ -321,7 +280,6 @@ T:start"template.insert_line_after (modules/template.lua) test/template_insert_l
             cmd.rm { "-f", testdir .. "._configi_template_insert_line_test.txt" }
         end
         template"test/template_insert_line_after.lua"
-        template"test/template_insert_line_after.moon"
     end
 T:done(N)
 
@@ -334,7 +292,6 @@ T:start"template.remove_line (modules/template.lua) test/template_remove_line.lu
             cmd.rm { "-f", testdir .. "template_remove_line_test.txt" }
         end
         template"test/template_remove_line.lua"
-        template"test/template_remove_line.moon"
     end
 T:done(N)
 
@@ -346,7 +303,6 @@ T:start"shell.command (modules/shell.lua)"
             os.remove(testdir .. "shell_command.txt")
         end
         shell"test/shell_command.lua"
-        shell"test/shell_command.moon"
     end
 T:done(N)
 
@@ -358,7 +314,6 @@ T:start"shell.system (modules/shell.lua)"
             os.remove(testdir .. "shell_system.txt")
         end
         shell"test/shell_system.lua"
-        shell"test/shell_system.moon"
     end
 T:done(N)
 
@@ -373,7 +328,6 @@ T:start"shell.popen (modules/shell.lua)"
             os.remove(testdir .. "The wizard quickly jinxed the gnomes before they vaporized")
         end
         shell("test/shell_popen.lua", "test/shell_popen_expects.lua")
-        shell("test/shell_popen.moon", "test/shell_popen_expects.moon")
     end
 T:done(N)
 
@@ -385,7 +339,6 @@ T:start"shell.popen3 (modules/shell.lua)"
             T:eq(cfg{ "-f", p3 }, true)
         end
         shell("test/shell_popen3_stdin.lua", "test/shell_popen3_stdout.lua", "test/shell_popen3_stderr.lua")
-        shell("test/shell_popen3_stdin.moon", "test/shell_popen3_stdout.moon", "test/shell_popen3_stderr.moon")
     end
 T:done(N)
 
@@ -395,7 +348,6 @@ T:start"user.present (modules/user.lua)"
             T:eq(cfg{ "-f", policy }, true)
         end
         user"test/user_present.lua"
-        user"test/user_present.moon"
     end
 T:done(N)
 
@@ -405,7 +357,6 @@ T:start"user.absent (modules/user.lua)"
             T:eq(cfg{ "-f", policy }, true)
         end
         user"test/user_absent.lua"
-        user"test/user_absent.moon"
     end
 T:done(N)
 
@@ -416,7 +367,6 @@ if lib.bin_path"apt-get" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             apt"test/apt_present.lua"
-            apt"test/apt_present.moon"
         end
     T:done(N)
     T:start"apt.absent (modules/apt.lua)"
@@ -425,7 +375,6 @@ if lib.bin_path"apt-get" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             apt"test/apt_absent.lua"
-            apt"test/apt_absent.moon"
         end
     T:done(N)
 end
@@ -437,7 +386,6 @@ if lib.bin_path"yum" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             yum"test/yum_present.lua"
-            yum"test/yum_present.moon"
         end
     T:done(N)
     T:start"yum.absent (modules/yum.lua)"
@@ -446,7 +394,6 @@ if lib.bin_path"yum" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             yum"test/yum_absent.lua"
-            yum"test/yum_absent.moon"
         end
     T:done(N)
 end
@@ -458,7 +405,6 @@ if lib.bin_path"systemctl" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             systemd"test/systemd_started.lua"
-            systemd"test/systemd_started.moon"
         end
     T:done(N)
     T:start"systemd.restart (modules/systemd.lua)"
@@ -477,7 +423,6 @@ if lib.bin_path"systemctl" then
                 T:yes(ok)
             end
             systemd"test/systemd_restart.lua"
-            systemd"test/systemd_restart.moon"
         end
     T:done(N)
     T:start"systemd.reload (modules/systemd.lua)"
@@ -486,7 +431,6 @@ if lib.bin_path"systemctl" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             systemd"test/systemd_reload.lua"
-            systemd"test/systemd_reload.moon"
         end
     T:done(N)
     T:start"systemd.stopped (modules/systemd.lua)"
@@ -496,7 +440,6 @@ if lib.bin_path"systemctl" then
                 T:eq(cmd.pgrep{ "lighttpd" }, nil)
             end
             systemd"test/systemd_stopped.lua"
-            systemd"test/systemd_stopped.moon"
         end
     T:done(N)
     T:start"systemd.enabled (modules/systemd.lua)"
@@ -505,7 +448,6 @@ if lib.bin_path"systemctl" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             systemd"test/systemd_enabled.lua"
-            systemd"test/systemd_enabled.moon"
         end
     T:done(N)
     T:start"systemd.disabled (modules/systemd.lua)"
@@ -514,7 +456,6 @@ if lib.bin_path"systemctl" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             systemd"test/systemd_disabled.lua"
-            systemd"test/systemd_disabled.moon"
         end
     T:done(N)
 end
@@ -526,7 +467,6 @@ if osfamily == "openwrt" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             opkg"test/opkg_present.lua"
-            opkg"test/opkg_present.moon"
         end
     T:done(N)
     T:start"opkg.absent (modules/opkg.lua)"
@@ -535,7 +475,6 @@ if osfamily == "openwrt" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             opkg"test/opkg_absent.lua"
-            opkg"test/opkg_absent.moon"
         end
     T:done(N)
     T:start"sysvinit.started (modules/sysvinit.lua)"
@@ -545,7 +484,6 @@ if osfamily == "openwrt" then
                 T:eq(cmd.pgrep{ "uhttpd" }, true)
             end
             sysvinit"test/sysvinit_started.lua"
-            sysvinit"test/sysvinit_started.moon"
         end
     T:done(N)
     T:start"sysvinit.restart (modules/sysvinit.lua)"
@@ -564,7 +502,6 @@ if osfamily == "openwrt" then
                 T:yes(ok)
             end
             sysvinit"test/sysvinit_restart.lua"
-            sysvinit"test/sysvinit_restart.moon"
         end
     T:done(N)
     T:start"sysvinit.reload (modules/sysvinit.lua)"
@@ -573,7 +510,6 @@ if osfamily == "openwrt" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             sysvinit"test/sysvinit_reload.lua"
-            sysvinit"test/sysvinit_reload.moon"
         end
     T:done(N)
     T:start"sysvinit.stopped (modules/sysvinit.lua)"
@@ -583,7 +519,6 @@ if osfamily == "openwrt" then
                 T:no(cmd.pgrep{ "uhttpd" })
             end
             sysvinit"test/sysvinit_stopped.lua"
-            sysvinit"test/sysvinit_stopped.moon"
         end
     T:done(N)
     T:start"sysvinit.enabled (modules/sysvinit.lua)"
@@ -592,7 +527,6 @@ if osfamily == "openwrt" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             sysvinit"test/sysvinit_enabled.lua"
-            sysvinit"test/sysvinit_enabled.moon"
         end
     T:done(N)
     T:start"sysvinit.disabled (modules/sysvinit.lua)"
@@ -601,7 +535,6 @@ if osfamily == "openwrt" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             sysvinit"test/sysvinit_disabled.lua"
-            sysvinit"test/sysvinit_disabled.moon"
         end
     T:done(N)
 end
@@ -613,7 +546,6 @@ if osfamily == "gentoo" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             portage"test/portage_present.lua"
-            portage"test/portage_present.moon"
         end
     T:done(N)
     T:start"portage.absent (modules/portage.lua)"
@@ -622,7 +554,6 @@ if osfamily == "gentoo" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             portage"test/portage_absent.lua"
-            portage"test/portage_absent.moon"
         end
     T:done(N)
 end
@@ -634,7 +565,6 @@ if osfamily == "alpine" then
                 T:eq(cfg{ "-v", "-f", policy }, true)
             end
             apk"test/apk_present.lua"
-            apk"test/apk_present.moon"
         end
     T:done(N)
     T:start"apk.absent (modules/apk.lua)"
@@ -643,7 +573,6 @@ if osfamily == "alpine" then
                 T:eq(cfg{ "-v", "-f", policy }, true)
             end
             apk"test/apk_absent.lua"
-            apk"test/apk_absent.moon"
         end
     T:done(N)
 end
@@ -656,7 +585,6 @@ if osfamily == "gentoo" or osfamily == "alpine" then
                 T:eq(cmd.pgrep{ "rsync" }, true)
             end
             openrc"test/openrc_started.lua"
-            openrc"test/openrc_started.moon"
         end
     T:done(N)
     T:start"openrc.restart (modules/openrc.lua)"
@@ -675,7 +603,6 @@ if osfamily == "gentoo" or osfamily == "alpine" then
                 T:yes(ok)
             end
             openrc"test/openrc_restart.lua"
-            openrc"test/openrc_restart.moon"
         end
     T:done(N)
     T:start"openrc.reload (modules/openrc.lua)"
@@ -684,7 +611,6 @@ if osfamily == "gentoo" or osfamily == "alpine" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             openrc"test/openrc_reload.lua"
-            openrc"test/openrc_reload.moon"
         end
     T:done(N)
     T:start"openrc.stopped (modules/openrc.lua)"
@@ -694,7 +620,6 @@ if osfamily == "gentoo" or osfamily == "alpine" then
                 T:eq(cmd.pgrep{ "rsync" }, nil)
             end
             openrc"test/openrc_stopped.lua"
-            openrc"test/openrc_stopped.moon"
         end
     T:done(N)
     T:start"openrc.add (modules/openrc.lua)"
@@ -703,7 +628,6 @@ if osfamily == "gentoo" or osfamily == "alpine" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             openrc"test/openrc_add.lua"
-            openrc"test/openrc_add.moon"
         end
     T:done(N)
     T:start"openrc.delete (modules/openrc.lua)"
@@ -712,7 +636,6 @@ if osfamily == "gentoo" or osfamily == "alpine" then
                 T:eq(cfg{ "-f", policy }, true)
             end
             openrc"test/openrc_del.lua"
-            openrc"test/openrc_del.moon"
         end
     T:done(N)
 end
@@ -737,7 +660,6 @@ T:start"file.attributes (module/file.lua)"
 
         end
         attributes"test/file_attributes.lua"
-        attributes"test/file_attributes.moon"
     end
 T:done(N)
 
@@ -750,7 +672,6 @@ T:start"file.link (module/file.lua)"
                         T:eq(lib.execute("rm -f " .. testdir .. "file_link"), true)
                 end
                 link"test/file_link.lua"
-                link"test/file_link.moon"
         end
 T:done(N)
 
@@ -765,7 +686,6 @@ T:start"file.hard (module/file.lua)"
                         T:eq(lib.execute("rm -f " .. testdir .. "file_hard_link"), true)
                 end
                 hard"test/file_hard.lua"
-                hard"test/file_hard.moon"
         end
 T:done(N)
 
@@ -778,7 +698,6 @@ T:start"file.directory (module/file.lua)"
                         T:yes(os.remove(testdir .. "file_directory"))
                 end
                 directory"test/file_directory.lua"
-                directory"test/file_directory.moon"
         end
 T:done(N)
 
@@ -791,7 +710,6 @@ T:start"file.touch (module/file.lua)"
                         T:yes(os.remove(testdir .. "file_touch"))
                 end
                 touch"test/file_touch.lua"
-                touch"test/file_touch.moon"
         end
 T:done(N)
 
@@ -802,7 +720,6 @@ T:start"file.absent (module/file.lua)"
                         T:no(stat.stat(testdir .. "file_absent"))
                 end
                 absent"test/file_absent.lua"
-                absent"test/file_absent.moon"
         end
 T:done(N)
 
@@ -819,7 +736,6 @@ T:start"file.copy (module/file.lua)"
                         T:eq(cmd.rm{ "-f", testdir .. "file_copy.tmp" }, true)
                 end
                 copy"test/file_copy.lua"
-                copy"test/file_copy.moon"
         end
 T:done(N)
 
@@ -829,7 +745,6 @@ T:start"authorized_keys.present (modules/authorized_keys.lua)"
             T:eq(cfg{ "-f", policy }, true)
         end
         authorized_keys"test/authorized_keys_present.lua"
-        authorized_keys"test/authorized_keys_present.moon"
     end
 T:done(N)
 
@@ -839,7 +754,6 @@ T:start"authorized_keys.absent (modules/authorized_keys.lua)"
             T:eq(cfg{ "-f", policy }, true)
         end
         authorized_keys"test/authorized_keys_absent.lua"
-        authorized_keys"test/authorized_keys_absent.moon"
     end
 T:done(N)
 
@@ -851,7 +765,6 @@ T:start"unarchive.unpack (modules/unarchive.lua)"
             cmd.rm{ "-f", testdir .. "unarchive_unpack.lua"}
         end
         unarchive"test/unarchive_unpack.lua"
-        unarchive"test/unarchive_unpack.moon"
     end
 T:done(N)
 
@@ -864,7 +777,6 @@ if lib.bin_path("git") then
                 T:yes(stat.stat(testdir .. "git/.git/config"))
             end
             git"test/git_clone.lua"
-            git"test/git_clone.moon"
         end
     T:done(N)
 
@@ -876,7 +788,6 @@ if lib.bin_path("git") then
                 T:eq(string.find(out, "Already up-to-date.", 1, true), 78)
             end
             git"test/git_pull.lua"
-            git"test/git_pull.moon"
         end
     T:done(N)
 end
@@ -887,7 +798,6 @@ T:start"sha256.verify (modules/sha256.lua)"
             T:eq(cfg{ "-f", policy }, true)
         end
         sha256"test/sha256_verify.lua"
-        sha256"test/sha256_verify.moon"
     end
 T:done(N)
 
@@ -903,7 +813,6 @@ T:start"iptables.append (modules/iptables.lua)"
             cmd.iptables{ "-F" }
         end
         iptables"test/iptables_append.lua"
-        iptables"test/iptables_append.moon"
     end
 T:done(N)
 
@@ -918,7 +827,6 @@ T:start"iptables.disable (modules/iptables.lua)"
             T:eq(#res.stdout, 3)
         end
         iptables("test/iptables_append.lua", "test/iptables_disable.lua")
-        iptables("test/iptables_append.moon", "test/iptables_disable.moon")
     end
 T:done(N)
 
@@ -931,7 +839,6 @@ T:start"make.install (modules/make.lua)"
             T:eq(cmd.rm{ "-r", "-f", "test/tmp/make_install" }, true)
         end
         make"test/make_install.lua"
-        make"test/make_install.moon"
     end
 T:done(N)
 
