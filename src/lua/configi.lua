@@ -6,6 +6,7 @@ local Psyslog = require"posix.syslog"
 local Pgetopt = require"posix.getopt"
 local Psystime = require"posix.sys.time"
 local lib = require"lib"
+local tsort = require"tsort"
 local cfg = {}
 local PATH = "./"
 local loaded, policy = pcall(require, "policy")
@@ -561,6 +562,29 @@ function cli.main (opts)
             end
         end
         temp, htemp = {}, {}
+    end
+    local graph = tsort.new()
+    do -- Create the DAG
+        for _, src in ipairs(source) do
+            local dep = src.param.wants or src.param.requires
+            if dep then -- Found a dependency
+                for _, dep_of_src in hsource[dep] do
+                    local dep_of_handler = dep_of_src.param.wants or dep_of_src.param.requires
+                    if dep_of_handler then -- Found a handler's dependency
+                        for _, edge in hsource[dep_of_handler] do
+                            graph:add{ edge, dep_of_src }
+                        end
+                        graph:add{ dep_of_src, src }
+                    else
+                        graph:add{ dep_of_src, src }
+                    end
+                end
+            end
+        end
+    end
+    local sorted_graph = graph:sort()
+    if #sorted_graph > 0 then
+       source = lib.clone_seq(sorted_graph)
     end
     source.debug, source.test, source.log, source.syslog, source.msg =
     opts.debug, opts.test, opts.log, opts.syslog, opts.msg
