@@ -1,2 +1,0 @@
-
-sysvinit.reload"uhttpd"()

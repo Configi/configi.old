@@ -1,1 +1,0 @@
-systemd.stopped"lighttpd"()

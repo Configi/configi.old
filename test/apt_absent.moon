@@ -1,1 +1,0 @@
-apt.absent"mtr-tiny"!
