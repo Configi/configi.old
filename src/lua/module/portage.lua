@@ -127,7 +127,7 @@ function portage.present(S)
             table.insert(args, 3, "--auto-unmask-write")
             table.insert(args, 3, "--auto-unmask")
             if not F.run(cmd["/usr/bin/emerge"], args) then
-                return F.result(atom, false, G.failed)
+                return F.result(atom, false, M.report.failed)
             end
             table.remove(args, 3)
             table.remove(args, 3)
