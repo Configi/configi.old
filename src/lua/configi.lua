@@ -572,7 +572,7 @@ function cli.main (opts)
     end
     local sorted_graph = graph:sort()
     if #sorted_graph > 0 then
-       source = lib.clone_seq(sorted_graph)
+       source = lib.clone(sorted_graph)
     end
     source.debug, source.test, source.log, source.syslog, source.msg =
     opts.debug, opts.test, opts.log, opts.syslog, opts.msg
