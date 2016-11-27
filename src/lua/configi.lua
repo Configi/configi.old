@@ -161,13 +161,6 @@ function Lmod.msg (C)
                 flag = "exit"
             end
         end
-
-        local str = string.format([[
-
- [%s] %s
-        Item: %s
-        Comment: %s
-        %s%s]], flag, msg, item, C.parameters.comment, "", "\n")
         local rs = string.char(9)
         local lstr
         if string.len(C.parameters.comment) > 0 then
@@ -182,7 +175,7 @@ function Lmod.msg (C)
             comment = C.parameters.comment,
             result = flag
         }
-        C.results.msg[#C.results.msg + 1] = str
+        C.results.msg[#C.results.msg + 1] = lstr
     end
 end
 
