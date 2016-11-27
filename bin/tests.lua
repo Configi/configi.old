@@ -130,6 +130,24 @@ T:start"comment test/core-comment.lua"
     end
 T:done(N)
 
+
+T:start"wants test/core-wants.lua"
+    do
+        local wants = function(policy)
+            local _, out = cfg{ "-m", "-f", policy }
+            T:eq(string.find(out.stderr[1], "%c+%c%c+%c%c+%c#1st"))
+            T:eq(string.find(out.stderr[2], "%c+%c%c+%c%c+%c#1st"))
+            T:eq(string.find(out.stderr[3], "%c+%c%c+%c%c+%c#2nd"))
+            T:eq(string.find(out.stderr[4], "%c+%c%c+%c%c+%c#2nd"))
+            T:eq(string.find(out.stderr[5], "%c+%c%c+%c%c+%c#3rd"))
+            T:eq(string.find(out.stderr[6], "%c+%c%c+%c%c+%c#3rd"))
+            cmd.rm { "-f", testdir .. "core-wants-first" }
+            cmd.rm { "-f", testdir .. "core-wants" }
+        end
+        wants("test/core-wants.lua")
+    end
+T:done(N)
+
 T:start"list test/core-list.lua"
     do
         local list = function(policy)
