@@ -563,7 +563,10 @@ function cli.main (opts)
             end
         end
     end
-    local sorted_graph = graph:sort()
+    local sorted_graph, tsort_err = graph:sort()
+    if not sorted_graph then
+        lib.errorf("%s %s %s\n", Lstr.SERR, opts.script, tsort_err)
+    end
     if #sorted_graph > 0 then
        source = lib.clone(sorted_graph)
     end
