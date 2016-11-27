@@ -790,7 +790,6 @@ if lib.bin_path("git") then
     T:start"git.clone (modules/git.lua)"
         do
             local git = function(policy)
-                cmd.rm{ "-rf", testdir .. "git" }
                 cfg{ "-f", policy }
                 T:yes(stat.stat(testdir .. "git/.git/config"))
             end
@@ -804,6 +803,7 @@ if lib.bin_path("git") then
                 local _, out = cfg{ "-vf", policy }
                 out = table.concat(out.stderr, "\n")
                 T:eq(string.find(out, "Already up-to-date.", 1, true), 78)
+                cmd.rm{ "-rf", testdir .. "git" }
             end
             git"test/git_pull.lua"
         end
