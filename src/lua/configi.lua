@@ -568,7 +568,7 @@ function cli.main (opts)
         lib.errorf("%s %s %s\n", Lstr.SERR, opts.script, tsort_err)
     end
     if #sorted_graph > 0 then
-       source = lib.clone(sorted_graph)
+        source = lib.clone(sorted_graph)
     end
     source.debug, source.test, source.log, source.syslog, source.msg =
     opts.debug, opts.test, opts.log, opts.syslog, opts.msg
