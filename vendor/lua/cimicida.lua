@@ -812,5 +812,7 @@ return {
     return_if = return_if, Return_If = return_if,
     return_if_not = return_if_not, Return_If_Not = return_if_not,
     autotable = autotable, Autotable = autotable,
-    count_keys = count_keys, Count_Keys = count_keys
+    count_keys = count_keys, Count_Keys = count_keys,
+    truncate = truncate, Truncate = truncate,
+    read_all = read_all, Read_All = read_all
 }
