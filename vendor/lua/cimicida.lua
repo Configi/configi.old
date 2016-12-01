@@ -738,6 +738,30 @@ local count_keys = function(t, maxn)
     return n
 end
 
+--- Truncate a file
+-- @tparam string file to truncate
+local truncate = function(file)
+  local o = io.output()
+  local fd = io.open(file, "w+")
+  io.output(fd)
+  io.write("")
+  io.close()
+  io.output(o)
+end
+
+--- Read a file in one shot
+-- @tparam string file to read
+-- @treturn string contents of file
+local read_all = function(file)
+  local o = io.input()
+  local fd = io.open(file)
+  io.input(fd)
+  local str = io.read("*a")
+  io.close()
+  io.input(o)
+  return str
+end
+
 --- @export
 return {
     pcall_f = pcall_f, Pcall_Factory = pcall_f,
