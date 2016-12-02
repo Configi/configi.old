@@ -147,11 +147,11 @@ function iptables.disable(S)
         if stat.stat("/proc/net/ip_tables_names") then
             ok = disable("/proc/net/ip_tables_names")
         else
-            ok = truE
+            ok = true
         end
         if stat.stat("/proc/net/ip6_tables_names") then
             ok = false -- reset variable
-            k = disable("/proc/net/ip6_tables_names")
+            ok = disable("/proc/net/ip6_tables_names")
         else
             ok = true
         end

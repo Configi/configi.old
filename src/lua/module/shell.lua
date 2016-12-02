@@ -99,7 +99,7 @@ function shell.command(S)
         end
         -- passing a dummy arg if no arguments
         args[2] = args[2] or true
-        local rt
+        local rt, _
         if not P.test then
             _, rt = F.run(lib.qexec, args)
         else
