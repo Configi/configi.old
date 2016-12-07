@@ -53,8 +53,9 @@ function opkg.present(S)
     return function(P)
         P.package = S
         local F, R = cfg.init(P, M)
+        local env
         if P.proxy then
-            local env = { "http_proxy=" .. P.proxy }
+            env = { "http_proxy=" .. P.proxy }
         end
         -- Update mode
         if P.update == true then
