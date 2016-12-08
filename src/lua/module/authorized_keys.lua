@@ -28,6 +28,9 @@ local keyfile = function(P)
         dir = "/etc/dropbear"
     else
         user = pwd.getpwnam(P.user)
+        if not user then
+            return nil, "Couldn't find user: " .. P.user
+        end
         file = user.pw_dir .. "/.ssh/authorized_keys"
         dir = user.pw_dir .. "/.ssh"
     end
@@ -35,14 +38,17 @@ local keyfile = function(P)
     if ret then
         return file
     elseif not ret and (P.create == false) then -- `create "yes"` is default
-        return nil
+        return nil, "File: " .. file .. " exists and create is false"
     end
     if not stat.stat(dir) then
-        if stat.mkdir(dir, 496) and lib.fwrite(file, "") then
-            return file
+        if not stat.mkdir(dir, 496) then
+            return nil, "Couldn't stat or create parent directory: " .. dir
         end
-    elseif lib.fwrite(file, "") then
+    end
+    if lib.fwrite(file, "") then
         return file
+    else
+        return nil, "Couldn't write to file: " .. file
     end
 end
 
@@ -84,7 +90,6 @@ function authorized_keys.present(S)
             repaired = "authorized_keys.present: Key successfully added.",
                 kept = "authorized_keys.present: Key already present.",
               failed = "authorized_keys.present: Error adding key.",
-        missing_fail = "authorized_keys.present: authorized_keys file missing."
     }
     return function(P)
         if fact.osfamily == "openwrt" then
@@ -96,9 +101,9 @@ function authorized_keys.present(S)
         if P.create == nil then
             P.create = true -- default: create "yes"
         end
-        local file = keyfile(P)
+        local file, err = keyfile(P)
         if not file then
-            F.msg("authorized_keys file", M.report.missing_fail, false)
+            F.msg("authorized_keys file", "authorized_keys.present: " .. err, false)
             return F.result(item, false)
         end
         if found(P) then
