@@ -11,3 +11,7 @@ file.touch"test/tmp/core-wants-first"{
     comment = "1st",
     handle = "FIRST"
 }
+file.touch"test/tmp/core-wants-another"{
+    comment = "another",
+    handle = "FIRST"
+}
