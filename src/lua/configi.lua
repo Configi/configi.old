@@ -551,15 +551,21 @@ function cli.main (opts)
         for _, src in ipairs(source) do
             local dep = src.param.wants or src.param.requires
             if dep then -- Found a dependency
-                for _, dep_of_src in ipairs(hsource[dep]) do
-                    local dep_of_handler = dep_of_src.param.wants or dep_of_src.param.requires
-                    if dep_of_handler then -- Found a handler's dependency
-                        for _, edge in ipairs(hsource[dep_of_handler]) do
-                            graph:add{ edge, dep_of_src }
+                for _, edge in ipairs(hsource[dep]) do
+                    local first_handler = edge.param.wants or edge.param.requires
+                    if first_handler then -- Found a handler's dependency
+                        for _, first_edge in ipairs(hsource[first_handler]) do
+                            local second_handler = first_edge.param.wants or first_edge.param.requires
+                            if second_handler then -- Found another dependency
+                                for _, second_edge in ipairs(hsource[second_handler]) do
+                                    graph:add{ second_edge, first_edge }
+                                end
+                            end
+                            graph:add{ first_edge, edge }
                         end
-                        graph:add{ dep_of_src, src }
+                        graph:add{ edge, src }
                     else
-                        graph:add{ dep_of_src, src }
+                        graph:add{ edge, src }
                     end
                 end
             end
