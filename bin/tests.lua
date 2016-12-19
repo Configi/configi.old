@@ -136,13 +136,12 @@ T:start"wants test/core-wants.lua"
         local wants = function(policy)
             local _, out = cfg{ "-m", "-f", policy }
             T:eq(string.find(out.stderr[1], "%c+%c%c+%c%c+%c#1st"))
-            T:eq(string.find(out.stderr[2], "%c+%c%c+%c%c+%c#1st"))
-            T:eq(string.find(out.stderr[3], "%c+%c%c+%c%c+%c#another"))
-            T:eq(string.find(out.stderr[4], "%c+%c%c+%c%c+%c#another"))
-            T:eq(string.find(out.stderr[5], "%c+%c%c+%c%c+%c#2nd"))
-            T:eq(string.find(out.stderr[6], "%c+%c%c+%c%c+%c#2nd"))
-            T:eq(string.find(out.stderr[7], "%c+%c%c+%c%c+%c#3rd"))
-            T:eq(string.find(out.stderr[8], "%c+%c%c+%c%c+%c#3rd"))
+            T:eq(string.find(out.stderr[2], "%c+%c%c+%c%c+%c#2nd"))
+            T:eq(string.find(out.stderr[3], "%c+%c%c+%c%c+%c#2nd"))
+            T:eq(string.find(out.stderr[4], "%c+%c%c+%c%c+%c#3rd"))
+            T:eq(string.find(out.stderr[5], "%c+%c%c+%c%c+%c#3rd"))
+            T:eq(string.find(out.stderr[6], "%c+%c%c+%c%c+%c#4th"))
+            T:eq(string.find(out.stderr[7], "%c+%c%c+%c%c+%c#4th"))
             cmd.rm { "-f", testdir .. "core-wants-first" }
             cmd.rm { "-f", testdir .. "core-wants-another" }
             cmd.rm { "-f", testdir .. "core-wants" }

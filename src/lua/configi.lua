@@ -492,24 +492,26 @@ function cli.main (opts)
                         return function (ptbl) -- mod.func
                             ptbl = ptbl or {}
                             local qt = { environment = {}, parameters = {} }
-                                for p, v in next, ptbl do
-                                    if p == register then
-                                        rawset(env.global, v, true)
-                                    end
-                                    qt.parameters[p] = v
+                            for p, v in next, ptbl do
+                                if p == register then
+                                    rawset(env.global, v, true)
                                 end
+                                qt.parameters[p] = v
+                            end
+                            local resource = qt.parameters.handle or subject
                             if qt.parameters.context == true or (qt.parameters.context == nil) then
-                                if qt.parameters.handle then
-                                    if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
-                                        hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
+                                if not qt.parameters.handle and type(ptbl) == "table" then
+                                    source[#source + 1] = { mod = mod, func = func, subject = subject, param = ptbl }
+                                end
+                                if type(ptbl) == "table" then
+                                    if hsource[resource] and (#hsource[resource] > 0) then
+                                        hsource[resource][#hsource[resource] + 1] =
                                             { mod = mod, func = func, subject = subject, param = ptbl }
                                     else
-                                        hsource[qt.parameters.handle] = {}
-                                        hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
-                                            { mod = mod, func = func, subject = subject, param = ptbl }
+                                        hsource[resource] = {}
+                                        hsource[resource][#hsource[resource] + 1] =
+                                             { mod = mod, func = func, subject = subject, param = ptbl }
                                     end
-                                elseif type(ptbl) == "table" then
-                                    source[#source + 1] = {mod = mod, func = func,subject=subject, param = ptbl}
                                 end
                             end -- context
                         end -- mod.func
@@ -549,15 +551,21 @@ function cli.main (opts)
         for _, src in ipairs(source) do
             local dep = src.param.wants or src.param.requires
             if dep then -- Found a dependency
-                for _, dep_of_src in ipairs(hsource[dep]) do
-                    local dep_of_handler = dep_of_src.param.wants or dep_of_src.param.requires
-                    if dep_of_handler then -- Found a handler's dependency
-                        for _, edge in ipairs(hsource[dep_of_handler]) do
-                            graph:add{ edge, dep_of_src }
+                for _, edge in ipairs(hsource[dep]) do
+                    local first_handler = edge.param.wants or edge.param.requires
+                    if first_handler then -- Found a handler's dependency
+                        for _, first_edge in ipairs(hsource[first_handler]) do
+                            local second_handler = first_edge.param.wants or first_edge.param.requires
+                            if second_handler then -- Found another dependency
+                                for _, second_edge in ipairs(hsource[second_handler]) do
+                                    graph:add{ second_edge, first_edge }
+                                end
+                            end
+                            graph:add{ first_edge, edge }
                         end
-                        graph:add{ dep_of_src, src }
+                        graph:add{ edge, src }
                     else
-                        graph:add{ dep_of_src, src }
+                        graph:add{ edge, src }
                     end
                 end
             end

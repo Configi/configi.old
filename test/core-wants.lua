@@ -1,17 +1,17 @@
 file.absent"test/tmp/core-wants"{
-    comment = "3rd",
+    comment = "4th",
     wants = "TOUCH"
 }
 file.touch"test/tmp/core-wants"{
-    comment = "2nd",
+    comment = "3rd",
     handle = "TOUCH",
-    wants = "FIRST"
+    wants = "SECOND"
 }
 file.touch"test/tmp/core-wants-first"{
-    comment = "1st",
-    handle = "FIRST"
+    comment = "2nd",
+    handle = "SECOND",
+    wants = "FIRST"
 }
-file.touch"test/tmp/core-wants-another"{
-    comment = "another",
-    handle = "FIRST"
+file.absent"FIRST"{
+    comment = "1st"
 }
