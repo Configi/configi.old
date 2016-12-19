@@ -492,24 +492,26 @@ function cli.main (opts)
                         return function (ptbl) -- mod.func
                             ptbl = ptbl or {}
                             local qt = { environment = {}, parameters = {} }
-                                for p, v in next, ptbl do
-                                    if p == register then
-                                        rawset(env.global, v, true)
-                                    end
-                                    qt.parameters[p] = v
+                            for p, v in next, ptbl do
+                                if p == register then
+                                    rawset(env.global, v, true)
                                 end
+                                qt.parameters[p] = v
+                            end
+                            local resource = qt.parameters.handle or subject
                             if qt.parameters.context == true or (qt.parameters.context == nil) then
-                                if qt.parameters.handle then
-                                    if hsource[qt.parameters.handle] and (#hsource[qt.parameters.handle] > 0) then
-                                        hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
+                                if not qt.parameters.handle and type(ptbl) == "table" then
+                                    source[#source + 1] = { mod = mod, func = func, subject = subject, param = ptbl }
+                                end
+                                if type(ptbl) == "table" then
+                                    if hsource[resource] and (#hsource[resource] > 0) then
+                                        hsource[resource][#hsource[resource] + 1] =
                                             { mod = mod, func = func, subject = subject, param = ptbl }
                                     else
-                                        hsource[qt.parameters.handle] = {}
-                                        hsource[qt.parameters.handle][#hsource[qt.parameters.handle] + 1] =
-                                            { mod = mod, func = func, subject = subject, param = ptbl }
+                                        hsource[resource] = {}
+                                        hsource[resource][#hsource[resource] + 1] =
+                                             { mod = mod, func = func, subject = subject, param = ptbl }
                                     end
-                                elseif type(ptbl) == "table" then
-                                    source[#source + 1] = {mod = mod, func = func,subject=subject, param = ptbl}
                                 end
                             end -- context
                         end -- mod.func
