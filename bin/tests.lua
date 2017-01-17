@@ -150,6 +150,17 @@ T:start"wants test/core-wants.lua"
     end
 T:done(N)
 
+T:start"user-modules test/core-user-modules"
+    do
+        local user = function(policy)
+            cfg{ "-f", policy}
+            T:yes(stat.stat(testdir .. "core-user-modules"))
+            cmd.rm { "-f", testdir .. "core-user-modules" }
+        end
+        user("test/core-user-modules/test.lua")
+    end
+T:done(N)
+
 T:start"list test/core-list.lua"
     do
         local list = function(policy)

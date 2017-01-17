@@ -11,6 +11,7 @@ local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
+package.path = aux.path() .. "/" .. "?.lua"
 _ENV = ENV
 
 -- Iterate a table (array) for records.
@@ -32,9 +33,13 @@ end
 -- @param m name of the module (STRING)
 -- @return module (TABLE or FUNCTION)
 function functions.module (m)
-    local rb, rm = pcall(require, "cfg-modules." .. m)
+    -- Try custom modules in the arg path .. "/modules" directory first.
+    local rb, rm = pcall(require, "modules." .. m)
     if not rb then
-        return lib.errorf("%s%s\n%s\n", strings.MERR, m, rm)
+        rb, rm = pcall(require, "cfg-modules." .. m)
+        if not rb then
+            return lib.errorf("%s%s\n%s\n", strings.MERR, m, rm)
+        end
     end
     return rm
 end
