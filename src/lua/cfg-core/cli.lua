@@ -303,7 +303,7 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
                 param.syslog = hsource[3] or param.syslog
                 param.log = hsource[4] or param.log
                 if not mod[func] then
-                    lib.errorf("Module error: function '%s' in module '%s' not found\n", func, mod)
+                    lib.errorf("%sfunction '%s' in module '%s' not found\n", strings.MERR, func, mod)
                 end
                 r[n] = mod[func](subject)(param)
                 coroutine.yield(r)
