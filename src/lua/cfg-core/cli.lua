@@ -18,7 +18,7 @@ _ENV = ENV
 -- @return iterator that results in a line terminated field "value" for each record (FUNCTION)
 function functions.list(tbl)
     if not tbl then
-        lib.errorf("Error: cfg.list: Expected table but got nil.\n")
+        lib.errorf("%scfg.list: Expected table but got nil.\n", strings.ERR)
     end
     local i, v
     return function()
@@ -34,7 +34,7 @@ end
 function functions.module (m)
     local rb, rm = pcall(require, "cfg-modules." .. m)
     if not rb then
-        return lib.errorf("Module error: %s\n%s\n", m, rm)
+        return lib.errorf("%s%s\n%s\n", strings.MERR, m, rm)
     end
     return rm
 end
