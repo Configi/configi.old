@@ -4,12 +4,12 @@ local string, table, coroutine = string, table, coroutine
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
 local cli = {}
-local strings = require"strings"
+local strings = require"cfg-core.strings"
+local aux = require"cfg-core.aux"
 local functions = {}
 local lib = require"lib"
 local tsort = require"tsort"
-local PATH = "./"
-local loaded, policy = pcall(require, "policy")
+local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
@@ -35,7 +35,7 @@ end
 -- @param m name of the module (STRING)
 -- @return module (TABLE or FUNCTION)
 function functions.module (m)
-    local rb, rm = pcall(require, "module." .. m)
+    local rb, rm = pcall(require, "cfg-modules." .. m)
     if not rb then
         return lib.errorf("Module error: %s\n%s\n", m, rm)
     end
@@ -78,25 +78,15 @@ function cli.main (opts)
     env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
     env.log = function (b) opts.log = b end
     env.include = function (f)
-        local path, base, ext = lib.decomp_path(f)
+        local include, base, ext = aux.path(f)
         -- Only include files relative to the same directory as opts.script.
         -- Includes with path information has priority.
-        local include
-        if path and string.find(path, "^/.*") and not (path == ".") then
-            include = f
-        else
-            include = PATH .. "/" .. f
-        end
         local include_name = base .. "." .. ext
-        if include then
-            if lib.is_file(include) then
-                -- Overwrite any matching base.ext
-                policy[ext][base] = lib.fopen(include)
-            else
-                lib.errorf("%s %s missing for inclusion\n", strings.SERR, include)
-            end
+        if lib.is_file(include) then
+             -- Overwrite any matching base.ext
+            policy[ext][base] = lib.fopen(include)
         elseif not policy[ext][base] then
-            lib.errorf("%s %s missing for inclusion\n", strings.SERR, include_name)
+            lib.errorf("%s %s or %s missing for inclusion\n", strings.SERR, include, include_name)
         else
             -- Should not be reached. Just in case.
             include_name = nil
@@ -212,57 +202,20 @@ function cli.main (opts)
 end
 
 function cli.opt (arg, version)
-    local short = "hvtDsmjVl:p:g:r:f:e:"
-    local long = {
-        {"help", "none", "h"},
-        {"debug", "none", "v"},
-        {"test", "none", "t"},
-        {"daemon", "none", "D"},
-        {"periodic", "none", "p"},
-        {"syslog", "none", "s"},
-        {"log", "required", "l"},
-        {"msg", "none", "m"},
-        {"version", "none", "V"},
-        {"tag", "required", "g"},
-        {"runs", "required", "r"},
-        {"file", "required", "f"},
-        {"embedded","required", "e"}
-    }
-    local help = [[
-    cfg [-h] [-V] [-v] [-t] [-D] [-p N] [-s] [-l FILE] [-m] [-g TAG] [-r N] [-f "CONFIGI POLICY"] [-e "CONFIGI POLICY"]
-
-        Options:
-            -h, --help                  This help text.
-            -V, --version               Print version.
-            -v, --debug                 Turn on debugging messages.
-            -t, --test                  Dry-run mode. All operations are expected to succeed. Turns on debugging.
-            -D, --daemon                Daemon mode. Watch for IN_MODIFY and IN_ATTRIB events to the policy file.
-            -p, --periodic              Do a run after N seconds.
-            -s, --syslog                Enable logging to syslog.
-            -l, --log                   Log to an specified file.
-            -m, --msg                   Show debug and test messages.
-            -g, --tag                   Only run specified tag(s).
-            -r, --runs                  Run the policy N times if a failure is encountered. Default is 3.
-            -f, --file                  Path to the Configi policy.
-            -e, --embedded              Name of the embedded Configi policy.
-
-]]
+    local short = strings.short_args
+    local long = strings.long_args
+    local help = strings.help
     -- Defaults. runs field is always used
     local opts = { runs = 3, _periodic = "300" }
     local tags = {}
     -- optind and li are unused
     for r, optarg, optind, li in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
-            local path, base, ext = lib.decomp_path(optarg)
+            local full, base, ext = aux.path(optarg)
             opts.ext = ext
             opts.base = base
-            if path and not (path == ".") then
-                opts.script = optarg
-            else
-                opts.script = PATH .. optarg
-            end
+            opts.script = full
             if lib.is_file(opts.script) then
-                PATH = path
                 -- overwrite [ext][base] with the contents of opts.script
                 policy[ext][base] = lib.fopen(opts.script)
             else

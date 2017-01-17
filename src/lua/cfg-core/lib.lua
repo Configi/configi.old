@@ -4,32 +4,18 @@ local string, table = string, table
 local Psyslog = require"posix.syslog"
 local Psystime = require"posix.sys.time"
 local lib = require"lib"
+local strings = require"cfg-core.strings"
+local aux = require"cfg-core.aux"
 local cfg = {}
-local strings = require"strings"
-local PATH = "./"
-local loaded, policy = pcall(require, "policy")
+local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
 local ENV = {}
 _ENV = ENV
 
--- Logging function for export too
-cfg.LOG = function (syslog, file, str, level)
-    level = level or Psyslog.LOG_DEBUG
-    if syslog then
-        return lib.log(file, strings.IDENT, str, Psyslog.LOG_NDELAY|Psyslog.LOG_PID, Psyslog.LOG_DAEMON, level)
-    elseif not syslog and file then
-        return lib.log(file, strings.IDENT, str)
-    end
-end
-
 --[[ Module internal functions ]]
 local Lmod = {}
-
---[[ Script functions ]]
-cfg.script = {}
-local Lscript = cfg.script
 
 -- Set value of a specified field in a parameter record.
 -- Returns a function that converts strings yes, true and True to boolean true
@@ -106,7 +92,7 @@ function Lmod.dmsg (C)
         else
             lstr = string.format("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
         end
-        cfg.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
+        aux.log(C.parameters.syslog, C.parameters.log, lstr, level)
         C.results.msgt[#C.results.msgt + 1] = {
             item = item,
             msg = msg,
@@ -152,7 +138,7 @@ function Lmod.msg (C)
         else
             lstr = string.format("[%s]%s%s%s%s", flag, rs, msg, rs, item)
         end
-        cfg.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
+        aux.log(C.parameters.syslog, C.parameters.log, lstr, level)
         C.results.msgt[#C.results.msgt + 1] = {
             item = item,
             msg = msg,
@@ -324,13 +310,7 @@ function cfg.init(P, M)
         return C.results
     end -- F.kept()
     C.functions.open = function (f)
-        local path, base, ext = lib.decomp_path(f)
-        local file
-        if path and string.find(path, "^/.*") and not (path == ".") then
-            file = f
-        else
-            file = PATH .. "/" .. f
-        end
+        local file, base, ext = aux.path(f)
         -- Actual files has priority
         if lib.is_file(file) then
            return lib.fopen(file)

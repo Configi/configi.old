@@ -18,14 +18,13 @@ local Path = function(f)
     local default = "./"
     local path, base, ext = lib.decomp_path(f)
     if path and string.find(path, "^/.*") and not (path == ".") then
-        full = f
+        path = f
     elseif path == "." then
-        path = arg_path()
-        full = path .. "/" .. f
+        path = arg_path() .. "/" .. f
     else
-        full = default .. f
+        path = default .. f
     end
-    return full, base, ext
+    return path, base, ext
 end
 
 
