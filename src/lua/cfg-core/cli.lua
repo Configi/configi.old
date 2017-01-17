@@ -1,19 +1,16 @@
 local type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
       type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require
-local string, table, coroutine = string, table, coroutine
+local ENV, cli, functions, string, table, coroutine = {}, {}, {}, string, table, coroutine
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
-local cli = {}
 local strings = require"cfg-core.strings"
 local aux = require"cfg-core.aux"
-local functions = {}
 local lib = require"lib"
 local tsort = require"tsort"
 local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
-local ENV = {}
 _ENV = ENV
 
 -- Iterate a table (array) for records.
@@ -21,7 +18,7 @@ _ENV = ENV
 -- @return iterator that results in a line terminated field "value" for each record (FUNCTION)
 function functions.list(tbl)
     if not tbl then
-        lib.errorf("Error: cfg.list: Expected table but got nil.\n")
+        lib.errorf("%scfg.list: Expected table but got nil.\n", strings.ERR)
     end
     local i, v
     return function()
@@ -37,7 +34,7 @@ end
 function functions.module (m)
     local rb, rm = pcall(require, "cfg-modules." .. m)
     if not rb then
-        return lib.errorf("Module error: %s\n%s\n", m, rm)
+        return lib.errorf("%s%s\n%s\n", strings.MERR, m, rm)
     end
     return rm
 end
@@ -237,7 +234,7 @@ function cli.opt (arg, version)
         if r == "s" then opts.syslog = true end
         if r == "r" then opts.runs = optarg or opts._runs end
         if r == "l" then opts.log = optarg end
-        if r == "?" then return lib.errorf("Error: Unrecognized option passed\n") end
+        if r == "?" then return lib.errorf("%sUnrecognized option passed\n", strings.ERR) end
         if r == "p" then opts.periodic = optarg or opts._periodic end
         if r == "D" then opts.daemon = true end
         if r == "g" then
@@ -283,7 +280,7 @@ function cli.run (source, runenv) -- execution step
         param.syslog = source.syslog or param.syslog
         param.log = source.log or param.log
         if not mod[func] then
-           lib.errorf("Module error: function '%s' in module '%s' not found\n", func, mod)
+           lib.errorf("%sfunction '%s' in module '%s' not found\n", strings.MERR, func, mod)
         end
         rt[i] = mod[func](subject)(param)
     end -- for each line
@@ -306,7 +303,7 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
                 param.syslog = hsource[3] or param.syslog
                 param.log = hsource[4] or param.log
                 if not mod[func] then
-                    lib.errorf("Module error: function '%s' in module '%s' not found\n", func, mod)
+                    lib.errorf("%sfunction '%s' in module '%s' not found\n", strings.MERR, func, mod)
                 end
                 r[n] = mod[func](subject)(param)
                 coroutine.yield(r)

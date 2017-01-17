@@ -38,5 +38,6 @@ return {
     ERROR = "ERROR: ",
     WARN = "WARNING: ",
     SERR = "POLICY ERROR: ",
+    MERR = "MODULE ERROR: ",
     OPERATION = "Operation"
 }
