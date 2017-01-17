@@ -234,7 +234,7 @@ function cli.opt (arg, version)
         if r == "s" then opts.syslog = true end
         if r == "r" then opts.runs = optarg or opts._runs end
         if r == "l" then opts.log = optarg end
-        if r == "?" then return lib.errorf("Error: Unrecognized option passed\n") end
+        if r == "?" then return lib.errorf("%sUnrecognized option passed\n", strings.ERR) end
         if r == "p" then opts.periodic = optarg or opts._periodic end
         if r == "D" then opts.daemon = true end
         if r == "g" then
