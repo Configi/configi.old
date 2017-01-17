@@ -9,7 +9,7 @@
 -- @added 0.9.0
 
 local ENV, M, openrc = {}, {}, {}
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
 _ENV = ENV

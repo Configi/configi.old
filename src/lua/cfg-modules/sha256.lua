@@ -6,7 +6,7 @@
 
 local ENV, M, sha256 = {}, {}, {}
 local io = io
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local sha2 = require"sha2"
 local stat = require"posix.sys.stat"
 local lib = require"lib"

@@ -6,7 +6,7 @@
 
 local ENV, M, hostname = {}, {}, {}
 local string, ipairs, next = string, ipairs, next
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local factid = require"factid"
 local lib = require"lib"
 local cmd = lib.cmd

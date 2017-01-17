@@ -1,6 +1,6 @@
 EXE:= cfg
-SRC:= configi
-SRC_DIR:= module
+SRC:=
+SRC_DIR:= cfg-modules cfg-core
 SRC_C:=
 VENDOR:= cimicida crc32 sha2 lib tsort
 VENDOR_DIR:=

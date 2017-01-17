@@ -7,7 +7,7 @@
 local ENV, M, template = {}, {}, {}
 local io, load, tonumber, pcall, table, os, string, require =
       io, load, tonumber, pcall, table, os, string, require
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local crc = require"crc32"
 local stat = require"posix.sys.stat"

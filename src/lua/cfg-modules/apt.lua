@@ -5,7 +5,7 @@
 -- @added 1.0.0
 
 local ENV, M, apt = {}, {}, {}
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
 _ENV = ENV
