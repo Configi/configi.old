@@ -291,7 +291,7 @@ function cfg.init(P, M)
         return C.results
     end -- F.kept()
     C.functions.open = function (f)
-        local file, base, ext = aux.path(f)
+        local file, base, ext = aux.file(f)
         -- Actual files has priority
         if lib.is_file(file) then
            return lib.fopen(file)

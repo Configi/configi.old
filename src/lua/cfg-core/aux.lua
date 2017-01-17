@@ -3,7 +3,7 @@ local syslog = require"posix.syslog"
 local getopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
 
-local arg_path = function()
+local Path = function()
     local path
     for r, optarg, _, _ in getopt.getopt(arg, strings.short_args, strings.long_args) do
         if r == "f" then
@@ -14,13 +14,13 @@ local arg_path = function()
     return path
 end
 
-local Path = function(f)
+local File = function(f)
     local default = "./"
     local path, base, ext = lib.decomp_path(f)
     if path and string.find(path, "^/.*") and not (path == ".") then
         path = f
     elseif path == "." then
-        path = arg_path() .. "/" .. f
+        path = Path() .. "/" .. f
     else
         path = default .. f
     end
@@ -37,4 +37,4 @@ local Log = function(sys, file, str, level)
     end
 end
 
-return { path = Path, log = Log }
+return { path = Path, file = File, log = Log }
