@@ -1,13 +1,13 @@
-local type, rawset, rawget, loadfile, pcall, next, setmetatable, load, pairs, ipairs, require, tostring =
-      type, rawset, rawget, loadfile, pcall, next, setmetatable, load, pairs, ipairs, require, tostring
-local coroutine, os, string, table = coroutine, os, string, table
+local type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
+      type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require
+local string, table, coroutine = string, table, coroutine
 local Factid = require"factid"
-local Psyslog = require"posix.syslog"
 local Pgetopt = require"posix.getopt"
-local Psystime = require"posix.sys.time"
+local cli = {}
+local strings = require"strings"
+local functions = {}
 local lib = require"lib"
 local tsort = require"tsort"
-local cfg = {}
 local PATH = "./"
 local loaded, policy = pcall(require, "policy")
 if not loaded then
@@ -16,383 +16,10 @@ end
 local ENV = {}
 _ENV = ENV
 
---[[ Strings ]]
-cfg.str = {
-        IDENT = "Configi",
-        ERROR = "ERROR: ",
-         WARN = "WARNING: ",
-         SERR = "POLICY ERROR: ",
-    OPERATION = "Operation"
-}
-local Lstr = cfg.str
-
--- Logging function for export too
-cfg.LOG = function (syslog, file, str, level)
-    level = level or Psyslog.LOG_DEBUG
-    if syslog then
-        return lib.log(file, Lstr.IDENT, str, Psyslog.LOG_NDELAY|Psyslog.LOG_PID, Psyslog.LOG_DAEMON, level)
-    elseif not syslog and file then
-        return lib.log(file, Lstr.IDENT, str)
-    end
-end
-
---[[ Module internal functions ]]
-local Lmod = {}
-
---[[ Script functions ]]
-cfg.script = {}
-local Lscript = cfg.script
-
---[[ Cli functions ]]
-cfg.cli = {}
-local cli = cfg.cli
-
--- Set value of a specified field in a parameter record.
--- Returns a function that converts strings yes, true and True to boolean true
--- Values no, false and False to boolean false
--- Other strings are set directly as the value
--- @param tbl table to operate on (TABLE)
--- @param field record field name to set the value (FIELD)
--- @return function that sets the value (FUNCTION)
-function Lmod.setvalue (tbl, field)
-    return function (v)
-        if lib.truthy(v) then
-            tbl.parameters[field] = true
-        elseif lib.falsy(v) then
-            tbl.parameters[field] = false
-        else
-            tbl.parameters[field] = v
-        end
-    end
-end
-
---- Return a function that passes the string argument to syslog() and add it to tbl
--- It calls string.format if a C-like argument is passed to the returned function
--- @param T module table (TABLE)
--- @return function (FUNCTION)
-function Lmod.dmsg (C)
-    return function (item, flag, bool, sec, extra)
-        local level, msg
-        item = string.match(item, "([%S+]+)")
-        if flag == true then
-            flag = " ok "
-            msg = C.report.repaired
-        elseif flag == nil then
-            flag = "skip"
-            msg = C.report.kept
-        elseif flag == false then
-            flag = "fail"
-            msg = C.report.failed
-            level = Psyslog.LOG_ERR
-        elseif type(flag) == "string" then
-            msg = flag
-            if bool == true then
-                flag = " ok "
-            elseif bool == false then
-                level = Psyslog.LOG_ERR
-                flag = "fail"
-            elseif bool == nil then
-                flag = "skip"
-            else
-                flag = "exit"
-            end
-        end
-        local str
-        if sec == nil then
-            str = string.format([[
-
- [%s] %s
-        Comment: %s
-        Item: %s
-        %s%s]],
-        flag, msg, C.parameters.comment, item or "", extra or "", "\n")
-        else
-             str = string.format([[
-
- [%s] %s
-        Elapsed: %.fs
-        %s%s]],
-        flag, msg, sec, extra or "", "\n")
-        end
-        local rs = string.char(9)
-        local lstr
-        sec = sec or ""
-        if string.len(C.parameters.comment) > 0 then
-            lstr = string.format("[%s]%s%s%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, sec, rs, C.parameters.comment)
-        else
-            lstr = string.format("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
-        end
-        cfg.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
-        C.results.msgt[#C.results.msgt + 1] = {
-            item = item,
-            msg = msg,
-            elapsed = sec,
-            comment = C.parameters.comment,
-            result = flag,
-        }
-        C.results.msg[#C.results.msg + 1] = str .. "\n"
-    end
-end
-
-function Lmod.msg (C)
-    return function (item, flag, bool)
-        local level, msg
-        item = string.match(item, "([%S+]+)")
-        if flag == true then
-            flag = " ok "
-            msg = C.report.repaired
-        elseif flag == nil then
-            flag = "skip"
-            msg = C.report.kept
-        elseif flag == false then
-            flag = "fail"
-            msg = C.report.failed
-            level = Psyslog.LOG_ERR
-        elseif type(flag) == "string" then
-            msg = flag
-            if bool == true then
-                flag = " ok "
-            elseif bool == false then
-                level = Psyslog.LOG_ERR
-                flag = "fail"
-            elseif bool == nil then
-                flag = "skip"
-            else
-                flag = "exit"
-            end
-        end
-        local rs = string.char(9)
-        local lstr
-        if string.len(C.parameters.comment) > 0 then
-            lstr = string.format("[%s]%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, C.parameters.comment)
-        else
-            lstr = string.format("[%s]%s%s%s%s", flag, rs, msg, rs, item)
-        end
-        cfg.LOG(C.parameters.syslog, C.parameters.log, lstr, level)
-        C.results.msgt[#C.results.msgt + 1] = {
-            item = item,
-            msg = msg,
-            comment = C.parameters.comment,
-            result = flag
-        }
-        C.results.msg[#C.results.msg + 1] = lstr
-    end
-end
-
---- Check if a required parameter is set.
--- Produce an error (exit code 1) if a required parameter is missing.
--- @param T main table (TABLE)
-function Lmod.required (C)
-    for n = 1, #C._required do
-        if not C.parameters[C._required[n]] then
-            lib.errorf("%s Required parameter '%s' missing.\n", Lstr.SERR, C._required[n])
-        end
-    end
-end
-
--- Warn (stderr output) if a "module.function" parameter is ignored.
--- @param T main table (TABLE)
-function Lmod.ignoredwarn (C)
-    for n = 1, #C._required do C._module[#C._module + 1] = C._required[n] end -- add C.required to M
-    -- Core parameters are added as valid parameters
-    C._module[#C._module + 1] = "comment"
-    C._module[#C._module + 1] = "debug"
-    C._module[#C._module + 1] = "test"
-    C._module[#C._module + 1] = "syslog"
-    C._module[#C._module + 1] = "log"
-    C._module[#C._module + 1] = "handle"
-    C._module[#C._module + 1] = "register"
-    C._module[#C._module + 1] = "context"
-    C._module[#C._module + 1] = "notify"
-    C._module[#C._module + 1] = "notify_failed"
-    C._module[#C._module + 1] = "notify_kept"
-    C._module[#C._module + 1] = "requires"
-    C._module[#C._module + 1] = "wants" -- alias to requires
-    -- Now check for any undeclared _module parameter
-    local Ps = lib.arr_to_rec(C._module, 0)
-    for param, _ in next, C.parameters do
-        if Ps[param] == nil then
-            lib.warn("%s Parameter '%s' ignored.\n", Lstr.WARN, param)
-        end
-    end
-end
-
---- Process a promise.
--- 1. Fill environment with functions to assign parameters
--- 2. Load promise chunk
--- 3. Check for required parameter(s)
--- 4. Debugging
--- @return functions table
--- @return parameters table
--- @return results table
-function cfg.init(P, M)
-    local C = {
-            _module = M.parameters or {},
-             report = M.report, -- cannot be unset
-          _required = M.required or {},
-          functions = {},
-         parameters = P,
-            results = { repaired = false, failed = false, msg = {}, msgt = {} }
-    }
-    -- assign aliases
-    local _temp = {}
-    if pcall(next, M.alias) then
-        for param, aliases in next, M.alias do
-            for n = 1, #aliases do
-                _temp[aliases[n]] = param
-            end
-        end
-        -- Preset found aliases to true since it's not ok to iterate and add at the same time.
-        for alias, param in next, _temp do
-            if C.parameters[alias] then
-                C.parameters[param] = true
-            end
-        end
-    end
-    -- assign values
-    for p, v in next, C.parameters do
-        if _temp[p] then
-            -- remove alias so it won't warn about an ignored parameter
-            C.parameters[p] = nil
-            -- reuse and update p for each alias hit
-            p = _temp[p]
-        end
-        if lib.truthy(v) then
-            C.parameters[p] = true
-        elseif lib.falsy(v) then
-            C.parameters[p] = false
-        else
-            C.parameters[p] = v
-        end
-    end
-    -- Check for required parameters
-    Lmod.required(C)
-    -- Return an F.run() depending on debug, test flags
-    C.parameters.comment = C.parameters.comment or ""
-    local msg
-    local functime = function (f, ...)
-    local t1 = Psystime.gettimeofday()
-    local stdout, stderr = "", ""
-    local ok, rt = f(...)
-    local err = lib.exit_string(rt.bin, rt.status, rt.code)
-    if rt then
-        if type(rt.stdout) == "table" then
-            stdout = table.concat(rt.stdout, "\n")
-        end
-        if type(rt.stderr) == "table" then
-            stderr = table.concat(rt.stderr, "\n")
-        end
-    end
-    local secs = lib.diff_time(Psystime.gettimeofday(), t1)
-        secs = string.format("%s.%s", tostring(secs.sec), tostring(secs.usec))
-        msg(Lstr.OPERATION, err, ok or false, secs, string.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
-        return ok, rt
-    end -- functime()
-    if not (C.parameters.test or C.parameters.debug) then
-        msg = Lmod.msg(C)
-        C.functions.run = function (f, ...)
-            local ok, rt = f(...)
-            local err = lib.exit_string(rt.bin, rt.status, rt.code)
-            local res = false
-            if ok then
-                res = true
-            end
-            msg(Lstr.OPERATION, err, ok, res, 0)
-            return ok, rt
-        end -- F.run()
-    elseif C.parameters.debug or C.parameters.test then
-        msg = Lmod.dmsg(C)
-        Lmod.ignoredwarn(C) -- Warn for ignored parameters
-    end
-    if C.parameters.test then
-        C.functions.run = function ()
-            msg(Lstr.OPERATION, string.format("Would execute a corrective operation"), true)
-            return true, {stdout={}, stderr={}}, true
-        end -- F.run()
-        C.functions.xrun = functime -- if you must execute something use F.xrun()
-    elseif C.parameters.debug then
-        C.functions.run = functime -- functime() is used when debug=true
-    end
-    C.functions.msg = msg -- Assign msg to F.msg()
-    C.functions.result = function (item, test, alt)
-        local flag = false
-        if test then
-            flag = true
-            C.results.notify = C.parameters.notify
-            C.results.repaired = true
-        elseif test == nil then
-            flag = nil
-            C.results.notify_kept = C.parameters.notify_kept
-        else
-            C.results.notify_failed = C.parameters.notify_failed
-            C.results.failed = true
-        end
-        if type(alt) == "string" then
-            msg(item, alt, flag)
-        else
-            msg(item, flag)
-        end
-        return C.results
-    end -- F.result()
-    C.functions.kept =  function (item)
-        C.results.notify_kept = C.parameters.notify_kept
-        msg(item, nil)
-        return C.results
-    end -- F.kept()
-    C.functions.open = function (f)
-        local path, base, ext = lib.decomp_path(f)
-        local file
-        if path and string.find(path, "^/.*") and not (path == ".") then
-            file = f
-        else
-            file = PATH .. "/" .. f
-        end
-        if not (PATH == false) and file then
-            if lib.is_file(file) then
-                return lib.fopen(file)
-            else
-                lib.errorf("%s %s not found\n", Lstr.SERR, file)
-            end
-        elseif PATH == false then
-            if policy[ext][base] then
-                return policy[ext][base]
-            else
-                lib.errorf("%s %s not found\n", Lstr.SERR, base .. "." .. ext)
-            end
-        end
-    end
-    _temp, C._module, C._required = nil, nil, nil -- GC
-
-    -- Methods available to P
-    local insert_if = function(self, source, target, i)
-        i = i or #target
-        for k, v in next, source do
-            lib.insert_if(self[k], target, i, v)
-        end
-    end
-    local set_if_not = function(self, test, value)
-        if not self[test] then
-            self[test] = value
-        end
-    end
-    local set_if = function(self, test, value)
-        if self[test] then
-            self[test] = value
-        end
-    end
-    local P_methods = {
-        insert_if = insert_if,
-        set_if_not = set_if_not,
-        set_if = set_if
-    }
-    setmetatable(C.parameters, { __index = P_methods })
-    return C.functions, C.results -- F, R
-end
-
---- Iterate a table (array) for records.
+-- Iterate a table (array) for records.
 -- @param tbl table to iterate (TABLE)
 -- @return iterator that results in a line terminated field "value" for each record (FUNCTION)
-function Lscript.list(tbl)
+function functions.list(tbl)
     if not tbl then
         lib.errorf("Error: cfg.list: Expected table but got nil.\n")
     end
@@ -407,7 +34,7 @@ end
 -- Exit with code 1 if there was an error
 -- @param m name of the module (STRING)
 -- @return module (TABLE or FUNCTION)
-function Lscript.module (m)
+function functions.module (m)
     local rb, rm = pcall(require, "module." .. m)
     if not rb then
         return lib.errorf("Module error: %s\n%s\n", m, rm)
@@ -415,14 +42,13 @@ function Lscript.module (m)
     return rm
 end
 
---[[ CLI functions ]]
 function cli.compile(s, env)
     local chunk, err
     local _, base, ext = lib.decomp_path(s)
     local script = policy[ext][base]
     chunk, err = load(script, script, "t", env)
     if not chunk then
-        lib.errorf("%s%s%s\n", Lstr.SERR, s, err)
+        lib.errorf("%s%s%s\n", strings.SERR, s, err)
     end
     return chunk()
 end
@@ -438,13 +64,13 @@ function cli.main (opts)
     env.pairs = pairs
     env.ipairs = ipairs
     env.format = string.format
-    env.list = Lscript.list
+    env.list = functions.list
     env.sub = lib.sub
     env.module = function (m)
         if m == "fact" then
             env.fact = Factid.gather()
         else
-            runenv[m] = Lscript.module(m)
+            runenv[m] = functions.module(m)
         end
     end
     env.debug = function (b) if lib.truthy(b) then opts.debug = true end end
@@ -456,22 +82,21 @@ function cli.main (opts)
         -- Only include files relative to the same directory as opts.script.
         -- Includes with path information has priority.
         local include
-        if path and not (path == ".") then
+        if path and string.find(path, "^/.*") and not (path == ".") then
             include = f
-        elseif PATH then
+        else
             include = PATH .. "/" .. f
         end
         local include_name = base .. "." .. ext
-        if not (PATH == false) and include then
+        if include then
             if lib.is_file(include) then
+                -- Overwrite any matching base.ext
                 policy[ext][base] = lib.fopen(include)
             else
-                lib.errorf("%s %s missing for inclusion\n", Lstr.SERR, include)
+                lib.errorf("%s %s missing for inclusion\n", strings.SERR, include)
             end
-        elseif PATH == false then
-            if not policy[ext][base] then
-                lib.errorf("%s %s missing for inclusion\n", Lstr.SERR, include_name)
-            end
+        elseif not policy[ext][base] then
+            lib.errorf("%s %s missing for inclusion\n", strings.SERR, include_name)
         else
             -- Should not be reached. Just in case.
             include_name = nil
@@ -479,7 +104,7 @@ function cli.main (opts)
         scripts[#scripts + 1] = include_name
     end
     env.each = function (t, f)
-        for str, tbl in Lscript.list(t) do
+        for str, tbl in functions.list(t) do
             f(str)(tbl)
         end
     end
@@ -573,7 +198,7 @@ function cli.main (opts)
     end
     local sorted_graph, tsort_err = graph:sort()
     if not sorted_graph then
-        lib.errorf("%s %s %s\n", Lstr.SERR, opts.script, tsort_err)
+        lib.errorf("%s %s %s\n", strings.SERR, opts.script, tsort_err)
     end
     if #sorted_graph > 0 then
         source = lib.clone(sorted_graph)
@@ -641,17 +266,16 @@ function cli.opt (arg, version)
                 -- overwrite [ext][base] with the contents of opts.script
                 policy[ext][base] = lib.fopen(opts.script)
             else
-                lib.errorf("%s %s not found\n", Lstr.SERR, opts.script)
+                lib.errorf("%s %s not found\n", strings.SERR, opts.script)
             end
         end
         if r == "e" then
-            PATH = false
             local _, base, ext = lib.decomp_path(optarg)
             opts.script = base .. "." .. ext
             opts.ext = ext
             opts.base = base
             if not policy[ext][base] then
-                lib.errorf("%s %s not found\n", Lstr.SERR, optarg)
+                lib.errorf("%s %s not found\n", strings.SERR, optarg)
             end
         end
         if r == "m" then opts.msg = true end
@@ -697,7 +321,7 @@ function cli.run (source, runenv) -- execution step
     for i, s in ipairs(source) do
         if runenv[s.mod] == nil then
             -- auto-load the module
-            runenv[s.mod] = Lscript.module(s.mod)
+            runenv[s.mod] = functions.module(s.mod)
         end
         local mod, func, subject, param = runenv[s.mod], s.func, s.subject, s.param
         -- append debug and test arguments
@@ -720,7 +344,7 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
             for n = 1, #hsource[tag] do
                 if runenv[hsource[tag][n].mod] == nil then
                     -- auto-load the module
-                    runenv[hsource[tag][n].mod] = Lscript.module(hsource[tag][n].mod)
+                    runenv[hsource[tag][n].mod] = functions.module(hsource[tag][n].mod)
                 end
                 mod, func, subject, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].subject, hsource[tag][n].param
                 -- append debug and test arguments
@@ -808,5 +432,4 @@ function cli.try (source, hsource, runenv)
     return R, M
 end
 
-return cfg
-
+return cli
