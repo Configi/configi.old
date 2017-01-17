@@ -1,15 +1,14 @@
 local version = "Configi 0.9.7"
 local ENV, os, string, arg, next, tostring, collectgarbage =
        {}, os, string, arg, next, tostring, collectgarbage
-local cfg = require"configi"
+local aux = require"cfg-core.aux"
+local cli = require"cfg-core.cli"
 local lib = require"lib"
-local cli = cfg.cli
 local unistd = require"posix.unistd"
 local signal = require"posix.signal"
 local sysstat = require"posix.sys.stat"
 local syslog = require"posix.syslog"
 local systime = require"posix.sys.time"
-local lib = require"lib"
 local inotify = require"inotify"
 local t1
 _ENV = ENV
@@ -58,7 +57,7 @@ while true do
         local bail = function(sig)
             handle:rmwatch(wd)
             handle:close()
-            cfg.LOG(opts.syslog, opts.log, string.format("Caught signal %s. Exiting.", tostring(sig)), syslog.LOG_ERR)
+            aux.log(opts.syslog, opts.log, string.format("Caught signal %s. Exiting.", tostring(sig)), syslog.LOG_ERR)
             os.exit(255)
         end
         signal.signal(signal.SIGINT, bail)
