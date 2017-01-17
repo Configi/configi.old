@@ -17,25 +17,6 @@ _ENV = ENV
 --[[ Module internal functions ]]
 local Lmod = {}
 
--- Set value of a specified field in a parameter record.
--- Returns a function that converts strings yes, true and True to boolean true
--- Values no, false and False to boolean false
--- Other strings are set directly as the value
--- @param tbl table to operate on (TABLE)
--- @param field record field name to set the value (FIELD)
--- @return function that sets the value (FUNCTION)
-function Lmod.setvalue (tbl, field)
-    return function (v)
-        if lib.truthy(v) then
-            tbl.parameters[field] = true
-        elseif lib.falsy(v) then
-            tbl.parameters[field] = false
-        else
-            tbl.parameters[field] = v
-        end
-    end
-end
-
 --- Return a function that passes the string argument to syslog() and add it to tbl
 -- It calls string.format if a C-like argument is passed to the returned function
 -- @param T module table (TABLE)
