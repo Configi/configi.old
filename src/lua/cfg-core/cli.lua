@@ -11,6 +11,7 @@ local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
+package.path = aux.path() .. "/" .. "?.lua"
 _ENV = ENV
 
 -- Iterate a table (array) for records.
@@ -32,9 +33,13 @@ end
 -- @param m name of the module (STRING)
 -- @return module (TABLE or FUNCTION)
 function functions.module (m)
-    local rb, rm = pcall(require, "cfg-modules." .. m)
+    -- Try custom modules in the arg path .. "/modules" directory first.
+    local rb, rm = pcall(require, "modules." .. m)
     if not rb then
-        return lib.errorf("%s%s\n%s\n", strings.MERR, m, rm)
+        rb, rm = pcall(require, "cfg-modules." .. m)
+        if not rb then
+            return lib.errorf("%s%s\n%s\n", strings.MERR, m, rm)
+        end
     end
     return rm
 end
@@ -75,7 +80,7 @@ function cli.main (opts)
     env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
     env.log = function (b) opts.log = b end
     env.include = function (f)
-        local include, base, ext = aux.path(f)
+        local include, base, ext = aux.file(f)
         -- Only include files relative to the same directory as opts.script.
         -- Includes with path information has priority.
         local include_name = base .. "." .. ext
@@ -208,7 +213,7 @@ function cli.opt (arg, version)
     -- optind and li are unused
     for r, optarg, optind, li in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
-            local full, base, ext = aux.path(optarg)
+            local full, base, ext = aux.file(optarg)
             opts.ext = ext
             opts.base = base
             opts.script = full
