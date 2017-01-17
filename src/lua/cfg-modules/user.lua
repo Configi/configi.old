@@ -7,7 +7,7 @@
 local ENV, M, user = {}, {}, {}
 local next, tostring, string = next, tostring, string
 local pwd = require"posix.pwd"
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
 _ENV = ENV

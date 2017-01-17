@@ -6,7 +6,7 @@
 
 local ENV, M, authorized_keys = {}, {}, {}
 local ipairs, string, table = ipairs, string, table
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local stat = require"posix.sys.stat"
 local pwd = require"posix.pwd"
 local factid = require"factid"

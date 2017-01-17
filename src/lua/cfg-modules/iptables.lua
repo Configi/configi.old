@@ -7,7 +7,7 @@
 
 local ENV, M, iptables = {}, {}, {}
 local io, string, table, ipairs = io, string, table, ipairs
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
 local stat = require"posix.sys.stat"

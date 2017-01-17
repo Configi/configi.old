@@ -5,7 +5,7 @@
 -- @added 0.9.0
 
 local ENV, M, git = {}, {}, {}
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local stat = require"posix.sys.stat"
 local cmd = lib.cmd

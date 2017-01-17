@@ -6,7 +6,7 @@
 
 local ENV, M, make = {}, {}, {}
 local table, pcall = table, pcall
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local stat = require"posix.sys.stat"
 local lib = require"lib"
 local cmd = lib.cmd

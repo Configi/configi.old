@@ -6,7 +6,7 @@
 
 local ENV, M, shell = {}, {}, {}
 local string, table = string, table
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local stat = require"posix.sys.stat"
 _ENV = ENV

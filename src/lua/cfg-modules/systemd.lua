@@ -5,7 +5,7 @@
 -- @added 0.9.0
 
 local ENV, M, systemd = {}, {}, {}
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"px"
 local cmd = lib.cmd
 _ENV = ENV

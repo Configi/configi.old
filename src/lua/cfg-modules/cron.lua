@@ -9,7 +9,7 @@
 local ENV, M, cron = {}, {}, {}
 local ipairs, pcall, next = ipairs, pcall, next
 local string, table = string, table
-local cfg = require"configi"
+local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
 local tag = "#" .. string.char(9) .. "Configi: " -- hackish anti-match tech.
