@@ -1,19 +1,16 @@
 local type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
       type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require
-local string, table, coroutine = string, table, coroutine
+local ENV, cli, functions, string, table, coroutine = {}, {}, {}, string, table, coroutine
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
-local cli = {}
 local strings = require"cfg-core.strings"
 local aux = require"cfg-core.aux"
-local functions = {}
 local lib = require"lib"
 local tsort = require"tsort"
 local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
-local ENV = {}
 _ENV = ENV
 
 -- Iterate a table (array) for records.
