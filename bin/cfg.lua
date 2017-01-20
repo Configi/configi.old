@@ -2,7 +2,7 @@ local version = "Configi 0.9.7"
 package.path = ""
 local ENV, os, string, arg, next, tostring, collectgarbage =
        {}, os, string, arg, next, tostring, collectgarbage
-local aux = require"cfg-core.aux"
+local std = require"cfg-core.std"
 local cli = require"cfg-core.cli"
 local lib = require"lib"
 local unistd = require"posix.unistd"
@@ -58,7 +58,7 @@ while true do
         local bail = function(sig)
             handle:rmwatch(wd)
             handle:close()
-            aux.log(opts.syslog, opts.log, string.format("Caught signal %s. Exiting.", tostring(sig)), syslog.LOG_ERR)
+            std.log(opts.syslog, opts.log, string.format("Caught signal %s. Exiting.", tostring(sig)), syslog.LOG_ERR)
             os.exit(255)
         end
         signal.signal(signal.SIGINT, bail)

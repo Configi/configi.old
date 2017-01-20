@@ -4,14 +4,14 @@ local ENV, cli, functions, string, table, coroutine = {}, {}, {}, string, table,
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
-local aux = require"cfg-core.aux"
+local std = require"cfg-core.std"
 local lib = require"lib"
 local tsort = require"tsort"
 local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
-package.path = aux.path() .. "/" .. "?.lua"
+package.path = std.path() .. "/" .. "?.lua"
 _ENV = ENV
 
 -- Iterate a table (array) for records.
@@ -80,7 +80,7 @@ function cli.main (opts)
     env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
     env.log = function (b) opts.log = b end
     env.include = function (f)
-        local include, base, ext = aux.file(f)
+        local include, base, ext = std.file(f)
         -- Only include files relative to the same directory as opts.script.
         -- Includes with path information has priority.
         local include_name = base .. "." .. ext
@@ -213,7 +213,7 @@ function cli.opt (arg, version)
     -- optind and li are unused
     for r, optarg, optind, li in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
-            local full, base, ext = aux.file(optarg)
+            local full, base, ext = std.file(optarg)
             opts.ext = ext
             opts.base = base
             opts.script = full
