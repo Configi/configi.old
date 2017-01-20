@@ -5,7 +5,7 @@ local Psyslog = require"posix.syslog"
 local Psystime = require"posix.sys.time"
 local lib = require"lib"
 local strings = require"cfg-core.strings"
-local aux = require"cfg-core.aux"
+local std = require"cfg-core.std"
 local cfg = {}
 local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
@@ -73,7 +73,7 @@ function Lmod.dmsg (C)
         else
             lstr = string.format("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
         end
-        aux.log(C.parameters.syslog, C.parameters.log, lstr, level)
+        std.log(C.parameters.syslog, C.parameters.log, lstr, level)
         C.results.msgt[#C.results.msgt + 1] = {
             item = item,
             msg = msg,
@@ -119,7 +119,7 @@ function Lmod.msg (C)
         else
             lstr = string.format("[%s]%s%s%s%s", flag, rs, msg, rs, item)
         end
-        aux.log(C.parameters.syslog, C.parameters.log, lstr, level)
+        std.log(C.parameters.syslog, C.parameters.log, lstr, level)
         C.results.msgt[#C.results.msgt + 1] = {
             item = item,
             msg = msg,
@@ -291,7 +291,7 @@ function cfg.init(P, M)
         return C.results
     end -- F.kept()
     C.functions.open = function (f)
-        local file, base, ext = aux.file(f)
+        local file, base, ext = std.file(f)
         -- Actual files has priority
         if lib.is_file(file) then
            return lib.fopen(file)
