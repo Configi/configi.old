@@ -30,12 +30,14 @@ end
 -- @param None
 -- @usage yum.add_repo("http://openresty.org/yum/centos/OpenResty.repo")
 function yum.add_repo(S)
+    M.parameters = { "repo" }
     M.report = {
         repaired = "yum.add_repo: Successfully added repository.",
             kept = "yum.add_repo: Repository already present.",
           failed = "yum.add_repo: Error adding repository."
     }
     return function(P)
+        P.package = ""
         P.repo = S
         local F, R = cfg.init(P, M)
         local file = string.match(P.repo, "^.*/(.*)$")
