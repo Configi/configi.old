@@ -5,6 +5,8 @@
 -- @added 0.9.0
 
 local ENV, M, yum = {}, {}, {}
+local string = string
+local stat = require"posix.sys.stat"
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
