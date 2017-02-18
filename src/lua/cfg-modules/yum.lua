@@ -23,6 +23,12 @@ local found = function(package)
     end
 end
 
+local found_group  = function(group)
+    local _, ret = cmd.yum{ "--cacheonly", "groups", "list", group }
+    if lib.find_string(ret.stdout, "Installed Groups", true) then
+        return true
+    end
+end
 
 --- Add custom repository.
 -- See yum-config-manager(1).
@@ -116,8 +122,14 @@ function yum.present(S)
             return F.result(P.package, F.run(cmd.yum, args))
         end
         -- Install mode
-        if found(P.package) then
-            return F.kept(P.package)
+        if not string.find(P.package, "^@") then
+            if found(P.package) then
+                return F.kept(P.package)
+            end
+        else
+            if found_group(P.package) then
+                return F.kept(P.package)
+            end
         end
         local args = { _env = env, "--quiet", "--assumeyes", "install", P.package }
         local set = {

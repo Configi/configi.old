@@ -438,6 +438,14 @@ if lib.bin_path"yum" then
             yum"test/yum_add_repo.lua"
         end
     T:done(N)
+    T:start"yum.install groups (modules/yum.lua)"
+        do
+            local yum = function(policy)
+                T:eq(cfg{ "-f", policy }, true)
+            end
+            yum"test/yum_groups.lua"
+        end
+    T:done(N)
 end
 
 if lib.bin_path"systemctl" then
