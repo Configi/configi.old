@@ -103,7 +103,7 @@ function yum.present(S)
             elseif P.update == true then
                 command = "update"
             end
-            local args = { _env = env, "--quiet", "--assumeyes", command }
+            local args = { _env = env, "--quiet", "--assumeyes", command, P.package }
             local set = {
                 nogpgcheck = "--nogpgcheck",
                   security = "--security",
