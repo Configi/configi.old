@@ -17,7 +17,7 @@ M.alias = {}
 M.alias.package = { "option" } -- for clean mode
 
 local found = function(package)
-    local _, ret = cmd.yum{ "-C", "info", package }
+    local _, ret = cmd.yum{ "--cacheonly", "info", package }
     if lib.find_string(ret.stdout, "Installed Packages", true) then
         return true
     end
@@ -61,7 +61,7 @@ function yum.clean(S)
     return function(P)
         P.option = S
         local F, R = cfg.init(P, M)
-        return F.result(P.package, F.run(cmd.yum, { "clean", P.option }))
+        return F.result(P.package, F.run(cmd.yum, { "--quiet", "--assumeyes", "clean", P.option }))
     end
 end
 
