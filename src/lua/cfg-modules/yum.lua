@@ -5,6 +5,8 @@
 -- @added 0.9.0
 
 local ENV, M, yum = {}, {}, {}
+local string = string
+local stat = require"posix.sys.stat"
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
@@ -18,6 +20,31 @@ local found = function(package)
     local _, ret = cmd.yum{ "-C", "info", package }
     if lib.find_string(ret.stdout, "Installed Packages", true) then
         return true
+    end
+end
+
+
+--- Add custom repository.
+-- See yum-config-manager(1).
+-- @Subject Location (file or URL) of the repository
+-- @param None
+-- @usage yum.add_repo("http://openresty.org/yum/centos/OpenResty.repo")
+function yum.add_repo(S)
+    M.parameters = { "repo" }
+    M.report = {
+        repaired = "yum.add_repo: Successfully added repository.",
+            kept = "yum.add_repo: Repository already present.",
+          failed = "yum.add_repo: Error adding repository."
+    }
+    return function(P)
+        P.package = ""
+        P.repo = S
+        local F, R = cfg.init(P, M)
+        local file = string.match(P.repo, "^.*/(.*)$")
+        if stat.stat("/etc/yum.repos.d/" .. file) then
+            return F.kept(P.repo)
+        end
+        return F.result(P.repo, F.run(cmd["yum-config-manager"], { "--add-repo", P.repo }))
     end
 end
 

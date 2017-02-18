@@ -427,6 +427,17 @@ if lib.bin_path"yum" then
             yum"test/yum_absent.lua"
         end
     T:done(N)
+    T:start"yum.add_repo (modules/yum.lua)"
+        do
+            local yum = function(policy)
+                T:eq(cfg{ "-f", policy }, true)
+                local info = stat.stat("/etc/yum.repos.d/OpenResty.repo")
+                T:neq(stat.S_ISREG(info.st_mode), 0)
+                cmd.rm{ "-f", "/etc/yum.repos.d/OpenResty.repo" }
+            end
+            yum"test/yum_add_repo.lua"
+        end
+    T:done(N)
 end
 
 if lib.bin_path"systemctl" then
