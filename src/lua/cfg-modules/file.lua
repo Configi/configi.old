@@ -32,14 +32,14 @@ local owner = function(F, P, R)
     local u = pwd.getpwuid(info.st_uid)
     local uid = string.format("%s(%s)", u.pw_uid, u.pw_name)
     if P.owner == u.pw_name or P.owner == tostring(u.pw_uid) then
-        return F.result(P.path, nil, report.file_owner_skip .. uid .. ".")
+        return F.result(P.path, false, report.file_owner_skip .. uid .. ".")
     end
     local args = { "-h", P.owner, P.path }
     lib.insert_if(P.recurse, args, 2, "-R")
     if F.run(cmd.chown, args) then
         return F.result(P.path, true, report.file_owner_ok)
     else
-        return F.result(P.path, false, report.file_owner_fail)
+        return F.result(P.path, nil, report.file_owner_fail)
     end
 end
 
@@ -53,14 +53,14 @@ local group = function(F, P, R)
     local g = grp.getgrgid(info.st_gid)
     local cg = string.format("%s(%s)", g.gr_gid, g.gr_name)
     if P.group == g.gr_name or P.group == tostring(g.gr_gid) then
-        return F.result(P.path, nil, report.file_group_skip .. cg .. ".")
+        return F.result(P.path, false, report.file_group_skip .. cg .. ".")
     end
     local args = { "-h", ":" .. P.group, P.path }
     lib.insert_if(P.recurse, args, 2, "-R")
     if F.run(cmd.chown, args) then
         return F.result(P.path, true, report.file_group_ok)
     else
-        return F.result(P.path, false, report.file_group_fail)
+        return F.result(P.path, nil, report.file_group_fail)
     end
 end
 
@@ -75,14 +75,14 @@ local mode = function(F, P, R)
     local len = 0 - string.len(mode)
     local current_mode = string.sub(tostring(string.format("%o", info.st_mode)), len, -1)
     if current_mode == string.sub(mode, len, -1) then
-        return F.result(P.path, nil, report.file_mode_skip)
+        return F.result(P.path, false, report.file_mode_skip)
     end
     local args = { P.mode, P.path }
     lib.insert_if(P.recurse, args, 1, "-R")
     if F.run(cmd.chmod, args) then
         return F.result(P.path, true, report.file_mode_ok)
     else
-        return F.result(P.path, false, report.file_mode_fail)
+        return F.result(P.path, nil, report.file_mode_fail)
     end
 end
 
@@ -119,7 +119,7 @@ function file.attributes(S)
         P.path = S
         local F, R = cfg.init(P, M)
         if not P.test and not stat.stat(P.path) then
-            return F.result(P.path, false, "Missing path.")
+            return F.result(P.path, nil, "Missing path.")
         end
         return attrib(F, P, R)
     end
@@ -152,7 +152,7 @@ function file.link(S)
             F.msg(P.path, M.report.repaired, true)
             return attrib(F, P, R)
         else
-            return F.result(P.path, false)
+            return F.result(P.path)
         end
     end
 end
@@ -176,7 +176,7 @@ function file.hard(S)
         local source = stat.stat(P.src)
         local link = stat.stat(P.path) or nil
         if not source then
-            return F.result(P.path, false, string.format(" '%s' is missing", source))
+            return F.result(P.path, nil, string.format(" '%s' is missing", source))
         end
         if source and link and (source.st_ino == link.st_ino) then
             F.msg(P.path, M.report.kept, nil)
@@ -188,7 +188,7 @@ function file.hard(S)
             F.msg(P.path, M.report.repaired, true)
             return attrib(F, P, R)
         else
-            return F.result(P.path, false)
+            return F.result(P.path)
         end
     end
 end
@@ -227,7 +227,7 @@ function file.directory(S)
             F.msg(P.path, M.report.repaired, true)
             return attrib(F, P, R)
         else
-            return F.result(P.path, false)
+            return F.result(P.path)
         end
     end
 end
@@ -251,7 +251,7 @@ function file.touch(S)
             F.msg(P.path, M.report.repaired, true)
             return attrib(F, P, R)
         else
-            return F.result(P.path, false)
+            return F.result(P.path)
         end
     end
 end
@@ -298,7 +298,7 @@ function file.copy(S)
         local present = stat.stat(P.path)
         if present and P.backup and (not stat.stat(backup)) then
             if not F.run(cmd.mv, { P.path, backup }) then
-                return F.result(P.path, false)
+                return F.result(P.path)
             end
         elseif not P.force and present then
             return F.kept(P.path)
@@ -310,7 +310,7 @@ function file.copy(S)
             return F.result(P.path, true)
         else
             F.run(cmd.rm, { "-r", "-f", P.path }) -- clean up incomplete copy
-            return F.result(P.path, false)
+            return F.result(P.path)
         end
     end
 end
