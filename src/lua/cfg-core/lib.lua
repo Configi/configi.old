@@ -244,7 +244,7 @@ function cfg.init(P, M)
         C.functions.run = function (f, ...)
             local ok, rt = f(...)
             local err = lib.exit_string(rt.bin, rt.status, rt.code)
-            local res = false
+            local res = nil
             if ok then
                 res = true
             end
