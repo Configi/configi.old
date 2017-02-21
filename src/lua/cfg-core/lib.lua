@@ -28,10 +28,10 @@ function Lmod.dmsg (C)
         if flag == true then
             flag = " ok "
             msg = C.report.repaired
-        elseif flag == nil then
+        elseif flag == false then
             flag = "skip"
             msg = C.report.kept
-        elseif flag == false then
+        elseif flag == nil then
             flag = "fail"
             msg = C.report.failed
             level = Psyslog.LOG_ERR
@@ -39,10 +39,10 @@ function Lmod.dmsg (C)
             msg = flag
             if bool == true then
                 flag = " ok "
-            elseif bool == false then
+            elseif bool == nil then
                 level = Psyslog.LOG_ERR
                 flag = "fail"
-            elseif bool == nil then
+            elseif bool == false then
                 flag = "skip"
             else
                 flag = "exit"
@@ -92,10 +92,10 @@ function Lmod.msg (C)
         if flag == true then
             flag = " ok "
             msg = C.report.repaired
-        elseif flag == nil then
+        elseif flag == false then
             flag = "skip"
             msg = C.report.kept
-        elseif flag == false then
+        elseif flag == nil then
             flag = "fail"
             msg = C.report.failed
             level = Psyslog.LOG_ERR
@@ -103,10 +103,10 @@ function Lmod.msg (C)
             msg = flag
             if bool == true then
                 flag = " ok "
-            elseif bool == false then
+            elseif bool == nil then
                 level = Psyslog.LOG_ERR
                 flag = "fail"
-            elseif bool == nil then
+            elseif bool == false then
                 flag = "skip"
             else
                 flag = "exit"
@@ -266,15 +266,15 @@ function cfg.init(P, M)
     end
     C.functions.msg = msg -- Assign msg to F.msg()
     C.functions.result = function (item, test, alt)
-        local flag = false
+        local flag
         if test then
             flag = true
             C.results.notify = C.parameters.notify
             C.results.repaired = true
-        elseif test == nil then
-            flag = nil
+        elseif test == false then
+            flag = false
             C.results.notify_kept = C.parameters.notify_kept
-        else
+        elseif test == nil then
             C.results.notify_failed = C.parameters.notify_failed
             C.results.failed = true
         end
@@ -287,7 +287,7 @@ function cfg.init(P, M)
     end -- F.result()
     C.functions.kept =  function (item)
         C.results.notify_kept = C.parameters.notify_kept
-        msg(item, nil)
+        msg(item, false)
         return C.results
     end -- F.kept()
     C.functions.open = function (f)
