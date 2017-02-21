@@ -105,7 +105,7 @@ function portage.present(S)
             if F.run(cmd["/usr/bin/emerge"], { "--sync" }) then
                 F.msg("sync", "Sync finished", true)
             else
-                return F.result("sync", false, "Sync failed")
+                return F.result("sync", nil, "Sync failed")
             end
         end
         if found(P) then
@@ -127,7 +127,7 @@ function portage.present(S)
             table.insert(args, 3, "--auto-unmask-write")
             table.insert(args, 3, "--auto-unmask")
             if not F.run(cmd["/usr/bin/emerge"], args) then
-                return F.result(atom, false, M.report.failed)
+                return F.result(atom, nil, M.report.failed)
             end
             table.remove(args, 3)
             table.remove(args, 3)
