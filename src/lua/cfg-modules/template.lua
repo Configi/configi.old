@@ -40,7 +40,7 @@ local write = function(F, P, R)
                 F.msg(P.path, "Showing changes", 0, 0, string.format("Diff:%s%s%s", "\n\n", table.concat(dtbl, "\n"), "\n"))
             end
         else
-            return F.result(P.path, false)
+            return F.result(P.path)
         end
     end
     return F.result(P.path, lib.awrite(P.path, P._input, P.mode))
@@ -74,11 +74,11 @@ function template.render(S)
         P.mode = tonumber(P.mode, 8)
         local ti = F.open(P.src)
         if not ti then
-            return F.result(P.src, false, M.report.missingsrc)
+            return F.result(P.src, nil, M.report.missingsrc)
         end
         local lua = F.open(P.lua)
         if not lua then
-            return F.result(P.lua, false, M.report.missinglua)
+            return F.result(P.lua, nil, M.report.missinglua)
         end
         local env = { require = require }
         local tbl
@@ -87,7 +87,7 @@ function template.render(S)
             chunk()
             tbl = env[P.table]
         else
-            return F.result(P.src, false, err)
+            return F.result(P.src, nil, err)
         end
         P._input = lib.sub(ti, tbl)
         if stat.stat(P.path) then
@@ -146,7 +146,7 @@ function template.insert_line(S)
         end
         local file = lib.file_to_tbl(P.path)
         if not file then
-            return F.result(P.path, false, M.report.missing)
+            return F.result(P.path, nil, M.report.missing)
         end
         P.mode = stat.stat(P.path).st_mode
         if P.inserts then
@@ -207,7 +207,7 @@ function template.remove_line(S)
         end
         local file = lib.file_to_tbl(P.path)
         if not file then
-            return F.result(P.path, false, M.report.missing)
+            return F.result(P.path, nil, M.report.missing)
         end
         P.mode = stat.stat(P.path).st_mode
         if not lib.find_string(file, pattern, P.plain) then
