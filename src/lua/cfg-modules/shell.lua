@@ -105,7 +105,7 @@ function shell.command(S)
         else
             rt = { code = 0 }
         end
-        return F.result(P.string, (rt.code == 0))
+        return F.result(P.string, (rt.code == 0) or nil)
     end
 end
 
@@ -129,7 +129,7 @@ function shell.system(S)
         local F, R = cfg.init(P, M)
         local script = lib.fopen(P.string)
         if not script then
-            return F.result(P.string, false, "shell.system: script not found")
+            return F.result(P.string, nil, "shell.system: script not found")
         end
         if rc(F, P) then
             return F.kept(P.string)
@@ -171,7 +171,7 @@ function shell.popen(S)
             str = P.string
         end
         str = F.run(lib.popen, str, P.cwd)
-        local res, ok = false, false
+        local res, ok
         if P.expects then
             if P.test then
                 F.msg(P.expects, report.shell_popenexpect_ok, true)
@@ -181,7 +181,7 @@ function shell.popen(S)
                     F.msg(P.expects, report.shell_popenexpect_ok, true)
                 end
                 if not res then
-                    F.msg(P.expects, report.shell_popenexpect_fail, false)
+                    F.msg(P.expects, report.shell_popenexpect_fail, nil)
                 end
             end
         else
@@ -242,7 +242,7 @@ function shell.popen3(S)
         if P.error == "ignore" then args._ignore_error = true end
         local res, rt = lib.exec(args)
         local err = lib.exit_string(rt.bin, rt.status, rt.code)
-        F.msg(args[1], err, res or false)
+        F.msg(args[1], err, res or nil)
         if P.stdout then
             if P.test then
                 F.msg(P.stdout, report.shell_popen3stdout_ok, true)
