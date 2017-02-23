@@ -24,10 +24,8 @@ local found = function(package)
 end
 
 local found_group  = function(group)
-    local _, ret = cmd.yum{ "--cacheonly", "groups", "list", group }
-    if lib.find_string(ret.stdout, "Installed Groups", true) then
-        return true
-    end
+    local _, ret = cmd.yum{ "--cacheonly", "groups", "list", "'" .. group .. "'"}
+    return lib.find_string(ret.stdout, "Installed Groups", true)
 end
 
 --- Add custom repository.
