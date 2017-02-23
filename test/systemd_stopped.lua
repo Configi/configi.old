@@ -1,1 +1,1 @@
-systemd.stopped"lighttpd"()
+systemd.stopped"nscd"()

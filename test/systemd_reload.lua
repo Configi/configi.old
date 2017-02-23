@@ -1,1 +1,1 @@
-systemd.reload"lighttpd"()
+systemd.reload"nscd"()

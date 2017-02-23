@@ -1,1 +1,1 @@
-systemd.enabled"lighttpd"()
+systemd.enabled"nscd"()
