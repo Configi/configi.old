@@ -103,8 +103,8 @@ function authorized_keys.present(S)
         end
         local file, err = keyfile(P)
         if not file then
-            F.msg("authorized_keys file", "authorized_keys.present: " .. err, false)
-            return F.result(item, false)
+            F.msg("authorized_keys file", "authorized_keys.present: " .. err)
+            return F.result(item)
         end
         if found(P) then
             return F.kept(item)

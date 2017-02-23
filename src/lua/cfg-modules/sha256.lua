@@ -34,7 +34,7 @@ function sha256.verify(S)
         P.path = S
         local F, R = cfg.init(P, M)
         if not stat.stat(P.path) then
-            return F.result(P.path, false, M.report.missing)
+            return F.result(P.path, nil, M.report.missing)
         end
         local S = sha2.new256()
         for f in io.lines(P.path, 2^12) do
@@ -43,7 +43,7 @@ function sha256.verify(S)
         if S:close() ==  P.hash then
             return F.kept(P.path)
         else
-            return F.result(P.path, false)
+            return F.result(P.path)
         end
     end
 end

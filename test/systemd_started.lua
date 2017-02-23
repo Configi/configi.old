@@ -1,1 +1,1 @@
-systemd.started"lighttpd"()
+systemd.started"nscd"()

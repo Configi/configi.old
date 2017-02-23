@@ -54,7 +54,7 @@ function make.install(S)
                 result = F.run(cmd["./configure"], { _env = P.environment, _cwd = P.directory })
             end
             if not result then
-                return F.result(P.directory, false, "`./configure` step failed")
+                return F.result(P.directory, nil, "`./configure` step failed")
             end
         end
         if P.make then
@@ -65,7 +65,7 @@ function make.install(S)
             result = F.run(cmd.make, { _env = P.environment, _cwd = P.directory })
         end
         if not result then
-            return F.result(P.directory, false, "`make` step failed")
+            return F.result(P.directory, nil, "`make` step failed")
         end
         if P.make then
             args = { _env = P.environment, _cwd = P.directory }
@@ -76,7 +76,7 @@ function make.install(S)
             result = F.run(cmd.make, { "install",  _env = P.environment, _cwd = P.directory })
         end
         if not result then
-            return F.result(P.directory, false, "`make install` step failed")
+            return F.result(P.directory, nil, "`make install` step failed")
         end
         return F.result(P.directory, true)
     end

@@ -452,11 +452,11 @@ if lib.bin_path"systemctl" then
     T:start"systemd.restart (modules/systemd.lua)"
         do
             local systemd = function(policy)
-                local ok, pgrep = cmd.pgrep{ "lighttpd" }
+                local ok, pgrep = cmd.pgrep{ "nscd" }
 		        T:yes(ok)
                 local first = pgrep.stdout[1]
                 cfg{ "-f", policy }
-                ok, pgrep = cmd.pgrep{ "lighttpd" }
+                ok, pgrep = cmd.pgrep{ "nscd" }
 		        T:yes(ok)
                 local second = pgrep.stdout[1]
                 if first == second then
@@ -479,7 +479,7 @@ if lib.bin_path"systemctl" then
         do
             local systemd = function(policy)
                 cfg{ "-f", policy }
-                T:eq(cmd.pgrep{ "lighttpd" }, nil)
+                T:eq(cmd.pgrep{ "nscd" }, nil)
             end
             systemd"test/systemd_stopped.lua"
         end

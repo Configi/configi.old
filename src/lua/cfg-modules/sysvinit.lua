@@ -17,6 +17,8 @@ local pgrep = function(service)
   local ok, ret = cmd.pgrep{ service }
   if ok then
     return true, ret.stdout[1]
+  else
+    return false
   end
 end
 
@@ -60,7 +62,7 @@ function sysvinit.stopped(S)
             return F.kept(P.service)
         end
         F.run(cmd["-/etc/init.d/" .. P.service], { "stop", _ignore_error = true })
-        return F.result(P.service, (pgrep(P.service) == nil))
+        return F.result(P.service, (pgrep(P.service) == false))
     end
 end
 

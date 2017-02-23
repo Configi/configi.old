@@ -55,7 +55,7 @@ function apt.present(S)
             if F.run(cmd["apt-get"], { "-q", "-y", "update" }) then
                 F.msg("update", "Update successful", true)
             else
-                return F.result("update", false, "Update failed")
+                return F.result("update", nil, "Update failed")
             end
         end
         -- Install mode

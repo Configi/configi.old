@@ -95,7 +95,7 @@ function iptables.append(S)
             else
                 rule[1] = "-A"
                 if not F.run(cmd[ipt[n]], rule) then
-                    return F.result("iptables.append", false)
+                    return F.result("iptables.append")
                 end
             end
         end
@@ -130,27 +130,27 @@ function iptables.disable(S)
             cmd[ipt]{ "-P", "INPUT", "ACCEPT" }
             cmd[ipt]{ "-P", "OUTPUT", "ACCEPT" }
             cmd[ipt]{ "-P", "FORWARD", "ACCEPT" }
-            local ok = false
+            local ok
             local cmds = { "-F", "-X", "-Z" }
             for t in io.lines(tables) do
                 for n = 1, #cmds do
                     if F.run(cmd[ipt], { "-t", t, cmds[n] }) then
                         ok = true
                     else
-                        return false
+                        return
                     end
                 end
             end
             return ok
         end
-        local ok = false
+        local ok
         if stat.stat("/proc/net/ip_tables_names") then
             ok = disable("/proc/net/ip_tables_names")
         else
             ok = true
         end
         if stat.stat("/proc/net/ip6_tables_names") then
-            ok = false -- reset variable
+            ok = nil -- reset variable
             ok = disable("/proc/net/ip6_tables_names")
         else
             ok = true

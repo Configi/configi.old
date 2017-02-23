@@ -67,13 +67,13 @@ function hostname.set(S)
                 if P[type] and not (P[type] == hostnames[type]) then
                     kept = false
                     if cmd.hostnamectl{ "--" .. type, "set-hostname", P[type]} == nil then
-                        return F.result(P[type], false)
+                        return F.result(P[type])
                     end
                 end
             end
             if not P.static then
                 if cmd.hostnamectl{ "--static", "set-hostname", P.hostname} == nil then
-                    return F.result(P.hostname, false)
+                    return F.result(P.hostname)
                 end
             end
             if kept then
