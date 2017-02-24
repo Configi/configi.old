@@ -59,7 +59,8 @@ end
 -- @param cmdline the string in /proc/$pid/cmdline
 -- @param name the Name field in /proc/$pid/status
 -- @usage process.signal"nginx-sighup"{
---    exe = "/usr/sbin/nginx"
+--     signal = "SIGHUP",
+--     exe = "/usr/sbin/nginx"
 -- }
 function process.signal(S)
     M.parameters = {"signal", "exe", "cmdline", "name"}
