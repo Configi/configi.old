@@ -84,7 +84,11 @@ function process.signal(S)
         elseif P.name then
             kill, err = signal.kill(name, signal[P.signal])
         end
-        return F.result(P.handle, (kill == 0) or nil)
+        if kill == 0 then
+            return F.result(P.handle, true)
+        else
+            return F.result(P.handle, nil, M.report.failed .. err)
+        end
     end
 end
 
