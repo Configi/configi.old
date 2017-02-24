@@ -913,6 +913,32 @@ T:start"make.install (modules/make.lua)"
     end
 T:done(N)
 
+T:start"process.running (modules/process.lua)"
+    do
+        local process = function(p1, p2)
+            cfg{"-f", p1}
+            T:yes(stat.stat("/tmp/RUNNING"))
+            cfg{"-f", p2}
+            T:yes(stat.stat("/tmp/NOT-RUNNING"))
+            cmd.rm{"-f", "/tmp/RUNNING"}
+            cmd.rm{"-f", "/tmp/NOT-RUNNING"}
+        end
+        process("test/process_running.lua", "test/process_not_running.lua")
+    end
+T:done(N)
+
+T:start"process.signal (modules/process.lua)"
+    do
+        local process = function(p)
+            cfg{"-f", p}
+            T:yes(stat.stat("/tmp/NSCD-NOT-RUNNING"))
+            cmd.rm{"-f", "/tmp/NSCD-NOT-RUNNING"}
+        end
+        process("test/process_signal.lua")
+    end
+T:done(N)
+
+
 --c.printf("\n  Summary: \n")
 --c.printf("        %s Passed\n", N.successes)
 --c.printf("        %s Failures\n\n", N.failures)
