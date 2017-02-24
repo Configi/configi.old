@@ -65,7 +65,7 @@ function process.signal(S)
     M.parameters = {"signal", "exe", "cmdline", "name"}
     M.report = {
         repaired = "process.signal: Successfully sent signal to process.",
-          failed = "process.signal: Error sending signal to process.",
+          failed = "process.signal: Error sending signal to process --",
          missing = "process.signal: Missing required parameter."
         }
     return function(P)
