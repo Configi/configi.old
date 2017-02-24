@@ -97,7 +97,9 @@ end
 -- @Subject executable where /proc/$pid/exe points to
 -- @param cmdline string from /proc/$pid/cmdline
 -- @param name Name field in /proc/$pid/status
--- @usage process.running("/usr/bin/rsyncd")()
+-- @usage process.running("/usr/bin/rsyncd"){
+--     notify_failed = "start-rsyncd"
+-- }
 function process.running(S)
     M.parameters = { "exe", "cmdline", "name" }
     M.report = {
