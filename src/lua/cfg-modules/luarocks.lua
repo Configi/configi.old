@@ -16,9 +16,7 @@ M.alias.rock = { "module" }
 
 local found = function(rock)
     local _, ret = cmd.luarocks{ "list" }
-    if lib.find_string(ret.stdout, "^" .. rock .. "$", true) then
-        return true
-    end
+    return lib.find_string(ret.stdout, "^" .. rock .. "$")
 end
 
 --- Install a rock.
