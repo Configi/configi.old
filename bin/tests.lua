@@ -410,6 +410,27 @@ if lib.bin_path"apt-get" then
     T:done(N)
 end
 
+if lib.bin_path"luarocks" then
+    T:start"luarocks.install (modules/luarocks.lua)"
+        do
+            local luarocks = function(policy)
+                T:eq(cfg{ "-f", policy }, true)
+                T:eq(lib.bin_path"luacheck", "/usr/bin/luacheck")
+            end
+            luarocks"test/luarocks_install.lua"
+        end
+    T:done(N)
+    T:start"luarocks.remove (modules/luarocks.lua)"
+        do
+            local luarocks = function(policy)
+                T:eq(cfg{ "-f", policy }, true)
+                T:no(lib.bin_path"luacheck")
+            end
+            luarocks"test/luarocks_remove.lua"
+        end
+    T:done(N)
+end
+
 if lib.bin_path"yum" then
     T:start"yum.present (modules/yum.lua)"
         do
