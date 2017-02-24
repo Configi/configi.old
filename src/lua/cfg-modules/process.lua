@@ -78,12 +78,14 @@ function process.signal(S)
         local _, exe, cmdline, name = find_proc(P.exe, P.cmdline, P.name)
         local kill, err
         -- Only send the signal once according to the order here.
-        if P.exe then
+        if P.exe and exe then
             kill, err = signal.kill(exe, signal[P.signal])
-        elseif P.cmdline then
+        elseif P.cmdline and cmdline then
             kill, err = signal.kill(cmdline, signal[P.signal])
-        elseif P.name then
+        elseif P.name and name then
             kill, err = signal.kill(name, signal[P.signal])
+        else
+            err = "No matching process found."
         end
         if kill == 0 then
             return F.result(P.handle, true)
