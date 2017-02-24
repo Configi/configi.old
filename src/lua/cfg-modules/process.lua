@@ -111,7 +111,7 @@ function process.running(S)
     return function(P)
         P.exe = S
         local F, R = cfg.init(P, M)
-        return F.result(P.exe, find_proc(P.exe, P.cmdline, P.name))
+        return F.result(P.exe, (find_proc(P.exe, P.cmdline, P.name)))
     end
 end
 
