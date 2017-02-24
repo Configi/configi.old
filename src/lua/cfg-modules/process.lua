@@ -17,7 +17,7 @@ _ENV = ENV
 -- We do not check if the PID of exe, cmdline and name are the same.
 -- In some cases different PIDs can have the same exe symlink, cmdline string and Name in status.
 local find_proc = function(exe, cmdline, name)
-    local E, C, N
+    local R, E, C, N
     local pid = dirent.dir("/proc")
     for n = 1, #pid do
         if string.find(pid[n], "%d+") then
@@ -44,11 +44,11 @@ local find_proc = function(exe, cmdline, name)
             end
         end
         if (E and C and N) then
+            R = false
             break
         end
     end
-    -- First return value is NOT a boolean. The last evaluated pid[n] is not nil but not equal to true.
-    return (E and C and N), E, C, N
+    return R, E, C, N
 end
 
 --- Send a signal to a specified process.
