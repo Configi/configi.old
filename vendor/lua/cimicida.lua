@@ -241,6 +241,7 @@ local file_to_tbl = function (file)
         io.close(fd)
         return tbl
     end
+    return nil, "File not found or no permissions to read file."
 end
 
 --- Find a string in a table value.
