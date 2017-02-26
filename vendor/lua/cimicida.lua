@@ -254,7 +254,7 @@ local find_in_tbl = function (tbl, str, plain)
     plain = plain or nil
     local ok, found
     for n = 1, #tbl do
-        ok, found = pcall(Lua.find, tbl[n], str, 1, plain)
+        ok, found = pcall(string.find, tbl[n], str, 1, plain)
         if ok and found then
             return n
         end
