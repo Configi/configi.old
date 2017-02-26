@@ -229,7 +229,7 @@ end
 --- Convert file into a table.
 -- Each line is a table value
 -- @tparam string file file to convert
--- @treturn table a new table
+-- @treturn table a new table, nil otherwise
 local file_to_tbl = function (file)
     local _, fd = pcall(io.open, file, "re")
     if fd then
@@ -241,7 +241,6 @@ local file_to_tbl = function (file)
         io.close(fd)
         return tbl
     end
-    return nil, "File not found or no permissions to read file."
 end
 
 --- Find a string in a table value.
