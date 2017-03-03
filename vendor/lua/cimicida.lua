@@ -229,7 +229,7 @@ end
 --- Convert file into a table.
 -- Each line is a table value
 -- @tparam string file file to convert
--- @treturn table a new table
+-- @treturn table a new table, nil otherwise
 local file_to_tbl = function (file)
     local _, fd = pcall(io.open, file, "re")
     if fd then
@@ -253,7 +253,7 @@ local find_in_tbl = function (tbl, str, plain)
     plain = plain or nil
     local ok, found
     for n = 1, #tbl do
-        ok, found = pcall(Lua.find, tbl[n], str, 1, plain)
+        ok, found = pcall(string.find, tbl[n], str, 1, plain)
         if ok and found then
             return n
         end
@@ -336,7 +336,7 @@ end
 -- @treturn string the contents of the file, nil if the file cannot be read or opened
 local fopen = function (file)
     if not test_open(file) then
-        return nil, "File not found or no permissions to read file."
+        return nil
     end
     local str = ""
     for s in io.lines(file, 2^12) do
