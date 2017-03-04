@@ -1,3 +1,4 @@
+#!bin/lua
 local factid = require"factid"
 local lib = require"lib"
 local cmd = lib.cmd
@@ -7,7 +8,7 @@ local ct = require"cwtest"
 local T, N=ct.new(), nil
 local osfamily = factid.osfamily()
 local testdir = "test/tmp/"
-local cfg = cmd["bin/cfg"]
+local cfg = cmd["bin/cfg.lua"]
 
 if not lib.is_dir(testdir) then
     stat.mkdir(testdir)
