@@ -21,3 +21,4 @@ TARGET_LDFLAGS= $(LDFLAGS)
 include lib/tests.mk
 include lib/std.mk
 include lib/rules.mk
+include configi.mk
