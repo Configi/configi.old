@@ -4,6 +4,7 @@ local ENV, cli, functions, string, table, coroutine = {}, {}, {}, string, table,
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
+local os = os
 local std = require"cfg-core.std"
 local lib = require"lib"
 local tsort = require"tsort"
@@ -11,7 +12,7 @@ local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
-package.path = std.path() .. "/" .. "?.lua"
+package.path = "./?.lua;".. "./?;" .. (std.path() or ".") .. "/" .. "?.lua"
 _ENV = ENV
 
 -- Iterate a table (array) for records.
