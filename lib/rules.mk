@@ -48,9 +48,9 @@ $(EXE_T): $(BUILD_DEPS) $(LIBLUA_A) $(LUA_T) $(C_MODULES) $(COMPILED) $(VENDOR_T
 	$(RM) $(RMFLAGS) $(MAIN).c $(VENDOR_TOP) $(SRC_TOP)
 	$(RMRF) $(VENDOR_DIRS) $(SRC_DIRS)
 
-dev: $(LUA_T) $(C_SHARED) $(COMPILED) $(VENDOR_TOP) $(SRC_TOP) $(SRC_LUA) $(VENDOR_LUA)
+dev: $(LUA_T) $(C_SHARED) $(COMPILED)
 	$(CPR) lib/luacheck .
-	-bin/luacheck.lua $(SRC_TOP) $(COMPILED) $(SRC_LUA) --exclude-files 'vendor/lua/*'
+	bin/luacheck.lua src/lua/*.lua $(COMPILED) $(SRC_CHECK) --exclude-files 'vendor/lua/*'
 
 clean: $(CLEAN)
 	$(ECHO) "Cleaning up..."
