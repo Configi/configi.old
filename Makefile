@@ -18,7 +18,7 @@ luaDEFINES:= -DLUA_COMPAT_BITLIB -DLUA_USE_POSIX
 TARGET_CCOPT= $(CCOPT)
 TARGET_CFLAGS= $(CFLAGS)
 TARGET_LDFLAGS= $(LDFLAGS)
+include configi.mk
 include lib/tests.mk
 include lib/std.mk
 include lib/rules.mk
-include configi.mk
