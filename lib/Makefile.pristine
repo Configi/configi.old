@@ -1,13 +1,13 @@
 .PHONY: default
 default: dev
-EXE:= cfg
+EXE:=
 SRC:=
-SRC_DIR:= cfg-modules cfg-core
+SRC_DIR:=
 SRC_C:=
-VENDOR:= cimicida crc32 sha2 lib tsort
+VENDOR:=
 VENDOR_DIR:=
-VENDOR_C:= inotify posix factid px qhttp auxlib
-MAKEFLAGS=
+VENDOR_C:=
+MAKEFLAGS= --silent
 HOST_CC= cc
 CROSS=
 CROSS_CC=
@@ -18,7 +18,6 @@ luaDEFINES:= -DLUA_COMPAT_BITLIB -DLUA_USE_POSIX
 TARGET_CCOPT= $(CCOPT)
 TARGET_CFLAGS= $(CFLAGS)
 TARGET_LDFLAGS= $(LDFLAGS)
-include configi.mk
-include lib/tests.mk
-include lib/std.mk
-include lib/rules.mk
+include aux/tests.mk
+include aux/std.mk
+include aux/rules.mk

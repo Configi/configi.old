@@ -1,5 +1,5 @@
+#!bin/lua
 local version = "Configi 0.9.7"
-package.path = ""
 local ENV, os, string, arg, next, tostring, collectgarbage =
        {}, os, string, arg, next, tostring, collectgarbage
 local std = require"cfg-core.std"
