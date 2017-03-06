@@ -42,7 +42,7 @@ function apt.present(S)
     return function(P)
         P.package = S
         local F = cfg.init(P, M)
-        local env, command
+        local env
         if P.proxy then
             env = { "http_proxy=" .. P.proxy }
         end
