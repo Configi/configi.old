@@ -140,7 +140,7 @@ function cli.main (opts)
     })
 
     -- scripts queue
-    local i, temp, htemp = 0, nil, nil
+    local i, temp, htemp = 0
     while next(scripts) do
         i = i + 1
         temp, htemp = source, hsource
