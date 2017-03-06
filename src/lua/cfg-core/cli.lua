@@ -323,7 +323,7 @@ end
 
 function cli.try (source, hsource, runenv)
     local M, R, results = {}, { repaired = false, failed = false, repaired = false, kept = false }
-    local notify, tags = nil, {}
+    local tags, notify = {}
     for this = 1, source.runs do
         if this > 1 and (source.debug or source.test or source.msg) then
             lib.printf("-- Retry #%.f\n", this - 1)
