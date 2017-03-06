@@ -5,7 +5,7 @@
 -- @added 0.9.0
 
 local ENV, M, user = {}, {}, {}
-local next, tostring, string = next, tostring, string
+local tostring, string = tostring, string
 local pwd = require"posix.pwd"
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
@@ -49,36 +49,36 @@ function user.present(S)
     return function(P)
         P.login = S
         local F, R = cfg.init(P, M)
-        local user = pwd.getpwnam(P.login)
+        local login = pwd.getpwnam(P.login)
         if not (P.shell or P.uid or P.gid or P.home) then
-            if user then
+            if login then
                 return F.kept(P.login)
             end
-        elseif user then
-            if P.shell and user.pw_shell ~= P.shell then
+        elseif login then
+            if P.shell and login.pw_shell ~= P.shell then
                 if F.run(cmd.usermod, { "-s", P.shell, P.login}) then
-                    F.msg(P.login, M.report.mod_shell, true, 0, string.format("From: %s To: %s", user.shell, P.shell))
+                    F.msg(P.login, M.report.mod_shell, true, 0, string.format("From: %s To: %s", login.shell, P.shell))
                     R.notify = P.notify
                     R.repaired = true
                 end
             end
-            if P.uid and tostring(user.pw_uid) ~= P.uid then
+            if P.uid and tostring(login.pw_uid) ~= P.uid then
                 if F.run(cmd.usermod, { "-u", P.uid, P.login}) then
-                    F.msg(P.login, M.report.mod_uid, true, 0, string.format("From: %s To: %s", user.uid, P.uid))
+                    F.msg(P.login, M.report.mod_uid, true, 0, string.format("From: %s To: %s", login.uid, P.uid))
                     R.notify = P.notify
                     R.repaired = true
                 end
             end
-            if P.gid and tostring(user.pw_gid) ~= P.gid then
+            if P.gid and tostring(login.pw_gid) ~= P.gid then
                 if F.run(cmd.usermod, { "-g", P.gid, P.login }) then
-                    F.msg(P.login, M.report.mod_gid, true, 0, string.format("From: %s To: %s", user.gid, P.gid))
+                    F.msg(P.login, M.report.mod_gid, true, 0, string.format("From: %s To: %s", login.gid, P.gid))
                     R.notify = P.notify
                     R.repaired = true
                 end
             end
-            if P.home and user.dir ~= P.home then
+            if P.home and login.dir ~= P.home then
                 if F.run(cmd.usermod, { "-m", "-d", P.home, P.login}) then
-                    F.msg(P.login, M.report.mod_home, true, 0, string.format("From: %s To: %s", user.dir, P.home))
+                    F.msg(P.login, M.report.mod_home, true, 0, string.format("From: %s To: %s", login.dir, P.home))
                     R.notify = P.notify
                     R.repaired = true
                 end
