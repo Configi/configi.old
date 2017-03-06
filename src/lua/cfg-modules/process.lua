@@ -11,7 +11,6 @@ local dirent = require"posix.dirent"
 local unistd = require"posix.unistd"
 local signal = require"posix.signal"
 local string = string
-local cmd = lib.cmd
 _ENV = ENV
 
 -- We do not check if the PID of exe, cmdline and name are the same.
@@ -71,7 +70,7 @@ function process.signal(S)
         }
     return function(P)
         P.handle = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not (P.exe or P.cmdline or P.name) or not P.signal then
             return F.result(P.handle, false, M.report.missing)
         end
@@ -112,7 +111,7 @@ function process.running(S)
     }
     return function(P)
         P.exe = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         return F.result(P.exe, (find_proc(P.exe, P.cmdline, P.name)))
     end
 end
