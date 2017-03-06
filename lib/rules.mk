@@ -56,6 +56,7 @@ dev: $(LUA_T) $(C_SHARED) luacheck $(COMPILED) $(VENDOR_LUA) $(VENDOR_TOP)
 	for f in $(SRC); do $(CP) $(SRC_P)/$$f.lua .; done
 	$(RMRF) $(SRC_DIRS)
 	for d in $(SRC_DIRS); do $(CPR) $(SRC_P)/$$d .; done
+	$(ECHOT) RUN luacheck
 	-bin/luacheck.lua src/lua/*.lua $(COMPILED) $(SRC_CHECK) --exclude-files 'vendor/lua/*'
 
 clean: $(CLEAN)
