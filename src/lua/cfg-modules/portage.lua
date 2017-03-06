@@ -140,7 +140,7 @@ end
 -- @Subject package atom. Can be "category/package" or "category/package-version"
 -- @Aliases remove
 -- @param atom package atom to unmerge [REQUIRED] [ALIAS: package]
--- @param depclean Remove packages not associated with explicitly installed packages [CHOICES: "yes","no"] [DEFAULT: "no"]
+-- @param depclean Remove packages not associated with explicitly installed packages [DEFAULT: false]
 -- @usage portage.absent("dev-util/strace")!
 function portage.absent(S)
     M.parameters = { "depclean" }
