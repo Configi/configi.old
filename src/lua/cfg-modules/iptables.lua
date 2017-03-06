@@ -6,7 +6,7 @@
 -- @added 0.9.7
 
 local ENV, M, iptables = {}, {}, {}
-local io, string, table, ipairs = io, string, table, ipairs
+local io, string = io, string
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
