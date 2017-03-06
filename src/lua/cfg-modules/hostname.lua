@@ -51,7 +51,7 @@ function hostname.set(S)
     }
     return function(P)
         P.hostname = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if lib.bin_path("hostnamectl") then
             local hostnames = current_hostnames()
             -- Handle hostname.set("localhost")! on hostnamectl(1) systems.
