@@ -9,7 +9,6 @@ local io = io
 local cfg = require"cfg-core.lib"
 local sha2 = require"sha2"
 local stat = require"posix.sys.stat"
-local lib = require"lib"
 _ENV = ENV
 
 M.required = { "path", "hash" }
@@ -32,7 +31,7 @@ function sha256.verify(S)
     }
     return function(P)
         P.path = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not stat.stat(P.path) then
             return F.result(P.path, nil, M.report.missing)
         end
