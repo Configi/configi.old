@@ -82,7 +82,6 @@ function apt.absent(S)
     return function(P)
         P.package = S
         local F = cfg.init(P, M)
-        local args = { "-q", "-y", "remove", P.package }
         if not found(P.package) then
             return F.kept(P.package)
         end
