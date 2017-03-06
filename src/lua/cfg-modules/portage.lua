@@ -96,7 +96,7 @@ function portage.present(S)
     }
     return function(P)
         P.atom = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if P.oneshot == nil then
             P.oneshot = true -- oneshot "yes" is default
         end
@@ -151,7 +151,7 @@ function portage.absent(S)
     }
     return function(P)
         P.atom = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not found(P) then
             return F.kept(P.atom)
         end
