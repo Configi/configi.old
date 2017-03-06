@@ -162,7 +162,6 @@ function cli.main (opts)
                 end
             end
         end
-        temp, htemp = {}, {}
     end
     local graph = tsort.new()
     do -- Create the DAG
