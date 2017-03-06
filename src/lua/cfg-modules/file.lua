@@ -293,8 +293,8 @@ function file.copy(S)
     return function(P)
         P.src = S
         local F, R = cfg.init(P, M)
-        local dir, file = lib.split_path(P.path)
-        local backup = dir .. "/._configi_" .. file
+        local dir, path = lib.split_path(P.path)
+        local backup = dir .. "/._configi_" .. path
         local present = stat.stat(P.path)
         if present and P.backup and (not stat.stat(backup)) then
             if not F.run(cmd.mv, { P.path, backup }) then
