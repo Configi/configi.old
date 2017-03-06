@@ -35,7 +35,8 @@ local current_hostnames = function()
 end
 
 --- Set hostname.
--- On systems that support hostnamectl(1) you can omit the `static` parameter since the subject is used to set the static hostname.
+-- On systems that support hostnamectl(1) you can omit the `static` parameter
+-- since the subject is used to set the static hostname.
 -- @Subject hostname
 -- @usage hostname.set("aardvark")!
 -- @usage hostname.set("aardvark")
