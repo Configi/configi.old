@@ -361,9 +361,9 @@ function cli.try (source, hsource, runenv)
         end
 
         -- Run handlers
-        local hrun = function(tags)
+        local hrun = function(htags)
             local h = coroutine.create(function ()
-                cli.hrun(tags, hsource, runenv)
+                cli.hrun(htags, hsource, runenv)
             end)
             return function()
                 local _, res = coroutine.resume(h)
