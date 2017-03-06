@@ -37,7 +37,8 @@ local write = function(F, P, R)
                 for n = 1, #diff.stdout do
                    dtbl[n] = string.match(diff.stdout[n], "[%g%s]+") or ""
                 end
-                F.msg(P.path, "Showing changes", 0, 0, string.format("Diff:%s%s%s", "\n\n", table.concat(dtbl, "\n"), "\n"))
+                F.msg(P.path, "Showing changes", 0, 0,
+                    string.format("Diff:%s%s%s", "\n\n", table.concat(dtbl, "\n"), "\n"))
             end
         else
             return F.result(P.path)
