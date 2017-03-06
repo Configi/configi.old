@@ -7,7 +7,7 @@
 -- @added 0.9.0
 
 local ENV, M, cron = {}, {}, {}
-local ipairs, pcall, next = ipairs, pcall, next
+local pcall, next = pcall, next
 local string, table = string, table
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
