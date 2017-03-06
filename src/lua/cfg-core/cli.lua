@@ -295,7 +295,7 @@ end
 
 function cli.hrun (tags, hsource, runenv) -- execution step for handlers
     for tag, _ in next, tags do
-        local mod, func, subject, param, r = nil, nil, nil, nil, {}
+        local r, mod, func, subject, param = {}
         if hsource[tag] then
             for n = 1, #hsource[tag] do
                 if runenv[hsource[tag][n].mod] == nil then
