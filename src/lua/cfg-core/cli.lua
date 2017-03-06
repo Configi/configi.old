@@ -111,7 +111,7 @@ function cli.main (opts)
                             ptbl = ptbl or {}
                             local qt = { environment = {}, parameters = {} }
                             for p, v in next, ptbl do
-                                if p == register then
+                                if p == "register" then
                                     rawset(env.global, v, true)
                                 end
                                 qt.parameters[p] = v
