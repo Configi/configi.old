@@ -1,5 +1,5 @@
-local type, pcall, next, setmetatable, pairs, ipairs, require, tostring =
-      type, pcall, next, setmetatable, pairs, ipairs, require, tostring
+local type, pcall, next, setmetatable, require, tostring =
+      type, pcall, next, setmetatable, require, tostring
 local string, table = string, table
 local Psyslog = require"posix.syslog"
 local Psystime = require"posix.sys.time"
