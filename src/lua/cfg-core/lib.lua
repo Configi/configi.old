@@ -302,7 +302,6 @@ function cfg.init(P, M)
            lib.errorf("%s %s or %s not found\n", strings.SERR, file, base .. "." .. ext)
         end
     end
-    _temp, C._module, C._required = nil, nil, nil -- GC
 
     -- Methods available to P
     local insert_if = function(self, source, target, i)
