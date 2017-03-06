@@ -302,7 +302,10 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
                     -- auto-load the module
                     runenv[hsource[tag][n].mod] = functions.module(hsource[tag][n].mod)
                 end
-                mod, func, subject, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].subject, hsource[tag][n].param
+                mod, func, subject, param = runenv[hsource[tag][n].mod],
+                    hsource[tag][n].func,
+                    hsource[tag][n].subject,
+                    hsource[tag][n].param
                 -- append debug and test arguments
                 param.debug = hsource[1] or param.debug
                 param.test = hsource[2] or param.test
