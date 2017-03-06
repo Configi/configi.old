@@ -212,7 +212,7 @@ function cli.opt (arg, version)
     local opts = { runs = 3, _periodic = "300" }
     local tags = {}
     -- optind and li are unused
-    for r, optarg, optind, li in Pgetopt.getopt(arg, short, long) do
+    for r, optarg, _, _ in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
             local full, base, ext = std.file(optarg)
             opts.ext = ext
