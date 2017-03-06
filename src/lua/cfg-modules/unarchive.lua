@@ -52,7 +52,7 @@ function unarchive.unpack(S)
     }
     return function(P)
         P.src = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if P.creates and stat.stat(P.creates) then
             return F.kept(P.src)
         end
