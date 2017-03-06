@@ -34,7 +34,7 @@ function luarocks.present(S)
     }
     return function(P)
         P.rock = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local env
         if P.proxy then
             env = { "http_proxy=" .. P.proxy }
@@ -59,7 +59,7 @@ function luarocks.absent(S)
     }
     return function(P)
         P.rock = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not found(P.rock) then
             return F.kept(P.rock)
         end
