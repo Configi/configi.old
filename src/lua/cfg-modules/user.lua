@@ -129,7 +129,7 @@ function user.absent(S)
     }
     return function(P)
         P.login = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not pwd.getpwnam(P.login) then
             return F.kept(P.login)
         end
