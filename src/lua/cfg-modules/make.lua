@@ -37,7 +37,7 @@ function make.install(S)
     }
     return function(P)
         P.directory = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if pcall(stat.stat, P.installs) then
             return F.kept(P.directory)
         end
