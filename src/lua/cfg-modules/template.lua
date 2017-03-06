@@ -22,7 +22,7 @@ M.alias.table = { "view" }
 M.alias.line = { "text" }
 M.alias.pattern = { "match" }
 
-local write = function(F, P, R)
+local write = function(F, P)
     -- ignore P.diff if diffutils is not found
     if not lib.bin_path"diff" then P.diff = false end
     if (P.debug or P.test) and P.diff then
