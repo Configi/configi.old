@@ -218,8 +218,8 @@ function file.directory(S)
         end
         if P.force then
             if P.backup then
-                local dir, file = lib.split_path(P.path)
-                F.run(os.rename, P.path, dir .. "/._configi_" .. file)
+                local dir, path = lib.split_path(P.path)
+                F.run(os.rename, P.path, dir .. "/._configi_" .. path)
             end
             F.run(cmd.rm, { "-r", "-f", P.path })
         end
