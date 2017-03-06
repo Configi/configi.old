@@ -1,6 +1,6 @@
 local type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
       type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require
-local ENV, cli, functions, string, table, coroutine = {}, {}, {}, string, table, coroutine
+local ENV, cli, functions, string, coroutine = {}, {}, {}, string, coroutine
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
