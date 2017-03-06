@@ -82,7 +82,6 @@ function iptables.append(S)
         lib.insert_if(P["in"], rule, 3, { "-i", P["in"]})
         lib.insert_if(P.destination, rule, 3, { "-d", P.destination })
         lib.insert_if(P.source, rule, 3, { "-s", P.source })
-        local list = { iptables = {}, ip6tables = {} }
         local ipt = {}
         lib.insert_if(P.ipv4, ipt, 1, "iptables")
         lib.insert_if(P.ipv6, ipt, 1, "iptables6")
