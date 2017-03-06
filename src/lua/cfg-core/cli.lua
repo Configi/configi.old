@@ -322,7 +322,7 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
 end
 
 function cli.try (source, hsource, runenv)
-    local M, results, R = {}, nil, { repaired = false, failed = false, repaired = false, kept = false }
+    local M, R, results = {}, { repaired = false, failed = false, repaired = false, kept = false }
     local notify, tags = nil, {}
     for this = 1, source.runs do
         if this > 1 and (source.debug or source.test or source.msg) then
