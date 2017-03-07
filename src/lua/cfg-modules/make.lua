@@ -25,7 +25,7 @@ M.alias.environment = { "env" }
 -- @param configure options to pass to `./configure` [ALIAS: options]
 -- @param make usually DEFINES that it passed to `make` [ALIAS: defines]
 -- @param installs path of installed executable. Considered kept if it exists [ALIAS: creates]
--- @param environment space delimited string that contains environment variables passed to `./configure` and `make` [ALIAS: env]
+-- @param environment space delimited string that contains environment passed to `./configure` and `make` [ALIAS: env]
 -- @usage make.install"/home/ed/Downloads/something-1.0.0"
 --     make: "-DNDEBUG"
 function make.install(S)
@@ -37,7 +37,7 @@ function make.install(S)
     }
     return function(P)
         P.directory = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if pcall(stat.stat, P.installs) then
             return F.kept(P.directory)
         end

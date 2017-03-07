@@ -96,7 +96,7 @@ function portage.present(S)
     }
     return function(P)
         P.atom = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if P.oneshot == nil then
             P.oneshot = true -- oneshot "yes" is default
         end
@@ -140,7 +140,7 @@ end
 -- @Subject package atom. Can be "category/package" or "category/package-version"
 -- @Aliases remove
 -- @param atom package atom to unmerge [REQUIRED] [ALIAS: package]
--- @param depclean Remove packages not associated with explicitly installed packages [CHOICES: "yes","no"] [DEFAULT: "no"]
+-- @param depclean Remove packages not associated with explicitly installed packages [DEFAULT: false]
 -- @usage portage.absent("dev-util/strace")!
 function portage.absent(S)
     M.parameters = { "depclean" }
@@ -151,7 +151,7 @@ function portage.absent(S)
     }
     return function(P)
         P.atom = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not found(P) then
             return F.kept(P.atom)
         end

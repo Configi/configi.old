@@ -22,7 +22,7 @@ M.alias.src = { "source" }
 M.alias.owner = { "uid" }
 M.alias.group = { "gid" }
 
-local owner = function(F, P, R)
+local owner = function(F, P)
     local report = {
         file_owner_ok = "file.owner: Owner/uid corrected.",
         file_owner_skip = "file.owner: Owner/uid already matches ",
@@ -43,7 +43,7 @@ local owner = function(F, P, R)
     end
 end
 
-local group = function(F, P, R)
+local group = function(F, P)
     local report = {
         file_group_ok = "file.group: Group/gid corrected.",
         file_group_skip = "file.group: Group/gid already matches ",
@@ -64,7 +64,7 @@ local group = function(F, P, R)
     end
 end
 
-local mode = function(F, P, R)
+local mode = function(F, P)
     local report = {
         file_mode_ok = "file.mode: Mode corrected.",
         file_mode_skip = "file.mode: Mode matched.",
@@ -218,8 +218,8 @@ function file.directory(S)
         end
         if P.force then
             if P.backup then
-                local dir, file = lib.split_path(P.path)
-                F.run(os.rename, P.path, dir .. "/._configi_" .. file)
+                local dir, path = lib.split_path(P.path)
+                F.run(os.rename, P.path, dir .. "/._configi_" .. path)
             end
             F.run(cmd.rm, { "-r", "-f", P.path })
         end
@@ -267,7 +267,7 @@ function file.absent(S)
     }
     return function(P)
         P.path = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not stat.stat(P.path) then
             return F.kept(P.path)
         end
@@ -292,9 +292,9 @@ function file.copy(S)
     }
     return function(P)
         P.src = S
-        local F, R = cfg.init(P, M)
-        local dir, file = lib.split_path(P.path)
-        local backup = dir .. "/._configi_" .. file
+        local F = cfg.init(P, M)
+        local dir, path = lib.split_path(P.path)
+        local backup = dir .. "/._configi_" .. path
         local present = stat.stat(P.path)
         if present and P.backup and (not stat.stat(backup)) then
             if not F.run(cmd.mv, { P.path, backup }) then

@@ -1,6 +1,6 @@
 local type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
       type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require
-local ENV, cli, functions, string, table, coroutine = {}, {}, {}, string, table, coroutine
+local ENV, cli, functions, string, coroutine = {}, {}, {}, string, coroutine
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
@@ -111,7 +111,7 @@ function cli.main (opts)
                             ptbl = ptbl or {}
                             local qt = { environment = {}, parameters = {} }
                             for p, v in next, ptbl do
-                                if p == register then
+                                if p == "register" then
                                     rawset(env.global, v, true)
                                 end
                                 qt.parameters[p] = v
@@ -140,7 +140,7 @@ function cli.main (opts)
     })
 
     -- scripts queue
-    local i, temp, htemp = 0, nil, nil
+    local i, temp, htemp = 0
     while next(scripts) do
         i = i + 1
         temp, htemp = source, hsource
@@ -162,7 +162,6 @@ function cli.main (opts)
                 end
             end
         end
-        temp, htemp = {}, {}
     end
     local graph = tsort.new()
     do -- Create the DAG
@@ -212,7 +211,7 @@ function cli.opt (arg, version)
     local opts = { runs = 3, _periodic = "300" }
     local tags = {}
     -- optind and li are unused
-    for r, optarg, optind, li in Pgetopt.getopt(arg, short, long) do
+    for r, optarg, _, _ in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
             local full, base, ext = std.file(optarg)
             opts.ext = ext
@@ -295,14 +294,17 @@ end
 
 function cli.hrun (tags, hsource, runenv) -- execution step for handlers
     for tag, _ in next, tags do
-        local mod, func, subject, param, r = nil, nil, nil, nil, {}
+        local r, mod, func, subject, param = {}
         if hsource[tag] then
             for n = 1, #hsource[tag] do
                 if runenv[hsource[tag][n].mod] == nil then
                     -- auto-load the module
                     runenv[hsource[tag][n].mod] = functions.module(hsource[tag][n].mod)
                 end
-                mod, func, subject, param = runenv[hsource[tag][n].mod], hsource[tag][n].func, hsource[tag][n].subject, hsource[tag][n].param
+                mod, func, subject, param = runenv[hsource[tag][n].mod],
+                    hsource[tag][n].func,
+                    hsource[tag][n].subject,
+                    hsource[tag][n].param
                 -- append debug and test arguments
                 param.debug = hsource[1] or param.debug
                 param.test = hsource[2] or param.test
@@ -319,8 +321,8 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
 end
 
 function cli.try (source, hsource, runenv)
-    local M, results, R = {}, nil, { repaired = false, failed = false, repaired = false, kept = false }
-    local notify, tags = nil, {}
+    local M, R, results = {}, { failed = false, repaired = false, kept = false }
+    local tags, notify = {}
     for this = 1, source.runs do
         if this > 1 and (source.debug or source.test or source.msg) then
             lib.printf("-- Retry #%.f\n", this - 1)
@@ -358,9 +360,9 @@ function cli.try (source, hsource, runenv)
         end
 
         -- Run handlers
-        local hrun = function(tags)
+        local hrun = function(htags)
             local h = coroutine.create(function ()
-                cli.hrun(tags, hsource, runenv)
+                cli.hrun(htags, hsource, runenv)
             end)
             return function()
                 local _, res = coroutine.resume(h)

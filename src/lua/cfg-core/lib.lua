@@ -1,5 +1,5 @@
-local type, pcall, next, setmetatable, pairs, ipairs, require, tostring =
-      type, pcall, next, setmetatable, pairs, ipairs, require, tostring
+local type, pcall, next, setmetatable, require, tostring =
+      type, pcall, next, setmetatable, require, tostring
 local string, table = string, table
 local Psyslog = require"posix.syslog"
 local Psystime = require"posix.sys.time"
@@ -236,7 +236,8 @@ function cfg.init(P, M)
     end
     local secs = lib.diff_time(Psystime.gettimeofday(), t1)
         secs = string.format("%s.%s", tostring(secs.sec), tostring(secs.usec))
-        msg(strings.OPERATION, err, ok or false, secs, string.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
+        msg(strings.OPERATION, err, ok or false, secs,
+            string.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
         return ok, rt
     end -- functime()
     if not (C.parameters.test or C.parameters.debug) then
@@ -301,7 +302,6 @@ function cfg.init(P, M)
            lib.errorf("%s %s or %s not found\n", strings.SERR, file, base .. "." .. ext)
         end
     end
-    _temp, C._module, C._required = nil, nil, nil -- GC
 
     -- Methods available to P
     local insert_if = function(self, source, target, i)

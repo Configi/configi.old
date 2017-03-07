@@ -9,7 +9,6 @@ local io = io
 local cfg = require"cfg-core.lib"
 local sha2 = require"sha2"
 local stat = require"posix.sys.stat"
-local lib = require"lib"
 _ENV = ENV
 
 M.required = { "path", "hash" }
@@ -32,15 +31,15 @@ function sha256.verify(S)
     }
     return function(P)
         P.path = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not stat.stat(P.path) then
             return F.result(P.path, nil, M.report.missing)
         end
-        local S = sha2.new256()
+        local csum = sha2.new256()
         for f in io.lines(P.path, 2^12) do
-            S:add(f)
+            csum:add(f)
         end
-        if S:close() ==  P.hash then
+        if csum:close() ==  P.hash then
             return F.kept(P.path)
         else
             return F.result(P.path)

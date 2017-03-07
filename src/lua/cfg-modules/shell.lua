@@ -83,7 +83,7 @@ function shell.command(S)
     }
     return function(P)
         P.string = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if rc(F, P) then
             return F.kept(P.string)
         end
@@ -126,7 +126,7 @@ function shell.system(S)
     }
     return function(P)
         P.string = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local script = lib.fopen(P.string)
         if not script then
             return F.result(P.string, nil, "shell.system: script not found")
@@ -160,7 +160,7 @@ function shell.popen(S)
     }
     return function(P)
         P.string = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if rc(F, P) then
             return F.kept(P.string)
         end
@@ -224,7 +224,7 @@ function shell.popen3(S)
     }
     return function(P)
         P.string = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if rc(F, P) then
             return F.kept(P.string)
         end

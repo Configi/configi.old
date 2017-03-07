@@ -35,7 +35,8 @@ local current_hostnames = function()
 end
 
 --- Set hostname.
--- On systems that support hostnamectl(1) you can omit the `static` parameter since the subject is used to set the static hostname.
+-- On systems that support hostnamectl(1) you can omit the `static` parameter
+-- since the subject is used to set the static hostname.
 -- @Subject hostname
 -- @usage hostname.set("aardvark")!
 -- @usage hostname.set("aardvark")
@@ -50,7 +51,7 @@ function hostname.set(S)
     }
     return function(P)
         P.hostname = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if lib.bin_path("hostnamectl") then
             local hostnames = current_hostnames()
             -- Handle hostname.set("localhost")! on hostnamectl(1) systems.

@@ -6,7 +6,7 @@
 -- @added 0.9.7
 
 local ENV, M, iptables = {}, {}, {}
-local io, string, table, ipairs = io, string, table, ipairs
+local io, string = io, string
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
@@ -63,7 +63,7 @@ function iptables.append(S)
     }
     return function(P)
         P.tag = S -- currently unused
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local mask = function (ip)
             if ip and not string.find(ip, "/", -3) and not string.find(ip, "/", -2) then
                 ip = ip .. "/32"
@@ -82,7 +82,6 @@ function iptables.append(S)
         lib.insert_if(P["in"], rule, 3, { "-i", P["in"]})
         lib.insert_if(P.destination, rule, 3, { "-d", P.destination })
         lib.insert_if(P.source, rule, 3, { "-s", P.source })
-        local list = { iptables = {}, ip6tables = {} }
         local ipt = {}
         lib.insert_if(P.ipv4, ipt, 1, "iptables")
         lib.insert_if(P.ipv6, ipt, 1, "iptables6")
@@ -119,7 +118,7 @@ function iptables.disable(S)
     return function(P)
         P.chain = "iptables.disable"
         P.tag = S -- currently unused
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local disable = function(tables)
             local ipt
             if tables == "/proc/net/ip_tables_names" then
@@ -174,7 +173,7 @@ function iptables.default(S)
           failed = "iptables.default: Error adding rules."
     }
     return function(P)
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         P.source = P.source or "0/0"
         P.host = P.host or "0/0"
         P.ssh = P.ssh or "22"

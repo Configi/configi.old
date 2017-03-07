@@ -35,7 +35,7 @@ function sysvinit.started(S)
     }
     return function(P)
         P.service = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if pgrep(P.service) then
             return F.kept(P.service)
         end
@@ -57,7 +57,7 @@ function sysvinit.stopped(S)
     }
     return function(P)
         P.service = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if not pgrep(P.service) then
             return F.kept(P.service)
         end
@@ -78,7 +78,7 @@ function sysvinit.restart(S)
     }
     return function(P)
         P.service = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local _, pid = pgrep(P.service)
         if not pid then
             return F.kept(P.service)
@@ -102,7 +102,7 @@ function sysvinit.reload(S)
     }
     return function(P)
         P.service = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local _, pid = pgrep(P.service)
         if not pid then
             return F.kept(P.service)
@@ -125,7 +125,7 @@ function sysvinit.enabled(S)
     }
     return function(P)
         P.service = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         if F.run(cmd["-/etc/init.d/" .. P.service], { "enabled" }) then
             return F.kept(P.service)
         end
@@ -146,7 +146,7 @@ function sysvinit.disabled(S)
     }
     return function(P)
         P.service = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local ok = cmd["-/etc/init.d/" .. P.service]{ "enabled" }
         if not ok then
             return F.kept(P.service)

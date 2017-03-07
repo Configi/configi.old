@@ -5,7 +5,7 @@
 -- @added 0.9.0
 
 local ENV, M, authorized_keys = {}, {}, {}
-local ipairs, string, table = ipairs, string, table
+local string, table = string, table
 local cfg = require"cfg-core.lib"
 local stat = require"posix.sys.stat"
 local pwd = require"posix.pwd"
@@ -96,7 +96,7 @@ function authorized_keys.present(S)
             P.type = "ssh-dss"
         end
         P.key = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local item = P["type"]  .. " key"
         if P.create == nil then
             P.create = true -- default: create "yes"
@@ -142,7 +142,7 @@ function authorized_keys.absent(S)
             P.type = "ssh-dss"
         end
         P.key = S
-        local F, R = cfg.init(P, M)
+        local F = cfg.init(P, M)
         local item = P["type"]  .. " key"
         P.create = false
         local file = keyfile(P)
