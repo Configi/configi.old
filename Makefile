@@ -1,5 +1,5 @@
 .PHONY: default
-default: dev
+default: development
 EXE:= cfg
 SRC:=
 SRC_DIR:= cfg-modules cfg-core
