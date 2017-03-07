@@ -1,9 +1,7 @@
 .PHONY: test clean_cwtest
 cwtest.lua:
-	$(ECHOT) CP cwtest
 	$(CP) vendor/lua/cwtest.lua .
-test: dev cwtest.lua
-	$(ECHOT) RUN tests
+test: development cwtest.lua
 	bin/tests.lua
 clean_cwtest:
 	$(RM) $(RMFLAGS) cwtest.lua
