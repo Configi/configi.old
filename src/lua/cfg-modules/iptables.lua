@@ -142,19 +142,18 @@ function iptables.disable(S)
             end
             return ok
         end
-        local ok
+        local ip, ip6
         if stat.stat("/proc/net/ip_tables_names") then
-            ok = disable("/proc/net/ip_tables_names")
+            ip = disable("/proc/net/ip_tables_names")
         else
-            ok = true
+            ip = true
         end
         if stat.stat("/proc/net/ip6_tables_names") then
-            ok = nil -- reset variable
-            ok = disable("/proc/net/ip6_tables_names")
+            ip6 = disable("/proc/net/ip6_tables_names")
         else
-            ok = true
+            ip6 = true
         end
-        return F.result("iptables.disable", ok)
+        return F.result("iptables.disable", (ip and ip6) or nil)
     end
 end
 
