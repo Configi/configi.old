@@ -12,7 +12,8 @@ local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
     policy = { lua = {} }
 end
-package.path = std.path() .. "/?.lua" .. ";./?.lua;./?"
+local path = std.path() or ""
+package.path = path .. "/?.lua" .. ";./?.lua;./?"
 _ENV = ENV
 
 -- Iterate a table (array) for records.
