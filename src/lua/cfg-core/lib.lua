@@ -293,7 +293,7 @@ function cfg.init(P, M)
         end
         return C.results
     end -- F.result()
-    C.functions.kept =  function (item)
+    C.functions.kept = function (item)
         C.results.notify_kept = C.parameters.notify_kept
         msg(item, false)
         return C.results
