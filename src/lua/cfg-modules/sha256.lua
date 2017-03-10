@@ -31,7 +31,10 @@ function sha256.verify(S)
     }
     return function(P)
         P.path = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         if not stat.stat(P.path) then
             return F.result(P.path, nil, M.report.missing)
         end

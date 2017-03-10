@@ -47,7 +47,10 @@ function git.clone(S)
     }
     return function(P)
         P.path = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         local ret = found(P)
         local dir, res, err
         if ret then
@@ -80,8 +83,8 @@ function git.pull(S)
     }
     return function(P)
         P.path = S
-        local F = cfg.init(P, M)
-        if not found(P) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not found(P) then
             return F.kept(P.path) -- piggyback on kept()
         end
         local args = { _cwd = P.path, "pull" }

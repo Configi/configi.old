@@ -63,7 +63,10 @@ function iptables.append(S)
     }
     return function(P)
         P.tag = S -- currently unused
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.tag)
+        end
         local mask = function (ip)
             if ip and not string.find(ip, "/", -3) and not string.find(ip, "/", -2) then
                 ip = ip .. "/32"
@@ -118,7 +121,10 @@ function iptables.disable(S)
     return function(P)
         P.chain = "iptables.disable"
         P.tag = S -- currently unused
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.tag)
+        end
         local disable = function(tables)
             local ipt
             if tables == "/proc/net/ip_tables_names" then
@@ -172,11 +178,14 @@ function iptables.default(S)
           failed = "iptables.default: Error adding rules."
     }
     return function(P)
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
         P.source = P.source or "0/0"
         P.host = P.host or "0/0"
         P.ssh = P.ssh or "22"
         P.tag = S
+        if R.kept then
+            return F.kept(P.tag)
+        end
         local args = {
             { "-F" },
             { "-X" },

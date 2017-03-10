@@ -29,7 +29,10 @@ function openrc.started(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code, out, test = F.run(cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
         local pattern = "^%s" .. lib.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
         if test or ((code ==0) and (lib.find_string(out.stdout, pattern))) then
@@ -54,7 +57,10 @@ function openrc.stopped(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code, out, test = F.run(cmd["/bin/rc-status"], { "--nocolor", "--servicelist", _return_code = true })
         local pattern = "^%s" .. lib.escape_pattern(P.service) .. "%s*%[%s%sstarted%s%s%]$"
         if test or ((code == 0) and not (lib.find_string(out.stdout, pattern))) then
@@ -77,7 +83,10 @@ function openrc.restart(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code, _, test =
             F.run(cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "restart", _return_code = true })
         if test or (code == 0) then
@@ -97,7 +106,10 @@ function openrc.reload(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code, _, test =
             F.run(cmd["/sbin/rc-service"], { "--nocolor", "--quiet", P.service, "reload", _return_code = true })
         if test or (code == 0) then
@@ -120,7 +132,10 @@ function openrc.add(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         P.runlevel = P.runlevel or "default"
         local _
         local code, out, test =
@@ -150,7 +165,10 @@ function openrc.delete(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         P.runlevel = P.runlevel or "default"
         local _
         local code, out, test =

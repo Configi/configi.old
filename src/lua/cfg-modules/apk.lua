@@ -36,8 +36,8 @@ function apk.present(S)
     }
     return function(P)
         P.package = S
-        local F = cfg.init(P, M)
-        if found(P.package) then
+        local F, R = cfg.init(P, M)
+        if R.kept or found(P.package) then
             return F.kept(P.package)
         end
         local args = { "add", "--no-progress", "--quiet", P.package }
@@ -60,8 +60,8 @@ function apk.absent(S)
     }
     return function(P)
         P.package = S
-        local F = cfg.init(P, M)
-        if not found(P.package) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not found(P.package) then
             return F.kept(P.package)
         end
         return F.result(P.package, F.run(cmd["/sbin/apk"], { "del", "--no-progress", "--quiet", P.package }))

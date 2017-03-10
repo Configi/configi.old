@@ -5,7 +5,7 @@
 -- @added 0.9.7
 
 local ENV, M, make = {}, {}, {}
-local table, pcall = table, pcall
+local table = table
 local cfg = require"cfg-core.lib"
 local stat = require"posix.sys.stat"
 local lib = require"lib"
@@ -17,7 +17,6 @@ M.alias = {}
 M.alias.configure = { "options" }
 M.alias.directory = { "dir", "build" }
 M.alias.make = { "defines" }
-M.alias.installs = { "creates" }
 M.alias.environment = { "env" }
 
 --- Install a program via the `configure; make; make install` sequence of commands.
@@ -29,7 +28,7 @@ M.alias.environment = { "env" }
 -- @usage make.install"/home/ed/Downloads/something-1.0.0"
 --     make: "-DNDEBUG"
 function make.install(S)
-    M.parameters = { "configure", "make", "installs", "environment" }
+    M.parameters = { "configure", "make", "environment" }
     M.report = {
         repaired = "make.install: Successfully installed.",
             kept = "make.install: Already installed.",
@@ -37,8 +36,8 @@ function make.install(S)
     }
     return function(P)
         P.directory = S
-        local F = cfg.init(P, M)
-        if pcall(stat.stat, P.installs) then
+        local F, R = cfg.init(P, M)
+        if R.kept then
             return F.kept(P.directory)
         end
         if P.environment then

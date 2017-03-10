@@ -41,7 +41,10 @@ function apt.present(S)
     }
     return function(P)
         P.package = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.package)
+        end
         local env
         if P.proxy then
             env = { "http_proxy=" .. P.proxy }
@@ -81,8 +84,8 @@ function apt.absent(S)
     }
     return function(P)
         P.package = S
-        local F = cfg.init(P, M)
-        if not found(P.package) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not found(P.package) then
             return F.kept(P.package)
         end
         return F.result(P.package, F.run(cmd["apt-get"], { "-q", "-y", "remove", P.package }))

@@ -96,7 +96,10 @@ function portage.present(S)
     }
     return function(P)
         P.atom = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.atom)
+        end
         if P.oneshot == nil then
             P.oneshot = true -- oneshot "yes" is default
         end
@@ -151,8 +154,8 @@ function portage.absent(S)
     }
     return function(P)
         P.atom = S
-        local F = cfg.init(P, M)
-        if not found(P) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not found(P) then
             return F.kept(P.atom)
         end
         local env = { "CLEAN_DELAY=0", "PATH=/bin:/usr/bin:/sbin:/usr/sbin" } -- PORTAGE_BZIP2_COMMAND needs $PATH

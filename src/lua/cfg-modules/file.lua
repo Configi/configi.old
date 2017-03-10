@@ -118,6 +118,9 @@ function file.attributes(S)
     return function(P)
         P.path = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         if not P.test and not stat.stat(P.path) then
             return F.result(P.path, nil, "Missing path.")
         end
@@ -141,6 +144,9 @@ function file.link(S)
     return function(P)
         P.path = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         local symlink = unistd.readlink(P.path)
         if symlink == P.src then
             F.msg(P.src, M.report.kept, nil)
@@ -173,6 +179,9 @@ function file.hard(S)
     return function(P)
         P.path = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         local source = stat.stat(P.src)
         local link = stat.stat(P.path) or nil
         if not source then
@@ -211,6 +220,9 @@ function file.directory(S)
     return function(P)
         P.path = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         local info = stat.stat(P.path)
         if info and (stat.S_ISDIR(info.st_mode) ~= 0 )then
             F.msg(P.path, M.report.kept, nil)
@@ -247,6 +259,9 @@ function file.touch(S)
     return function(P)
         P.path = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         if F.run(cmd.touch, { P.path }) then
             F.msg(P.path, M.report.repaired, true)
             return attrib(F, P, R)
@@ -267,8 +282,8 @@ function file.absent(S)
     }
     return function(P)
         P.path = S
-        local F = cfg.init(P, M)
-        if not stat.stat(P.path) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not stat.stat(P.path) then
             return F.kept(P.path)
         end
         return F.result(P.path, F.run(cmd.rm, { "-r", "-f", P.path }))
@@ -292,7 +307,10 @@ function file.copy(S)
     }
     return function(P)
         P.src = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         local dir, path = lib.split_path(P.path)
         local backup = dir .. "/._configi_" .. path
         local present = stat.stat(P.path)

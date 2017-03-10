@@ -34,12 +34,12 @@ function luarocks.present(S)
     }
     return function(P)
         P.rock = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
         local env
         if P.proxy then
             env = { "http_proxy=" .. P.proxy }
         end
-        if found(P.rock) then
+        if R.kept or found(P.rock) then
             return F.kept(P.rock)
         end
         return F.result(P.rock, F.run(cmd.luarocks, { _env = env, "install", P.rock }))
@@ -59,8 +59,8 @@ function luarocks.absent(S)
     }
     return function(P)
         P.rock = S
-        local F = cfg.init(P, M)
-        if not found(P.rock) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not found(P.rock) then
             return F.kept(P.rock)
         end
         return F.result(P.rock, F.run(cmd.luarocks, { "remove", P.rock }))

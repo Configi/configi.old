@@ -52,7 +52,7 @@ function opkg.present(S)
     }
     return function(P)
         P.package = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
         local env
         if P.proxy then
             env = { "http_proxy=" .. P.proxy }
@@ -62,7 +62,7 @@ function opkg.present(S)
             return F.result(P.package, F.run(cmd.opkg, { _env = env, "update", P.package}))
         end
         -- Install mode
-        if found(P.package) then
+        if R.kept or found(P.package) then
             return F.kept(P.package)
         end
         local args = { _env = env, "install", P.package }
@@ -98,8 +98,8 @@ function opkg.absent(S)
     }
     return function(P)
         P.package = S
-        local F = cfg.init(P, M)
-        if not found(P.package) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not found(P.package) then
             return F.kept(P.package)
         end
         local args = { "remove", P.package }

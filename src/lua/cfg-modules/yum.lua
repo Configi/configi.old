@@ -43,7 +43,10 @@ function yum.add_repo(S)
     return function(P)
         P.package = ""
         P.repo = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.repo)
+        end
         local file = string.match(P.repo, "^.*/(.*)$")
         if stat.stat("/etc/yum.repos.d/" .. file) then
             return F.kept(P.repo)
@@ -64,7 +67,10 @@ function yum.clean(S)
     }
     return function(P)
         P.option = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept("yum clean")
+        end
         return F.result(P.package, F.run(cmd.yum, { "--quiet", "--assumeyes", "clean", P.option }))
     end
 end
@@ -95,7 +101,10 @@ function yum.present(S)
     }
     return function(P)
         P.package = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.package)
+        end
         local env, command
         if P.proxy then
             env = { "http_proxy=" .. P.proxy }
@@ -157,8 +166,8 @@ function yum.absent(S)
     }
     return function(P)
         P.package = S
-        local F = cfg.init(P, M)
-        if not found(P.package) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not found(P.package) then
             return F.kept(P.package)
         end
         local args = { _env = P.env or P.environment, "--quiet", "--assumeyes", "remove", P.package }

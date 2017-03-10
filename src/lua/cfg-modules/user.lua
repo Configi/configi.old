@@ -49,6 +49,9 @@ function user.present(S)
     return function(P)
         P.login = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.login)
+        end
         local login = pwd.getpwnam(P.login)
         if not (P.shell or P.uid or P.gid or P.home) then
             if login then
@@ -129,7 +132,10 @@ function user.absent(S)
     }
     return function(P)
         P.login = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.login)
+        end
         if not pwd.getpwnam(P.login) then
             return F.kept(P.login)
         end

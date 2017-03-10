@@ -75,7 +75,7 @@ end
 --     env: "test=this whatever=youwant"
 --     creates: "test"
 function shell.command(S)
-    M.parameters = { "cwd", "creates", "removes" }
+    M.parameters = { "cwd" }
     M.report = {
         repaired = "shell.command: Command successfully executed.",
             kept = "shell.command: `creates` or `removes` parameter satisfied.",
@@ -83,8 +83,8 @@ function shell.command(S)
     }
     return function(P)
         P.string = S
-        local F = cfg.init(P, M)
-        if rc(F, P) then
+        local F, R = cfg.init(P, M)
+        if R.kept or rc(F, P) then
             return F.kept(P.string)
         end
         local args = {}
@@ -126,7 +126,10 @@ function shell.system(S)
     }
     return function(P)
         P.string = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.string)
+        end
         local script = lib.fopen(P.string)
         if not script then
             return F.result(P.string, nil, "shell.system: script not found")
@@ -160,8 +163,8 @@ function shell.popen(S)
     }
     return function(P)
         P.string = S
-        local F = cfg.init(P, M)
-        if rc(F, P) then
+        local F, R = cfg.init(P, M)
+        if R.kept or rc(F, P) then
             return F.kept(P.string)
         end
         local str
@@ -224,8 +227,8 @@ function shell.popen3(S)
     }
     return function(P)
         P.string = S
-        local F = cfg.init(P, M)
-        if rc(F, P) then
+        local F, R = cfg.init(P, M)
+        if R.kept or rc(F, P) then
             return F.kept(P.string)
         end
         local str

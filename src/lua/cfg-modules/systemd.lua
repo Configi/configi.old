@@ -25,7 +25,10 @@ function systemd.started(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _return_code = true })
         if code == 0 then
             return F.kept(P.service)
@@ -47,7 +50,10 @@ function systemd.stopped(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _return_code = true })
         if code ~= 0 then
             return F.kept(P.service)
@@ -69,7 +75,10 @@ function systemd.restart(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _return_code = true})
         if code ~= 0 then
             return F.kept(P.service)
@@ -90,7 +99,10 @@ function systemd.reload(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _return_code = true})
         if code ~= 0 then
             return F.kept(P.service)
@@ -111,7 +123,10 @@ function systemd.enabled(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code = F.run(cmd["systemctl"], { "--quiet", "is-enabled", P.service, _return_code = true})
         if code == 0 then
             return F.kept(P.service)
@@ -132,7 +147,10 @@ function systemd.disabled(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         local code = F.run(cmd["systemctl"], { "--quiet", "is-enabled", P.service, _return_code = true })
         if code ~= 0 then
             return F.kept(P.service)

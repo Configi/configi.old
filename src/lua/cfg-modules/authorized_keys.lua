@@ -96,7 +96,10 @@ function authorized_keys.present(S)
             P.type = "ssh-dss"
         end
         P.key = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept("authorized_keys")
+        end
         local item = P["type"]  .. " key"
         if P.create == nil then
             P.create = true -- default: create "yes"
@@ -142,7 +145,10 @@ function authorized_keys.absent(S)
             P.type = "ssh-dss"
         end
         P.key = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept("authorized_keys")
+        end
         local item = P["type"]  .. " key"
         P.create = false
         local file = keyfile(P)

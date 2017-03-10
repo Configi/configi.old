@@ -9,7 +9,6 @@ local string = string
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.cmd
-local stat = require"posix.sys.stat"
 _ENV = ENV
 
 M.required = { "src", "dest" }
@@ -44,7 +43,6 @@ end
 --     dest: "/tmp/test"
 --     creates: "/tmp/test/file.1"
 function unarchive.unpack(S)
-    M.parameters = { "creates" }
     M.report = {
         repaired = "unarchive.unpack: Successfully unpacked archive.",
             kept = "unarchive.unpack: Archive already unpacked.",
@@ -52,8 +50,9 @@ function unarchive.unpack(S)
     }
     return function(P)
         P.src = S
-        local F = cfg.init(P, M)
-        if P.creates and stat.stat(P.creates) then
+        local F, R = cfg.init(P, M)
+        -- Use built-in P.creates test in cfg.init()
+        if R.kept then
             return F.kept(P.src)
         end
         local code

@@ -71,6 +71,9 @@ function template.render(S)
     return function(P)
         P.path = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         P.mode = P.mode or "0600"
         P.mode = tonumber(P.mode, 8)
         local ti = F.open(P.src)
@@ -134,6 +137,9 @@ function template.insert_line(S)
     return function(P)
         P.path = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         P.plain = P.plain or true
         local inserts, line, pattern
         if not P.plain then
@@ -199,6 +205,9 @@ function template.remove_line(S)
     return function(P)
         P.path = S
         local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.path)
+        end
         P.plain = P.plain or true
         local pattern
         if not P.plain then

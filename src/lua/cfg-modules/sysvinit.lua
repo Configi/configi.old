@@ -35,8 +35,8 @@ function sysvinit.started(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
-        if pgrep(P.service) then
+        local F, R = cfg.init(P, M)
+        if R.kept or pgrep(P.service) then
             return F.kept(P.service)
         end
         F.run(cmd["-/etc/init.d/" .. P.service], { "start", _ignore_error = true })
@@ -57,8 +57,8 @@ function sysvinit.stopped(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
-        if not pgrep(P.service) then
+        local F, R = cfg.init(P, M)
+        if R.kept or not pgrep(P.service) then
             return F.kept(P.service)
         end
         F.run(cmd["-/etc/init.d/" .. P.service], { "stop", _ignore_error = true })
@@ -78,9 +78,9 @@ function sysvinit.restart(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
         local _, pid = pgrep(P.service)
-        if not pid then
+        if R.kept or not pid then
             return F.kept(P.service)
         end
         F.run(cmd["-/etc/init.d/" .. P.service], { "restart", _ignore_error = true })
@@ -102,9 +102,9 @@ function sysvinit.reload(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
         local _, pid = pgrep(P.service)
-        if not pid then
+        if R.kept or not pid then
             return F.kept(P.service)
         end
         -- Assumed to always succeed
@@ -125,7 +125,10 @@ function sysvinit.enabled(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
+        if R.kept then
+            return F.kept(P.service)
+        end
         if F.run(cmd["-/etc/init.d/" .. P.service], { "enabled" }) then
             return F.kept(P.service)
         end
@@ -146,9 +149,9 @@ function sysvinit.disabled(S)
     }
     return function(P)
         P.service = S
-        local F = cfg.init(P, M)
+        local F, R = cfg.init(P, M)
         local ok = cmd["-/etc/init.d/" .. P.service]{ "enabled" }
-        if not ok then
+        if R.kept or not ok then
             return F.kept(P.service)
         end
         F.run(cmd["-/etc/init.d/" .. P.service], { "disable", _ignore_error = true })
