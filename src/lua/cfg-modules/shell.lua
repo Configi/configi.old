@@ -83,8 +83,8 @@ function shell.command(S)
     }
     return function(P)
         P.string = S
-        local F, R = cfg.init(P, M)
-        if R.kept or rc(F, P) then
+        local F = cfg.init(P, M)
+        if rc(F, P) then
             return F.kept(P.string)
         end
         local args = {}
@@ -118,7 +118,6 @@ end
 -- @param removes a filename, if not found will not run the script
 -- @usage shell.system("/root/test.sh")!
 function shell.system(S)
-    M.parameters = { "creates", "removes" }
     M.report = {
         repaired = "shell.system: Script successfully executed.",
             kept = "shell.system: `creates` or `removes` parameter satisfied.",
@@ -126,10 +125,7 @@ function shell.system(S)
     }
     return function(P)
         P.string = S
-        local F, R = cfg.init(P, M)
-        if R.kept then
-            return F.kept(P.string)
-        end
+        local F = cfg.init(P, M)
         local script = lib.fopen(P.string)
         if not script then
             return F.result(P.string, nil, "shell.system: script not found")
@@ -155,7 +151,7 @@ function shell.popen(S)
         shell_popenexpect_ok = "expects: Expected pattern found.",
         shell_popenexpect_fail = "expects: Expected pattern not found."
     }
-    M.parameters = { "cwd", "creates", "removes", "expects" }
+    M.parameters = { "cwd", "expects" }
     M.report = {
         repaired = "shell.popen: Command or script successfully executed.",
             kept = "shell.popen: `creates` or `removes` parameter satisfied.",
@@ -163,8 +159,8 @@ function shell.popen(S)
     }
     return function(P)
         P.string = S
-        local F, R = cfg.init(P, M)
-        if R.kept or rc(F, P) then
+        local F = cfg.init(P, M)
+        if rc(F, P) then
             return F.kept(P.string)
         end
         local str
@@ -219,7 +215,7 @@ function shell.popen3(S)
           shell_popen3stderr_ok = "stderr: Expected stderr pattern found.",
         shell_popen3stderr_fail = "stderr: Expected stderr pattern not found."
     }
-    M.parameters = { "cwd", "creates", "removes", "stdin", "stdout", "stderr", "error" }
+    M.parameters = { "cwd", "stdin", "stdout", "stderr", "error" }
     M.report = {
         repaired = "shell.popen3: Command or script successfully executed.",
             kept = "shell.popen3: `creates` or `removes` parameter satisfied.",
@@ -227,8 +223,8 @@ function shell.popen3(S)
     }
     return function(P)
         P.string = S
-        local F, R = cfg.init(P, M)
-        if R.kept or rc(F, P) then
+        local F = cfg.init(P, M)
+        if rc(F, P) then
             return F.kept(P.string)
         end
         local str
