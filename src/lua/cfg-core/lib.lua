@@ -268,13 +268,13 @@ function cfg.init(P, M)
     C.functions.msg = msg -- Assign msg to F.msg()
     C.functions.result = function (item, test, alt)
         local flag
-        if test then
+        if test == false then
+            flag = false
+            C.results.notify_kept = C.parameters.notify_kept
+        elseif test == true then
             flag = true
             C.results.notify = C.parameters.notify
             C.results.repaired = true
-        elseif test == false then
-            flag = false
-            C.results.notify_kept = C.parameters.notify_kept
         elseif test == nil then
             C.results.notify_failed = C.parameters.notify_failed
             C.results.failed = true
