@@ -33,18 +33,18 @@ local rc = function(F, P)
     local created, removed
     if P.removes then
         if not stat.stat(P.removes) then
-            F.msg(P.removes, report.shell_removes_skip, nil)
+            F.msg(P.removes, report.shell_removes_skip, false)
             removed = true
         else
-            F.msg(P.removes, report.shell_removes_fail, false)
+            F.msg(P.removes, report.shell_removes_fail, nil)
         end
     end
     if P.creates then
         if stat.stat(P.creates) then
-            F.msg(P.creates, report.shell_creates_skip, nil)
+            F.msg(P.creates, report.shell_creates_skip, false)
             created = true
         else
-            F.msg(P.creates, report.shell_creates_fail, false)
+            F.msg(P.creates, report.shell_creates_fail, nil)
         end
     end
     if P.removes and P.creates then
