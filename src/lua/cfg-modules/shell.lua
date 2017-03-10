@@ -126,7 +126,12 @@ function shell.system(S)
     return function(P)
         P.string = S
         local F = cfg.init(P, M)
-        local script = lib.fopen(P.string)
+        local script
+        if lib.is_file(P.string) then
+            script = lib.fopen(P.string)
+        else
+            script = P.string
+        end
         if not script then
             return F.result(P.string, nil, "shell.system: script not found")
         end
