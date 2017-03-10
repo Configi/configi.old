@@ -149,7 +149,7 @@ function file.link(S)
         end
         local symlink = unistd.readlink(P.path)
         if symlink == P.src then
-            F.msg(P.src, M.report.kept, nil)
+            F.msg(P.src, M.report.kept, false)
             return attrib(F, P, R)
         end
         local args = { "-s", P.src, P.path }
@@ -188,7 +188,7 @@ function file.hard(S)
             return F.result(P.path, nil, string.format(" '%s' is missing", source))
         end
         if source and link and (source.st_ino == link.st_ino) then
-            F.msg(P.path, M.report.kept, nil)
+            F.msg(P.path, M.report.kept, false)
             return attrib(F, P, R)
         end
         local args = { P.src, P.path }
@@ -225,7 +225,7 @@ function file.directory(S)
         end
         local info = stat.stat(P.path)
         if info and (stat.S_ISDIR(info.st_mode) ~= 0 )then
-            F.msg(P.path, M.report.kept, nil)
+            F.msg(P.path, M.report.kept, false)
             return attrib(F, P, R)
         end
         if P.force then
