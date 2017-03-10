@@ -3,6 +3,7 @@ local type, pcall, next, setmetatable, require, tostring =
 local string, table = string, table
 local Psyslog = require"posix.syslog"
 local Psystime = require"posix.sys.time"
+local stat = require"posix.sys.stat"
 local lib = require"lib"
 local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
@@ -159,6 +160,8 @@ function Lmod.ignoredwarn (C)
     C._module[#C._module + 1] = "notify_kept"
     C._module[#C._module + 1] = "requires"
     C._module[#C._module + 1] = "wants" -- alias to requires
+    C._module[#C._module + 1] = "creates"
+    C._module[#C._module + 1] = "installs" -- alias to creates
     -- Now check for any undeclared _module parameter
     local Ps = lib.arr_to_rec(C._module, 0)
     for param, _ in next, C.parameters do
@@ -183,8 +186,12 @@ function cfg.init(P, M)
           _required = M.required or {},
           functions = {},
          parameters = P,
-            results = { repaired = false, failed = false, msg = {}, msgt = {} }
+            results = { kept = false, repaired = false, failed = false, msg = {}, msgt = {} }
     }
+    local creates = P.creates or P.installs
+    if creates and stat.stat(creates) then
+        C.results.kept = true
+    end
     -- assign aliases
     local _temp = {}
     if pcall(next, M.alias) then
