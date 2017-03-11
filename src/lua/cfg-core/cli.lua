@@ -215,7 +215,8 @@ function cli.opt (arg, version)
     for r, optarg, _, _ in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
             local full, base, _ = std.file(optarg)
-            opts.ext = "lua"
+            local ext = "lua"
+            opts.ext = ext
             opts.base = base
             opts.script = full
             if lib.is_file(opts.script) then
