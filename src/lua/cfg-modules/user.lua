@@ -60,7 +60,8 @@ function user.present(S)
         elseif login then
             if P.shell and login.pw_shell ~= P.shell then
                 if F.run(cmd.usermod, { "-s", P.shell, P.login}) then
-                    F.msg(P.login, M.report.mod_shell, true, 0, string.format("From: %s To: %s", login.pw_shell, P.shell))
+                    F.msg(P.login, M.report.mod_shell, true, 0,
+                        string.format("From: %s To: %s", login.pw_shell, P.shell))
                     R.notify = P.notify
                     R.repaired = true
                 end
