@@ -214,8 +214,8 @@ function cli.opt (arg, version)
     -- optind and li are unused
     for r, optarg, _, _ in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
-            local full, base, ext = std.file(optarg)
-            opts.ext = ext
+            local full, base, _ = std.file(optarg)
+            opts.ext = "lua"
             opts.base = base
             opts.script = full
             if lib.is_file(opts.script) then
