@@ -70,7 +70,7 @@ function cli.main (opts)
     env.format = string.format
     env.list = functions.list
     env.sub = function (str)
-        lib.sub(str, env)
+        return lib.sub(str, env)
     end
     env.module = function (m)
         if m == "fact" then
