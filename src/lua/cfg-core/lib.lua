@@ -55,7 +55,7 @@ function Lmod.dmsg (C)
 
  [%s] %s
         Comment: %s
-        Item: %s
+        Subject: %s
         %s%s]],
         flag, msg, C.parameters.comment, item or "", extra or "", "\n")
         else
