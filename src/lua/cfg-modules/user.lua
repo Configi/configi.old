@@ -60,28 +60,28 @@ function user.present(S)
         elseif login then
             if P.shell and login.pw_shell ~= P.shell then
                 if F.run(cmd.usermod, { "-s", P.shell, P.login}) then
-                    F.msg(P.login, M.report.mod_shell, true, 0, string.format("From: %s To: %s", login.shell, P.shell))
+                    F.msg(P.login, M.report.mod_shell, true, 0, string.format("From: %s To: %s", login.pw_shell, P.shell))
                     R.notify = P.notify
                     R.repaired = true
                 end
             end
             if P.uid and tostring(login.pw_uid) ~= P.uid then
                 if F.run(cmd.usermod, { "-u", P.uid, P.login}) then
-                    F.msg(P.login, M.report.mod_uid, true, 0, string.format("From: %s To: %s", login.uid, P.uid))
+                    F.msg(P.login, M.report.mod_uid, true, 0, string.format("From: %s To: %s", login.pw_uid, P.uid))
                     R.notify = P.notify
                     R.repaired = true
                 end
             end
             if P.gid and tostring(login.pw_gid) ~= P.gid then
                 if F.run(cmd.usermod, { "-g", P.gid, P.login }) then
-                    F.msg(P.login, M.report.mod_gid, true, 0, string.format("From: %s To: %s", login.gid, P.gid))
+                    F.msg(P.login, M.report.mod_gid, true, 0, string.format("From: %s To: %s", login.pw_gid, P.gid))
                     R.notify = P.notify
                     R.repaired = true
                 end
             end
-            if P.home and login.dir ~= P.home then
+            if P.home and login.pw_dir ~= P.home then
                 if F.run(cmd.usermod, { "-m", "-d", P.home, P.login}) then
-                    F.msg(P.login, M.report.mod_home, true, 0, string.format("From: %s To: %s", login.dir, P.home))
+                    F.msg(P.login, M.report.mod_home, true, 0, string.format("From: %s To: %s", login.pw_dir, P.home))
                     R.notify = P.notify
                     R.repaired = true
                 end
