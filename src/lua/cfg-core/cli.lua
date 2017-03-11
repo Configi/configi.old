@@ -69,7 +69,9 @@ function cli.main (opts)
     env.ipairs = ipairs
     env.format = string.format
     env.list = functions.list
-    env.sub = lib.sub
+    env.sub = function (str)
+        return lib.sub(str, env)
+    end
     env.module = function (m)
         if m == "fact" then
             env.fact = Factid.gather()
