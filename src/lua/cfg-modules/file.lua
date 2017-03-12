@@ -94,12 +94,21 @@ local attrib = function(F, P, R)
     end
     if P.owner then
         R = owner(F, P, R)
+        if R.failed then
+            return R
+        end
     end
     if P.group then
         R = group(F, P, R)
+        if R.failed then
+            return R
+        end
     end
     if P.mode then
         R = mode (F, P, R)
+        if R.failed then
+            return R
+        end
     end
     return R
 end
