@@ -34,7 +34,7 @@ T:start"debug test/core-debug.lua"
         local debug = function(policy)
             local _, out = cfg{ "-f", policy }
             out = table.concat(out.stderr, "\n")
-            T:eq(string.find(out, "TESTDEBUG", 1, true), 75)
+            T:eq(string.find(out, "TESTDEBUG", 1, true), 78)
         end
         debug"test/core-debug.lua"
     end
