@@ -2,10 +2,9 @@
 file.touch"test/tmp/file_attributes1"()
 file.touch"test/tmp/file_attributes2"()
 file.touch"test/tmp/file_attributes3"()
-
 file.attributes"test/tmp/file_attributes1"{
   mode  = 0600,
-  uid   = "nobody",
+  owner = "nobody",
   group = "nobody"
 }
 
