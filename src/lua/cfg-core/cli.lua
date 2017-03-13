@@ -194,11 +194,11 @@ function cli.main (opts)
             end
         end
     end
-    for i = #nodeps, 1, -1 do
-        if i ~= 1 then
-            graph:add{nodeps[i-1], nodeps[i]}
+    for src = #nodeps, 1, -1 do
+        if not (src == 1) then
+            graph:add{nodeps[src-1], nodeps[src]}
         else
-            graph:add{nodeps[i]}
+            graph:add{nodeps[src]}
         end
     end
     local sorted_graph, tsort_err = graph:sort()
