@@ -182,6 +182,16 @@ T:start"user-modules test/core-user-modules"
     end
 T:done(N)
 
+T:start"sub() test/core-sub.lua"
+    do
+        local sub = function(policy)
+            cfg{"-f", policy}
+            T:eq(cmd.rm{"-f", testdir.."FILE-1.0"}, true)
+        end
+        sub("test/core-sub.lua")
+    end
+T:done(N)
+
 T:start"list test/core-list.lua"
     do
         local list = function(policy)
