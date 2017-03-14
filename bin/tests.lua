@@ -192,7 +192,7 @@ T:start"sub() test/core-sub.lua"
     end
 T:done(N)
 
-T:start"list test/core-list.lua"
+T:start"list() test/core-list.lua"
     do
         local list = function(policy)
             T:yes(stat.mkdir(testdir .. "core-list.xxx"))
@@ -205,7 +205,7 @@ T:start"list test/core-list.lua"
     end
 T:done(N)
 
-T:start"each test/core-each.lua"
+T:start"each() test/core-each.lua"
     do
         local each = function(policy)
 	    cmd.mkdir{ "-p", testdir .. "core-each.xxx" }
