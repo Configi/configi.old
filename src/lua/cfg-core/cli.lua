@@ -167,12 +167,15 @@ function cli.main (opts)
         end
     end
     local graph = tsort.new()
-    local nodeps = {}
     do -- Create the DAG
-        for _, src in ipairs(source) do
-            local dep = src.param.wants or src.param.requires
+        for n = #source, 1, -1 do
+            local dep = source[n].param.wants or source[n].param.requires
             if not dep then
-                nodeps[#nodeps + 1] = src
+                if not (n == 1) then
+                    graph:add{source[n-1], source[n]}
+                else
+                    graph:add{source[n]}
+                end
             else -- Found a dependency
                 for _, edge in ipairs(hsource[dep]) do
                     local first_handler = edge.param.wants or edge.param.requires
@@ -186,19 +189,12 @@ function cli.main (opts)
                             end
                             graph:add{ first_edge, edge }
                         end
-                        graph:add{ edge, src }
+                        graph:add{ edge, source[n] }
                     else
-                        graph:add{ edge, src }
+                        graph:add{ edge, source[n] }
                     end
                 end
             end
-        end
-    end
-    for src = #nodeps, 1, -1 do
-        if not (src == 1) then
-            graph:add{nodeps[src-1], nodeps[src]}
-        else
-            graph:add{nodeps[src]}
         end
     end
     local sorted_graph, tsort_err = graph:sort()
