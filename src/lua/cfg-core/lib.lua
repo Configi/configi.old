@@ -258,11 +258,7 @@ function cfg.init(P, M)
         C.functions.run = function (f, ...)
             local ok, rt = f(...)
             local err = lib.exit_string(rt.bin, rt.status, rt.code)
-            local res = nil
-            if ok then
-                res = true
-            end
-            msg(strings.OPERATION, err, ok, res, 0)
+            msg(strings.OPERATION, err, ok)
             return ok, rt
         end -- F.run()
     elseif C.parameters.debug or C.parameters.test then
