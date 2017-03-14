@@ -121,18 +121,16 @@ function cli.main (opts)
                             end
                             local resource = qt.parameters.handle or subject
                             if qt.parameters.context == true or (qt.parameters.context == nil) then
-                                if not qt.parameters.handle and type(ptbl) == "table" then
+                                if not qt.parameters.handle then
                                     source[#source + 1] = { mod = mod, func = func, subject = subject, param = ptbl }
                                 end
-                                if type(ptbl) == "table" then
-                                    if hsource[resource] and (#hsource[resource] > 0) then
-                                        hsource[resource][#hsource[resource] + 1] =
-                                            { mod = mod, func = func, subject = subject, param = ptbl }
-                                    else
-                                        hsource[resource] = {}
-                                        hsource[resource][#hsource[resource] + 1] =
-                                             { mod = mod, func = func, subject = subject, param = ptbl }
-                                    end
+                                if hsource[resource] and (#hsource[resource] > 0) then
+                                    hsource[resource][#hsource[resource] + 1] =
+                                    { mod = mod, func = func, subject = subject, param = ptbl }
+                                else
+                                    hsource[resource] = {}
+                                    hsource[resource][#hsource[resource] + 1] =
+                                    { mod = mod, func = func, subject = subject, param = ptbl }
                                 end
                             end -- context
                         end -- mod.func
