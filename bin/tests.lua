@@ -57,6 +57,7 @@ T:start"fact test/core-fact.lua"
         local fact = function(policy)
             local _, out = cfg{ "-f", policy }
             T:eq(out.code, 0)
+            T:eq(cmd.rm{"-f", testdir .. "i-deadbeef"}, true)
         end
         fact"test/core-fact.lua"
     end
