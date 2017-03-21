@@ -54,9 +54,10 @@ function cli.main (opts)
     env.pairs = pairs
     env.ipairs = ipairs
     env.format = string.format
-    env.sub = function (str)
+    env._ = function (str)
         return lib.sub(str, env)
     end
+    env.sub = env._
     env.module = function (m)
         if m == "fact" then
             env.fact = Factid.gather()
