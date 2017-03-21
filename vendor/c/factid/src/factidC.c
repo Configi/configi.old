@@ -155,8 +155,8 @@ Fsysconf(lua_State *L)
 		{"avphyspages", sysconf(_SC_AVPHYS_PAGES)}
 	};
 
-	lua_createtable(L, 0, 6);
 	size_t c;
+	lua_createtable(L, 0, 6);
 	for (c = 0; c < sizeof m/sizeof *m; c++) {
 		lua_pushinteger(L, m[c].sc);
 		lua_setfield(L, -2, m[c].name);
