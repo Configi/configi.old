@@ -69,6 +69,9 @@ static int
 luaX_assert(lua_State *L)
 {
 	const char *msg;
+	lua_Debug info;
+	const char *failed = "Assertion failed";
+	const char *name;
 	msg = 0;
 	int fargs = lua_gettop(L);
 	if (fargs >= 2) {
@@ -79,13 +82,10 @@ luaX_assert(lua_State *L)
 	} else {
 		luaL_checkany(L, 1);
 		lua_remove(L, 1);
-		lua_Debug info;
 		lua_getstack(L, 1, &info);
-		const char *failed = "Assertion failed";
 		if (!msg) {
 			msg = "false";
 		}
-		const char *name;
 		name = 0;
 		lua_getinfo(L, "Snl", &info);
 		if (info.name) {
