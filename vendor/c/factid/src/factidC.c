@@ -487,7 +487,7 @@ Fmacaddrs(lua_State *L)
 	char buf[8192];
 	char mac[18];
 	int fd = 0;
-	int c = 0;
+	size_t c = 0;
  	struct ifconf ifc = {0};
 	struct ifreq *cifr = {0};
 
