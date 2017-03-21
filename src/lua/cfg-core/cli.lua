@@ -1,10 +1,10 @@
 local pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
       pcall, rawset, next, setmetatable, load, pairs, ipairs, require
-local ENV, cli, functions, string, coroutine = {}, {}, {}, string, coroutine
+local ENV, cli, functions = {}, {}, {}
+local string, coroutine, os = string, coroutine, os
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
-local os = os
 local std = require"cfg-core.std"
 local lib = require"lib"
 local tsort = require"tsort"
