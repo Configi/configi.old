@@ -70,10 +70,10 @@ luaX_assert(lua_State *L)
 {
 	const char *msg;
 	lua_Debug info;
-	const char *failed = "Assertion failed";
 	const char *name;
-	msg = 0;
+	const char *failed = "Assertion failed";
 	int fargs = lua_gettop(L);
+	msg = 0;
 	if (fargs >= 2) {
 		msg = lua_tolstring(L, 2, 0);
 	}
