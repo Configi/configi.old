@@ -15,9 +15,7 @@
 #include <net/if.h>
 #include <ifaddrs.h>
 #include <linux/if_link.h>
-#ifndef _LINUX_SYSINFO_H
-# include <sys/sysinfo.h>
-#endif
+#include <sys/sysinfo.h>
 #include <utmpx.h>
 
 #include <assert.h>
