@@ -89,10 +89,10 @@ static int Cflopen(lua_State *L)
 	int flags = luaL_optinteger(L, 2, O_NONBLOCK | O_RDWR);
 	mode_t mode = luaL_optinteger(L, 3, 0700);
 	int fd = flopen(path, flags, mode);
+	LStream *p = newfile(L);
 	if (fd == -1) {
 		return pusherrno(L, "open(2) error");
 	}
-	LStream *p = newfile(L);
 	p->f = fdopen(fd, "rwe");
 	return (p->f == NULL) ? luaL_fileresult(L, 0, NULL) : 1;
 }
@@ -141,12 +141,13 @@ static int Cexecve(lua_State *L)
 	char **argv;
 	char **env;
 	const char *path = luaL_checkstring(L, 1);
-
+	int n;
+	int i;
 	if (lua_type(L, 2) != LUA_TTABLE) {
 		return pusherror(L, "bad argument #2 to 'execve' (table expected)");
 	}
 
-	int n = lua_rawlen(L, 2);
+	n = lua_rawlen(L, 2);
 	argv = lua_newuserdata(L, (n + 2) * sizeof(char*));
 	argv[0] = (char*) path;
 	lua_pushinteger(L, 0);
@@ -158,7 +159,6 @@ static int Cexecve(lua_State *L)
 		lua_pop(L, 1);
 	}
 
-	int i;
 	for (i=1; i<=n; i++) {
 		lua_pushinteger(L, i);
 		lua_gettable(L, 2);
