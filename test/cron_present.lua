@@ -67,6 +67,6 @@ xp = {
   Rec = { minute = "5", hour = "3", job = p.job }
 }
 
-for names, jobs in list(xp) do
+for names, jobs in pairs(xp) do
   cron.present(names)(jobs)
 end

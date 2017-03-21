@@ -85,7 +85,7 @@ function cli.main (opts)
         scripts[#scripts + 1] = include_name
     end
     env.each = function (t, f)
-        for str, tbl in functions.list(t) do
+        for str, tbl in pairs(t) do
             f(str)(tbl)
         end
     end

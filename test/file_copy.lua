@@ -7,7 +7,7 @@ files = {
   ["test/tmp/file_copy_src/three"] = {},
 }
 
-for s, t in list(files) do
+for s, t in pairs(files) do
   file.touch(s)(t)
 end
 
