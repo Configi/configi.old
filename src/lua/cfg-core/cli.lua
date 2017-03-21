@@ -16,20 +16,6 @@ local path = std.path() or ""
 package.path = path .. "/?.lua" .. ";./?.lua;./?"
 _ENV = ENV
 
--- Iterate a table (array) for records.
--- @param tbl table to iterate (TABLE)
--- @return iterator that results in a line terminated field "value" for each record (FUNCTION)
-function functions.list(tbl)
-    if not tbl then
-        lib.errorf("%scfg.list: Expected table but got nil.\n", strings.ERR)
-    end
-    local i, v
-    return function()
-       i, v = next(tbl, i)
-       return i, v
-    end
-end
-
 --- Assign returned value from require() to the custom environment
 -- Exit with code 1 if there was an error
 -- @param m name of the module (STRING)

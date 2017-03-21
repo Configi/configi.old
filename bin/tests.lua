@@ -192,19 +192,6 @@ T:start"sub() test/core-sub.lua"
     end
 T:done(N)
 
-T:start"list() test/core-list.lua"
-    do
-        local list = function(policy)
-            T:yes(stat.mkdir(testdir .. "core-list.xxx"))
-            T:yes(stat.mkdir(testdir .. "core-list.yyy"))
-            cfg{ "-f", policy }
-            T:no(lib.is_dir(testdir .. "core-list.xxx"))
-            T:no(lib.is_dir(testdir .. "core-list.yyy"))
-        end
-        list"test/core-list.lua"
-    end
-T:done(N)
-
 T:start"each() test/core-each.lua"
     do
         local each = function(policy)
