@@ -316,21 +316,15 @@ Fipaddress(lua_State *L)
 	int fd4, fd6, c;
 	char ipv6[INET6_ADDRSTRLEN];
 	char ipv4[INET_ADDRSTRLEN];
-	struct sockaddr_in l4 = {0}, r4 = {0}, ip4 = {0};
-	struct sockaddr_in6 l6 = {0}, r6 = {0}, ip6 = {0};
+	struct sockaddr_in r4 = {0}, ip4 = {0};
+	struct sockaddr_in6 r6 = {0}, ip6 = {0};
 	socklen_t ip4len = sizeof ip4;
 	socklen_t ip6len = sizeof ip6;
 
-	l4.sin_family = AF_INET;
-	l4.sin_port = htons(0);
-	l4.sin_addr.s_addr = htonl(INADDR_ANY);
 	r4.sin_family = AF_INET;
 	r4.sin_port = htons(40444);
 	inet_pton(AF_INET, "8.8.8.8", &r4.sin_addr.s_addr);
 
-	l6.sin6_family = AF_INET6;
-	l6.sin6_port = htons(0);
-	l6.sin6_addr = in6addr_any;
 	r6.sin6_family = AF_INET6;
 	r6.sin6_port = htons(40666);
 	inet_pton(AF_INET6, "2001:4860:4860::8888", &r6.sin6_addr);
