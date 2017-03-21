@@ -54,7 +54,6 @@ function cli.main (opts)
     env.pairs = pairs
     env.ipairs = ipairs
     env.format = string.format
-    env.list = functions.list
     env.sub = function (str)
         return lib.sub(str, env)
     end
