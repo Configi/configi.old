@@ -275,10 +275,23 @@ T:start"cron.present (modules/cron.lua) test/cron_present.lua"
             local t = lib.filter_tbl_value(r.stdout, "^#[%C]+") -- Remove comments
             t[#t] = t[#t] .. "\n" -- Add trailing newline
             T:eq(crc(lib.fopen("test/cron_present.out")), crc(table.concat(t, "\n")))
+        end
+        cron"test/cron_present.lua"
+    end
+T:done(N)
+
+T:start"cron.absent (modules/cron.lua) test/cron_absent.lua"
+    do
+        local cron = function(policy)
+            cfg{ "-f", policy }
+            local _, r = cmd.crontab{ "-l" }
+            local t = lib.filter_tbl_value(r.stdout, "^#[%C]+") -- Remove comments
+            t[#t] = t[#t] .. "\n" -- Add trailing newline
+            T:eq(crc(lib.fopen("test/cron_absent.out")), crc(table.concat(t, "\n")))
             cmd.crontab{ "-r" }
             cmd.crontab{ "-d" }
         end
-        cron"test/cron_present.lua"
+        cron"test/cron_absent.lua"
     end
 T:done(N)
 
