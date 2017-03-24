@@ -156,9 +156,9 @@ function cli.main (opts)
     local graph = tsort.new()
     do -- Create the DAG
          for n = #source, 1, -1 do
-            local dep = source[n].param.wants
+            local dep = source[n].param.require
             if not dep then
-                if not (n == 1) and not (source[n-1].param.wants)  then
+                if not (n == 1) and not (source[n-1].param.require)  then
                     graph:add{source[n-1], source[n]}
                 else
                     graph:add{source[n]}

@@ -158,8 +158,7 @@ function Lmod.ignoredwarn (C)
     C._module[#C._module + 1] = "notify"
     C._module[#C._module + 1] = "notify_failed"
     C._module[#C._module + 1] = "notify_kept"
-    C._module[#C._module + 1] = "requires"
-    C._module[#C._module + 1] = "wants" -- alias to requires
+    C._module[#C._module + 1] = "require"
     C._module[#C._module + 1] = "creates"
     C._module[#C._module + 1] = "installs" -- alias to creates
     C._module[#C._module + 1] = "removes"

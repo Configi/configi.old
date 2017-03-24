@@ -133,30 +133,30 @@ T:start"comment test/core-comment.lua"
 T:done(N)
 
 
-T:start"wants test/core-wants.lua"
+T:start"require test/core-require.lua"
     do
-        local wants = function(policy)
+        local require = function(policy)
             local _, out = cfg{ "-m", "-f", policy }
             T:neq(string.find(out.stderr[1], "%C+%c%C+%c%C+%c#1st"), nil)
-            T:neq(string.find(out.stderr[2], "%C+%c%C+%c%C+%c#last"), nil)
-            T:neq(string.find(out.stderr[3], "%C+%c%C+%c%C+%c#last"), nil)
-            T:neq(string.find(out.stderr[4], "%C+%c%C+%c%C+%c#delete%-last"), nil)
-            T:neq(string.find(out.stderr[5], "%C+%c%C+%c%C+%c#delete%-last"), nil)
+            T:neq(string.find(out.stderr[2], "%C+%c%C+%c%C+%c#2nd"), nil)
+            T:neq(string.find(out.stderr[3], "%C+%c%C+%c%C+%c#2nd"), nil)
+            T:neq(string.find(out.stderr[4], "%C+%c%C+%c%C+%c#3rd"), nil)
+            T:neq(string.find(out.stderr[5], "%C+%c%C+%c%C+%c#3rd"), nil)
             T:neq(string.find(out.stderr[6], "%C+%c%C+%c%C+%c#nodeps"), nil)
             T:neq(string.find(out.stderr[7], "%C+%c%C+%c%C+%c#nodeps"), nil)
-            T:neq(string.find(out.stderr[8], "%C+%c%C+%c%C+%c#2nd"), nil)
-            T:neq(string.find(out.stderr[9], "%C+%c%C+%c%C+%c#2nd"), nil)
-            T:neq(string.find(out.stderr[10], "%C+%c%C+%c%C+%c#3rd"), nil)
-            T:neq(string.find(out.stderr[11], "%C+%c%C+%c%C+%c#3rd"), nil)
-            T:neq(string.find(out.stderr[12], "%C+%c%C+%c%C+%c#4th"), nil)
-            T:neq(string.find(out.stderr[13], "%C+%c%C+%c%C+%c#4th"), nil)
-            T:neq(string.find(out.stderr[14], "%C+%c%C+%c%C+%c#delete%-nodeps"), nil)
-            T:neq(string.find(out.stderr[15], "%C+%c%C+%c%C+%c#delete%-nodeps"), nil)
-            cmd.rm { "-f", testdir .. "core-wants-first" }
-            cmd.rm { "-f", testdir .. "core-wants-another" }
-            cmd.rm { "-f", testdir .. "core-wants" }
+            T:neq(string.find(out.stderr[8], "%C+%c%C+%c%C+%c#delete%-nodeps"), nil)
+            T:neq(string.find(out.stderr[9], "%C+%c%C+%c%C+%c#delete%-nodeps"), nil)
+            T:neq(string.find(out.stderr[10], "%C+%c%C+%c%C+%c#last"), nil)
+            T:neq(string.find(out.stderr[11], "%C+%c%C+%c%C+%c#last"), nil)
+            T:neq(string.find(out.stderr[12], "%C+%c%C+%c%C+%c#delete%-last"), nil)
+            T:neq(string.find(out.stderr[13], "%C+%c%C+%c%C+%c#delete%-last"), nil)
+            T:neq(string.find(out.stderr[14], "%C+%c%C+%c%C+%c#4th"), nil)
+            T:neq(string.find(out.stderr[15], "%C+%c%C+%c%C+%c#4th"), nil)
+            cmd.rm { "-f", testdir .. "core-require-first" }
+            cmd.rm { "-f", testdir .. "core-require-another" }
+            cmd.rm { "-f", testdir .. "core-require" }
         end
-        local wants_nodeps = function(policy)
+        local require_nodeps = function(policy)
             local _, out = cfg{ "-m", "-f", policy }
             T:neq(string.find(out.stderr[1], "%C+%c%C+%c%C+%c#nodeps"), nil)
             T:neq(string.find(out.stderr[2], "%C+%c%C+%c%C+%c#nodeps"), nil)
@@ -166,11 +166,11 @@ T:start"wants test/core-wants.lua"
             T:neq(string.find(out.stderr[6], "%C+%c%C+%c%C+%c#3rd"), nil)
             T:neq(string.find(out.stderr[7], "%C+%c%C+%c%C+%c#4th"), nil)
             T:neq(string.find(out.stderr[8], "%C+%c%C+%c%C+%c#4th"), nil)
-            cmd.rm{"-f", testdir .. "core-wants-nodeps"}
-            cmd.rm{"-f", testdir .. "core-wants-last"}
+            cmd.rm{"-f", testdir .. "core-require-nodeps"}
+            cmd.rm{"-f", testdir .. "core-require-last"}
         end
-        wants("test/core-wants.lua")
-        wants_nodeps("test/core-wants-nodeps.lua")
+        require("test/core-require.lua")
+        require_nodeps("test/core-require-nodeps.lua")
     end
 T:done(N)
 
