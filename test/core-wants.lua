@@ -5,18 +5,16 @@ file.absent"test/tmp/core-wants-nodeps"{
     comment = "delete-nodeps"
 }
 file.absent"test/tmp/core-wants"{
-    comment = "4th",
-    wants = "TOUCH"
+    comment = "2nd",
+    wants = [[file.touch"test/tmp/core-wants-nodeps"]]
 }
 file.touch"test/tmp/core-wants"{
-    comment = "3rd",
-    handle = "TOUCH",
-    wants = "SECOND"
+    comment = "4th",
+    wants = [[file.touch"test/tmp/core-wants-first"]]
 }
 file.touch"test/tmp/core-wants-first"{
-    comment = "2nd",
-    handle = "SECOND",
-    wants = "FIRST"
+    comment = "3rd",
+    wants = [[file.absent"FIRST"]]
 }
 file.absent"FIRST"{
     comment = "1st"
