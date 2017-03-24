@@ -106,9 +106,11 @@ function cli.main (opts)
                                 qt.parameters[p] = v
                             end
                             local resource = qt.parameters.handle or subject
+                            local rs = string.char(9)
                             if qt.parameters.context == true or (qt.parameters.context == nil) then
                                 if not qt.parameters.handle then
-                                    source[#source + 1] = { mod = mod, func = func, subject = subject, param = ptbl }
+                                    source[#source + 1] = { res = mod..rs..func..rs..subject,
+                                        mod = mod, func = func, subject = subject, param = ptbl }
                                 end
                                 if hsource[resource] and (#hsource[resource] > 0) then
                                     hsource[resource][#hsource[resource] + 1] =
@@ -147,35 +149,47 @@ function cli.main (opts)
                     hsource[t] = {}
                     hsource[t][#hsource[t] + 1] = htemp[t][n]
                 end
+
             end
         end
     end
     local graph = tsort.new()
     do -- Create the DAG
-        for n = #source, 1, -1 do
-            local dep = source[n].param.wants or source[n].param.requires
+         for n = #source, 1, -1 do
+            local dep = source[n].param.wants
             if not dep then
-                if not (n == 1) then
+                if not (n == 1) and not (source[n-1].param.wants)  then
                     graph:add{source[n-1], source[n]}
                 else
                     graph:add{source[n]}
                 end
-            else -- Found a dependency
-                for _, edge in ipairs(hsource[dep]) do
-                    local first_handler = edge.param.wants or edge.param.requires
-                    if first_handler then -- Found a handler's dependency
-                        for _, first_edge in ipairs(hsource[first_handler]) do
-                            local second_handler = first_edge.param.wants or first_edge.param.requires
-                            if second_handler then -- Found another dependency
-                                for _, second_edge in ipairs(hsource[second_handler]) do
-                                    graph:add{ second_edge, first_edge }
+            else
+                local e = {}
+                local rs = string.char(9)
+                setmetatable(e, {
+                    __index = function(_, mod)
+                        local t = setmetatable({}, {
+                            __index=function(_,fn)
+                                return function(subj)
+                                    return mod..rs..fn..rs..subj
                                 end
                             end
-                            graph:add{ first_edge, edge }
-                        end
-                        graph:add{ edge, source[n] }
-                    else
-                        graph:add{ edge, source[n] }
+                        })
+                        return t
+                    end
+                })
+                dep = "V="..dep
+                local run, err = load(dep, dep, "t", e)
+                if run then
+                    run()
+                else
+                    lib.errorf("%s %s %s\n", strings.SERR, opts.script, err)
+                end
+                dep = e.V
+                for x = 1, #source do
+                    if source[x].res == dep then
+                        graph:add{source[x], source[n]}
+                        break
                     end
                 end
             end
