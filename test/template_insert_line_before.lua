@@ -5,7 +5,7 @@ file.copy"test/template_insert_line_test.txt"{
 
 template.insert_line"test/tmp/template_insert_line_test.txt"{
   plain   = "true",
-  before  = "true",
+  before_pattern = "true",
   pattern = "father",
   line    = "mother",
   diff    = "true"
