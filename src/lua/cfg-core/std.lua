@@ -35,7 +35,6 @@ end
 
 return {
             path = Path,
-            file = File,
              log = Log,
     add_policies = Add_Policies
 }
