@@ -25,8 +25,6 @@ local Log = function(sys, file, str, level)
 end
 
 local Add_Policies = function(tbl, dir)
-    local path = Path()
-    dir = path.."/"..dir
     if lib.is_dir(dir) then
         for f in dirent.files(dir) do
             tbl[#tbl+1] = dir.."/"..f
