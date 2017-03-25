@@ -199,14 +199,11 @@ function cli.main (opts)
                 req = e.R
                 bef = e.B
                 for x = 1, #source do
-                    if source[x].res == req or source[x].res == bef then
-                        if source[n].param.require then
-                            graph:add{source[x], source[n]}
-                        end
-                        if source[n].param.before then
-                            graph:add{source[n], source[x]}
-                        end
-                        break
+                    if source[x].res == req then
+                        graph:add{source[x], source[n]}
+                    end
+                    if source[x].res == bef then
+                        graph:add{source[n], source[x]}
                     end
                 end
             end
