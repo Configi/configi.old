@@ -5,7 +5,7 @@ local getopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
 
 local Path = function()
-    local path
+    local path = "."
     for r, optarg, _, _ in getopt.getopt(arg, strings.short_args, strings.long_args) do
         if r == "f" then
             path, _, _ = lib.decomp_path(optarg)
