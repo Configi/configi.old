@@ -209,19 +209,16 @@ function cli.main (opts)
             end
         end
     end
-    local sorted_graph, tsort_err = graph:sort()
-    if not sorted_graph then
+    local sorted, tsort_err = graph:sort()
+    if not sorted then
         lib.errorf("%s %s %s\n", strings.SERR, opts.script, tsort_err)
     end
-    if #sorted_graph > 0 then
-        source = lib.clone(sorted_graph)
-    end
-    source.debug, source.test, source.log, source.syslog, source.msg =
+    sorted.debug, sorted.test, sorted.log, sorted.syslog, sorted.msg =
     opts.debug, opts.test, opts.log, opts.syslog, opts.msg
     hsource[1], hsource[2], hsource[3], hsource[4] =
         opts.debug, opts.test, opts.syslog, opts.log -- source.msg already handles the msg output
     scripts, env = nil, nil -- GC
-    return source, hsource, runenv
+    return sorted, hsource, runenv
 end
 
 function cli.opt (arg, version)
