@@ -156,9 +156,10 @@ function cli.main (opts)
     local graph = tsort.new()
     do -- Create the DAG
          for n = #source, 1, -1 do
-            local dep = source[n].param.require
-            if not dep then
-                if not (n == 1) and not (source[n-1].param.require)  then
+            local req = source[n].param.require
+            local bef = source[n].param.before
+            if not req and not bef then
+                if not (n == 1) and not (source[n-1].param.require) and not (source[n-1].param.before) then
                     graph:add{source[n-1], source[n]}
                 else
                     graph:add{source[n]}
@@ -178,18 +179,31 @@ function cli.main (opts)
                         return t
                     end
                 })
-                dep = "V="..dep
-                local run, err = load(dep, dep, "t", e)
+                if req then
+                    req = "R="..req
+                else
+                    req = "R=''"
+                end
+                if bef then
+                    bef = "B="..bef
+                else
+                    bef = "B=''"
+                end
+                local code = req..";"..bef
+                local run, err = load(code, code, "t", e)
                 if run then
                     run()
                 else
                     lib.errorf("%s %s %s\n", strings.SERR, opts.script, err)
                 end
-                dep = e.V
+                req = e.R
+                bef = e.B
                 for x = 1, #source do
-                    if source[x].res == dep then
+                    if source[x].res == req then
                         graph:add{source[x], source[n]}
-                        break
+                    end
+                    if source[x].res == bef then
+                        graph:add{source[n], source[x]}
                     end
                 end
             end

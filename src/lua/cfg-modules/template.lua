@@ -119,15 +119,15 @@ end
 -- @param inserts a line (string) if found, skips the operation
 -- @param pattern line is added before or after this pattern [ALIAS: match]
 -- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @param before [CHOICES: "yes","no"] [DEFAULT: "no"]
--- @param after [CHOICES: "yes","no"] [DEFAULT: "yes"]
+-- @param before_pattern [CHOICES: "yes","no"] [DEFAULT: "no"]
+-- @param after_pattern [CHOICES: "yes","no"] [DEFAULT: "yes"]
 -- @usage template.insert_line("/etc/sysctl.conf")
 --     pattern: "# http://cr.yp.to/syncookies.html"
 --     text: "net.ipv4.tcp_syncookies = 1"
 --     after: "true"
 --     plain: "true"
 function template.insert_line(S)
-    M.parameters = { "diff", "line", "plain", "pattern", "before", "after", "inserts" }
+    M.parameters = { "diff", "line", "plain", "pattern", "before_pattern", "after_pattern", "inserts" }
     M.report = {
         repaired = "template.insert_line: Successfully inserted line.",
         kept = "template.insert_line: Insert cancelled, found a matching line.",
@@ -169,7 +169,7 @@ function template.insert_line(S)
             end
         else
             local x, n, nf = 1, 1, #file
-            if P.before then -- after "yes" is default
+            if P.before_pattern then -- after_pattern "yes" is default
                 x = 0
             end
             repeat
