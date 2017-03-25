@@ -301,14 +301,15 @@ function cfg.init(P, M)
         return C.results
     end -- F.kept()
     C.functions.open = function (f)
-        local file, base, ext = std.file(f)
+        local file = std.path().."/"..f
+        local path, base, ext = lib.decomp_path(f)
         -- Actual files has priority
         if lib.is_file(file) then
            return lib.fopen(file)
-        elseif policy[ext][base] then
-           return policy[ext][base]
+        elseif policy[path][base] then
+           return policy[path][base]
         else
-           lib.errorf("%s %s or %s not found\n", strings.SERR, file, base .. "." .. ext)
+           lib.errorf("%s %s or %s not found\n", strings.SERR, file, base.."."..ext)
         end
     end
 

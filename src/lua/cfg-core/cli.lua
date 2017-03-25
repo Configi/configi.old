@@ -10,7 +10,11 @@ local lib = require"lib"
 local tsort = require"tsort"
 local loaded, policy = pcall(require, "cfg-policy")
 if not loaded then
-    policy = { lua = {} }
+    policy = {
+        attributes = {},
+        policies = {},
+        handlers = {}
+    }
 end
 local path = std.path() or ""
 package.path = path .. "/?.lua" .. ";./?.lua;./?"
@@ -34,8 +38,8 @@ end
 
 function cli.compile(s, env)
     local chunk, err
-    local _, base, ext = lib.decomp_path(s)
-    local script = policy[ext][base]
+    local dir, base, _ = lib.decomp_path(s)
+    local script = policy[dir][base]
     chunk, err = load(script, script, "t", env)
     if not chunk then
         lib.errorf("%s%s%s\n", strings.SERR, s, err)
@@ -47,7 +51,7 @@ function cli.main (opts)
     local source = {}
     local hsource = {}
     local runenv = {}
-    local scripts = { opts.base .. "." .. opts.ext }
+    local scripts = { [1] = opts.script }
     local env = { fact = {}, global = {} }
 
     -- Built-in functions inside scripts --
@@ -70,20 +74,21 @@ function cli.main (opts)
     env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
     env.log = function (b) opts.log = b end
     env.include = function (f)
-        local include, base, ext = std.file(f)
+        local p = std.path()
+        local _, base, _ = lib.decomp_path(f)
         -- Only include files relative to the same directory as opts.script.
         -- Includes with path information has priority.
-        local include_name = base .. "." .. ext
+        local include = p.."/"..f
         if lib.is_file(include) then
              -- Overwrite any matching base.ext
-            policy[ext][base] = lib.fopen(include)
-        elseif not policy[ext][base] then
-            lib.errorf("%s %s or %s missing for inclusion\n", strings.SERR, include, include_name)
+            policy[p][base] = lib.fopen(include)
+        elseif not policy[base] then
+            lib.errorf("%s %s or %s missing for inclusion\n", strings.SERR, include, include)
         else
             -- Should not be reached. Just in case.
-            include_name = nil
+            include = nil
         end
-        scripts[#scripts + 1] = include_name
+        scripts[#scripts + 1] = include
     end
     env.each = function (t, f)
         for str, tbl in pairs(t) do
@@ -127,6 +132,11 @@ function cli.main (opts)
             return tbl
         end -- __index = function (_, mod)
     })
+
+
+    scripts = std.add_policies(scripts, "attributes")
+    scripts = std.add_policies(scripts, "policies")
+    scripts = std.add_policies(scripts, "handlers")
 
     -- scripts queue
     local i, temp, htemp = 0
@@ -231,24 +241,23 @@ function cli.opt (arg, version)
     -- optind and li are unused
     for r, optarg, _, _ in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
-            local full, base, _ = std.file(optarg)
-            local ext = "lua"
-            opts.ext = ext
+            local dir, base, ext = lib.decomp_path(optarg)
+            policy[dir] = {}
             opts.base = base
-            opts.script = full
+            opts.script = dir.."/"..base.."."..ext
             if lib.is_file(opts.script) then
                 -- overwrite [ext][base] with the contents of opts.script
-                policy[ext][base] = lib.fopen(opts.script)
+                policy[dir][base] = lib.fopen(opts.script)
             else
                 lib.errorf("%s %s not found\n", strings.SERR, opts.script)
             end
         end
         if r == "e" then
             local _, base, ext = lib.decomp_path(optarg)
+            policy.root = {}
             opts.script = base .. "." .. ext
-            opts.ext = ext
             opts.base = base
-            if not policy[ext][base] then
+            if not policy["root"][base] then
                 lib.errorf("%s %s not found\n", strings.SERR, optarg)
             end
         end

@@ -1,4 +1,5 @@
 local lib = require"lib"
+local dirent = require"posix.dirent"
 local syslog = require"posix.syslog"
 local getopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
@@ -14,20 +15,6 @@ local Path = function()
     return path
 end
 
-local File = function(f)
-    local default = "./"
-    local path, base, ext = lib.decomp_path(f)
-    if path and string.find(path, "^/.*") and not (path == ".") then
-        path = f
-    elseif path == "." then
-        path = Path() .. "/" .. f
-    else
-        path = default .. f
-    end
-    return path, base, ext
-end
-
-
 local Log = function(sys, file, str, level)
     level = level or syslog.LOG_DEBUG
     if sys then
@@ -37,4 +24,20 @@ local Log = function(sys, file, str, level)
     end
 end
 
-return { path = Path, file = File, log = Log }
+local Add_Policies = function(tbl, dir)
+    local path = Path()
+    dir = path.."/"..dir
+    if lib.is_dir(dir) then
+        for f in dirent.files(dir) do
+            tbl[#tbl+1] = dir.."/"..f
+        end
+    end
+    return tbl
+end
+
+return {
+            path = Path,
+            file = File,
+             log = Log,
+    add_policies = Add_Policies
+}
