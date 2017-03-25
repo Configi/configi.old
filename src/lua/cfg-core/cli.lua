@@ -182,12 +182,12 @@ function cli.main (opts)
                 if req then
                     req = "R="..req
                 else
-                    req = ""
+                    req = "R=''"
                 end
                 if bef then
                     bef = "B="..bef
                 else
-                    bef = ""
+                    bef = "B=''"
                 end
                 local code = req..";"..bef
                 local run, err = load(code, code, "t", e)
