@@ -8,10 +8,7 @@ local lib = require"lib"
 local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
 local cfg = {}
-local loaded, policy = pcall(require, "cfg-policy")
-if not loaded then
-    policy = { lua = {} }
-end
+local _, policy = pcall(require, "cfg-policy")
 local ENV = {}
 _ENV = ENV
 
