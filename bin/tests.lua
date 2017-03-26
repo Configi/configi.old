@@ -29,6 +29,21 @@ T:start"Lua tests"
     end
 T:done(N)
 
+T:start"directory structure test/core-structure"
+    do
+        local st = function(policy)
+            cfg{"-f", policy}
+            T:yes(stat.stat"test/tmp/core-structure-attributes")
+            T:yes(stat.stat"test/tmp/core-structure-policies")
+            T:yes(stat.stat"test/tmp/core-structure-handlers")
+            cmd.rm{"test/tmp/core-structure-attributes"}
+            cmd.rm{"test/tmp/core-structure-policies"}
+            cmd.rm{"test/tmp/core-structure-handlers"}
+        end
+        st("test/core-structure/test.lua")
+    end
+T:done(N)
+
 T:start"debug test/core-debug.lua"
     do
         local debug = function(policy)
