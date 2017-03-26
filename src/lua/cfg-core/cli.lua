@@ -8,11 +8,8 @@ local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
 local lib = require"lib"
 local tsort = require"tsort"
-local loaded, policy = pcall(require, "cfg-policy")
-if not loaded then
-    policy = {["."] = {}}
-end
-local path = std.path() or ""
+local _, policy = pcall(require, "cfg-policy")
+local path = std.path()
 package.path = path .. "/?.lua" .. ";./?.lua;./?"
 _ENV = ENV
 
