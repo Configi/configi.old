@@ -122,10 +122,12 @@ function cli.main (opts)
         end -- __index = function (_, mod)
     })
 
-
-    scripts = std.add_policies(scripts, path.."/attributes")
-    scripts = std.add_policies(scripts, path.."/policies")
-    scripts = std.add_policies(scripts, path.."/handlers")
+    scripts = std.add_from_dirs(scripts, path.."/attributes")
+    scripts = std.add_from_dirs(scripts, path.."/policies")
+    scripts = std.add_from_dirs(scripts, path.."/handlers")
+    scripts = std.add_from_embedded(scripts, policy, "attributes")
+    scripts = std.add_from_embedded(scripts, policy, "policies")
+    scripts = std.add_from_embedded(scripts, policy, "handlers")
 
     -- scripts queue
     local i, temp, htemp = 0
