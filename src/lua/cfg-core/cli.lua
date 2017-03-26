@@ -236,8 +236,9 @@ function cli.opt (arg, version)
             opts.script = dir.."/"..base.."."..ext
         end
         if r == "e" then
-            local _, base, ext = lib.decomp_path(optarg)
-            opts.script = base .. "." .. ext
+            local _, base, _ = lib.decomp_path(optarg)
+            -- policy["."][base]
+            opts.script = base
         end
         if r == "m" then opts.msg = true end
         if r == "v" then opts.debug = true end
