@@ -104,20 +104,21 @@ function cli.main (opts)
                                 end
                                 qt.parameters[p] = v
                             end
-                            local resource = qt.parameters.handle or subject
+                            local resource = qt.parameters.handle
                             local rs = string.char(9)
                             if qt.parameters.context == true or (qt.parameters.context == nil) then
                                 if not qt.parameters.handle then
                                     source[#source + 1] = { res = mod..rs..func..rs..subject,
                                         mod = mod, func = func, subject = subject, param = ptbl }
-                                end
-                                if hsource[resource] and (#hsource[resource] > 0) then
-                                    hsource[resource][#hsource[resource] + 1] =
-                                    { mod = mod, func = func, subject = subject, param = ptbl }
                                 else
-                                    hsource[resource] = {}
-                                    hsource[resource][#hsource[resource] + 1] =
-                                    { mod = mod, func = func, subject = subject, param = ptbl }
+                                    if hsource[resource] and (#hsource[resource] > 0) then
+                                        hsource[resource][#hsource[resource] + 1] =
+                                        { mod = mod, func = func, subject = subject, param = ptbl }
+                                    else
+                                        hsource[resource] = {}
+                                        hsource[resource][#hsource[resource] + 1] =
+                                        { mod = mod, func = func, subject = subject, param = ptbl }
+                                    end
                                 end
                             end -- context
                         end -- mod.func
