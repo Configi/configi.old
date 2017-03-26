@@ -15,6 +15,14 @@ local Path = function()
     return path
 end
 
+local Embed = function()
+    for r in getopt.getopt(arg, strings.short_args, strings.long_args) do
+        if r == "e" then
+            return true
+        end
+    end
+end
+
 local Log = function(sys, file, str, level)
     level = level or syslog.LOG_DEBUG
     if sys then
@@ -46,6 +54,7 @@ end
 
 return {
                  path = Path,
+                embed = Embed,
                   log = Log,
         add_from_dirs = Add_From_Dirs,
     add_from_embedded = Add_From_Embedded
