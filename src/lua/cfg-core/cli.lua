@@ -31,11 +31,14 @@ end
 
 function cli.compile(s, env)
     local chunk, err, script
-    local _, base, _ = lib.decomp_path(s)
+    local p, base, _ = lib.decomp_path(s)
     if lib.is_file(s) then
         script = lib.fopen(s)
     else
-        script = policy[path][base]
+        script = policy[p][base]
+    end
+    if not script then
+        lib.errorf("%s%s\n", strings.SERR, "Unable to load policy.")
     end
     chunk, err = load(script, script, "t", env)
     if not chunk then
