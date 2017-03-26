@@ -10,6 +10,7 @@ local lib = require"lib"
 local tsort = require"tsort"
 local _, policy = pcall(require, "cfg-policy")
 local path = std.path()
+local embed = std.embed()
 package.path = path .. "/?.lua" .. ";./?.lua;./?"
 _ENV = ENV
 
@@ -34,7 +35,7 @@ function cli.compile(s, env)
     local p, base, _ = lib.decomp_path(s)
     if lib.is_file(s) then
         script = lib.fopen(s)
-    else
+    elseif embed then
         script = policy[p][base]
     end
     if not script then
@@ -77,7 +78,11 @@ function cli.main (opts)
         -- Only include files relative to the same directory as opts.script.
         -- Includes with path information has priority.
         local include = path.."/"..f
-        scripts[#scripts + 1] = include
+        if lib.is_file(include) then
+            scripts[#scripts+1] = include
+        else
+            scripts[#scripts+1] = f
+        end
     end
     env.each = function (t, f)
         for str, tbl in pairs(t) do
@@ -125,9 +130,11 @@ function cli.main (opts)
     scripts = std.add_from_dirs(scripts, path.."/attributes")
     scripts = std.add_from_dirs(scripts, path.."/policies")
     scripts = std.add_from_dirs(scripts, path.."/handlers")
-    scripts = std.add_from_embedded(scripts, policy, "attributes")
-    scripts = std.add_from_embedded(scripts, policy, "policies")
-    scripts = std.add_from_embedded(scripts, policy, "handlers")
+    if embed then
+        scripts = std.add_from_embedded(scripts, policy, "attributes")
+        scripts = std.add_from_embedded(scripts, policy, "policies")
+        scripts = std.add_from_embedded(scripts, policy, "handlers")
+    end
 
     -- scripts queue
     local i, temp, htemp = 0
