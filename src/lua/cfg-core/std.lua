@@ -46,7 +46,7 @@ end
 local Add_From_Embedded = function(tbl, pol, k)
     if pol and pol[k] then
         for n, _ in pairs(pol[k]) do
-            tbl[#tbl+1] = k.."/"..n
+            tbl[#tbl+1] = k.."/"..n..".lua"
         end
     end
     return tbl
