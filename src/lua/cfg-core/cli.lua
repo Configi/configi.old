@@ -244,9 +244,12 @@ function cli.opt (arg, version)
             opts.script = dir.."/"..base.."."..ext
         end
         if r == "e" then
-            local _, base, _ = lib.decomp_path(optarg)
+            local _, base, ext = lib.decomp_path(optarg)
             -- policy["."][base]
-            opts.script = base
+            if not ext then
+                lib.errorf("%s %s\n", strings.ERROR, "Missing .lua?")
+            end
+            opts.script = base.."."..ext
         end
         if r == "m" then opts.msg = true end
         if r == "v" then opts.debug = true end
