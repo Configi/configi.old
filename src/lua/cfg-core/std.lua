@@ -24,17 +24,29 @@ local Log = function(sys, file, str, level)
     end
 end
 
-local Add_Policies = function(tbl, dir)
+local Add_From_Dirs = function(tbl, dir)
     if lib.is_dir(dir) then
         for f in dirent.files(dir) do
-            tbl[#tbl+1] = dir.."/"..f
+            if not (f==".") and not (f=="..") then
+                tbl[#tbl+1] = dir.."/"..f
+            end
+        end
+    end
+    return tbl
+end
+
+local Add_From_Embedded = function(tbl, pol, k)
+    if pol and pol[k] then
+        for n, _ in pairs(pol[k]) do
+            tbl[#tbl+1] = k.."/"..n
         end
     end
     return tbl
 end
 
 return {
-            path = Path,
-             log = Log,
-    add_policies = Add_Policies
+                 path = Path,
+                  log = Log,
+        add_from_dirs = Add_From_Dirs,
+    add_from_embedded = Add_From_Embedded
 }
