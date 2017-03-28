@@ -21,6 +21,6 @@ file.touch"test/tmp/core-embedded.txt" {
 }
 ]]
 policy["."]["include"] = [[
-file.touch"test/tmp/core-include.txt"()
+file.touch"test/tmp/core-embedded-include"()
 ]]
 return policy
