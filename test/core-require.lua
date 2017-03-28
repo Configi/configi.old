@@ -1,5 +1,6 @@
 file.absent"test/tmp/core-require"{
     comment = "4th",
+    before = [[file.touch"test/tmp/core-require-nodeps"]],
     require = [[file.absent"FIRST"]],
     require = [[file.touch"test/tmp/core-require"]]
 }
