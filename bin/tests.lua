@@ -29,6 +29,50 @@ T:start"Lua tests"
     end
 T:done(N)
 
+T:start"embedded policy test/core-embedded"
+    do
+        local e = function(policy)
+            local _, out = cfg{ "-m", "-e", policy }
+            T:neq(string.find(out.stderr[1], "%C+%c%C+%c%C+"), nil)
+            T:neq(string.find(out.stderr[2], "%C+%c%C+%c%C+"), nil)
+            T:neq(string.find(out.stderr[3], "%C+%c%C+%c%C+%c#test policies"), nil)
+            T:neq(string.find(out.stderr[4], "%C+%c%C+%c%C+%c#test policies"), nil)
+            T:neq(string.find(out.stderr[5], "%C+%c%C+%c%C+"), nil)
+            T:neq(string.find(out.stderr[6], "%C+%c%C+%c%C+"), nil)
+            T:neq(string.find(out.stderr[7], "%C+%c%C+%c%C+"), nil)
+            T:neq(string.find(out.stderr[8], "%C+%c%C+%c%C+"), nil)
+            T:neq(string.find(out.stderr[9], "%C+%c%C+%c%C+%c#test handlers"), nil)
+            T:neq(string.find(out.stderr[10], "%C+%c%C+%c%C+%c#test handlers"), nil)
+            T:yes(stat.stat"test/tmp/core-embedded-structure")
+            T:yes(stat.stat"test/tmp/core-embedded-handlers")
+            T:yes(stat.stat"test/tmp/core-embedded.txt")
+            T:yes(stat.stat"test/tmp/core-embedded-include")
+            local stat2 = stat.stat(testdir .. "core-embedded.txt")
+            T:eq(string.format("%o", stat2.st_mode), "100777")
+            os.remove(testdir.."core-embedded-structure")
+            os.remove(testdir.."core-embedded-handlers")
+            os.remove(testdir.."core-embedded-include")
+            os.remove(testdir.."core-embedded.txt")
+        end
+        e"init.lua"
+    end
+T:done(N)
+
+T:start"directory structure test/core-structure"
+    do
+        local st = function(policy)
+            cfg{"-f", policy}
+            T:yes(stat.stat"test/tmp/core-structure-attributes")
+            T:yes(stat.stat"test/tmp/core-structure-policies")
+            T:yes(stat.stat"test/tmp/core-structure-handlers")
+            cmd.rm{"test/tmp/core-structure-attributes"}
+            cmd.rm{"test/tmp/core-structure-policies"}
+            cmd.rm{"test/tmp/core-structure-handlers"}
+        end
+        st("test/core-structure/test.lua")
+    end
+T:done(N)
+
 T:start"debug test/core-debug.lua"
     do
         local debug = function(policy)

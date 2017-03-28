@@ -1,10 +1,11 @@
 local lib = require"lib"
+local dirent = require"posix.dirent"
 local syslog = require"posix.syslog"
 local getopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
 
 local Path = function()
-    local path
+    local path = "."
     for r, optarg, _, _ in getopt.getopt(arg, strings.short_args, strings.long_args) do
         if r == "f" then
             path, _, _ = lib.decomp_path(optarg)
@@ -14,19 +15,13 @@ local Path = function()
     return path
 end
 
-local File = function(f)
-    local default = "./"
-    local path, base, ext = lib.decomp_path(f)
-    if path and string.find(path, "^/.*") and not (path == ".") then
-        path = f
-    elseif path == "." then
-        path = Path() .. "/" .. f
-    else
-        path = default .. f
+local Embed = function()
+    for r in getopt.getopt(arg, strings.short_args, strings.long_args) do
+        if r == "e" then
+            return true
+        end
     end
-    return path, base, ext
 end
-
 
 local Log = function(sys, file, str, level)
     level = level or syslog.LOG_DEBUG
@@ -37,4 +32,30 @@ local Log = function(sys, file, str, level)
     end
 end
 
-return { path = Path, file = File, log = Log }
+local Add_From_Dirs = function(tbl, dir)
+    if lib.is_dir(dir) then
+        for f in dirent.files(dir) do
+            if not (f==".") and not (f=="..") then
+                tbl[#tbl+1] = dir.."/"..f
+            end
+        end
+    end
+    return tbl
+end
+
+local Add_From_Embedded = function(tbl, pol, k)
+    if pol and pol[k] then
+        for n, _ in pairs(pol[k]) do
+            tbl[#tbl+1] = k.."/"..n..".lua"
+        end
+    end
+    return tbl
+end
+
+return {
+                 path = Path,
+                embed = Embed,
+                  log = Log,
+        add_from_dirs = Add_From_Dirs,
+    add_from_embedded = Add_From_Embedded
+}

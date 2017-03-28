@@ -8,11 +8,9 @@ local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
 local lib = require"lib"
 local tsort = require"tsort"
-local loaded, policy = pcall(require, "cfg-policy")
-if not loaded then
-    policy = { lua = {} }
-end
-local path = std.path() or ""
+local _, policy = pcall(require, "cfg-policy")
+local path = std.path()
+local embed = std.embed()
 package.path = path .. "/?.lua" .. ";./?.lua;./?"
 _ENV = ENV
 
@@ -33,9 +31,16 @@ function functions.module (m)
 end
 
 function cli.compile(s, env)
-    local chunk, err
-    local _, base, ext = lib.decomp_path(s)
-    local script = policy[ext][base]
+    local chunk, err, script
+    local p, base, _ = lib.decomp_path(s)
+    if lib.is_file(s) then
+        script = lib.fopen(s)
+    elseif embed then
+        script = policy[p][base]
+    end
+    if not script then
+        lib.errorf("%s%s\n", strings.SERR, "Unable to load policy.")
+    end
     chunk, err = load(script, script, "t", env)
     if not chunk then
         lib.errorf("%s%s%s\n", strings.SERR, s, err)
@@ -47,7 +52,7 @@ function cli.main (opts)
     local source = {}
     local hsource = {}
     local runenv = {}
-    local scripts = { opts.base .. "." .. opts.ext }
+    local scripts = { [1] = opts.script }
     local env = { fact = {}, global = {} }
 
     -- Built-in functions inside scripts --
@@ -70,20 +75,14 @@ function cli.main (opts)
     env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
     env.log = function (b) opts.log = b end
     env.include = function (f)
-        local include, base, ext = std.file(f)
         -- Only include files relative to the same directory as opts.script.
         -- Includes with path information has priority.
-        local include_name = base .. "." .. ext
+        local include = path.."/"..f
         if lib.is_file(include) then
-             -- Overwrite any matching base.ext
-            policy[ext][base] = lib.fopen(include)
-        elseif not policy[ext][base] then
-            lib.errorf("%s %s or %s missing for inclusion\n", strings.SERR, include, include_name)
+            scripts[#scripts+1] = include
         else
-            -- Should not be reached. Just in case.
-            include_name = nil
+            scripts[#scripts+1] = f
         end
-        scripts[#scripts + 1] = include_name
     end
     env.each = function (t, f)
         for str, tbl in pairs(t) do
@@ -105,20 +104,21 @@ function cli.main (opts)
                                 end
                                 qt.parameters[p] = v
                             end
-                            local resource = qt.parameters.handle or subject
+                            local resource = qt.parameters.handle
                             local rs = string.char(9)
                             if qt.parameters.context == true or (qt.parameters.context == nil) then
                                 if not qt.parameters.handle then
                                     source[#source + 1] = { res = mod..rs..func..rs..subject,
                                         mod = mod, func = func, subject = subject, param = ptbl }
-                                end
-                                if hsource[resource] and (#hsource[resource] > 0) then
-                                    hsource[resource][#hsource[resource] + 1] =
-                                    { mod = mod, func = func, subject = subject, param = ptbl }
                                 else
-                                    hsource[resource] = {}
-                                    hsource[resource][#hsource[resource] + 1] =
-                                    { mod = mod, func = func, subject = subject, param = ptbl }
+                                    if hsource[resource] and (#hsource[resource] > 0) then
+                                        hsource[resource][#hsource[resource] + 1] =
+                                        { mod = mod, func = func, subject = subject, param = ptbl }
+                                    else
+                                        hsource[resource] = {}
+                                        hsource[resource][#hsource[resource] + 1] =
+                                        { mod = mod, func = func, subject = subject, param = ptbl }
+                                    end
                                 end
                             end -- context
                         end -- mod.func
@@ -127,6 +127,15 @@ function cli.main (opts)
             return tbl
         end -- __index = function (_, mod)
     })
+
+    scripts = std.add_from_dirs(scripts, path.."/attributes")
+    scripts = std.add_from_dirs(scripts, path.."/policies")
+    scripts = std.add_from_dirs(scripts, path.."/handlers")
+    if embed then
+        scripts = std.add_from_embedded(scripts, policy, "attributes")
+        scripts = std.add_from_embedded(scripts, policy, "policies")
+        scripts = std.add_from_embedded(scripts, policy, "handlers")
+    end
 
     -- scripts queue
     local i, temp, htemp = 0
@@ -231,26 +240,16 @@ function cli.opt (arg, version)
     -- optind and li are unused
     for r, optarg, _, _ in Pgetopt.getopt(arg, short, long) do
         if r == "f" then
-            local full, base, _ = std.file(optarg)
-            local ext = "lua"
-            opts.ext = ext
-            opts.base = base
-            opts.script = full
-            if lib.is_file(opts.script) then
-                -- overwrite [ext][base] with the contents of opts.script
-                policy[ext][base] = lib.fopen(opts.script)
-            else
-                lib.errorf("%s %s not found\n", strings.SERR, opts.script)
-            end
+            local dir, base, ext = lib.decomp_path(optarg)
+            opts.script = dir.."/"..base.."."..ext
         end
         if r == "e" then
             local _, base, ext = lib.decomp_path(optarg)
-            opts.script = base .. "." .. ext
-            opts.ext = ext
-            opts.base = base
-            if not policy[ext][base] then
-                lib.errorf("%s %s not found\n", strings.SERR, optarg)
+            -- policy["."][base]
+            if not ext then
+                lib.errorf("%s %s\n", strings.ERROR, "Missing .lua?")
             end
+            opts.script = base.."."..ext
         end
         if r == "m" then opts.msg = true end
         if r == "v" then opts.debug = true end
