@@ -405,7 +405,7 @@ end
 -- @treturn string processed string
 local sub = function (str, tbl)
     local t, _ = {}, nil
-    _, str = pcall(string.gsub, str, "{{[%s]-([%g]+)[%s]-}}",
+    _, str = pcall(string.gsub, str, "#{[%s]-([%g]+)[%s]-}",
         function (s)
             t.type = type
             local code = [[
