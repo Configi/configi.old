@@ -65,9 +65,11 @@ T:start"directory structure test/core-structure"
             T:yes(stat.stat"test/tmp/core-structure-attributes")
             T:yes(stat.stat"test/tmp/core-structure-policies")
             T:yes(stat.stat"test/tmp/core-structure-handlers")
+            T:yes(stat.stat"test/tmp/copied-under-files")
             cmd.rm{"test/tmp/core-structure-attributes"}
             cmd.rm{"test/tmp/core-structure-policies"}
             cmd.rm{"test/tmp/core-structure-handlers"}
+            cmd.rm{"test/tmp/copied-under-files"}
         end
         st("test/core-structure/test.lua")
     end

@@ -7,6 +7,7 @@
 local ENV, M, file = {}, {}, {}
 local tostring, os, string = tostring, os, string
 local cfg = require"cfg-core.lib"
+local std = require"cfg-core.std"
 local lib = require"lib"
 local cmd = lib.cmd
 local stat = require"posix.sys.stat"
@@ -316,6 +317,10 @@ function file.copy(S)
     }
     return function(P)
         P.src = S
+        local from_files = std.path().."/files/"..S
+        if stat.stat(from_files) then
+            P.src = from_files
+        end
         local F, R = cfg.init(P, M)
         if R.kept then
             return F.kept(P.path)
