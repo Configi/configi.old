@@ -8,7 +8,7 @@ local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
 local lib = require"lib"
 local tsort = require"tsort"
-local _, policy = pcall(require, "cfg-policy")
+local ep_found, policy = pcall(require, "cfg-policy")
 local path = std.path()
 local embed = std.embed()
 package.path = path .. "/?.lua" .. ";./?.lua;./?"
@@ -244,10 +244,13 @@ function cli.opt (arg, version)
             opts.script = dir.."/"..base.."."..ext
         end
         if r == "e" then
+            if not ep_found then
+                lib.errorf("%s %s\n", strings.ERROR, "Missing embedded policy")
+            end
             local _, base, ext = lib.decomp_path(optarg)
             -- policy["."][base]
             if not ext then
-                lib.errorf("%s %s\n", strings.ERROR, "Missing .lua?")
+                lib.errorf("%s %s\n", strings.ERROR, "Missing .lua extension?")
             end
             opts.script = base.."."..ext
         end
