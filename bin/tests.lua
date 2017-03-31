@@ -363,54 +363,54 @@ T:start"template.render (modules/template.lua) test/template_render.lua"
     end
 T:done(N)
 
-T:start"template.insert_line (modules/template.lua) test/template_insert.lua"
+T:start"edit.insert_line (modules/edit.lua) test/edit_insert.lua"
     do
-        local template = function(p1, p2)
-            local out = testdir .. "template_insert_test.txt"
-            cfg{ "-f", "test/template_insert.lua"}
-            T:eq(crc(lib.fopen("test/template_insert.txt")), crc(lib.fopen(out)))
-            local _, ret = cfg{ "-mf", "test/template_insert_inserts.lua"}
+        local edit = function(p1, p2)
+            local out = testdir .. "edit_insert_test.txt"
+            cfg{ "-f", "test/edit_insert.lua"}
+            T:eq(crc(lib.fopen("test/edit_insert.txt")), crc(lib.fopen(out)))
+            local _, ret = cfg{ "-mf", "test/edit_insert_inserts.lua"}
             T:neq(string.find(ret.stderr[1], "^[skip]*"), nil)
-            T:eq(crc(lib.fopen("test/template_insert.txt")), crc(lib.fopen(out)))
+            T:eq(crc(lib.fopen("test/edit_insert.txt")), crc(lib.fopen(out)))
             os.remove(out)
         end
-        template("test/template_insert.lua", "test/template_insert_inserts.lua")
+        edit("test/edit_insert.lua", "test/edit_insert_inserts.lua")
     end
 T:done(N)
 
-T:start"template.insert_line_before (modules/template.lua) test/template_insert_line_before.lua"
+T:start"edit.insert_line_before (modules/edit.lua) test/edit_insert_line_before.lua"
     do
-        local template = function(policy)
+        local edit = function(policy)
             cfg{ "-f", policy }
-            T:eq(crc(lib.fopen("test/template_insert_line_before.txt")),
-                crc(lib.fopen("test/tmp/template_insert_line_test.txt")))
+            T:eq(crc(lib.fopen("test/edit_insert_line_before.txt")),
+                crc(lib.fopen("test/tmp/edit_insert_line_test.txt")))
         end
-        template"test/template_insert_line_before.lua"
+        edit"test/edit_insert_line_before.lua"
     end
 T:done(N)
 
-T:start"template.insert_line_after (modules/template.lua) test/template_insert_line_after.lua"
+T:start"edit.insert_line_after (modules/edit.lua) test/edit_insert_line_after.lua"
     do
-        local template = function(policy)
+        local edit = function(policy)
             cfg{ "-f", policy }
-            T:eq(crc(lib.fopen("test/template_insert_line_after.txt")),
-                crc(lib.fopen("test/tmp/template_insert_line_test.txt")))
-            cmd.rm { "-f", testdir .. "template_insert_line_test.txt" }
-            cmd.rm { "-f", testdir .. "._configi_template_insert_line_test.txt" }
+            T:eq(crc(lib.fopen("test/edit_insert_line_after.txt")),
+                crc(lib.fopen("test/tmp/edit_insert_line_test.txt")))
+            cmd.rm { "-f", testdir .. "edit_insert_line_test.txt" }
+            cmd.rm { "-f", testdir .. "._configi_edit_insert_line_test.txt" }
         end
-        template"test/template_insert_line_after.lua"
+        edit"test/edit_insert_line_after.lua"
     end
 T:done(N)
 
-T:start"template.remove_line (modules/template.lua) test/template_remove_line.lua"
+T:start"edit.remove_line (modules/edit.lua) test/edit_remove_line.lua"
     do
-        local template = function(policy)
+        local edit = function(policy)
             cfg{ "-f", policy }
-            T:eq(crc(lib.fopen("test/template_remove_line.txt")),
-                crc(lib.fopen("test/tmp/template_remove_line_test.txt")))
-            cmd.rm { "-f", testdir .. "template_remove_line_test.txt" }
+            T:eq(crc(lib.fopen("test/edit_remove_line.txt")),
+                crc(lib.fopen("test/tmp/edit_remove_line_test.txt")))
+            cmd.rm { "-f", testdir .. "edit_remove_line_test.txt" }
         end
-        template"test/template_remove_line.lua"
+        edit"test/edit_remove_line.lua"
     end
 T:done(N)
 

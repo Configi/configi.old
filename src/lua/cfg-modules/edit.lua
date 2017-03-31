@@ -1,26 +1,24 @@
---- Render a template.
--- @module template
+--- Text file line editing.
+-- @module edit
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
--- @added 0.9.0
+-- @added 2.0.0
 
-local ENV, M, template = {}, {}, {}
-local io, tonumber, table, os, string, require =
-      io, tonumber, table, os, string, require
+local ENV, M, edit = {}, {}, {}
+local table, os, string, require =
+      table, os, string, require
 local cfg = require"cfg-core.lib"
-local std = require"cfg-core.std"
 local lib = require"lib"
-local crc = require"crc32"
 local stat = require"posix.sys.stat"
 local cmd = lib.cmd
 _ENV = ENV
 
 M.required = { "path" }
 M.alias = {}
-M.alias.src = { "template" }
-M.alias.table = { "view" }
+M.alias.line = { "text" }
+M.alias.pattern = { "match" }
 
--- XXX: Duplicated in the edit module
+-- XXX: Duplicated in the template module
 local write = function(F, P)
     -- ignore P.diff if diffutils is not found
     if not lib.bin_path"diff" then P.diff = false end
@@ -46,62 +44,6 @@ local write = function(F, P)
     return F.result(P.path, lib.awrite(P.path, P._input, P.mode))
 end
 
---- Render a template.
--- @Subject output file
--- @Note Requires the diffutils package for the diff parameter to work
--- @param src source template [REQUIRED] [ALIAS: template]
--- @param table [REQUIRED] [ALIAS: view]
--- @param lua [ALIAS: data]
--- @param mode mode bits for output file [DEFAULT: "0600"]
--- @param diff show diff [CHOICES: "yes","no"]
--- @usage template.render("/etc/something/config")
---     template: "/etc/something/config.template"
---     view: "view_model"
---     data: "/etc/something/config.lua"
-function template.render(S)
-    M.parameters = { "src", "lua", "table", "mode", "diff" }
-    M.report = {
-          repaired = "template.render: Successfully rendered textfile.",
-              kept = "template.render: No difference detected, not overwriting existing destination.",
-            failed = "template.render: Error rendering textfile.",
-        missingsrc = "template.render: Can't access or missing source file.",
-    }
-    return function(P)
-        P.path = S
-        local from_templates = std.path().."/templates/"..P.src
-        if stat.stat(from_templates) then
-            P.src = from_templates
-        end
-        local F, R = cfg.init(P, M)
-        if R.kept then
-            return F.kept(P.path)
-        end
-        P.mode = P.mode or "0600"
-        P.mode = tonumber(P.mode, 8)
-        local ti = lib.fopen(P.src)
-        if not ti then
-            return F.result(P.src, nil, M.report.missingsrc)
-        end
-        P._input = lib.sub(ti, P.table)
-        if stat.stat(P.path) then
-            do -- compare P.path and rendered text
-                local i
-                for b in io.lines(P.path, 2^12) do
-                    if i == nil then
-                        i = crc.crc32_string(b)
-                    else
-                        i = crc.crc32(b, crc.crc32(i))
-                    end
-                end
-                if i == crc.crc32_string(P._input) then
-                    return F.kept(P.path)
-                end
-            end
-        end
-        return write(F, P, R)
-    end
-end
-
 --- Insert lines into an existing file.
 -- @Subject path of text file to modify
 -- @param line text to insert [REQUIRED] [ALIAS: text]
@@ -110,18 +52,18 @@ end
 -- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
 -- @param before_pattern [CHOICES: "yes","no"] [DEFAULT: "no"]
 -- @param after_pattern [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @usage template.insert_line("/etc/sysctl.conf")
+-- @usage edit.insert_line("/etc/sysctl.conf")
 --     pattern: "# http://cr.yp.to/syncookies.html"
 --     text: "net.ipv4.tcp_syncookies = 1"
 --     after: "true"
 --     plain: "true"
-function template.insert_line(S)
+function edit.insert_line(S)
     M.parameters = { "diff", "line", "plain", "pattern", "before_pattern", "after_pattern", "inserts" }
     M.report = {
-        repaired = "template.insert_line: Successfully inserted line.",
-        kept = "template.insert_line: Insert cancelled, found a matching line.",
-        failed = "template.insert_line: Error inserting line.",
-        missing = "template.insert_line: Can't access or missing file."
+        repaired = "edit.insert_line: Successfully inserted line.",
+        kept = "edit.insert_line: Insert cancelled, found a matching line.",
+        failed = "edit.insert_line: Error inserting line.",
+        missing = "edit.insert_line: Can't access or missing file."
     }
     return function(P)
         P.path = S
@@ -180,16 +122,16 @@ end
 -- @Subject path of text file to modify
 -- @param pattern text pattern to remove [REQUIRED] [ALIAS: match]
 -- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @usage template.remove_line("/etc/sysctl.conf")
+-- @usage edit.remove_line("/etc/sysctl.conf")
 --     match: "net.ipv4.ip_forward = 1"
 --     plain: "true"
-function template.remove_line(S)
+function edit.remove_line(S)
     M.parameters = { "pattern", "plain", "diff" }
     M.report = {
-        repaired = "template.remove_line: Successfully removed line.",
-            kept = "template.remove_line: Line not found.",
-          failed = "template.remove_line: Error removing line.",
-         missing = "template.remove_line: Can't access or missing file."
+        repaired = "edit.remove_line: Successfully removed line.",
+            kept = "edit.remove_line: Line not found.",
+          failed = "edit.remove_line: Error removing line.",
+         missing = "edit.remove_line: Can't access or missing file."
     }
     return function(P)
         P.path = S
@@ -217,4 +159,4 @@ function template.remove_line(S)
     end
 end
 
-return template
+return edit
