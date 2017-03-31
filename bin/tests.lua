@@ -3,6 +3,7 @@ local factid = require"factid"
 local lib = require"lib"
 local cmd = lib.cmd
 local crc = require"crc32".crc32_string
+local string = string
 local stat, pwd, grp = require"posix.sys.stat", require"posix.pwd", require"posix.grp"
 local ct = require"cwtest"
 local T, N=ct.new(), nil
@@ -66,10 +67,16 @@ T:start"directory structure test/core-structure"
             T:yes(stat.stat"test/tmp/core-structure-policies")
             T:yes(stat.stat"test/tmp/core-structure-handlers")
             T:yes(stat.stat"test/tmp/copied-under-files")
+            T:yes(stat.stat"test/tmp/template_render_test.txt")
+            local t = lib.fopen("test/tmp/template_render_test.txt")
+            local m1, m2 = string.match(t, "^(Joe spends 6)\n(\n)")
+            T:eq(m1, "Joe spends 6")
+            T:eq(m2, "\n")
             cmd.rm{"test/tmp/core-structure-attributes"}
             cmd.rm{"test/tmp/core-structure-policies"}
             cmd.rm{"test/tmp/core-structure-handlers"}
             cmd.rm{"test/tmp/copied-under-files"}
+            cmd.rm{"test/tmp/template_render_test.txt"}
         end
         st("test/core-structure/test.lua")
     end

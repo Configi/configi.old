@@ -5,9 +5,10 @@
 -- @added 0.9.0
 
 local ENV, M, template = {}, {}, {}
-local io, load, tonumber, pcall, table, os, string, require =
-      io, load, tonumber, pcall, table, os, string, require
+local io, tonumber, table, os, string, require =
+      io, tonumber, table, os, string, require
 local cfg = require"cfg-core.lib"
+local std = require"cfg-core.std"
 local lib = require"lib"
 local crc = require"crc32"
 local stat = require"posix.sys.stat"
@@ -66,34 +67,24 @@ function template.render(S)
               kept = "template.render: No difference detected, not overwriting existing destination.",
             failed = "template.render: Error rendering textfile.",
         missingsrc = "template.render: Can't access or missing source file.",
-        missinglua = "template.render: Can't access or missing lua file."
     }
     return function(P)
         P.path = S
+        local from_templates = std.path().."/templates/"..P.src
+        if stat.stat(from_templates) then
+            P.src = from_templates
+        end
         local F, R = cfg.init(P, M)
         if R.kept then
             return F.kept(P.path)
         end
         P.mode = P.mode or "0600"
         P.mode = tonumber(P.mode, 8)
-        local ti = F.open(P.src)
+        local ti = lib.fopen(P.src)
         if not ti then
             return F.result(P.src, nil, M.report.missingsrc)
         end
-        local lua = F.open(P.lua)
-        if not lua then
-            return F.result(P.lua, nil, M.report.missinglua)
-        end
-        local env = { require = require }
-        local tbl
-        local ret, chunk, err = pcall(load, lua, lua, "t", env)
-        if ret and chunk then
-            chunk()
-            tbl = env[P.table]
-        else
-            return F.result(P.src, nil, err)
-        end
-        P._input = lib.sub(ti, tbl)
+        P._input = lib.sub(ti, P.table)
         if stat.stat(P.path) then
             do -- compare P.path and rendered text
                 local i
