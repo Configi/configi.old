@@ -369,7 +369,8 @@ T:start"template.insert_line (modules/template.lua) test/template_insert.lua"
             local out = testdir .. "template_insert_test.txt"
             cfg{ "-f", "test/template_insert.lua"}
             T:eq(crc(lib.fopen("test/template_insert.txt")), crc(lib.fopen(out)))
-            cfg{ "-f", "test/template_insert_inserts.lua"}
+            local _, ret = cfg{ "-mf", "test/template_insert_inserts.lua"}
+            T:neq(string.find(ret.stderr[1], "^[skip]*"), nil)
             T:eq(crc(lib.fopen("test/template_insert.txt")), crc(lib.fopen(out)))
             os.remove(out)
         end
