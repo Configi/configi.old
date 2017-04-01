@@ -5,7 +5,7 @@ return {
         {"help", "none", "h"},
         {"debug", "none", "v"},
         {"test", "none", "t"},
-        {"daemon", "none", "D"},
+        {"watch", "none", "w"},
         {"periodic", "none", "p"},
         {"syslog", "none", "s"},
         {"log", "required", "l"},
@@ -17,14 +17,14 @@ return {
         {"embedded","required", "e"}
     },
     help = [[
-    cfg [-h] [-V] [-v] [-t] [-D] [-p N] [-s] [-l FILE] [-m] [-g TAG] [-r N] [-f "CONFIGI POLICY"] [-e "CONFIGI POLICY"]
+    cfg [-h] [-V] [-v] [-t] [-w] [-p N] [-s] [-l FILE] [-m] [-g TAG] [-r N] [-f "CONFIGI POLICY"] [-e "CONFIGI POLICY"]
 
         Options:
             -h, --help                  This help text.
             -V, --version               Print version.
             -v, --debug                 Turn on debugging messages.
             -t, --test                  Dry-run mode. All operations are expected to succeed. Turns on debugging.
-            -D, --daemon                Daemon mode. Watch for IN_MODIFY and IN_ATTRIB events to the policy file.
+            -w, --watch                 Watch for inotify IN_MODIFY and IN_ATTRIB events to the main policy file.
             -p, --periodic              Do a run after N seconds.
             -s, --syslog                Enable logging to syslog.
             -l, --log                   Log to an specified file.

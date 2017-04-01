@@ -45,7 +45,7 @@ while true do
             os.exit(1)
         end
     end
-    if opts.daemon then
+    if opts.watch then
         if unistd.geteuid() == 0 then
             if sysstat.stat("/proc/self/oom_score_adj") then
                 lib.fdwrite("/proc/self/oom_score_adj", "-1000")

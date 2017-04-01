@@ -262,7 +262,7 @@ function cli.opt (arg, version)
         if r == "l" then opts.log = optarg end
         if r == "?" then return lib.errorf("%sUnrecognized option passed\n", strings.ERR) end
         if r == "p" then opts.periodic = optarg or opts._periodic end
-        if r == "D" then opts.daemon = true end
+        if r == "w" then opts.watch = true end
         if r == "g" then
             for tag in string.gmatch(optarg, "([%w_]+)") do
                 tags[#tags + 1] = tag
