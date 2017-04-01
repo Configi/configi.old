@@ -1,7 +1,7 @@
 #!bin/lua
-local version = "Configi 0.9.7"
 local ENV, os, string, arg, next, tostring, collectgarbage =
        {}, os, string, arg, next, tostring, collectgarbage
+local version = require"cfg-core.strings".version
 local std = require"cfg-core.std"
 local cli = require"cfg-core.cli"
 local lib = require"lib"

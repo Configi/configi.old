@@ -1,4 +1,5 @@
 return {
+    version = "Configi 2.0.0",
     short_args = "hvtDsmjVl:p:g:r:f:e:",
     long_args = {
         {"help", "none", "h"},
