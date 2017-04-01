@@ -1,6 +1,6 @@
 .PHONY: default
 default: release
-EXE:= cfg
+EXE:= cfg-agent
 SRC:=
 SRC_DIR:= cfg-modules cfg-core
 SRC_C:=
