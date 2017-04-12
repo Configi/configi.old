@@ -32,15 +32,37 @@ local Log = function(sys, file, str, level)
     end
 end
 
-local Add_From_Dirs = function(tbl, dir)
-    if lib.is_dir(dir) then
-        for f in dirent.files(dir) do
-            if not (f==".") and not (f=="..") then
-                tbl[#tbl+1] = dir.."/"..f
+local Add_From_Dirs = function(scripts, path)
+    local dirs = {
+                   "/attributes",
+                   "/policies",
+                   "/handlers"
+                 }
+    local dir
+    for _, d in ipairs(dirs) do
+        dir = path..d
+        if lib.is_dir(dir) then
+            for f in dirent.files(dir) do
+                if not (f==".") and not (f=="..") then
+                    scripts[#scripts+1] = dir.."/"..f
+                end
             end
         end
     end
-    return tbl
+    return scripts
+end
+
+local Add_From_Roles = function(scripts, path, roles)
+    local d, m
+    for _, r in ipairs(roles) do
+        d = path.."/"..r
+        m = d.."/main.lua"
+        if lib.is_file(m) then
+            scripts[#scripts+1] = m
+            scripts = Add_From_Dirs(scripts, d)
+        end
+    end
+    return scripts
 end
 
 local Add_From_Embedded = function(tbl, pol, k)
@@ -57,5 +79,6 @@ return {
                 embed = Embed,
                   log = Log,
         add_from_dirs = Add_From_Dirs,
+       add_from_roles = Add_From_Roles,
     add_from_embedded = Add_From_Embedded
 }
