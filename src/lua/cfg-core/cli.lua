@@ -135,9 +135,7 @@ function cli.main (opts)
     scripts = std.add_from_dirs(scripts, path)
     scripts = std.add_from_roles(scripts, path, roles)
     if embed then
-        scripts = std.add_from_embedded(scripts, policy, "attributes")
-        scripts = std.add_from_embedded(scripts, policy, "policies")
-        scripts = std.add_from_embedded(scripts, policy, "handlers")
+        scripts = std.add_from_embedded(scripts, policy)
     end
 
     -- scripts queue

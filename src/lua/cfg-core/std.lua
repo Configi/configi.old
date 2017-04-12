@@ -37,7 +37,7 @@ local Add_From_Dirs = function(scripts, path)
                    "/attributes",
                    "/policies",
                    "/handlers"
-                 }
+    }
     local dir
     for _, d in ipairs(dirs) do
         dir = path..d
@@ -65,13 +65,20 @@ local Add_From_Roles = function(scripts, path, roles)
     return scripts
 end
 
-local Add_From_Embedded = function(tbl, pol, k)
-    if pol and pol[k] then
-        for n, _ in pairs(pol[k]) do
-            tbl[#tbl+1] = k.."/"..n..".lua"
+local Add_From_Embedded = function(scripts, pol)
+    local keys = {
+                "attributes",
+                "policies",
+                "handlers"
+    }
+    for _, k in ipairs(keys) do
+        if pol and pol[k] then
+            for n, _ in pairs(pol[k]) do
+                scripts[#scripts+1] = k.."/"..n..".lua"
+            end
         end
     end
-    return tbl
+    return scripts
 end
 
 return {
