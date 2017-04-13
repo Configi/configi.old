@@ -52,14 +52,10 @@ function cli.main (opts)
     local source = {}
     local hsource = {}
     local runenv = {}
-    local roles = {}
     local scripts = { [1] = opts.script }
     local env = { fact = {}, global = {} }
 
     -- Built-in functions inside scripts --
-    env.roles = function(r)
-        roles[#roles+1] = r
-    end
     env.pairs = pairs
     env.ipairs = ipairs
     env.format = string.format
@@ -133,7 +129,6 @@ function cli.main (opts)
     })
 
     scripts = std.add_from_dirs(scripts, path)
-    scripts = std.add_from_roles(scripts, path, roles)
     if embed then
         scripts = std.add_from_embedded(scripts, policy)
     end
