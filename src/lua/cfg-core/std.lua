@@ -52,6 +52,20 @@ local Add_From_Dirs = function(scripts, path)
     return scripts
 end
 
+local Add_From_Role = function(scripts, path, role)
+    local d = path.."/roles/"..role
+    local m = d.."/main.lua"
+    if lib.is_file(m) then
+        scripts[#scripts+1] = m
+        scripts = Add_From_Dirs(scripts, d)
+    end
+    return scripts
+end
+
+local Add_To_Path = function(pp, path, role)
+    return pp..";"..path.."/roles/"..role.."/?.lua;"..path.."/roles/"..role.."/?/init.lua"
+end
+
 local Add_From_Embedded = function(scripts, pol)
     local keys = {
                 "attributes",
@@ -73,5 +87,7 @@ return {
                 embed = Embed,
                   log = Log,
         add_from_dirs = Add_From_Dirs,
+        add_from_role = Add_From_Role,
+          add_to_path = Add_To_Path,
     add_from_embedded = Add_From_Embedded
 }

@@ -34,25 +34,21 @@ T:start"embedded policy test/core-embedded"
     do
         local e = function(policy)
             local _, out = cfg{ "-m", "-e", policy }
-            T:neq(string.find(out.stderr[1], "%C+%c%C+%c%C+"), nil)
-            T:neq(string.find(out.stderr[2], "%C+%c%C+%c%C+"), nil)
-            T:neq(string.find(out.stderr[3], "%C+%c%C+%c%C+%c#test policies"), nil)
-            T:neq(string.find(out.stderr[4], "%C+%c%C+%c%C+%c#test policies"), nil)
+            T:neq(string.find(out.stderr[1], "%C+%c%C+%c%C+%c#test policies"), nil)
+            T:neq(string.find(out.stderr[2], "%C+%c%C+%c%C+%c#test policies"), nil)
+            T:neq(string.find(out.stderr[3], "%C+%c%C+%c%C+"), nil)
+            T:neq(string.find(out.stderr[4], "%C+%c%C+%c%C+"), nil)
             T:neq(string.find(out.stderr[5], "%C+%c%C+%c%C+"), nil)
             T:neq(string.find(out.stderr[6], "%C+%c%C+%c%C+"), nil)
-            T:neq(string.find(out.stderr[7], "%C+%c%C+%c%C+"), nil)
-            T:neq(string.find(out.stderr[8], "%C+%c%C+%c%C+"), nil)
-            T:neq(string.find(out.stderr[9], "%C+%c%C+%c%C+%c#test handlers"), nil)
-            T:neq(string.find(out.stderr[10], "%C+%c%C+%c%C+%c#test handlers"), nil)
+            T:neq(string.find(out.stderr[7], "%C+%c%C+%c%C+%c#test handlers"), nil)
+            T:neq(string.find(out.stderr[8], "%C+%c%C+%c%C+%c#test handlers"), nil)
             T:yes(stat.stat"test/tmp/core-embedded-structure")
             T:yes(stat.stat"test/tmp/core-embedded-handlers")
             T:yes(stat.stat"test/tmp/core-embedded.txt")
-            T:yes(stat.stat"test/tmp/core-embedded-include")
             local stat2 = stat.stat(testdir .. "core-embedded.txt")
             T:eq(string.format("%o", stat2.st_mode), "100777")
             os.remove(testdir.."core-embedded-structure")
             os.remove(testdir.."core-embedded-handlers")
-            os.remove(testdir.."core-embedded-include")
             os.remove(testdir.."core-embedded.txt")
         end
         e"init.lua"
@@ -138,32 +134,17 @@ T:start"module test/core-module.lua"
     end
 T:done(N)
 
-T:start"include test/core-include1.lua, test/core-include2.lua"
-    do
-        local include = function(first, second)
-            local dir = testdir .. "CONFIGI_TEST_INCLUDE"
-            cfg{ "-f", first }
-            T:yes(lib.is_dir(dir))
-            cfg{ "-f", second }
-            T:no(stat.stat(dir))
-        end
-        include("test/core-include1.lua", "test/core-include2.lua")
-    end
-T:done(N)
-
 T:start"handler,notify test/core-handler.lua"
     do
-        local h = function(handler, handler_include, handler2)
+        local h = function(handler,handler2)
             cfg{ "-f", handler }
-            local _, r = cfg{"-v", "-f", handler_include }
-            T:no(lib.find_string(r.stdout, "core-handler-file"))
             local xfile, file = "test/tmp/core-handler2-xfile", "test/tmp/core-handler2-file"
             cfg{ "-g", "testhandle", "-f",  handler2 }
             T:no(stat.stat(xfile))
             T:yes(stat.stat(file))
             os.remove(file)
         end
-        h("test/core-handler.lua", "test/core-handler_include.lua", "test/core-handler2.lua")
+        h("test/core-handler.lua", "test/core-handler2.lua")
     end
 T:done(N)
 

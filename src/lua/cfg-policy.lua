@@ -15,12 +15,8 @@ file.touch"test/tmp/core-embedded-handlers"{
 }
 ]]
 policy["."]["init"] = [[
-include"include.lua"
 file.touch"test/tmp/core-embedded.txt" {
     mode = "0777"
 }
-]]
-policy["."]["include"] = [[
-file.touch"test/tmp/core-embedded-include"()
 ]]
 return policy
