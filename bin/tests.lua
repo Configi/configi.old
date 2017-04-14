@@ -55,6 +55,34 @@ T:start"embedded policy test/core-embedded"
     end
 T:done(N)
 
+T:start"roles test/core-roles"
+    do
+        local c
+        c = function(p)
+            local f
+            f = {
+                "core-role",
+                "core-role-attrib",
+                "core-role-attrib-one",
+                "core-role-handler",
+                "core-role-handler-one",
+                "core-role-modules",
+                "core-role-modules-one",
+                "core-role-one",
+                "core-role-policy",
+                "core-role-policy-one",
+                "core-role-top"
+            }
+            cfg{"-f", p}
+            for _, t in ipairs(f) do
+                T:yes(stat.stat(testdir..t))
+                os.remove(testdir..t)
+            end
+        end
+        c"test/core-roles/test.lua"
+    end
+T:done(N)
+
 T:start"directory structure test/core-structure"
     do
         local st = function(policy)
@@ -1011,3 +1039,5 @@ T:done(N)
 --c.printf("\n  Summary: \n")
 --c.printf("        %s Passed\n", N.successes)
 --c.printf("        %s Failures\n\n", N.failures)
+
+
