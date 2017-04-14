@@ -129,15 +129,16 @@ function cli.main (opts)
         end -- __index = function (_, mod)
     })
 
-    scripts = std.add_from_dirs(scripts, path)
     if embed then
         scripts = std.add_from_embedded(scripts, policy)
     end
     cli.compile(scripts[1], env)
+    -- We should only populate roles.
+    source, hsource = {}, {}
+    scripts = std.add_from_dirs(scripts, path)
     for _, role in ipairs(roles) do
         scripts = std.add_from_role(scripts, path, role)
     end
-    source, hsource = {}, {}
 
     -- scripts queue
     local i, temp, htemp = 0
