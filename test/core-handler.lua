@@ -1,4 +1,3 @@
-include "core-handler_include.lua"
 notify = "touch_file"
 file.directory"test/tmp/core-handler-directory"{
   debug  = "true"

@@ -1,6 +1,6 @@
 local pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
       pcall, rawset, next, setmetatable, load, pairs, ipairs, require
-local ENV, cli, functions = {}, {}, {}
+local ENV, cli, functions = {_G=_G}, {}, {}
 local string, coroutine, os = string, coroutine, os
 local Factid = require"factid"
 local Pgetopt = require"posix.getopt"
@@ -11,14 +11,19 @@ local tsort = require"tsort"
 local ep_found, policy = pcall(require, "cfg-policy")
 local path = std.path()
 local embed = std.embed()
-package.path = path .. "/?.lua" .. ";./?.lua;./?"
+_G.package.path = "./?.lua;"..path.."/?.lua;"..path.."/?.lua;"..path.."/?"
 _ENV = ENV
 
 --- Assign returned value from require() to the custom environment
 -- Exit with code 1 if there was an error
 -- @param m name of the module (STRING)
 -- @return module (TABLE or FUNCTION)
-function functions.module (m)
+function functions.module (m, roles)
+    if roles then
+        for _, role in ipairs(roles) do
+            _G.package.path = std.add_to_path(_G.package.path, path, role)
+        end
+    end
     -- Try custom modules in the arg path .. "/modules" directory first.
     local rb, rm = pcall(require, "modules." .. m)
     if not rb then
@@ -52,10 +57,16 @@ function cli.main (opts)
     local source = {}
     local hsource = {}
     local runenv = {}
+    local roles = {}
     local scripts = { [1] = opts.script }
     local env = { fact = {}, global = {} }
 
     -- Built-in functions inside scripts --
+    env.roles = function(r)
+        for _, role in ipairs(r) do
+            roles[#roles+1] = role
+        end
+    end
     env.pairs = pairs
     env.ipairs = ipairs
     env.format = string.format
@@ -67,23 +78,13 @@ function cli.main (opts)
         if m == "fact" then
             env.fact = Factid.gather()
         else
-            runenv[m] = functions.module(m)
+            runenv[m] = functions.module(m, roles)
         end
     end
     env.debug = function (b) if lib.truthy(b) then opts.debug = true end end
     env.test = function (b) if lib.truthy(b) then opts.test = true end end
     env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
     env.log = function (b) opts.log = b end
-    env.include = function (f)
-        -- Only include files relative to the same directory as opts.script.
-        -- Includes with path information has priority.
-        local include = path.."/"..f
-        if lib.is_file(include) then
-            scripts[#scripts+1] = include
-        else
-            scripts[#scripts+1] = f
-        end
-    end
     env.each = function (t, f)
         for str, tbl in pairs(t) do
             f(str)(tbl)
@@ -128,13 +129,15 @@ function cli.main (opts)
         end -- __index = function (_, mod)
     })
 
-    scripts = std.add_from_dirs(scripts, path.."/attributes")
-    scripts = std.add_from_dirs(scripts, path.."/policies")
-    scripts = std.add_from_dirs(scripts, path.."/handlers")
     if embed then
-        scripts = std.add_from_embedded(scripts, policy, "attributes")
-        scripts = std.add_from_embedded(scripts, policy, "policies")
-        scripts = std.add_from_embedded(scripts, policy, "handlers")
+        scripts = std.add_from_embedded(scripts, policy)
+    end
+    cli.compile(scripts[1], env)
+    -- We should only populate roles.
+    source, hsource = {}, {}
+    scripts = std.add_from_dirs(scripts, path)
+    for _, role in ipairs(roles) do
+        scripts = std.add_from_role(scripts, path, role)
     end
 
     -- scripts queue
@@ -226,7 +229,6 @@ function cli.main (opts)
     opts.debug, opts.test, opts.log, opts.syslog, opts.msg
     hsource[1], hsource[2], hsource[3], hsource[4] =
         opts.debug, opts.test, opts.syslog, opts.log -- source.msg already handles the msg output
-    scripts, env = nil, nil -- GC
     return sorted, hsource, runenv
 end
 
