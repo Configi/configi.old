@@ -418,7 +418,9 @@ local sub = function (str, tbl)
             local chunk, err = load(lua, lua, "t", setmetatable(t, {__index=tbl}))
             if chunk then
                 chunk()
-                return t.V
+                if type(t.V) == "string" then
+                    return t.V
+                end
             else
                 return s
             end
