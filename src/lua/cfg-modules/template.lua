@@ -52,12 +52,13 @@ end
 -- @param src source template [REQUIRED] [ALIAS: template]
 -- @param table [REQUIRED] [ALIAS: view]
 -- @param lua [ALIAS: data]
--- @param mode mode bits for output file [DEFAULT: "0600"]
--- @param diff show diff [CHOICES: "yes","no"]
--- @usage template.render("/etc/something/config")
---     template: "/etc/something/config.template"
---     view: "view_model"
---     data: "/etc/something/config.lua"
+-- @param mode mode bits for output file [DEFAULT: 0600]
+-- @param diff show diff [DEFAULT: false]
+-- @usage template.render("/etc/something/config"){
+--     template = "etc/something/config.template",
+--         view = "view_model",
+--         data = "/etc/something/config.lua"
+-- }
 function template.render(S)
     M.parameters = { "src", "lua", "table", "mode", "diff" }
     M.report = {
