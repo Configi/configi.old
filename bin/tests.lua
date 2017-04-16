@@ -34,8 +34,8 @@ T:start"embedded policy test/core-embedded"
     do
         local e = function(policy)
             local _, out = cfg{ "-m", "-e", policy }
-            T:neq(string.find(out.stderr[1], "%C+%c%C+%c%C+%c#test policies"), nil)
-            T:neq(string.find(out.stderr[2], "%C+%c%C+%c%C+%c#test policies"), nil)
+            T:neq(string.find(out.stderr[1], "%C+%c%C+%c%C+%c#test includes"), nil)
+            T:neq(string.find(out.stderr[2], "%C+%c%C+%c%C+%c#test includes"), nil)
             T:neq(string.find(out.stderr[3], "%C+%c%C+%c%C+"), nil)
             T:neq(string.find(out.stderr[4], "%C+%c%C+%c%C+"), nil)
             T:neq(string.find(out.stderr[5], "%C+%c%C+%c%C+"), nil)
