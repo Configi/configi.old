@@ -15,7 +15,7 @@ _ENV = ENV
 
 M.required = { "path" }
 M.alias = {}
-M.alias.line = { "text" }
+M.alias.line = { "content" }
 M.alias.pattern = { "match" }
 
 -- XXX: Duplicated in the template module
@@ -46,17 +46,18 @@ end
 
 --- Insert lines into an existing file.
 -- @Subject path of text file to modify
--- @param line text to insert [REQUIRED] [ALIAS: text]
+-- @param line to insert [REQUIRED] [ALIAS: content]
 -- @param inserts a line (string) if found, skips the operation
 -- @param pattern line is added before or after this pattern [ALIAS: match]
--- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @param before_pattern [CHOICES: "yes","no"] [DEFAULT: "no"]
--- @param after_pattern [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @usage edit.insert_line("/etc/sysctl.conf")
---     pattern: "# http://cr.yp.to/syncookies.html"
---     text: "net.ipv4.tcp_syncookies = 1"
---     after: "true"
---     plain: "true"
+-- @param plain turn on or off pattern matching facilities [DEFAULT: "yes", true]
+-- @param before [DEFAULT: "no", false]
+-- @param after [DEFAULT: "yes", true]
+-- @usage edit.insert_line("/etc/sysctl.conf"){
+--     pattern = "# http://cr.yp.to/syncookies.html",
+--     content = "net.ipv4.tcp_syncookies = 1",
+--       after = true,
+--      plain  = true
+-- }
 function edit.insert_line(S)
     M.parameters = { "diff", "line", "plain", "pattern", "before_pattern", "after_pattern", "inserts" }
     M.report = {
@@ -121,10 +122,11 @@ end
 --- Remove lines from an existing file.
 -- @Subject path of text file to modify
 -- @param pattern text pattern to remove [REQUIRED] [ALIAS: match]
--- @param plain turn on or off pattern matching facilities [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @usage edit.remove_line("/etc/sysctl.conf")
---     match: "net.ipv4.ip_forward = 1"
---     plain: "true"
+-- @param plain turn on or off pattern matching facilities [DEFAULT: "yes"]
+-- @usage edit.remove_line("/etc/sysctl.conf"){
+--     match = "net.ipv4.ip_forward = 1",
+--     plain = true
+-- }
 function edit.remove_line(S)
     M.parameters = { "pattern", "plain", "diff" }
     M.report = {
