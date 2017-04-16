@@ -4,13 +4,13 @@ policy.attributes.test = [[
 ]]
 policy.policies.test = [[
 file.touch"test/tmp/core-embedded-structure"{
-    comment = _"#{var} policies",
+    comment = _"${var} policies",
     notify = "embedded"
 }
 ]]
 policy.handlers.test = [[
 file.touch"test/tmp/core-embedded-handlers"{
-    comment = _"#{var} handlers",
+    comment = _"${var} handlers",
     handle = "embedded"
 }
 ]]
