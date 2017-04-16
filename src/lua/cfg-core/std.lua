@@ -35,7 +35,7 @@ end
 local Add_From_Dirs = function(scripts, path)
     local dirs = {
                    "/attributes",
-                   "/policies",
+                   "/includes",
                    "/handlers"
     }
     local dir
@@ -69,7 +69,7 @@ end
 local Add_From_Embedded = function(scripts, pol)
     local keys = {
                 "attributes",
-                "policies",
+                "includes",
                 "handlers"
     }
     for _, k in ipairs(keys) do
