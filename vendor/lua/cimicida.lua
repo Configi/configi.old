@@ -1,8 +1,8 @@
 --- Additional functions. Can also be called from the `lib` module.
 -- @module lib
 local io, string, os, table = io, string, os, table
-local type, pcall, load, setmetatable, ipairs, next, pairs, error, require, getmetatable =
-      type, pcall, load, setmetatable, ipairs, next, pairs, error, require, getmetatable
+local rawget, type, pcall, load, setmetatable, ipairs, next, pairs, error, require, getmetatable =
+      rawget, type, pcall, load, setmetatable, ipairs, next, pairs, error, require, getmetatable
 local ENV = {}
 _ENV = ENV
 
@@ -405,7 +405,7 @@ end
 -- @treturn string processed string
 local sub = function (str, tbl)
     local t, _ = {}, nil
-    _, str = pcall(string.gsub, str, "#{[%s]-([%g]+)[%s]-}",
+    _, str = pcall(string.gsub, str, "%${[%s]-([%g]+)[%s]-}",
         function (s)
             t.type = type
             local code = [[
@@ -418,9 +418,7 @@ local sub = function (str, tbl)
             local chunk, err = load(lua, lua, "t", setmetatable(t, {__index=tbl}))
             if chunk then
                 chunk()
-                if type(t.V) == "string" then
-                    return t.V
-                end
+                return rawget(t, "V") or s
             else
                 return s
             end
