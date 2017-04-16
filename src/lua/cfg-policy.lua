@@ -1,10 +1,10 @@
-local policy = {["."]={},attributes={},policies={},handlers={}}
+local policy = {["."]={},attributes={},includes={},handlers={}}
 policy.attributes.test = [[
     var="test"
 ]]
-policy.policies.test = [[
+policy.includes.test = [[
 file.touch"test/tmp/core-embedded-structure"{
-    comment = _"${var} policies",
+    comment = _"${var} includes",
     notify = "embedded"
 }
 ]]
