@@ -119,10 +119,11 @@ end
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
--- @usage file.attributes("/etc/shadow")
---     mode: "0600"
---     owner: "root"
---     group: "root"
+-- @usage file.attributes("/etc/shadow"){
+--      mode = 0600,
+--     owner = "root",
+--     group = "root"
+-- }
 function file.attributes(S)
     M.parameters = { "mode", "owner", "group" }
     return function(P)
@@ -142,8 +143,9 @@ end
 -- @Subject symlink path
 -- @param src path where the symlink points to [REQUIRED]
 -- @param force remove existing symlink
--- @usage file.link("/home/ed/root")
---     src: "/"
+-- @usage file.link("/home/ed/root"){
+--     src = "/"
+-- }
 function file.link(S)
     M.parameters = { "src", "force", "owner", "group", "mode" }
     M.report = {
@@ -177,8 +179,9 @@ end
 -- @Subject hard link path
 -- @param src path where the hard link points to [REQUIRED]
 -- @param force remove existing hard link
--- @usage file.hard("/home/ed/root")
---     src: "/"
+-- @usage file.hard("/home/ed/root"){
+--     src = "/"
+-- }
 function file.hard(S)
     M.parameters = { "src", "force", "owner", "group", "mode" }
     M.report = {
@@ -217,9 +220,9 @@ end
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
--- @param force remove existing path before creating directory [DEFAULT: "no"]
--- @param backup rename existing path and prepend '._configi_' to the name [DEFAULT: "no"]
--- @usage file.directory("/usr/portage")!
+-- @param force remove existing path before creating directory [DEFAULT: "no", false]
+-- @param backup rename existing path and prepend '._configi_' to the name [DEFAULT: "no", false]
+-- @usage file.directory("/usr/portage")()
 function file.directory(S)
     M.parameters = { "mode", "owner", "group", "force", "backup" }
     M.report = {
@@ -259,7 +262,7 @@ end
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
--- @usage file.touch("/srv/.keep")!
+-- @usage file.touch("/srv/.keep")()
 function file.touch(S)
     M.parameters = { "mode", "owner", "group" }
     M.report = {
@@ -283,7 +286,7 @@ end
 
 --- Remove a path.
 -- @Subject path
--- @usage file.absent("/home/ed/.xinitrc")!
+-- @usage file.absent("/home/ed/.xinitrc")()
 function file.absent(S)
     M.report = {
         repaired = "file.absent: Successfully removed.",
@@ -303,11 +306,12 @@ end
 --- Copy a path.
 -- @Subject path
 -- @param path destination path [REQUIRED] [ALIAS: dest,target]
--- @param recurse recursively copy source [DEFAULT: "no"]
--- @param force remove existing destination before copying [DEFAULT: "no"]
--- @param backup rename existing path and prepend '._configi_' to the name [DEFAULT: "no"]
--- @usage file.copy("/home/ed")
---     dest: "/mnt/backups"
+-- @param recurse recursively copy source [DEFAULT: "no", false]
+-- @param force remove existing destination before copying [DEFAULT: "no", false]
+-- @param backup rename existing path and prepend '._configi_' to the name [DEFAULT: "no", false]
+-- @usage file.copy("/home/ed"){
+--     dest = "/mnt/backups"
+-- }
 function file.copy(S)
     M.parameters = { "src", "path", "recurse", "force", "backup" }
     M.report = {

@@ -19,9 +19,10 @@ M.alias.hash = { "digest", "signature" }
 -- Useful for alerting on changed hashes.
 -- @Subject path of file to hash
 -- @Aliases check
--- @param hash the 32-byte alphanumeric string to match for [ALIAS: digest,signature] [REQUIRED]
--- @usage sha256.verify("/etc/passwd")
---     hash: "09e40b7b232c4abb427f1344e636e44ebf5684f70fb6cd67507e88955064255d"
+-- @param hash the 32-byte alphanumeric string to match for [ALIAS: digest, signature] [REQUIRED]
+-- @usage sha256.verify("/etc/passwd"){
+--     hash = "09e40b7b232c4abb427f1344e636e44ebf5684f70fb6cd67507e88955064255d"
+-- }
 function sha256.verify(S)
     M.report = {
         repaired = "sha256.verify: Hash matched.",

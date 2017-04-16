@@ -78,12 +78,13 @@ end
 -- @param type SSH key type [REQUIRED]
 -- @param options a comma-separated options specifications
 -- @param create create ~/.ssh directory or not [DEFAULT: "yes", true]
--- @usage authorized_keys.present("AAAAA....")
---     options: "yaaaya"
---     user: "ed"
---     id: "etongson"
---     type: "ssh-rsa"
---     create: false
+-- @usage authorized_keys.present("AAAAA...."){
+--     options = "yaaaya",
+--        user = "ed",
+--          id = "etongson",
+--        type = "ssh-rsa",
+--      create = false
+-- }
 function authorized_keys.present(S)
     M.parameters = { "user", "options", "id", "create" }
     M.report = {
@@ -130,9 +131,10 @@ end
 -- @param user user to operate on
 -- [ALIAS: login] [DEFAULT: Effective user ID]
 -- @param type SSH key type
--- @usage authorized_keys.absent"AAAAA..."
---     user: "ed"
---     type: "ssh-rsa"
+-- @usage authorized_keys.absent"AAAAA..."{
+--     user = "ed",
+--     type = "ssh-rsa"
+-- }
 function authorized_keys.absent(S)
     M.parameters =  { "user", "options", "id", "create" } -- make it easier to toggle a key
     M.report = {

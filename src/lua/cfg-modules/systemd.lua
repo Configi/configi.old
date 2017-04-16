@@ -16,7 +16,7 @@ M.required = { "service" }
 -- @Subject service
 -- @Aliases present
 -- @param None
--- @usage systemd.started("rsyncd")!
+-- @usage systemd.started("rsyncd")()
 function systemd.started(S)
     M.report = {
         repaired = "systemd.started: Successfully started service.",
@@ -41,7 +41,7 @@ end
 -- @Subject service
 -- @Aliases absent
 -- @param None
--- @usage systemd.stopped("rsyncd")!
+-- @usage systemd.stopped("rsyncd")()
 function systemd.stopped(S)
     M.report = {
         repaired = "systemd.stopped: Successfully stopped service.",
@@ -66,7 +66,7 @@ end
 -- @Subject service
 -- @Note skips restart if service is not yet active.
 -- @param None
--- @usage systemd.restart("rsyncd")!
+-- @usage systemd.restart("rsyncd")()
 function systemd.restart(S)
     M.report = {
         repaired = "systemd.restart: Successfully restarted service.",
@@ -90,7 +90,7 @@ end
 --- Reload a service.
 -- @Subject service
 -- @param None
--- @usage systemd.reload("sshd")!
+-- @usage systemd.reload("sshd")()
 function systemd.reload(S)
     M.report = {
         repaired = "system.reload: Successfully reloaded service.",
@@ -114,7 +114,7 @@ end
 --- Enable a service.
 -- @Subject service
 -- @param None
--- @usage systemd.enabled("rsyncd")!
+-- @usage systemd.enabled("rsyncd")()
 function systemd.enabled(S)
     M.report = {
         repaired = "systemd.enabled: Successfully enabled service.",
@@ -138,7 +138,7 @@ end
 --- Disable a service.
 -- @Subject service
 -- @param None
--- @usage systemd.disabled("rsyncd")!
+-- @usage systemd.disabled("rsyncd")()
 function systemd.disabled(S)
     M.report = {
         repaired = "systemd.disabled: Successfully disabled service.",

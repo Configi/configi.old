@@ -39,9 +39,10 @@ end
 -- @Note detects archive type using the 3 letter filename extension e.g. tar, zip, rar
 -- @param dest path where the archive should unpacked [REQUIRED] [ALIAS: directory]
 -- @param creates path to a file, if already existing will skip the unpacking step
--- @usage unarchive.unpack("/tmp/file.tar")
---     dest: "/tmp/test"
---     creates: "/tmp/test/file.1"
+-- @usage unarchive.unpack("/tmp/file.tar"){
+--        dest = "/tmp/test"
+--     creates = "/tmp/test/file.1"
+-- }
 function unarchive.unpack(S)
     M.report = {
         repaired = "unarchive.unpack: Successfully unpacked archive.",

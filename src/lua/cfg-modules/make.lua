@@ -25,8 +25,9 @@ M.alias.environment = { "env" }
 -- @param make usually DEFINES that it passed to `make` [ALIAS: defines]
 -- @param installs path of installed executable. Considered kept if it exists [ALIAS: creates]
 -- @param environment space delimited string that contains environment passed to `./configure` and `make` [ALIAS: env]
--- @usage make.install"/home/ed/Downloads/something-1.0.0"
---     make: "-DNDEBUG"
+-- @usage make.install"/home/ed/Downloads/something-1.0.0"{
+--     make = "-DNDEBUG"
+-- }
 function make.install(S)
     M.parameters = { "configure", "make", "environment" }
     M.report = {

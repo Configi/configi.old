@@ -26,7 +26,7 @@ end
 -- @Subject service
 -- @Aliases present
 -- @param None
--- @usage sysvinit.started("ntpd")!
+-- @usage sysvinit.started("ntpd")()
 function sysvinit.started(S)
     M.report = {
         repaired = "sysvinit.started: Successfully started service.",
@@ -48,7 +48,7 @@ end
 -- @Subject service
 -- @Aliases absent
 -- @param None
--- @usage sysvinit.stopped("telnetd")!
+-- @usage sysvinit.stopped("telnetd")()
 function sysvinit.stopped(S)
     M.report = {
         repaired = "sysvinit.stopped: Successfully stopped service.",
@@ -69,7 +69,7 @@ end
 --- Restart a service.
 -- @Subject service
 -- @param None
--- @usage sysvinit.restart("ntpd")!
+-- @usage sysvinit.restart("ntpd")()
 function sysvinit.restart(S)
     M.report = {
         repaired = "sysvinit.restart: Successfully restarted service.",
@@ -93,7 +93,7 @@ end
 -- @Subject service
 -- @Note OpenWRT sysvinit can not detect reload failures
 -- @param None
--- @usage sysvinit.reload("ntpd")!
+-- @usage sysvinit.reload("ntpd")()
 function sysvinit.reload(S)
     M.report = {
         repaired = "sysvinit.reload: Successfully reloaded service.",
@@ -116,7 +116,7 @@ end
 --- Enable a service
 -- @Subject service
 -- @param None
--- @usage sysvinit.enabled("ntpd")!
+-- @usage sysvinit.enabled("ntpd")()
 function sysvinit.enabled(S)
     M.report = {
         repaired = "sysvinit.enabled: Successfully enabled service.",
@@ -140,7 +140,7 @@ end
 --- Disable a service.
 -- @Subject service
 -- @param None
--- @usage sysvinit.disabled("ntpd")!
+-- @usage sysvinit.disabled("ntpd")()
 function sysvinit.disabled(S)
     M.report = {
         repaired = "sysvinit.disabled: Successfully disabled service.",

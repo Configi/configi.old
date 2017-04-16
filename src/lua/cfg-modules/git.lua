@@ -31,13 +31,14 @@ local found = function(P)
     end
 end
 
---- Ensure that a Git repository is cloned into a specified path
+--- Ensure that a repository is cloned into a specified path.
 -- @Subject path where to clone the repository
 -- @Aliases repo
 -- @Aliases cloned
 -- @param repository The URL of the repository. [ALIAS: url,repo] [REQUIRED]
--- @usage git.repo"/home/user/work"
---     repo: "https://github.com/torvalds/linux.git"
+-- @usage git.repo"/home/user/work"{
+--     repo = "https://github.com/torvalds/linux.git"
+-- }
 function git.clone(S)
     M.parameters = { "repository" }
     M.report = {
@@ -73,8 +74,9 @@ end
 -- This always attempts to run the command. Useful as a handler.
 -- @Subject path where to clone the repository
 -- @param repository The URL of the repository. [ALIAS: url,repo] [REQUIRED]
--- @usage git.pull("/home/user/work")
---     repo: "https://github.com/torvalds/linux.git"
+-- @usage git.pull("/home/user/work"){
+--     repo = "https://github.com/torvalds/linux.git"
+-- }
 function git.pull(S)
     M.report = {
         repaired = "git.pull: Successfully pulled Git repository.",

@@ -20,7 +20,7 @@ M.required = { "service" }
 -- @Subject service
 -- @Aliases present
 -- @param None
--- @usage openrc.started("rsyncd")!
+-- @usage openrc.started("rsyncd")()
 function openrc.started(S)
     M.report = {
         repaired = "openrc.started: Successfully started service.",
@@ -48,7 +48,7 @@ end
 -- @Subject service
 -- @Aliases absent
 -- @param None
--- @usage openrc.stopped("rsyncd")!
+-- @usage openrc.stopped("rsyncd")()
 function openrc.stopped(S)
     M.report = {
         repaired = "openrc.stopped: Successfully stopped service.",
@@ -75,7 +75,7 @@ end
 --- Restart a service.
 -- @Subject service
 -- @param None
--- @usage openrc.restart("rsyncd")!
+-- @usage openrc.restart("rsyncd")()
 function openrc.restart(S)
     M.report = {
         repaired = "openrc.restart: Successfully restarted service.",
@@ -98,7 +98,7 @@ end
 --- Reload a service.
 -- @Subject service
 -- @param None
--- @usage openrc.reload("sshd")!
+-- @usage openrc.reload("sshd")()
 function openrc.reload(S)
     M.report = {
         repaired = "openrc.reload: Successfully reloaded service",
@@ -121,8 +121,9 @@ end
 --- Add a service to runlevel.
 -- @Subject service
 -- @param runlevel runlevel to add to [REQUIRED] [DEFAULT: default]
--- @usage openrc.add("rsyncd")
---     runlevel: "default"
+-- @usage openrc.add("rsyncd"){
+--     runlevel = "default"
+-- }
 function openrc.add(S)
     M.parameters = { "runlevel" }
     M.report = {
@@ -154,8 +155,9 @@ end
 -- @Subject service
 -- @Aliases del
 -- @param runlevel runlevel to remove from [REQUIRED] [DEFAULT: default]
--- @usage openrc.delete("rsyncd")
---     runlevel: "default"
+-- @usage openrc.delete("rsyncd"){
+--     runlevel = "default"
+-- }
 function openrc.delete(S)
     M.parameters = { "runlevel" }
     M.report = {

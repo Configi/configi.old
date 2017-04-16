@@ -1,5 +1,5 @@
---- IPTables.
--- This module is for configuring rules on a host. Warning: the FORWARD chain is untested.
+--- iptables.
+-- This module is for configuring rules on a host. Warning: the FORWARD chain is unsupported.
 -- @module iptables
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
@@ -29,14 +29,15 @@ M.alias.match = { "module" }
 -- @param in incoming interface via which the rule to match for
 -- @param out outgoing interface via which the rule to match for
 -- @param ipv6 Use ip6tables
--- @param ipv4 Use iptables [DEFAULT: yes]
--- @usage iptables.append("comment")
---     table: "filter"
---     chain: "input"
---     target: "accept"
---     source: "6.6.6.6"
---     protocol: "tcp"
---     options: "-m tcp --sport 31337 --dport 31337"
+-- @param ipv4 Use iptables [DEFAULT: "yes", true]
+-- @usage iptables.append("comment"){
+--        table = "filter",
+--        chain = "input",
+--       target = "accept",
+--       source = "6.6.6.6",
+--     protocol = "tcp",
+--      options = "-m tcp --sport 31337 --dport 31337"
+-- }
 function iptables.append(S)
     --[[
          -A INPUT -s P.source -d P.destination -i lo -p tcp -m tcp
@@ -108,11 +109,11 @@ function iptables.append(S)
     end
 end
 
---- Disable IPTables.
+--- Disable iptables.
 -- Flush, zero out counters and remove user-defined chains.
 -- @Subject tag
 -- @param NONE
--- @usage iptables.disable("comment")!
+-- @usage iptables.disable("comment")()
 function iptables.disable(S)
     M.report = {
         repaired = "iptables.disable: Successfully disabled iptables.",
@@ -169,7 +170,7 @@ end
 -- @param host IP of the local host [DEFAULT: 0.0.0.0]
 -- @param source IP of host to white list [DEFAULT: 0.0.0.0]
 -- @param ssh SSH port [DEFAULT: 22]
--- @usage iptables.default("comment")!
+-- @usage iptables.default("comment")()
 function iptables.default(S)
     M.parameters = { "source", "host", "ssh" }
     M.report = {

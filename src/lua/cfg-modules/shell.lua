@@ -70,10 +70,11 @@ end
 -- @param env space separated environment variables
 -- @param creates a filename, if found will not run the command
 -- @param removes a filename, if not found will not run the command
--- @usage shell.command("touch test")
---     cwd: "/tmp"
---     env: "test=this whatever=youwant"
---     creates: "test"
+-- @usage shell.command("touch test"){
+--         cwd = "/tmp",
+--         env = "test=this whatever=youwant",
+--     creates = "test"
+-- }
 function shell.command(S)
     M.parameters = { "cwd" }
     M.report = {
@@ -116,7 +117,7 @@ end
 -- @Aliases script
 -- @param creates a filename, if found will not run the script
 -- @param removes a filename, if not found will not run the script
--- @usage shell.system("/root/test.sh")!
+-- @usage shell.system("/root/test.sh")()
 function shell.system(S)
     M.report = {
         repaired = "shell.system: Script successfully executed.",
@@ -148,9 +149,10 @@ end
 -- @param creates a filename, if found will not run the command
 -- @param removes a filename, if not found will not run the command
 -- @param expects instead of the exit code, use a string match as a test for success
--- @usage shell.popen("ls -la")
---     cwd: "/tmp"
---     expects: ".X11-unix"
+-- @usage shell.popen("ls -la"){
+--         cwd = "/tmp",
+--     expects = ".X11-unix"
+-- }
 function shell.popen(S)
     local report = {
         shell_popenexpect_ok = "expects: Expected pattern found.",
@@ -209,10 +211,11 @@ end
 -- @param stdin pipe a string from STDIN
 -- @param stdout test for a string from STDOUT
 -- @param stderr test for a string from STDERR
--- @param error ignore errors when set to "ignore" [CHOICES: "yes","no"]
--- @usage shell.popen3("ls")
---     cwd: "/tmp"
---     stdout: ".X11-unix"
+-- @param error ignore errors when set to "ignore" [Default: false]
+-- @usage shell.popen3("ls"){
+--        cwd = "/tmp",
+--     stdout = ".X11-unix"
+-- }
 function shell.popen3(S)
     local report = {
           shell_popen3stdout_ok = "stdout: Expected stdout pattern found.",

@@ -24,16 +24,17 @@ M.required = { "login" }
 -- @param gid gid of the new user account
 -- @param shell shell of the new user account
 -- @param home home directory of the new user account
--- @param create_home whether to create the home directory of not [CHOICES: "yes","no"] [DEFAULT: "yes"]
+-- @param create_home whether to create the home directory of not [DEFAULT: true]
 -- @param description decription field for the new user account
 -- @param expire_date the date on which the account will be disabled [FORMAT: YYYY-MM-DD]
 -- @param groups supplementary groups for the user account
--- @param user_group whether to create a new group with the same name as the user account [CHOICES: "yes","no"]
--- @usage user.present("ed")
---     uid: "666"
---     gid: "777"
---     shell: "/usr/bin/mksh"
---     groups: "kvm"
+-- @param user_group whether to create a new group with the same name as the user account [DEFAULT: false]
+-- @usage user.present("ed"){
+--        uid = "666",
+--        gid = "777",
+--      shell = "/usr/bin/mksh",
+--     groups = "kvm"
+-- }
 function user.present(S)
     M.report = {
          repaired = "user.present: Successfully created user login.",
@@ -121,9 +122,10 @@ end
 --- Remove a system user account.
 -- @Subject username
 -- @Aliases remove
--- @param remove delete home directory [CHOICES: "yes","no"]
--- @usage user.absent("ed")
---     remove: "yes"
+-- @param remove delete home directory [DEFAULT: false]
+-- @usage user.absent("ed"){
+--     remove = true
+-- }
 function user.absent(S)
     M.parameters = { "remove" }
     M.report = {

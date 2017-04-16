@@ -155,8 +155,9 @@ end
 -- @Aliases removed
 -- @Aliases remove
 -- @param config yum config file location
--- @usage yum.absent("strace")
---     config: "/etc/yum.conf"
+-- @usage yum.absent("strace"){
+--     config = "/etc/yum.conf"
+-- }
 function yum.absent(S)
     M.parameters = { "config" }
     M.report = {

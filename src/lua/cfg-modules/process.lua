@@ -59,7 +59,7 @@ end
 -- @param name the Name field in /proc/$pid/status
 -- @usage process.signal"nginx-sighup"{
 --     signal = "SIGHUP",
---     exe = "/usr/sbin/nginx"
+--        exe = "/usr/sbin/nginx"
 -- }
 function process.signal(S)
     M.parameters = {"signal", "exe", "cmdline", "name"}
@@ -103,7 +103,7 @@ end
 -- @param cmdline string from /proc/$pid/cmdline
 -- @param name Name field in /proc/$pid/status
 -- @usage process.running("/usr/bin/rsyncd"){
---     requires = "start-rsyncd",
+--          requires = "start-rsyncd",
 --     notify_failed = "start-rsyncd"
 -- }
 function process.running(S)

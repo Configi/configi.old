@@ -21,15 +21,16 @@ local found = function(package)
     end
 end
 
---- Install a package via Debian APT.
+--- Install a package.
 -- See apt-get(8) for full description of options and parameters
 -- @Subject package
 -- @Aliases installed
 -- @Aliases install
 -- @param update_cache Run `apt-get update` before any operation [DEFAULT: false]
 -- @param no_upgrade Prevent upgrade of specified package if already installed [DEFAULT: false]
--- @usage apt.present("strace")
---     update_cache: true
+-- @usage apt.present("strace"){
+--     update_cache = true
+-- }
 function apt.present(S)
     M.parameters = {
         "update_cache", "no_upgrade"
@@ -70,12 +71,12 @@ function apt.present(S)
     end
 end
 
---- Remove a package via Debian APT.
+--- Remove a package.
 -- @Subject package
 -- @Aliases removed
 -- @Aliases remove
 -- @param None
--- @usage apt.absent("strace")!
+-- @usage apt.absent("strace")()
 function apt.absent(S)
     M.report = {
         repaired = "apt.absent: Successfully removed package.",

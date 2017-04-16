@@ -82,14 +82,15 @@ end
 -- @param day day value [DEFAULT: "*"]
 -- @param weekday weekday value [DEFAULT: "*"]
 -- @param month month value [DEFAULT: "*"]
--- @usage cron.present("example")
---     job: "/bin/ls"
---     minute: "5"
---     hour: "3"
---     day: "2"
---     weekday: "2"
---     month: "5"
---     user "ed"
+-- @usage cron.present("example"){
+--         job = "/bin/ls",
+--      minute = "5",
+--        hour = "3",
+--         day = "2",
+--     weekday = "2",
+--       month = "5",
+--        user = "ed"
+-- }
 function cron.present(S)
     M.parameters = { "minute", "hour", "day", "weekday", "month", "user" }
     M.report = {
@@ -122,9 +123,10 @@ end
 -- @Subject tag to track jobs
 -- @param job the command or job string [REQUIRED]
 -- @param user user login to operate on [DEFAULT: "root"]
--- @usage cron.absent("example")
---     job: "/bin/ls"
---     user: "ed"
+-- @usage cron.absent("example"){
+--      job = "/bin/ls",
+--     user = "ed"
+-- }
 function cron.absent(S)
     M.parameters = { "minute", "hour", "day", "weekday", "month", "user" }
     M.report = {

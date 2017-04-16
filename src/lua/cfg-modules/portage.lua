@@ -72,19 +72,20 @@ end
 -- @Aliases installed
 -- @Aliases install
 -- @param version package version
--- @param deep evaluate entire dependency tree [CHOICES: "yes","no"]
--- @param newuse reinstall packages that had a change in its USE flags [CHOICES: "yes","no"]
--- @param nodeps do not merge dependencies [CHOICES: "yes","no"]
--- @param noreplace skip already installed packages [CHOICES: "yes","no"]
--- @param oneshot do not update the world file [CHOICES: "yes","no"] [DEFAULT: "yes"]
--- @param onlydeps only merge dependencies [CHOICES: "yes","no"]
--- @param sync perform an `emerge --sync` before installing package(s) [CHOICES: "yes","no"]
--- @param update update package to the best version [CHOICES: "yes","no"]
--- @param unmask enable auto-unmask and auto-unmask-write options [CHOICES: "yes","no"]
--- @usage portage.present("dev-util/strace")
---     version: "4.8"
--- portage.present("dev-util/strace-4.8")!
--- portage.present("dev-util/strace")!
+-- @param deep evaluate entire dependency tree [Default: false]
+-- @param newuse reinstall packages that had a change in its USE flags [Default: false]
+-- @param nodeps do not merge dependencies [Default: false]
+-- @param noreplace skip already installed packages [Default: false]
+-- @param oneshot do not update the world file [Default: true]
+-- @param onlydeps only merge dependencies [Default: false]
+-- @param sync perform an `emerge --sync` before installing packages) [Default: false]
+-- @param update update package to the best version [Default: false]
+-- @param unmask enable auto-unmask and auto-unmask-write options [Default: false]
+-- @usage portage.present("dev-util/strace"){
+--     version = "4.8"
+-- }
+-- portage.present("dev-util/strace-4.8")()
+-- portage.present("dev-util/strace")()
 function portage.present(S)
     M.parameters = {
         "deep", "newuse", "nodeps", "noreplace", "oneshot", "onlydeps", "sync", "unmask", "update", "version"
@@ -144,7 +145,7 @@ end
 -- @Aliases remove
 -- @param atom package atom to unmerge [REQUIRED] [ALIAS: package]
 -- @param depclean Remove packages not associated with explicitly installed packages [DEFAULT: false]
--- @usage portage.absent("dev-util/strace")!
+-- @usage portage.absent("dev-util/strace")()
 function portage.absent(S)
     M.parameters = { "depclean" }
     M.report = {

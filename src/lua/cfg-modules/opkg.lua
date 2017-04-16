@@ -24,16 +24,17 @@ end
 -- @Aliases installed
 -- @Aliases install
 -- @Subject package
--- @param force_depends install despite failed dependencies [CHOICES: "yes","no"]
--- @param force_reinstall reinstall package [CHOICES: "yes","no"]
--- @param force_overwrite overwrite files from other packages [CHOICES: "yes","no"]
--- @param force_downgrade Allow downgrading packages [CHOICES: "yes","no"]
--- @param force_maintainer Overwrite existing config files [CHOICES: "yes","no"]
--- @param nodeps Do not install dependencies [CHOICES: "yes","no"]
+-- @param force_depends install despite failed dependencies [Default: false]
+-- @param force_reinstall reinstall package [Default: false]
+-- @param force_overwrite overwrite files from other packages [Default: false]
+-- @param force_downgrade Allow downgrading packages [Default: false]
+-- @param force_maintainer Overwrite existing config files [Default: false]
+-- @param nodeps Do not install dependencies [Default: false]
 -- @param proxy HTTP proxy to use for connections
--- @param update update package [CHOICES: "yes","no"]
--- @usage opkg.present("strace")
---     update: "yes"
+-- @param update update package [Default: false]
+-- @usage opkg.present("strace") {
+--     update = true
+-- }
 function opkg.present(S)
     M.parameters = {
            "force_depends",
@@ -83,12 +84,13 @@ end
 -- @Subject package
 -- @Aliases removed
 -- @Aliases remove
--- @param force_depends remove despite failed dependencies [CHOICES: "yes","no"]
--- @param force_remove Remove packages even if prerm hook fails [CHOICES: "yes","no"]
--- @param autoremove Remove packages that were installed to satisfy dependencies [CHOICES: "yes","no"]
--- @param force_removal_of_dependent_packages Remove package and all dependencies [CHOICES: "yes","no"]
--- @usage opkg.absent("ncurses")
---     force_remove: "yes"
+-- @param force_depends remove despite failed dependencies
+-- @param force_remove Remove packages even if prerm hook fails [Default: false]
+-- @param autoremove Remove packages that were installed to satisfy dependencies [Default: false]
+-- @param force_removal_of_dependent_packages Remove package and all dependencies [Default: false]
+-- @usage opkg.absent("ncurses"){
+--     force_remove = true
+-- }
 function opkg.absent(S)
     M.parameters = { "force_depends", "force_remove", "autoremove", "force_removal_of_dependent_packages" }
     M.report = {

@@ -19,14 +19,15 @@ local found = function(package)
     end
 end
 
---- Install a package via apk
+--- Install a package
 -- See `apk help` for full description of options and parameters
 -- @Subject package
 -- @Aliases installed
 -- @Aliases install
 -- @param update_cache update cache before adding package [DEFAULT: "no", false]
--- @usage apk.present("strace")
---     update_cache: true
+-- @usage apk.present("strace"){
+--     update_cache = true
+-- }
 function apk.present(S)
     M.parameters = { "update_cache" }
     M.report = {
@@ -51,7 +52,7 @@ end
 -- @Aliases removed
 -- @Aliases remove
 -- @param None
--- @usage apk.absent"strace"!
+-- @usage apk.absent"strace"()
 function apk.absent(S)
     M.report = {
         repaired = "apk.absent: Successfully removed package",
