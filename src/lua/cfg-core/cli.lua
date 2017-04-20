@@ -107,7 +107,12 @@ function cli.main (opts)
                             end
                             local resource = qt.parameters.handle
                             local rs = string.char(9)
-                            if qt.parameters.context == true or (qt.parameters.context == nil) then
+                            local is_string = (type(subject) == "string")
+                            if not is_string then
+                                lib.warn("%sIgnoring promise. Nil value passed to %s.%s()\n",
+                                    strings.WARN, mod, func)
+                            end
+                            if (qt.parameters.context == true or (qt.parameters.context == nil)) and is_string then
                                 if not qt.parameters.handle then
                                     source[#source + 1] = { res = mod..rs..func..rs..subject,
                                         mod = mod, func = func, subject = subject, param = ptbl }
