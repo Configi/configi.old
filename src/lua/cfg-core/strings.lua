@@ -1,10 +1,11 @@
 return {
     version = "Configi 2.0.0",
-    short_args = "hvtDsmjVl:p:g:r:f:e:",
+    short_args = "hvtdsmjVl:p:g:r:f:e:",
     long_args = {
         {"help", "none", "h"},
         {"debug", "none", "v"},
         {"test", "none", "t"},
+        {"dump", "none", "d"},
         {"watch", "none", "w"},
         {"periodic", "none", "p"},
         {"syslog", "none", "s"},
@@ -17,12 +18,13 @@ return {
         {"embedded","required", "e"}
     },
     help = [[
-    cfg [-h] [-V] [-v] [-t] [-w] [-p N] [-s] [-l FILE] [-m] [-g TAG] [-r N] [-f "CONFIGI POLICY"] [-e "CONFIGI POLICY"]
+    cfg [-h] [-V] [-v] [-d] [-t] [-w] [-p N] [-s] [-l FILE] [-m] [-g TAG] [-r N] [-f "POLICY"] [-e "POLICY"]
 
         Options:
             -h, --help                  This help text.
             -V, --version               Print version.
             -v, --debug                 Turn on debugging messages.
+            -d, --dump                  Dump tree.
             -t, --test                  Dry-run mode. All operations are expected to succeed. Turns on debugging.
             -w, --watch                 Watch for inotify IN_MODIFY and IN_ATTRIB events to the main policy file.
             -p, --periodic              Do a run after N seconds.

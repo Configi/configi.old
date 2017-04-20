@@ -11,12 +11,20 @@ local sysstat = require"posix.sys.stat"
 local syslog = require"posix.syslog"
 local systime = require"posix.sys.time"
 local inotify = require"inotify"
+local inspect = require"inspect"
 local t1
 _ENV = ENV
 
 while true do
     local handle, wd
     local source, hsource, runenv, opts = cli.opt(arg, version)
+    if std.dump() then
+        lib.printf("%s\n", "main")
+        lib.printf("%s\n", inspect(source))
+        lib.printf("%s\n", "handlers")
+        lib.printf("%s\n", inspect(hsource))
+        break
+    end
     ::RUN::
     t1 = systime.gettimeofday()
     local R, M = cli.try(source, hsource, runenv)

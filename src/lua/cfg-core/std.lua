@@ -23,6 +23,14 @@ local Embed = function()
     end
 end
 
+local Dump = function()
+    for r in getopt.getopt(arg, strings.short_args, strings.long_args) do
+        if r == "d" then
+            return true
+        end
+    end
+end
+
 local Log = function(sys, file, str, level)
     level = level or syslog.LOG_DEBUG
     if sys then
@@ -85,6 +93,7 @@ end
 return {
                  path = Path,
                 embed = Embed,
+                 dump = Dump,
                   log = Log,
         add_from_dirs = Add_From_Dirs,
         add_from_role = Add_From_Role,
