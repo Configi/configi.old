@@ -102,7 +102,7 @@ function cli.main (opts)
                             for p, v in next, ptbl do
                                 qt.parameters[p] = v
                             end
-                            local resource = qt.parameters.handle
+                            local tag = qt.parameters.handle
                             local rs = string.char(9)
                             local is_string = (type(subject) == "string")
                             if not is_string then
@@ -114,12 +114,12 @@ function cli.main (opts)
                                     source[#source + 1] = { res = mod..rs..func..rs..subject,
                                         mod = mod, func = func, subject = subject, param = ptbl }
                                 else
-                                    if hsource[resource] and (#hsource[resource] > 0) then
-                                        hsource[resource][#hsource[resource] + 1] =
+                                    if hsource[tag] and (#hsource[tag] > 0) then
+                                        hsource[tag][#hsource[tag] + 1] =
                                         { mod = mod, func = func, subject = subject, param = ptbl }
                                     else
-                                        hsource[resource] = {}
-                                        hsource[resource][#hsource[resource] + 1] =
+                                        hsource[tag] = {}
+                                        hsource[tag][#hsource[tag] + 1] =
                                         { mod = mod, func = func, subject = subject, param = ptbl }
                                     end
                                 end
