@@ -1,5 +1,5 @@
-local pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
-      pcall, rawset, next, setmetatable, load, pairs, ipairs, require
+local type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
+      type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require
 local ENV, cli, functions = {_G=_G}, {}, {}
 local string, coroutine, os = string, coroutine, os
 local Factid = require"factid"
