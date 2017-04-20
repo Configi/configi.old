@@ -59,7 +59,7 @@ function cli.main (opts)
     local runenv = {}
     local roles = {}
     local scripts = { [1] = opts.script }
-    local env = { fact = {}, global = {} }
+    local env = { fact = {} }
 
     -- Built-in functions inside scripts --
     env.roles = function(r)
@@ -100,9 +100,6 @@ function cli.main (opts)
                             ptbl = ptbl or {}
                             local qt = { environment = {}, parameters = {} }
                             for p, v in next, ptbl do
-                                if p == "register" then
-                                    rawset(env.global, v, true)
-                                end
                                 qt.parameters[p] = v
                             end
                             local resource = qt.parameters.handle
