@@ -98,19 +98,15 @@ function cli.main (opts)
                     return function (subject)
                         return function (ptbl) -- mod.func
                             ptbl = ptbl or {}
-                            local qt = { environment = {}, parameters = {} }
-                            for p, v in next, ptbl do
-                                qt.parameters[p] = v
-                            end
-                            local tag = qt.parameters.handle
+                            local tag = ptbl.handle
                             local rs = string.char(9)
                             local is_string = (type(subject) == "string")
                             if not is_string then
                                 lib.warn("%sIgnoring promise. Nil value passed to %s.%s()\n",
                                     strings.WARN, mod, func)
                             end
-                            if (qt.parameters.context == true or (qt.parameters.context == nil)) and is_string then
-                                if not qt.parameters.handle then
+                            if (ptbl.context == true or (ptbl.context == nil)) and is_string then
+                                if not ptbl.handle then
                                     source[#source + 1] = { res = mod..rs..func..rs..subject,
                                         mod = mod, func = func, subject = subject, param = ptbl }
                                 else
