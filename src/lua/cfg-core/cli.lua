@@ -1,5 +1,5 @@
-local type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require =
-      type, pcall, rawset, next, setmetatable, load, pairs, ipairs, require
+local type, pcall, next, setmetatable, load, pairs, ipairs, require =
+      type, pcall, next, setmetatable, load, pairs, ipairs, require
 local ENV, cli, functions = {_G=_G}, {}, {}
 local string, coroutine, os = string, coroutine, os
 local Factid = require"factid"
@@ -10,7 +10,7 @@ local lib = require"lib"
 local tsort = require"tsort"
 local ep_found, policy = pcall(require, "cfg-policy")
 local path = std.path()
-local embed = std.embed()
+local embed = std.get_opt"e"
 _G.package.path = "./?.lua;"..path.."/?.lua;"..path.."/?.lua;"..path.."/?"
 _ENV = ENV
 

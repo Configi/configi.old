@@ -15,17 +15,9 @@ local Path = function()
     return path
 end
 
-local Embed = function()
+local Get_Opt = function(o)
     for r in getopt.getopt(arg, strings.short_args, strings.long_args) do
-        if r == "e" then
-            return true
-        end
-    end
-end
-
-local Dump = function()
-    for r in getopt.getopt(arg, strings.short_args, strings.long_args) do
-        if r == "d" then
+        if r == o then
             return true
         end
     end
@@ -92,8 +84,7 @@ end
 
 return {
                  path = Path,
-                embed = Embed,
-                 dump = Dump,
+              get_opt = Get_Opt,
                   log = Log,
         add_from_dirs = Add_From_Dirs,
         add_from_role = Add_From_Role,

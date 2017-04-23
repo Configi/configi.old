@@ -18,7 +18,7 @@ _ENV = ENV
 while true do
     local handle, wd
     local source, hsource, runenv, opts = cli.opt(arg, version)
-    if std.dump() then
+    if std.get_opt"d" then
         lib.printf("%s\n", "main")
         lib.printf("%s\n", inspect(source))
         lib.printf("%s\n", "handlers")
