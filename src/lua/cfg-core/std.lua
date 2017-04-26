@@ -16,9 +16,9 @@ local Path = function()
 end
 
 local Get_Opt = function(o)
-    for r in getopt.getopt(arg, strings.short_args, strings.long_args) do
+    for r, oarg, _, _ in getopt.getopt(arg, strings.short_args, strings.long_args) do
         if r == o then
-            return true
+            return true, oarg
         end
     end
 end

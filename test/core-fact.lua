@@ -1,4 +1,3 @@
-debug "true"
 module "fact"
 
 file.touch"test/tmp/i-deadbeef"{

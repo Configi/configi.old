@@ -11,6 +11,8 @@ local tsort = require"tsort"
 local ep_found, policy = pcall(require, "cfg-policy")
 local path = std.path()
 local embed = std.get_opt"e"
+local opt_msg = std.get_opt"m"
+local opt_verbose = std.get_opt"v"
 _G.package.path = "./?.lua;"..path.."/?.lua;"..path.."/?.lua;"..path.."/?"
 _ENV = ENV
 
@@ -81,10 +83,6 @@ function cli.main (opts)
             runenv[m] = functions.module(m, roles)
         end
     end
-    env.debug = function (b) if lib.truthy(b) then opts.debug = true end end
-    env.test = function (b) if lib.truthy(b) then opts.test = true end end
-    env.syslog = function (b) if lib.truthy(b) then opts.syslog = true end end
-    env.log = function (b) opts.log = b end
     env.each = function (t, f)
         for str, tbl in pairs(t) do
             f(str)(tbl)
@@ -223,10 +221,6 @@ function cli.main (opts)
     if not sorted then
         lib.errorf("%s %s %s\n", strings.SERR, opts.script, tsort_err)
     end
-    sorted.debug, sorted.test, sorted.log, sorted.syslog, sorted.msg =
-    opts.debug, opts.test, opts.log, opts.syslog, opts.msg
-    hsource[1], hsource[2], hsource[3], hsource[4] =
-        opts.debug, opts.test, opts.syslog, opts.log -- source.msg already handles the msg output
     return sorted, hsource, runenv
 end
 
@@ -300,11 +294,6 @@ function cli.run (source, runenv) -- execution step
             runenv[s.mod] = functions.module(s.mod)
         end
         local mod, func, subject, param = runenv[s.mod], s.func, s.subject, s.param
-        -- append debug and test arguments
-        param.debug = source.debug or param.debug
-        param.test = source.test or param.test
-        param.syslog = source.syslog or param.syslog
-        param.log = source.log or param.log
         if not mod[func] then
            lib.errorf("%sfunction '%s' in module '%s' not found\n", strings.MERR, func, mod)
         end
@@ -326,11 +315,6 @@ function cli.hrun (tags, hsource, runenv) -- execution step for handlers
                     hsource[tag][n].func,
                     hsource[tag][n].subject,
                     hsource[tag][n].param
-                -- append debug and test arguments
-                param.debug = hsource[1] or param.debug
-                param.test = hsource[2] or param.test
-                param.syslog = hsource[3] or param.syslog
-                param.log = hsource[4] or param.log
                 if not mod[func] then
                     lib.errorf("%sfunction '%s' in module '%s' not found\n", strings.MERR, func, mod)
                 end
@@ -345,7 +329,7 @@ function cli.try (source, hsource, runenv)
     local M, R, results = {}, { failed = false, repaired = false, kept = false }
     local tags, notify = {}
     for this = 1, source.runs do
-        if this > 1 and (source.debug or source.test or source.msg) then
+        if this > 1 then
             lib.printf("-- Retry #%.f\n", this - 1)
         end
         if #source.tags == 0 then
@@ -367,7 +351,7 @@ function cli.try (source, hsource, runenv)
                     tags[notify] = true -- toggle handle "$tag"
                 end
                 -- read the T.results.msg table if debugging is on or the last result failed
-                if (result.failed or source.debug or source.test or source.msg) and result.msg then
+                if (result.failed or opt_msg or opt_verbose) and result.msg then
                     for ni = 1, #result.msg do
                         lib.warn("%s\n", result.msg[ni])
                     end
@@ -397,7 +381,7 @@ function cli.try (source, hsource, runenv)
                     R.failed = false
                 end -- if repaired
                 R.failed = rh[#rh].failed or false
-                if (rh[#rh].failed or source.debug or source.test or source.msg) and rh[#rh].msg then
+                if (rh[#rh].failed or opt_msg or opt_verbose) and rh[#rh].msg then
                     for ni = 1, #rh[#rh].msg do
                         lib.warn("%s\n", rh[#rh].msg[ni])
                     end -- for handler messages

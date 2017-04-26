@@ -7,8 +7,13 @@ local stat = require"posix.sys.stat"
 local lib = require"lib"
 local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
+local opt_verbose = std.get_opt"v"
+local opt_test = std.get_opt"t"
+local opt_syslog = std.get_opt"s"
+local _, opt_log_file = std.get_opt"l"
 local cfg = {}
 local _, policy = pcall(require, "cfg-policy")
+_ = nil
 local ENV = {}
 _ENV = ENV
 
@@ -71,7 +76,7 @@ function Lmod.dmsg (C)
         else
             lstr = string.format("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
         end
-        std.log(C.parameters.syslog, C.parameters.log, lstr, level)
+        std.log(opt_syslog, opt_log_file, lstr, level)
         C.results.msgt[#C.results.msgt + 1] = {
             item = item,
             msg = msg,
@@ -117,7 +122,7 @@ function Lmod.msg (C)
         else
             lstr = string.format("[%s]%s%s%s%s", flag, rs, msg, rs, item)
         end
-        std.log(C.parameters.syslog, C.parameters.log, lstr, level)
+        std.log(opt_syslog, opt_log_file, lstr, level)
         C.results.msgt[#C.results.msgt + 1] = {
             item = item,
             msg = msg,
@@ -145,10 +150,6 @@ function Lmod.ignoredwarn (C)
     for n = 1, #C._required do C._module[#C._module + 1] = C._required[n] end -- add C.required to M
     -- Core parameters are added as valid parameters
     C._module[#C._module + 1] = "comment"
-    C._module[#C._module + 1] = "debug"
-    C._module[#C._module + 1] = "test"
-    C._module[#C._module + 1] = "syslog"
-    C._module[#C._module + 1] = "log"
     C._module[#C._module + 1] = "handle"
     C._module[#C._module + 1] = "register"
     C._module[#C._module + 1] = "context"
@@ -250,7 +251,7 @@ function cfg.init(P, M)
             string.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
         return ok, rt
     end -- functime()
-    if not (C.parameters.test or C.parameters.debug) then
+    if not (opt_test or opt_verbose) then
         msg = Lmod.msg(C)
         C.functions.run = function (f, ...)
             local ok, rt = f(...)
@@ -258,7 +259,7 @@ function cfg.init(P, M)
             msg(strings.OPERATION, err, ok)
             return ok, rt
         end -- F.run()
-    elseif C.parameters.debug or C.parameters.test then
+    elseif opt_test or opt_verbose then
         msg = Lmod.dmsg(C)
         Lmod.ignoredwarn(C) -- Warn for ignored parameters
     end
@@ -268,7 +269,7 @@ function cfg.init(P, M)
             return true, {stdout={}, stderr={}}, true
         end -- F.run()
         C.functions.xrun = functime -- if you must execute something use F.xrun()
-    elseif C.parameters.debug then
+    elseif opt_verbose then
         C.functions.run = functime -- functime() is used when debug=true
     end
     C.functions.msg = msg -- Assign msg to F.msg()
