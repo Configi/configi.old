@@ -109,7 +109,7 @@ T:done(N)
 T:start"debug test/core-debug.lua"
     do
         local debug = function(policy)
-            local _, out = cfg{ "-f", policy }
+            local _, out = cfg{ "-vf", policy }
             out = table.concat(out.stderr, "\n")
             T:eq(string.find(out, "TESTDEBUG", 1, true), 78)
         end
@@ -121,7 +121,7 @@ T:start"log test/core-log.lua"
     do
         local log = function(policy)
             local log = "test/tmp/_test_configi.log"
-            cfg{ "-f", policy }
+            cfg{ "-ltest/tmp/_test_configi.log", "-f", policy }
             T:yes(stat.stat(log))
             os.remove(log)
         end
@@ -145,7 +145,7 @@ T:start"test test/core-test.lua"
         local test = function(policy)
             local tempname = testdir .. "core-test.txt"
             lib.fwrite(tempname, "test")
-            cfg{ "-f", policy}
+            cfg{ "-tf", policy}
             T:eq(lib.fopen(tempname), "test")
             os.remove(tempname)
         end
