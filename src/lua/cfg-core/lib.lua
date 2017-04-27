@@ -260,10 +260,10 @@ function cfg.init(P, M)
         msg = Lmod.dmsg(C)
         Lmod.ignoredwarn(C) -- Warn for ignored parameters
     end
-    if C.parameters.test then
-        C.functions.run = function ()
-            msg(strings.OPERATION, string.format("Would execute a corrective operation"), true)
-            return true, {stdout={}, stderr={}}, true
+    if args["t"] then
+        C.functions.run = function()
+            msg(strings.OPERATION, "Would execute through F.run().", true)
+            return true, {stdout = {}, stderr = {}}, true
         end -- F.run()
         C.functions.xrun = functime -- if you must execute something use F.xrun()
     elseif args["v"] then
