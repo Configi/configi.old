@@ -244,7 +244,7 @@ function cfg.init(P, M)
     end
     local secs = lib.diff_time(Psystime.gettimeofday(), t1)
         secs = string.format("%s.%s", tostring(secs.sec), tostring(secs.usec))
-        msg(strings.OPERATION, err, ok or false, secs,
+        msg(strings.EXEC, err, ok or false, secs,
             string.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
         return ok, rt
     end -- functime()
@@ -253,7 +253,7 @@ function cfg.init(P, M)
         C.functions.run = function (f, ...)
             local ok, rt = f(...)
             local err = lib.exit_string(rt.bin, rt.status, rt.code)
-            msg(strings.OPERATION, err, ok)
+            msg(strings.EXEC, err, ok)
             return ok, rt
         end -- F.run()
     elseif args["t"] or args["v"] then
@@ -262,7 +262,7 @@ function cfg.init(P, M)
     end
     if args["t"] then
         C.functions.run = function()
-            msg(strings.OPERATION, "Would execute through F.run().", true)
+            msg(strings.EXEC, "Test option passed. Noop F.run().", true)
             return true, {stdout = {}, stderr = {}}, true
         end -- F.run()
         C.functions.xrun = functime -- if you must execute something use F.xrun()

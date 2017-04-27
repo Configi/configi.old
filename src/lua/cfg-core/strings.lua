@@ -39,8 +39,8 @@ return {
 ]],
     IDENT = "Configi",
     ERROR = "ERROR: ",
-    WARN = "WARNING: ",
-    SERR = "POLICY ERROR: ",
-    MERR = "MODULE ERROR: ",
-    OPERATION = "Operation"
+     WARN = "WARNING: ",
+     SERR = "POLICY ERROR: ",
+     MERR = "MODULE ERROR: ",
+     EXEC = "EXECUTION: "
 }
