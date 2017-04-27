@@ -3,6 +3,7 @@ local ENV, os, string, arg, next, tostring, collectgarbage =
        {}, os, string, arg, next, tostring, collectgarbage
 local version = require"cfg-core.strings".version
 local std = require"cfg-core.std"
+local args = std.args(arg)
 local cli = require"cfg-core.cli"
 local lib = require"lib"
 local unistd = require"posix.unistd"
@@ -18,7 +19,7 @@ _ENV = ENV
 while true do
     local handle, wd
     local source, hsource, runenv, opts = cli.opt(arg, version)
-    if std.get_opt"d" then
+    if args["d"] then
         lib.printf("%s\n", "main")
         lib.printf("%s\n", inspect(source))
         lib.printf("%s\n", "handlers")

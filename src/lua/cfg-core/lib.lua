@@ -7,11 +7,8 @@ local stat = require"posix.sys.stat"
 local lib = require"lib"
 local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
-local opt_verbose = std.get_opt"v"
-local opt_test = std.get_opt"t"
-local opt_syslog = std.get_opt"s"
-local _, opt_log_file = std.get_opt"l"
 local cfg = {}
+local args = std.args(arg)
 local _, policy = pcall(require, "cfg-policy")
 _ = nil
 local ENV = {}
@@ -76,7 +73,7 @@ function Lmod.dmsg (C)
         else
             lstr = string.format("[%s]%s%s%s%s%s%s", flag, rs, msg, rs, item, rs, sec)
         end
-        std.log(opt_syslog, opt_log_file, lstr, level)
+        std.log(args["s"], args["l"], lstr, level)
         C.results.msgt[#C.results.msgt + 1] = {
             item = item,
             msg = msg,
@@ -122,7 +119,7 @@ function Lmod.msg (C)
         else
             lstr = string.format("[%s]%s%s%s%s", flag, rs, msg, rs, item)
         end
-        std.log(opt_syslog, opt_log_file, lstr, level)
+        std.log(args["s"], args["l"], lstr, level)
         C.results.msgt[#C.results.msgt + 1] = {
             item = item,
             msg = msg,
@@ -251,7 +248,7 @@ function cfg.init(P, M)
             string.format("stdout:\n%s\n        stderr:\n%s\n", stdout, stderr))
         return ok, rt
     end -- functime()
-    if not (opt_test or opt_verbose) then
+    if not (args["t"] or args["v"]) then
         msg = Lmod.msg(C)
         C.functions.run = function (f, ...)
             local ok, rt = f(...)
@@ -259,7 +256,7 @@ function cfg.init(P, M)
             msg(strings.OPERATION, err, ok)
             return ok, rt
         end -- F.run()
-    elseif opt_test or opt_verbose then
+    elseif args["t"] or args["v"] then
         msg = Lmod.dmsg(C)
         Lmod.ignoredwarn(C) -- Warn for ignored parameters
     end
@@ -269,7 +266,7 @@ function cfg.init(P, M)
             return true, {stdout={}, stderr={}}, true
         end -- F.run()
         C.functions.xrun = functime -- if you must execute something use F.xrun()
-    elseif opt_verbose then
+    elseif args["v"] then
         C.functions.run = functime -- functime() is used when debug=true
     end
     C.functions.msg = msg -- Assign msg to F.msg()

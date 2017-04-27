@@ -3,16 +3,13 @@ local type, pcall, next, setmetatable, load, pairs, ipairs, require =
 local ENV, cli, functions = {_G=_G}, {}, {}
 local string, coroutine, os = string, coroutine, os
 local Factid = require"factid"
-local Pgetopt = require"posix.getopt"
 local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
 local lib = require"lib"
 local tsort = require"tsort"
 local ep_found, policy = pcall(require, "cfg-policy")
 local path = std.path()
-local embed = std.get_opt"e"
-local opt_msg = std.get_opt"m"
-local opt_verbose = std.get_opt"v"
+local args = std.args(arg)
 _G.package.path = "./?.lua;"..path.."/?.lua;"..path.."/?.lua;"..path.."/?"
 _ENV = ENV
 
@@ -42,7 +39,7 @@ function cli.compile(s, env)
     local p, base, _ = lib.decomp_path(s)
     if lib.is_file(s) then
         script = lib.fopen(s)
-    elseif embed then
+    elseif args["e"] then
         script = policy[p][base]
     end
     if not script then
@@ -125,7 +122,7 @@ function cli.main (opts)
         end -- __index = function (_, mod)
     })
 
-    if embed then
+    if args["e"] then
         scripts = std.add_from_embedded(scripts, policy)
     end
     cli.compile(scripts[1], env)
@@ -224,62 +221,57 @@ function cli.main (opts)
     return sorted, hsource, runenv
 end
 
-function cli.opt (arg, version)
-    local short = strings.short_args
-    local long = strings.long_args
-    local help = strings.help
+function cli.opt (version)
     -- Defaults. runs field is always used
     local opts = { runs = 3, _periodic = "300" }
+    if args["f"] then
+        local dir, base, ext = lib.decomp_path(args["f"])
+        opts.script = dir.."/"..base.."."..ext
+    end
+    if args["e"] then
+        if not ep_found then
+            lib.errorf("%s %s\n", strings.ERROR, "Missing embedded policy")
+        end
+        local _, base, ext = lib.decomp_path(args["e"])
+        -- policy["."][base]
+        if not ext then
+            lib.errorf("%s %s\n", strings.ERROR, "Missing .lua extension?")
+        end
+        opts.script = base.."."..ext
+    end
+    if args["m"] then opts.msg = true end
+    if args["v"] then opts.debug = true end
+    if args["t"] then opts.test = true end
+    if args["s"] then opts.syslog = true end
+    if args["r"] then opts.runs = args["r"] or opts._runs end
+    if args["l"] then opts.log = args["l"] end
+    if args["?"] then return lib.errorf("%sUnrecognized option passed\n", strings.ERR) end
+    if args["p"] then opts.periodic = args["p"] or opts._periodic end
+    if args["w"] then opts.watch = true end
     local tags = {}
-    -- optind and li are unused
-    for r, optarg, _, _ in Pgetopt.getopt(arg, short, long) do
-        if r == "f" then
-            local dir, base, ext = lib.decomp_path(optarg)
-            opts.script = dir.."/"..base.."."..ext
-        end
-        if r == "e" then
-            if not ep_found then
-                lib.errorf("%s %s\n", strings.ERROR, "Missing embedded policy")
-            end
-            local _, base, ext = lib.decomp_path(optarg)
-            -- policy["."][base]
-            if not ext then
-                lib.errorf("%s %s\n", strings.ERROR, "Missing .lua extension?")
-            end
-            opts.script = base.."."..ext
-        end
-        if r == "m" then opts.msg = true end
-        if r == "v" then opts.debug = true end
-        if r == "t" then opts.test = true end
-        if r == "s" then opts.syslog = true end
-        if r == "r" then opts.runs = optarg or opts._runs end
-        if r == "l" then opts.log = optarg end
-        if r == "?" then return lib.errorf("%sUnrecognized option passed\n", strings.ERR) end
-        if r == "p" then opts.periodic = optarg or opts._periodic end
-        if r == "w" then opts.watch = true end
-        if r == "g" then
-            for tag in string.gmatch(optarg, "([%w_]+)") do
-                tags[#tags + 1] = tag
-            end
-        end
-        if r == "h" then
-            lib.printf("%s", help)
-            os.exit(0)
-        end
-        if r == "V" then
-            lib.printf("%s\n", version)
-            os.exit(0)
+    if args["g"] then
+        for tag in string.gmatch(args["g"], "([%w_]+)") do
+            tags[#tags + 1] = tag
         end
     end
+    if args["h"] then
+        lib.printf("%s", strings.help)
+        os.exit(0)
+    end
+    if args["V"] then
+        lib.printf("%s\n", version)
+        os.exit(0)
+    end
     if not opts.script then
-        lib.errorf("%s", help)
+        lib.errorf("%s", strings.help)
     end
     if opts.debug then
         lib.printf("Started run %s\n", lib.timestamp())
         lib.printf("Applying policy: %s\n", opts.script)
     end
     local source, hsource, runenv = cli.main(opts) -- arg[index]
-    source.runs, source.tags = opts.runs, tags
+    source.runs = opts.runs
+    source.tags = tags
     return source, hsource, runenv, opts
 end
 
@@ -351,7 +343,7 @@ function cli.try (source, hsource, runenv)
                     tags[notify] = true -- toggle handle "$tag"
                 end
                 -- read the T.results.msg table if debugging is on or the last result failed
-                if (result.failed or opt_msg or opt_verbose) and result.msg then
+                if (result.failed or args["m"] or args["v"]) and result.msg then
                     for ni = 1, #result.msg do
                         lib.warn("%s\n", result.msg[ni])
                     end
@@ -381,7 +373,7 @@ function cli.try (source, hsource, runenv)
                     R.failed = false
                 end -- if repaired
                 R.failed = rh[#rh].failed or false
-                if (rh[#rh].failed or opt_msg or opt_verbose) and rh[#rh].msg then
+                if (rh[#rh].failed or args["m"] or args["v"]) and rh[#rh].msg then
                     for ni = 1, #rh[#rh].msg do
                         lib.warn("%s\n", rh[#rh].msg[ni])
                     end -- for handler messages
