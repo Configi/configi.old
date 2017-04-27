@@ -3,7 +3,7 @@ local ENV, os, string, arg, next, tostring, collectgarbage =
        {}, os, string, arg, next, tostring, collectgarbage
 local version = require"cfg-core.strings".version
 local std = require"cfg-core.std"
-local args = std.args(arg)
+local args = require"cfg-core.args"
 local cli = require"cfg-core.cli"
 local lib = require"lib"
 local unistd = require"posix.unistd"

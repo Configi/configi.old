@@ -4,12 +4,12 @@ local ENV, cli, functions = {_G=_G}, {}, {}
 local string, coroutine, os = string, coroutine, os
 local Factid = require"factid"
 local strings = require"cfg-core.strings"
+local args = require"cfg-core.args"
 local std = require"cfg-core.std"
 local lib = require"lib"
 local tsort = require"tsort"
 local ep_found, policy = pcall(require, "cfg-policy")
 local path = std.path()
-local args = std.args(arg)
 _G.package.path = "./?.lua;"..path.."/?.lua;"..path.."/?.lua;"..path.."/?"
 _ENV = ENV
 
