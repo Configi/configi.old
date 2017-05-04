@@ -115,7 +115,7 @@ local attrib = function(F, P, R)
 end
 
 --- Set path attributes such as the mode, owner or group.
--- @Subject path to file
+-- @Promiser path to file
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
@@ -140,7 +140,7 @@ function file.attributes(S)
 end
 
 --- Create a symlink.
--- @Subject symlink path
+-- @Promiser symlink path
 -- @param src path where the symlink points to [REQUIRED]
 -- @param force remove existing symlink
 -- @usage file.link("/home/ed/root"){
@@ -176,7 +176,7 @@ function file.link(S)
 end
 
 --- Create a hard link.
--- @Subject hard link path
+-- @Promiser hard link path
 -- @param src path where the hard link points to [REQUIRED]
 -- @param force remove existing hard link
 -- @usage file.hard("/home/ed/root"){
@@ -216,7 +216,7 @@ function file.hard(S)
 end
 
 --- Create a directory.
--- @Subject directory path
+-- @Promiser directory path
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
@@ -258,7 +258,7 @@ function file.directory(S)
 end
 
 --- Touch a path.
--- @Subject path
+-- @Promiser path
 -- @param mode set the file mode bits
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
@@ -285,7 +285,7 @@ function file.touch(S)
 end
 
 --- Remove a path.
--- @Subject path
+-- @Promiser path
 -- @usage file.absent("/home/ed/.xinitrc")()
 function file.absent(S)
     M.report = {
@@ -304,7 +304,7 @@ function file.absent(S)
 end
 
 --- Copy a path.
--- @Subject path
+-- @Promiser path
 -- @param path destination path [REQUIRED] [ALIAS: dest,target]
 -- @param recurse recursively copy source [DEFAULT: "no", false]
 -- @param force remove existing destination before copying [DEFAULT: "no", false]

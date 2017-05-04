@@ -18,7 +18,7 @@ M.alias = {}
 M.alias.match = { "module" }
 
 --- Add iptables rules.
--- @Subject tag
+-- @Promiser tag
 -- @param table packet matching table [DEFAULT: filter]
 -- @param chain [DEFAULT: INPUT]
 -- @param source source specification. Default network mask is /32.
@@ -111,7 +111,7 @@ end
 
 --- Disable iptables.
 -- Flush, zero out counters and remove user-defined chains.
--- @Subject tag
+-- @Promiser tag
 -- @param NONE
 -- @usage iptables.disable("comment")()
 function iptables.disable(S)
@@ -165,7 +165,7 @@ function iptables.disable(S)
 end
 
 --- Default deny but allow incoming connections to port 22.
--- @Subject tag
+-- @Promiser tag
 -- @Note IPv4 only at the moment.
 -- @param host IP of the local host [DEFAULT: 0.0.0.0]
 -- @param source IP of host to white list [DEFAULT: 0.0.0.0]

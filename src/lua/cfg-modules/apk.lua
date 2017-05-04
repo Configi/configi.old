@@ -21,7 +21,7 @@ end
 
 --- Install a package
 -- See `apk help` for full description of options and parameters
--- @Subject package
+-- @Promiser package
 -- @Aliases installed
 -- @Aliases install
 -- @param update_cache update cache before adding package [DEFAULT: "no", false]
@@ -48,7 +48,7 @@ function apk.present(S)
 end
 
 --- Remove a package
--- @Subject package
+-- @Promiser package
 -- @Aliases removed
 -- @Aliases remove
 -- @param None

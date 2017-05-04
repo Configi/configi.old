@@ -23,7 +23,7 @@ end
 
 --- Install a package.
 -- See apt-get(8) for full description of options and parameters
--- @Subject package
+-- @Promiser package
 -- @Aliases installed
 -- @Aliases install
 -- @param update_cache Run `apt-get update` before any operation [DEFAULT: false]
@@ -72,7 +72,7 @@ function apt.present(S)
 end
 
 --- Remove a package.
--- @Subject package
+-- @Promiser package
 -- @Aliases removed
 -- @Aliases remove
 -- @param None

@@ -20,7 +20,7 @@ M.alias.make = { "defines" }
 M.alias.environment = { "env" }
 
 --- Install a program via the `configure; make; make install` sequence of commands.
--- @Subject path to directory containing the root of the configure script
+-- @Promiser path to directory containing the root of the configure script
 -- @param configure options to pass to `./configure` [ALIAS: options]
 -- @param make usually DEFINES that it passed to `make` [ALIAS: defines]
 -- @param installs path of installed executable. Considered kept if it exists [ALIAS: creates]

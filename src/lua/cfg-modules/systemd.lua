@@ -13,7 +13,7 @@ _ENV = ENV
 M.required = { "service" }
 
 --- Start a service.
--- @Subject service
+-- @Promiser service
 -- @Aliases present
 -- @param None
 -- @usage systemd.started("rsyncd")()
@@ -38,7 +38,7 @@ function systemd.started(S)
 end
 
 --- Stop a service.
--- @Subject service
+-- @Promiser service
 -- @Aliases absent
 -- @param None
 -- @usage systemd.stopped("rsyncd")()
@@ -63,7 +63,7 @@ function systemd.stopped(S)
 end
 
 --- Restart a service.
--- @Subject service
+-- @Promiser service
 -- @Note skips restart if service is not yet active.
 -- @param None
 -- @usage systemd.restart("rsyncd")()
@@ -88,7 +88,7 @@ function systemd.restart(S)
 end
 
 --- Reload a service.
--- @Subject service
+-- @Promiser service
 -- @param None
 -- @usage systemd.reload("sshd")()
 function systemd.reload(S)
@@ -112,7 +112,7 @@ function systemd.reload(S)
 end
 
 --- Enable a service.
--- @Subject service
+-- @Promiser service
 -- @param None
 -- @usage systemd.enabled("rsyncd")()
 function systemd.enabled(S)
@@ -136,7 +136,7 @@ function systemd.enabled(S)
 end
 
 --- Disable a service.
--- @Subject service
+-- @Promiser service
 -- @param None
 -- @usage systemd.disabled("rsyncd")()
 function systemd.disabled(S)

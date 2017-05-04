@@ -17,7 +17,7 @@ M.alias.hash = { "digest", "signature" }
 
 --- Check that a given hash matches the actual SHA256 hash of a file.
 -- Useful for alerting on changed hashes.
--- @Subject path of file to hash
+-- @Promiser path of file to hash
 -- @Aliases check
 -- @param hash the 32-byte alphanumeric string to match for [ALIAS: digest, signature] [REQUIRED]
 -- @usage sha256.verify("/etc/passwd"){

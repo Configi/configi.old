@@ -30,7 +30,7 @@ end
 
 --- Add custom repository.
 -- See yum-config-manager(1).
--- @Subject Location (file or URL) of the repository
+-- @Promiser Location (file or URL) of the repository
 -- @param None
 -- @usage yum.add_repo("http://openresty.org/yum/centos/OpenResty.repo")
 function yum.add_repo(S)
@@ -57,7 +57,7 @@ end
 
 --- Run clean mode.
 -- See yum(8) for possible options.
--- @Subject option to pass to `yum clean`
+-- @Promiser option to pass to `yum clean`
 -- @param None
 -- @usage yum.clean("all")!
 function yum.clean(S)
@@ -77,7 +77,7 @@ end
 
 --- Install a package via the Yum package manager.
 -- See yum(8) for full description of options and parameters
--- @Subject package
+-- @Promiser package
 -- @Aliases installed
 -- @Aliases install
 -- @param cleanall run `yum clean all` before proceeding [CHOICES: "yes", "no"]
@@ -151,7 +151,7 @@ function yum.present(S)
 end
 
 --- Remove a package via the Yum package manager.
--- @Subject package
+-- @Promiser package
 -- @Aliases removed
 -- @Aliases remove
 -- @param config yum config file location

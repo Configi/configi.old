@@ -65,7 +65,7 @@ local rc = function(F, P)
 end
 
 --- Run a command via execve(3).
--- @Subject command to execute
+-- @Promiser command to execute
 -- @param cwd current working directory
 -- @param env space separated environment variables
 -- @param creates a filename, if found will not run the command
@@ -113,7 +113,7 @@ end
 --- Run a script or command via os.execute.
 -- <br />
 -- STDIN and STDERR are closed and STDOUT is piped to /dev/null
--- @Subject script or command to execute
+-- @Promiser script or command to execute
 -- @Aliases script
 -- @param creates a filename, if found will not run the script
 -- @param removes a filename, if not found will not run the script
@@ -144,7 +144,7 @@ function shell.system(S)
 end
 
 --- Run a command via io.popen.
--- @Subject command to execute
+-- @Promiser command to execute
 -- @param cwd current working directory
 -- @param creates a filename, if found will not run the command
 -- @param removes a filename, if not found will not run the command
@@ -203,7 +203,7 @@ function shell.popen(S)
 end
 
 --- Run a command via lib.exec which can expect strings from STDIN, STDOUT or STDERR
--- @Subject command to execute
+-- @Promiser command to execute
 -- @param cwd current working directory
 -- @param env space separated string of environment variables
 -- @param creates a filename, if found will not run the command

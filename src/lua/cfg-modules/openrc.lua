@@ -17,7 +17,7 @@ _ENV = ENV
 M.required = { "service" }
 
 --- Start a service.
--- @Subject service
+-- @Promiser service
 -- @Aliases present
 -- @param None
 -- @usage openrc.started("rsyncd")()
@@ -45,7 +45,7 @@ function openrc.started(S)
 end
 
 --- Stop a service.
--- @Subject service
+-- @Promiser service
 -- @Aliases absent
 -- @param None
 -- @usage openrc.stopped("rsyncd")()
@@ -73,7 +73,7 @@ function openrc.stopped(S)
 end
 
 --- Restart a service.
--- @Subject service
+-- @Promiser service
 -- @param None
 -- @usage openrc.restart("rsyncd")()
 function openrc.restart(S)
@@ -96,7 +96,7 @@ function openrc.restart(S)
 end
 
 --- Reload a service.
--- @Subject service
+-- @Promiser service
 -- @param None
 -- @usage openrc.reload("sshd")()
 function openrc.reload(S)
@@ -119,7 +119,7 @@ function openrc.reload(S)
 end
 
 --- Add a service to runlevel.
--- @Subject service
+-- @Promiser service
 -- @param runlevel runlevel to add to [REQUIRED] [DEFAULT: default]
 -- @usage openrc.add("rsyncd"){
 --     runlevel = "default"
@@ -152,7 +152,7 @@ function openrc.add(S)
 end
 
 --- Remove a service from a runlevel.
--- @Subject service
+-- @Promiser service
 -- @Aliases del
 -- @param runlevel runlevel to remove from [REQUIRED] [DEFAULT: default]
 -- @usage openrc.delete("rsyncd"){

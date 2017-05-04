@@ -71,7 +71,7 @@ end
 -- <br />
 -- All matching base64 encoded keys are removed first before adding the specificied key.
 -- See the AUTHORIZED_KEYS FILE FORMAT section in sshd(8)
--- @Subject base64 encoded key
+-- @Promiser base64 encoded key
 -- @Note this note
 -- @param user user to operate on [ALIAS: login] [DEFAULT: Effective user ID]
 -- @param id a string usually used to comment or identify a key
@@ -127,7 +127,7 @@ function authorized_keys.present(S)
 end
 
 --- Remove key from a user's authorized_keys file.
--- @Subject base64 encoded key
+-- @Promiser base64 encoded key
 -- @param user user to operate on
 -- [ALIAS: login] [DEFAULT: Effective user ID]
 -- @param type SSH key type

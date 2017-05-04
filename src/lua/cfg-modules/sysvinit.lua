@@ -23,7 +23,7 @@ local pgrep = function(service)
 end
 
 --- Start a service.
--- @Subject service
+-- @Promiser service
 -- @Aliases present
 -- @param None
 -- @usage sysvinit.started("ntpd")()
@@ -45,7 +45,7 @@ function sysvinit.started(S)
 end
 
 --- Stop a service.
--- @Subject service
+-- @Promiser service
 -- @Aliases absent
 -- @param None
 -- @usage sysvinit.stopped("telnetd")()
@@ -67,7 +67,7 @@ function sysvinit.stopped(S)
 end
 
 --- Restart a service.
--- @Subject service
+-- @Promiser service
 -- @param None
 -- @usage sysvinit.restart("ntpd")()
 function sysvinit.restart(S)
@@ -90,7 +90,7 @@ function sysvinit.restart(S)
 end
 
 --- Reload a service.
--- @Subject service
+-- @Promiser service
 -- @Note OpenWRT sysvinit can not detect reload failures
 -- @param None
 -- @usage sysvinit.reload("ntpd")()
@@ -114,7 +114,7 @@ function sysvinit.reload(S)
 end
 
 --- Enable a service
--- @Subject service
+-- @Promiser service
 -- @param None
 -- @usage sysvinit.enabled("ntpd")()
 function sysvinit.enabled(S)
@@ -138,7 +138,7 @@ function sysvinit.enabled(S)
 end
 
 --- Disable a service.
--- @Subject service
+-- @Promiser service
 -- @param None
 -- @usage sysvinit.disabled("ntpd")()
 function sysvinit.disabled(S)

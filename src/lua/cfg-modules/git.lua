@@ -32,7 +32,7 @@ local found = function(P)
 end
 
 --- Ensure that a repository is cloned into a specified path.
--- @Subject path where to clone the repository
+-- @Promiser path where to clone the repository
 -- @Aliases repo
 -- @Aliases cloned
 -- @param repository The URL of the repository. [ALIAS: url,repo] [REQUIRED]
@@ -72,7 +72,7 @@ end
 
 --- Run `git pull` for a repository.
 -- This always attempts to run the command. Useful as a handler.
--- @Subject path where to clone the repository
+-- @Promiser path where to clone the repository
 -- @param repository The URL of the repository. [ALIAS: url,repo] [REQUIRED]
 -- @usage git.pull("/home/user/work"){
 --     repo = "https://github.com/torvalds/linux.git"

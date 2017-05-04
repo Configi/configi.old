@@ -52,7 +52,7 @@ end
 
 --- Send a signal to a specified process.
 -- Note: Can only be used as a handler.
--- @Subject Handler name (string)
+-- @Promiser Handler name (string)
 -- @param signal signal to send eg. "SIGHUP"
 -- @param exe the /proc/$pid/exe symlink
 -- @param cmdline the string in /proc/$pid/cmdline
@@ -99,7 +99,7 @@ end
 
 --- Check if a specified process is running.
 -- You can pinpoint a process by also specifying the cmdline and name parameters.
--- @Subject executable where /proc/$pid/exe points to
+-- @Promiser executable where /proc/$pid/exe points to
 -- @param cmdline string from /proc/$pid/cmdline
 -- @param name Name field in /proc/$pid/status
 -- @usage process.running("/usr/bin/rsyncd"){

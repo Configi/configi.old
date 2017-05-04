@@ -47,7 +47,7 @@ local write = function(F, P)
 end
 
 --- Render a template.
--- @Subject output file
+-- @Promiser output file
 -- @Note Requires the diffutils package for the diff parameter to work
 -- @param src source template [REQUIRED] [ALIAS: template]
 -- @param table [REQUIRED] [ALIAS: view]

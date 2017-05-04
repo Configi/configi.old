@@ -23,7 +23,7 @@ end
 -- See `opkg --help`
 -- @Aliases installed
 -- @Aliases install
--- @Subject package
+-- @Promiser package
 -- @param force_depends install despite failed dependencies [Default: false]
 -- @param force_reinstall reinstall package [Default: false]
 -- @param force_overwrite overwrite files from other packages [Default: false]
@@ -81,7 +81,7 @@ function opkg.present(S)
 end
 
 --- Uninstall a package.
--- @Subject package
+-- @Promiser package
 -- @Aliases removed
 -- @Aliases remove
 -- @param force_depends remove despite failed dependencies

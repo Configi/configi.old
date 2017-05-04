@@ -23,7 +23,7 @@ end
 -- See `luarocks --help`
 -- @Aliases installed
 -- @Aliases install
--- @Subject rock
+-- @Promiser rock
 -- @usage luarocks.present("luacheck")()
 function luarocks.present(S)
     M.parameters = { "proxy" }
@@ -47,7 +47,7 @@ function luarocks.present(S)
 end
 
 --- Uninstall a rock.
--- @Subject rock
+-- @Promiser rock
 -- @Aliases removed
 -- @Aliases remove
 -- @usage luarocks.absent("luarocks")()

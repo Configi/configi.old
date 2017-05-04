@@ -15,7 +15,7 @@ _ENV = ENV
 M.required = { "login" }
 
 --- Add a system user account.
--- @Subject username
+-- @Promiser username
 -- @Aliases add
 -- @Note On OpenWRT: requires the shadow-useradd package
 -- @Note This module can only check attributes returned by posix.getpasswd.
@@ -120,7 +120,7 @@ function user.present(S)
 end
 
 --- Remove a system user account.
--- @Subject username
+-- @Promiser username
 -- @Aliases remove
 -- @param remove delete home directory [DEFAULT: false]
 -- @usage user.absent("ed"){

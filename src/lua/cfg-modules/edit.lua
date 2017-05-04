@@ -45,7 +45,7 @@ local write = function(F, P)
 end
 
 --- Insert lines into an existing file.
--- @Subject path of text file to modify
+-- @Promiser path of text file to modify
 -- @param line to insert [REQUIRED] [ALIAS: content]
 -- @param inserts a line (string) if found, skips the operation
 -- @param pattern line is added before or after this pattern [ALIAS: match]
@@ -120,7 +120,7 @@ function edit.insert_line(S)
 end
 
 --- Remove lines from an existing file.
--- @Subject path of text file to modify
+-- @Promiser path of text file to modify
 -- @param pattern text pattern to remove [REQUIRED] [ALIAS: match]
 -- @param plain turn on or off pattern matching facilities [DEFAULT: "yes"]
 -- @usage edit.remove_line("/etc/sysctl.conf"){

@@ -32,7 +32,7 @@ local extension = function(filename)
 end
 
 --- Unpack a tar, zip or rar archive.
--- @Subject path of archive
+-- @Promiser path of archive
 -- @Aliases untar
 -- @Aliases unzip
 -- @Aliases unrar

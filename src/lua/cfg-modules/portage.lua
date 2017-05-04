@@ -68,7 +68,7 @@ end
 
 --- Install package atom.
 --- See emerge(1).
--- @Subject package atom. Can be "category/package" or "category/package-version"
+-- @Promiser package atom. Can be "category/package" or "category/package-version"
 -- @Aliases installed
 -- @Aliases install
 -- @param version package version
@@ -141,7 +141,7 @@ function portage.present(S)
 end
 
 --- Remove package atom.
--- @Subject package atom. Can be "category/package" or "category/package-version"
+-- @Promiser package atom. Can be "category/package" or "category/package-version"
 -- @Aliases remove
 -- @param atom package atom to unmerge [REQUIRED] [ALIAS: package]
 -- @param depclean Remove packages not associated with explicitly installed packages [DEFAULT: false]

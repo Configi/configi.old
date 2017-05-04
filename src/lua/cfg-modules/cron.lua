@@ -74,7 +74,7 @@ end
 --- Add a job to a user's crontab. <br />
 -- Cron jobs that does not match its tag are replaced. <br />
 -- See crontab(5)
--- @Subject tag to track jobs
+-- @Promiser tag to track jobs
 -- @param job the command or job to add [REQUIRED]
 -- @param user user login to operate on [DEFAULT: "root"]
 -- @param minute minute value [DEFAULT: "*"]
@@ -120,7 +120,7 @@ function cron.present(S)
 end
 
 --- Remove a job from a user's crontab.
--- @Subject tag to track jobs
+-- @Promiser tag to track jobs
 -- @param job the command or job string [REQUIRED]
 -- @param user user login to operate on [DEFAULT: "root"]
 -- @usage cron.absent("example"){
