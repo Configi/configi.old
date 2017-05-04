@@ -444,12 +444,9 @@ end
 -- @tparam string s string to evaluate
 -- @treturn bool the boolean true if the string matches, nil otherwise
 local truthy = function (s)
-    if s == "yes" or
-         s == "YES" or
-         s == "true" or
-         s == "True" or
-         s == "TRUE" then
-         return true
+    s = string.lower(s)
+    if s == "yes" or s == "true" or s == "on" then
+        return true
     end
 end
 
@@ -457,12 +454,9 @@ end
 -- @tparam string s string to evaluate
 -- @treturn bool the boolean true if the string matches, nil otherwise
 local falsy = function (s)
-    if s == "no" or
-         s == "NO" or
-         s == "false" or
-         s == "False" or
-         s == "FALSE" then
-         return true
+    s = string.lower(s)
+    if s == "no" or s == "false" or s == "off" then
+        return true
     end
 end
 
