@@ -90,33 +90,33 @@ function cli.main (opts)
         __index = function (_, mod)
             local tbl = setmetatable({}, {
                 __index = function (_, func)
-                    return function (subject)
+                    return function (promiser)
                         return function (ptbl) -- mod.func
                             ptbl = ptbl or {}
                             local tag = ptbl.handle
                             local rs = string.char(9)
-                            local is_string = (type(subject) == "string")
+                            local is_string = (type(promiser) == "string")
                             if not is_string then
                                 lib.warn("%sIgnoring promise. Nil value passed to %s.%s()\n",
                                     strings.WARN, mod, func)
                             end
                             if (ptbl.context == true or (ptbl.context == nil)) and is_string then
                                 if not ptbl.handle then
-                                    source[#source + 1] = { res = mod..rs..func..rs..subject,
-                                        mod = mod, func = func, subject = subject, param = ptbl }
+                                    source[#source + 1] = { res = mod..rs..func..rs..promiser,
+                                        mod = mod, func = func, promiser = promiser, param = ptbl }
                                 else
                                     if hsource[tag] and (#hsource[tag] > 0) then
                                         hsource[tag][#hsource[tag] + 1] =
-                                        { mod = mod, func = func, subject = subject, param = ptbl }
+                                        { mod = mod, func = func, promiser = promiser, param = ptbl }
                                     else
                                         hsource[tag] = {}
                                         hsource[tag][#hsource[tag] + 1] =
-                                        { mod = mod, func = func, subject = subject, param = ptbl }
+                                        { mod = mod, func = func, promiser = promiser, param = ptbl }
                                     end
                                 end
                             end -- context
                         end -- mod.func
-                    end -- function (subject)
+                    end -- function (promiser)
                 end }) -- __index = function (_, func)
             return tbl
         end -- __index = function (_, mod)
@@ -285,32 +285,32 @@ function cli.run (source, runenv) -- execution step
             -- auto-load the module
             runenv[s.mod] = functions.module(s.mod)
         end
-        local mod, func, subject, param = runenv[s.mod], s.func, s.subject, s.param
+        local mod, func, promiser, param = runenv[s.mod], s.func, s.promiser, s.param
         if not mod[func] then
            lib.errorf("%sfunction '%s' in module '%s' not found\n", strings.MERR, func, mod)
         end
-        rt[i] = mod[func](subject)(param)
+        rt[i] = mod[func](promiser)(param)
     end -- for each line
     return rt
 end
 
 function cli.hrun (tags, hsource, runenv) -- execution step for handlers
     for tag, _ in next, tags do
-        local r, mod, func, subject, param = {}
+        local r, mod, func, promiser, param = {}
         if hsource[tag] then
             for n = 1, #hsource[tag] do
                 if runenv[hsource[tag][n].mod] == nil then
                     -- auto-load the module
                     runenv[hsource[tag][n].mod] = functions.module(hsource[tag][n].mod)
                 end
-                mod, func, subject, param = runenv[hsource[tag][n].mod],
+                mod, func, promiser, param = runenv[hsource[tag][n].mod],
                     hsource[tag][n].func,
-                    hsource[tag][n].subject,
+                    hsource[tag][n].promiser,
                     hsource[tag][n].param
                 if not mod[func] then
                     lib.errorf("%sfunction '%s' in module '%s' not found\n", strings.MERR, func, mod)
                 end
-                r[n] = mod[func](subject)(param)
+                r[n] = mod[func](promiser)(param)
                 coroutine.yield(r)
             end -- for each tag
         end -- if a tag
