@@ -444,7 +444,8 @@ end
 -- @tparam string s string to evaluate
 -- @treturn bool the boolean true if the string matches, nil otherwise
 local truthy = function (s)
-    s = string.lower(s)
+    local _
+    _, s = pcall(string.lower, s)
     if s == "yes" or s == "true" or s == "on" then
         return true
     end
@@ -454,7 +455,8 @@ end
 -- @tparam string s string to evaluate
 -- @treturn bool the boolean true if the string matches, nil otherwise
 local falsy = function (s)
-    s = string.lower(s)
+    local _
+    _, s = pcall(string.lower, s)
     if s == "no" or s == "false" or s == "off" then
         return true
     end
