@@ -1,5 +1,5 @@
-local type, pcall, next, setmetatable, load, pairs, ipairs, require =
-      type, pcall, next, setmetatable, load, pairs, ipairs, require
+local rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require =
+      rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require
 local ENV, cli, functions = {_G=_G}, {}, {}
 local string, coroutine, os = string, coroutine, os
 local Factid = require"factid"
@@ -88,6 +88,10 @@ function cli.main (opts)
     -- Metatable for the script environment
     setmetatable(env, {
         __index = function (_, mod)
+            local null
+            if rawget(env, mod) == nil then
+                null = mod
+            end
             local tbl = setmetatable({}, {
                 __index = function (_, func)
                     return function (promiser)
@@ -97,8 +101,8 @@ function cli.main (opts)
                             local rs = string.char(9)
                             local is_string = (type(promiser) == "string")
                             if not is_string then
-                                lib.warn("%sIgnoring promise. Nil value passed to %s.%s()\n",
-                                    strings.WARN, mod, func)
+                                lib.warn("%sIgnoring promise. \"%s\" is not set, passed to %s.%s()\n",
+                                    strings.WARN, null, mod, func)
                             end
                             if (ptbl.context == true or (ptbl.context == nil)) and is_string then
                                 if not ptbl.handle then
