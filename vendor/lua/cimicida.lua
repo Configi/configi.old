@@ -243,13 +243,12 @@ local file_to_tbl = function (file)
     end
 end
 
---- Find a string in a table value.
--- string is a plain string not a pattern
+--- Find table (sequence) index where a given string is the value.
 -- @tparam table tbl properly sequenced table to traverse
 -- @tparam string str string or pattern to look for
--- @tparam bool plain set to true if true, turns of pattern matching facilities
+-- @tparam bool plain set to true if true, turns off pattern matching facilities
 -- @treturn number the matching index if string is found, nil otherwise
-local find_in_tbl = function (tbl, str, plain)
+local find_in_seq = function (tbl, str, plain)
     plain = plain or nil
     local ok, found
     for n = 1, #tbl do
@@ -784,7 +783,7 @@ return {
     escape_pattern = escape_pattern,
     filter_tbl_value = filter_tbl_value,
     file_to_tbl = file_to_tbl,
-    find_in_tbl = find_in_tbl,
+    find_in_seq = find_in_seq,
     shallow_cp = shallow_cp,
     clone = clone,
     split_path = split_path,
