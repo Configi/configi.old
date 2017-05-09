@@ -532,7 +532,6 @@ lib.pipeline = pipeline
 -- @usage cmd["/bin/ls"]{ "/tmp" }
 -- @usage cmd.ls{"/tmp"}
 -- @usage cmd["-/bin/ls"]{ "/tmp" }
-
 lib.cmd = setmetatable({}, { __index =
     function (_, key)
         local exec, bin
