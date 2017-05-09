@@ -511,13 +511,13 @@ end
 
 --- Get effective username.
 -- @treturn string username
-function lib.ename ()
+function lib.effective_username ()
     return pwd.getpwuid(unistd.geteuid()).pw_name
 end
 
 --- Get real username.
 -- @treturn string username
-function lib.rname ()
+function lib.real_username ()
     return pwd.getpwuid(unistd.getuid()).pw_name
 end
 
