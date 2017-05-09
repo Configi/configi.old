@@ -569,7 +569,7 @@ lib.basename = libgen.basename
 lib.dirname = libgen.dirname
 
 --- Split a file name.
--- @tparam string str policy name
+-- @tparam string str path name
 -- @treturn string path Directory component
 -- @treturn string base Basename minus the extension
 -- @treturn string ext The extension
