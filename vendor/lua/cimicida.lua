@@ -320,7 +320,7 @@ local split_path = function (path)
 end
 
 
---- Check if a path is a file or not.
+--- Test if file can be opened.
 -- @tparam string file path to the file
 -- @return true if path is a file, nil otherwise
 local test_open = function (file)
