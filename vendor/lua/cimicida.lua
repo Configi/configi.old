@@ -164,7 +164,7 @@ end
 
 --- Split alphanumeric matches of a string into table values.
 -- @tparam string str string to convert
--- @treturn table a new
+-- @treturn table a new table
 local word_to_tbl = function (str)
     local t = {}
     for s in string.gmatch(str, "%w+") do
