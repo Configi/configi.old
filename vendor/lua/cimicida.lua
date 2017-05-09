@@ -123,7 +123,7 @@ local timestamp = function ()
 end
 
 --- Check if a table has an specified string.
--- @warning does not check if value is a string
+-- @Warning does not check if value is a string
 -- @tparam table tbl table to search
 -- @tparam string str plain string or pattern to look for in tbl
 -- @tparam bool plain if true, turns off pattern matching facilities
@@ -137,7 +137,7 @@ end
 
 --- Convert a sequence into a dictionary.
 -- Sequence values are converted into field names.
--- @warning Does not check if input table is a sequence.
+-- @Warning Does not check if input table is a sequence.
 -- @tparam table tbl the properly sequenced table to convert
 -- @param def default value for each field in the record. Should not be nil
 -- @treturn table the converted table
@@ -469,7 +469,7 @@ end
 -- 3. STDIN is closed<br/>
 -- 4. Copy STDERR to STDOUT<br/>
 -- 5. Finally replace the shell with the command
--- @warning The command has a script preamble
+-- @Warning The command has a script preamble
 -- @tparam string str command to popen(3)
 -- @tparam string cwd current working directory
 -- @tparam bool _ignore_error boolean setting to ignore errors
