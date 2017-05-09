@@ -276,11 +276,11 @@ local shallow_cp = function (tbl)
     return copy
 end
 
+local clone
 --- Clone a table.
 -- From <http://stackoverflow.com/questions/640642/how-do-you-copy-a-lua-table-by-value/16077650#16077650>
 -- @tparam table tbl table to be cloned
 -- @treturn table a new table
-local clone
 clone = function(tbl, seen)
     seen = seen or {}
     if tbl == nil then
@@ -693,9 +693,6 @@ local return_if_not = function (bool, value)
     end
 end
 
---- Set up a table so that missing keys are created automatically as autotables.
--- From Luapower/glue
--- @return a new table with automatic keys
 local autotable
 local auto_meta = {
     __index = function(t, k)
@@ -703,6 +700,9 @@ local auto_meta = {
         return t[k]
     end
 }
+--- Set up a table so that missing keys are created automatically as autotables.
+-- From Luapower/glue
+-- @return a new table with automatic keys
 autotable = function(t)
     t = t or {}
     local meta = getmetatable(t)
