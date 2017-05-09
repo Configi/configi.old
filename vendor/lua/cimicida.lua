@@ -123,6 +123,7 @@ local timestamp = function ()
 end
 
 --- Check if a table has an specified string.
+-- @warning does not check if value is a string
 -- @tparam table tbl table to search
 -- @tparam string str plain string or pattern to look for in tbl
 -- @tparam bool plain if true, turns off pattern matching facilities
