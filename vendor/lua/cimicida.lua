@@ -684,7 +684,7 @@ local return_if = function (bool, value)
 end
 
 --- Return the second argument if the first argument is nil or false.
--- @param bool value to evaluate
+-- @tparam bool value to evaluate
 -- @param value value to return if first argument evaluates to nil or false
 -- @return value if first argument evaluates to nil or false
 local return_if_not = function (bool, value)
