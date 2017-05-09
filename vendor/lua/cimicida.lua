@@ -702,6 +702,7 @@ local auto_meta = {
 }
 --- Set up a table so that missing keys are created automatically as autotables.
 -- From Luapower/glue
+-- @tparam table t optional table to apply autotable mechanism on
 -- @return a new table with automatic keys
 autotable = function(t)
     t = t or {}
