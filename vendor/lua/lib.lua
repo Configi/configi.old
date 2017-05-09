@@ -1,7 +1,7 @@
 --- Configi standard library.
 -- Lua extensions and some unix utilities.
 -- Depends on cimicida and Luaposix.
---     VENDOR_LUA= cimicida
+--     VENDOR= lib
 --     VENDOR_C= posix
 -- @module lib
 
