@@ -1,5 +1,4 @@
-.PHONY: default
-default: release
+.DEFAULT_GOAL: release
 EXE:= cfg-agent
 SRC:=
 SRC_DIR:= cfg-modules cfg-core
@@ -12,7 +11,7 @@ HOST_CC= cc
 CROSS=
 CROSS_CC=
 CCOPT= -Os -mtune=generic -mmmx -msse -msse2 -fomit-frame-pointer -pipe
-CFLAGS+= -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables
+CFLAGS+= -std=c99 -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables
 LDFLAGS= -Wl,--gc-sections -Wl,--strip-all -Wl,--relax -Wl,--sort-common
 luaDEFINES:= -DLUA_COMPAT_BITLIB -DLUA_USE_POSIX
 TARGET_CCOPT= $(CCOPT)
