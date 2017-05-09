@@ -59,6 +59,10 @@ ifneq ($(VENDOR_C),)
   include $(eval _d:=vendor/c/$(VENDOR_C) $(_d)) $(call _vget,$(VENDOR_C))
 endif
 
+ifneq ($(COMPILED),)
+  include lib/moonscript.mk
+endif
+
 print-%: ; @echo $*=$($*)
 
 vprint-%:
