@@ -41,7 +41,7 @@ local try_f = function(finalizer)
    end
 end
 
---- ADA-style case insensitive calls to modules with lower case functions.
+--- Ada-style case insensitive calls to modules with lower case functions.
 -- @tparam string module name
 -- @treturn table module functions
 local xrequire = function(m)
@@ -763,7 +763,7 @@ end
 return {
     pcall_f = pcall_f,
     try_f = try_f,
-    require = xrequire,
+    xrequire = xrequire,
     printf = printf,
     fprintf = fprintf,
     errorf = errorf,
