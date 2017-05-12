@@ -109,10 +109,13 @@ ifeq ($(HAVE_FCNTL_CLOSEM), true)
 endif
 
 ifeq ($(or $(MAKECMDGOALS),$(.DEFAULT_GOAL)), development)
-  CCWARN:= -Wall -Wextra -Wredundant-decls -Wshadow -Wpointer-arith
+  CCWARN:= -Wall -Wextra -Wredundant-decls -Wshadow -Wpointer-arith -Werror=implicit-function-declaration
   TARGET_CFLAGS:= -O0 -fno-omit-frame-pointer -ggdb
   CFLAGS:= -O0 -fno-omit-frame-pointer -ggdb
   ifeq ($(shell $(CONFIGURE_P)/test-gcc48.sh $(CC)), true)
+	CFLAGS+= -fsanitize=address
+  endif
+  ifeq ($(IS_CC), CLANG)
 	CFLAGS+= -fsanitize=address
   endif
   TARGET_CCOPT:= $(NULSTRING)
