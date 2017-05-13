@@ -104,7 +104,7 @@ function cron.present(S)
         if R.kept then
             return F.kept(P.name)
         end
-        P:set_if_not("user", lib.ename())
+        P:set_if_not("user", lib.effective_username())
         local jobs = list(P)
         P.cronjob = genjob(P) -- Replace P.job with prepended scheduling info. This is used by listed()
         local islisted = listed(P)
@@ -140,7 +140,7 @@ function cron.absent(S)
         if R.kept then
             return F.kept(P.name)
         end
-        P:set_if_not("user", lib.ename())
+        P:set_if_not("user", lib.effective_username())
         local jobs = list(P)
         if not next(jobs) or not listed(P) then
             return F.kept(P.name)

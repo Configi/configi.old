@@ -22,7 +22,7 @@ M.alias.user = { "login" }
 
 local keyfile = function(P)
     local user, file, dir
-    P:set_if_not("user", lib.ename())
+    P:set_if_not("user", lib.effective_username())
     if fact.osfamily == "openwrt" then
         file = "/etc/dropbear/authorized_keys"
         dir = "/etc/dropbear"
