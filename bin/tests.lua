@@ -96,11 +96,28 @@ T:start"directory structure test/core-structure"
             local m1, m2 = string.match(t, "^(Joe spends 6)\n(\n)")
             T:eq(m1, "Joe spends 6")
             T:eq(m2, "\n")
+            T:yes(stat.stat"test/tmp/core-structure-role-copy")
+            T:yes(stat.stat"test/tmp/core-structure-override-role-copy")
+            t = lib.fopen("test/tmp/core-structure-override-role-copy")
+            m1 = string.match(t, "^(1)")
+            T:eq(m1, "1")
+            T:yes(stat.stat"test/tmp/core-structure-role-template")
+            t = lib.fopen("test/tmp/core-structure-role-template")
+            m1 = string.match(t, "^(Joe spends 6)")
+            T:eq(m1, "Joe spends 6")
+            T:yes(stat.stat"test/tmp/core-structure-override-role-template")
+            t = lib.fopen("test/tmp/core-structure-override-role-template")
+            m1 = string.match(t, "^(1 Joe spends 6)")
+            T:eq(m1, "1 Joe spends 6")
             cmd.rm{"test/tmp/core-structure-attributes"}
             cmd.rm{"test/tmp/core-structure-policies"}
             cmd.rm{"test/tmp/core-structure-handlers"}
             cmd.rm{"test/tmp/copied-under-files"}
             cmd.rm{"test/tmp/template_render_test.txt"}
+            cmd.rm{"test/tmp/core-structure-override-role-template"}
+            cmd.rm{"test/tmp/core-structure-override-role-copy"}
+            cmd.rm{"test/tmp/core-structure-role-template"}
+            cmd.rm{"test/tmp/core-structure-role-copy"}
         end
         st("test/core-structure/test.lua")
     end

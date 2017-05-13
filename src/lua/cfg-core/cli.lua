@@ -1,6 +1,6 @@
 local rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require =
       rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require
-local ENV, cli, functions = {_G=_G}, {}, {}
+local ENV, cli, functions = {_G=_G, package=package}, {}, {}
 local string, coroutine, os = string, coroutine, os
 local Factid = require"factid"
 local strings = require"cfg-core.strings"
@@ -133,10 +133,12 @@ function cli.main (opts)
     -- We should only populate roles.
     source, hsource = {}, {}
     scripts = std.add_from_dirs(scripts, path)
-    for _, role in ipairs(roles) do
-        scripts = std.add_from_role(scripts, path, role)
+    if #roles > 0 then
+        for _, role in ipairs(roles) do
+            scripts = std.add_from_role(scripts, path, role)
+            package.loaded["cfg-core.roles"] = roles
+        end
     end
-
     -- scripts queue
     local i, temp, htemp = 0
     while next(scripts) do

@@ -5,10 +5,11 @@
 -- @added 0.9.0
 
 local ENV, M, template = {}, {}, {}
-local io, tonumber, table, os, string, require =
-      io, tonumber, table, os, string, require
+local ipairs, io, tonumber, table, os, string, require =
+      ipairs, io, tonumber, table, os, string, require
 local cfg = require"cfg-core.lib"
 local std = require"cfg-core.std"
+local roles = require"cfg-core.roles"
 local lib = require"lib"
 local crc = require"crc32"
 local stat = require"posix.sys.stat"
@@ -69,11 +70,20 @@ function template.render(S)
     }
     return function(P)
         P.path = S
-        local from_templates = std.path().."/templates/"..P.src
+        local F, R = cfg.init(P, M)
+        local ppath = std.path()
+        local from_templates = ppath.."/templates/"..P.src
         if stat.stat(from_templates) then
             P.src = from_templates
+        elseif #roles > 0 then
+            for _, r in ipairs(roles) do
+                from_templates = ppath.."/roles/"..r.."/templates/"..P.src
+                if stat.stat(from_templates) then
+                    P.src = from_templates
+                    break
+                end
+            end
         end
-        local F, R = cfg.init(P, M)
         if R.kept then
             return F.kept(P.path)
         end

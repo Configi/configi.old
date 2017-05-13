@@ -5,9 +5,10 @@
 -- @added 0.9.0
 
 local ENV, M, file = {}, {}, {}
-local tostring, os, string = tostring, os, string
+local ipairs, tostring, os, string = ipairs, tostring, os, string
 local cfg = require"cfg-core.lib"
 local std = require"cfg-core.std"
+local roles = require"cfg-core.roles"
 local lib = require"lib"
 local cmd = lib.cmd
 local stat = require"posix.sys.stat"
@@ -321,9 +322,18 @@ function file.copy(S)
     }
     return function(P)
         P.src = S
-        local from_files = std.path().."/files/"..S
+        local ppath = std.path()
+        local from_files = ppath.."/files/"..S
         if stat.stat(from_files) then
             P.src = from_files
+        elseif #roles > 0 then
+            for _, r in ipairs(roles) do
+                from_files = ppath.."/roles/"..r.."/files/"..S
+                if stat.stat(from_files) then
+                    P.src = from_files
+                    break
+                end
+            end
         end
         local F, R = cfg.init(P, M)
         if R.kept then
