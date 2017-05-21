@@ -2,11 +2,11 @@ local lib = require"lib"
 local dirent = require"posix.dirent"
 local syslog = require"posix.syslog"
 local strings = require"cfg-core.strings"
-local getopt = require"posix.getopt"
+local unistd = require"posix.unistd"
 
 local Path = function()
     local path = "."
-    for r, optarg, _, _ in getopt.getopt(arg, strings.short_args, strings.long_args) do
+    for r, optarg, _, _ in unistd.getopt(arg, strings.short_args) do
         if r == "f" then
             path, _, _ = lib.decomp_path(optarg)
             break
