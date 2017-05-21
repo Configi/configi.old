@@ -41,6 +41,7 @@ ifeq ($(IS_APPLE), APPLE)
   LDFLAGS:= -Wl,-dead_strip
   TARGET_LDFLAGS:= -Wl,-dead_strip
   TARGET_DYNCC+= -undefined dynamic_lookup
+  luaposixDEFINES+= -D_DARWIN_C_SOURCE
 else
   LUAT_FLAGS:= -ldl -Wl,-E
 endif
@@ -67,7 +68,6 @@ endif
 ifeq ($(filter posix,$(VENDOR_C)), posix)
   HAVE_LINUX_NETLINK_H:= $(shell $(CONFIGURE_P)/test-netlinkh.sh $(TARGET_STCC))
   HAVE_POSIX_FADVISE:= $(shell $(CONFIGURE_P)/test-posix_fadvise.sh $(TARGET_STCC))
-  HAVE_STRLCPY:= $(shell $(CONFIGURE_P)/test-strlcpy.sh $(TARGET_STCC))
 endif
 ifeq ($(filter px,$(VENDOR_C)), px)
   HAVE_FCNTL_CLOSEM:= $(shell $(CONFIGURE_P)/test-F_CLOSEM.sh $(TARGET_STCC))
@@ -94,9 +94,6 @@ endif
 ifeq ($(HAVE_POSIX_FADVISE), true)
   luaposixDEFINES+= -DHAVE_POSIX_FADVISE
 endif
-ifeq ($(HAVE_STRLCPY), true)
-  luaposixDEFINES+= -DHAVE_STRLCPY
-endif
 
 ## lpeg
 ifeq ($(DEBUG), 1)
@@ -109,14 +106,17 @@ ifeq ($(HAVE_FCNTL_CLOSEM), true)
 endif
 
 ifeq ($(or $(MAKECMDGOALS),$(.DEFAULT_GOAL)), development)
-  CCWARN:= -Wall -Wextra -Wredundant-decls -Wshadow -Wpointer-arith
-  TARGET_CFLAGS:= -O0 -fno-omit-frame-pointer -ggdb
-  CFLAGS:= -O0 -fno-omit-frame-pointer -ggdb
+  CCWARN:= -Wall -Wextra -Wredundant-decls -Wshadow -Wpointer-arith -Werror=implicit-function-declaration
+  TARGET_CFLAGS:= -D_FORTIFY_SOURCE=2 -O1 -fno-omit-frame-pointer -ggdb
+  CFLAGS:= -D_FORTIFY_SOURCE=2 -O1 -fno-omit-frame-pointer -ggdb
   ifeq ($(shell $(CONFIGURE_P)/test-gcc48.sh $(CC)), true)
 	CFLAGS+= -fsanitize=address
   endif
   ifeq ($(IS_CC), CLANG)
-	CFLAGS+= -fsanitize=address
+	CFLAGS+= -fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined
+  endif
+  ifeq ($(shell $(CONFIGURE_P)/test-gcc49.sh $(CC)), true)
+	CFLAGS+= -fsanitize=undefined
   endif
   TARGET_CCOPT:= $(NULSTRING)
   CCOPT:= $(NULSTRING)
