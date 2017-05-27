@@ -378,6 +378,7 @@ local fwrite = function (path, str, mode)
         end
         return true
     end
+    return nil, "io.open: Cannot open path."
 end
 
 --- Get line.
