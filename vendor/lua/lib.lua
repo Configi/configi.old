@@ -390,7 +390,7 @@ end
 -- @tparam string str string to write
 -- @treturn bool true if successfully written; otherwise it returns nil
 function lib.fdwrite (path, str)
-    local fd = lib.open(path, (fcntl.O_RDWR))
+    local fd = lib.open(path, (fcntl.O_WRONLY))
     if not fd then
         return nil
     end
