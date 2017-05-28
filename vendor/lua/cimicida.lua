@@ -336,7 +336,7 @@ end
 -- @treturn string the contents of the file, nil if the file cannot be read or opened
 local fopen = function (file)
     if not test_open(file) then
-        return nil
+        return nil, "io.open: File not found or no permissions to read file."
     end
     local str = ""
     for s in io.lines(file, 2^12) do
