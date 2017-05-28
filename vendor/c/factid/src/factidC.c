@@ -296,7 +296,7 @@ Fmount(lua_State *L)
 		lua_setfield(L, -2, "freq");
 		lua_pushinteger(L, m->mnt_passno);
 		lua_setfield(L, -2, "passno");
-		lua_rawseti(L, -2, c);
+		lua_rawseti(L, -2, c+1);
 		c++;
 	}
 	endmntent(mtab);
