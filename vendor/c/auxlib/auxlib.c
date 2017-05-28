@@ -1,8 +1,19 @@
 #include <string.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <lua.h>
 #include <lauxlib.h>
+
+void
+auxI_assertion_failed(const char *file, int line, const char *diag, const char *cond)
+{
+	fprintf(stderr, "Assertion failed on %s line %d: %s\n", file, line, cond);
+	fprintf(stderr, "Diagnostic: %s\n", diag);
+	(void)fflush(stderr);
+	abort();
+}
 
 /*
  * From: https://boringssl.googlesource.com/boringssl/+/ad1907fe73334d6c696c8539646c21b11178f20f
@@ -10,14 +21,24 @@
  */
 
 void
-bzero_x(void *ptr, size_t len)
+auxL_bzero(void *ptr, size_t len)
 {
 	memset(ptr, 0, len);
 	__asm__ __volatile__("" : : "r"(ptr) : "memory");
 }
 
+int
+auxL_assert_bzero(unsigned char *buf, size_t len)
+{
+	int z = 0;
+	size_t i;
+	for (i = 0; i < len; ++i)
+		z |= buf[i];
+	return z != 0;
+}
+
 char
-*strncpy_x(char *dest, const char *src, size_t n)
+*auxL_strncpy(char *dest, const char *src, size_t n)
 {
 	size_t len = strlen(src);
 	if (len != 0) {
@@ -26,14 +47,14 @@ char
 		}
 		memmove(dest, src, len);
 		if (len < n) {
-			bzero_x(dest + len, n - len);
+			auxL_bzero(dest + len, n - len);
 		}
 	}
 	return dest;
 }
 
 char
-*strnmove(char *dest, const char *src, size_t n)
+*auxL_strnmove(char *dest, const char *src, size_t n)
 {
 	if (n > 0) {
 		size_t len = strlen(src);
@@ -42,7 +63,7 @@ char
 				len = n - 1;
 			}
 			memmove(dest, src, len);
-			dest[len] = 0;
+			dest[len] = '\0';
 		}
 	}
 	return dest;
@@ -69,11 +90,8 @@ static int
 luaX_assert(lua_State *L)
 {
 	const char *msg;
-	lua_Debug info;
-	const char *name;
-	const char *failed = "Assertion failed";
-	int fargs = lua_gettop(L);
 	msg = 0;
+	int fargs = lua_gettop(L);
 	if (fargs >= 2) {
 		msg = lua_tolstring(L, 2, 0);
 	}
@@ -82,10 +100,13 @@ luaX_assert(lua_State *L)
 	} else {
 		luaL_checkany(L, 1);
 		lua_remove(L, 1);
+		lua_Debug info;
 		lua_getstack(L, 1, &info);
+		const char *failed = "Assertion failed";
 		if (!msg) {
 			msg = "false";
 		}
+		const char *name;
 		name = 0;
 		lua_getinfo(L, "Snl", &info);
 		if (info.name) {
