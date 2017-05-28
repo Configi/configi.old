@@ -189,7 +189,7 @@ Show uname information via uname(2)
 static int
 Funame(lua_State *L)
 {
-	struct utsname uts = {{0}};
+	struct utsname uts = {.nodename = {0}};
 	char buf[_UTSNAME_LENGTH] = {0};
 	char dbuf[_UTSNAME_DOMAIN_LENGTH] = {0};
 
