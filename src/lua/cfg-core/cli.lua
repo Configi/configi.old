@@ -2,7 +2,8 @@ local rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require =
       rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require
 local ENV, cli, functions = {_G=_G, package=package}, {}, {}
 local string, coroutine, os = string, coroutine, os
-local Factid = require"factid"
+local factid = require"factid"
+package.loaded["cfg-core.fact"] = factid.gather()
 local strings = require"cfg-core.strings"
 local args = require"cfg-core.args"
 local std = require"cfg-core.std"
@@ -58,7 +59,7 @@ function cli.main (opts)
     local runenv = {}
     local roles = {}
     local scripts = { [1] = opts.script }
-    local env = { fact = {} }
+    local env = { fact = package.loaded["cfg-core.fact"] }
 
     -- Built-in functions inside scripts --
     env.roles = function(r)
@@ -74,11 +75,7 @@ function cli.main (opts)
     end
     env.sub = env._
     env.module = function (m)
-        if m == "fact" then
-            env.fact = Factid.gather()
-        else
-            runenv[m] = functions.module(m, roles)
-        end
+        runenv[m] = functions.module(m, roles)
     end
     env.each = function (t, f)
         for str, tbl in pairs(t) do
