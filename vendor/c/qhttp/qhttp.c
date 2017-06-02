@@ -36,20 +36,13 @@ get(lua_State *L)
 	struct sockaddr_in target = {0};
 	char buf[BUFSZ] = {0};
 	size_t len;
-	struct timeval timeout;
-	fd_set set;
-	int status;
-	int n;
-	ssize_t sent_bytes;
-	ssize_t total_bytes;
-	ssize_t send_bytes = strlen(uri) + 19;
 	if ((len = strlen(arg_ip)) > 15) {
 		return luaX_pusherror(L, "IP argument cannot exceed 15 characters.");
 	}
 	if ((len = strlen(uri)) > MAXURI) {
 		return luaX_pusherror(L, "URI too long.");
 	}
-	strnmove(ip, arg_ip, 16);
+	auxL_strnmove(ip, arg_ip, 16);
 	target.sin_family = AF_INET;
 	target.sin_port = htons(80);
 	if (inet_pton(AF_INET, ip, &target.sin_addr.s_addr) == 0) {
@@ -59,8 +52,10 @@ get(lua_State *L)
 		return luaX_pusherrno(L, "socket(2) error.");
 	}
 
+	struct timeval timeout;
 	timeout.tv_sec = 10;
 	timeout.tv_usec = 0;
+	fd_set set;
 	FD_ZERO(&set);
 	FD_SET(fd, &set);
 	fcntl(fd, F_SETFL, O_NONBLOCK);
@@ -69,6 +64,7 @@ get(lua_State *L)
 			return luaX_pusherrno(L, "connect(2) error.");
 		}
 	}
+	int status;
 	status = select(fd + 1, NULL, &set, NULL, &timeout);
 	if (status == 0) {
 		return luaX_pusherror(L, "select(2) timeout.");
@@ -78,6 +74,9 @@ get(lua_State *L)
 	}
 	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) & ~O_NONBLOCK);
 
+	ssize_t send_bytes = strlen(uri) + 19;
+	ssize_t sent_bytes;
+	ssize_t total_bytes;
 	if (snprintf(buf, send_bytes, "GET %s HTTP/1.0\r\n\r\n\r\n\r\n", uri) < 0) {
 		return luaX_pusherror(L, "snprintf(2) error.");
 	}
@@ -93,7 +92,8 @@ get(lua_State *L)
 
 	lua_settop(L, 0);
 	while (1) {
-		bzero_x(buf, BUFSZ);
+		auxL_bzero(buf, BUFSZ);
+		REQUIRE(auxL_assert_bzero(buf, BUFSZ) == 0, "auxL_bzero() failed. Compiler behavior changed!");
 		read = recv(fd, buf, sizeof(buf), 0);
 		if (read > 0) {
 			lua_pushlstring(L, buf, read);
@@ -104,7 +104,7 @@ get(lua_State *L)
 	}
 
 	close(fd);
-	n = lua_gettop(L);
+	int n = lua_gettop(L);
 	lua_concat(L, n);
 	return 1;
 }
