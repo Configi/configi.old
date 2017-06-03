@@ -135,6 +135,20 @@ local find_string = function (tbl, str, plain)
     end
 end
 
+--- Find string in file.
+-- @Warning searches per line.
+-- @tparam string file file to open and search in
+-- @tparam string str plain string or pattern to look for in the file
+-- @tparam bool plain if true, turns off pattern matching facilities
+-- @treturn boo a boolean value, true if string is found, nil otherwise
+local find_in_file = function(file, str, plain)
+    for s in io.lines(file, "L") do
+        if string.find(s, str, 1, plain) then
+            return true
+        end
+    end
+end
+
 --- Convert a sequence into a dictionary.
 -- Sequence values are converted into field names.
 -- @Warning Does not check if input table is a sequence.
@@ -781,6 +795,7 @@ return {
     timestamp = timestamp,
     find_string = find_string,
     string_find = find_string,
+    find_in_file = find_in_file,
     seq_to_dict = seq_to_dict,
     arr_to_rec = seq_to_dict,
     ln_to_tbl = ln_to_tbl,
