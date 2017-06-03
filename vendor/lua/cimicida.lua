@@ -668,7 +668,11 @@ local insert_if = function (bool, list, pos, value)
                 table.insert(list, pos + p, i)
             end
         else
-            table.insert(list, pos, value)
+            if pos == -1 then
+                table.insert(list, value)
+            else
+                table.insert(list, pos, value)
+            end
         end
     end
 end
