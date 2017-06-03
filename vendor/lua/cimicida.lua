@@ -658,7 +658,7 @@ end
 -- Wraps table.insert().
 -- @tparam bool bool value to evaluate
 -- @tparam table list table to insert into
--- @tparam number pos position index in the table
+-- @tparam number pos position index in the table, -1 only valid for non-table values
 -- @param value value to insert (VALUE)
 local insert_if = function (bool, list, pos, value)
     if bool then
