@@ -375,20 +375,6 @@ local fopen = function (file)
     return str
 end
 
---- Return the first string.match result from a given file/path.
--- @tparam string file path to the file
--- @tparam string pattern string or pattern to look for
--- @treturn string results of string.match, nil otherwise
-local match_from_file = function(file, pattern)
-    local str
-    for s in io.lines(file) do
-        str = string.match(s, pattern)
-        if str then
-            return str
-        end
-    end
-end
-
 --- Write a string to a file/path.
 -- @tparam string path path to the file
 -- @tparam string str string to write
@@ -827,7 +813,6 @@ return {
     split_path = split_path,
     test_open = test_open,
     fopen = fopen,
-    match_from_file = match_from_file,
     fwrite = fwrite,
     get_ln = get_ln,
     sub = sub,
