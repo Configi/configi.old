@@ -149,6 +149,22 @@ local find_in_file = function(file, str, plain)
     end
 end
 
+--- Match a string in a file.
+-- @Warning searches per line and returns the first match
+-- @tparam string file file to open and search in
+-- @tparam string str to look for in the file
+-- @treturn string matched string
+local match_in_file = function(file, str)
+    local m
+    for s in io.lines(file, "L") do
+        m = string.match(s, str)
+        if m then
+           break
+        end
+    end
+    return m
+end
+
 --- Convert a sequence into a dictionary.
 -- Sequence values are converted into field names.
 -- @Warning Does not check if input table is a sequence.
@@ -796,6 +812,7 @@ return {
     find_string = find_string,
     string_find = find_string,
     find_in_file = find_in_file,
+    match_in_file = match_in_file,
     seq_to_dict = seq_to_dict,
     arr_to_rec = seq_to_dict,
     ln_to_tbl = ln_to_tbl,
