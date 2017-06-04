@@ -1052,6 +1052,37 @@ T:start"process.signal (modules/process.lua)"
     end
 T:done(N)
 
+T:start"mount.mounted (modules/mount.lua)"
+    do
+        local mount = function(p)
+            cfg{"-f", p}
+            T:yes(lib.find_in_file("/proc/mounts", "/configi-test-mount", true))
+        end
+        mount("test/mount_mounted.lua")
+    end
+T:done(N)
+
+
+T:start"mount.opts (modules/mount.lua)"
+    do
+        local mount = function(p)
+            cfg{"-f", p}
+            local s = lib.match_in_file("/proc/mounts", "tmpfs.+/configi%-test%-mount.*")
+            T:eq(type(string.find(s, "nodev")), "number")
+        end
+        mount("test/mount_opts.lua")
+    end
+T:done(N)
+
+T:start"mounts.unmounted (modules/mount.lua)"
+    do
+        local mount = function(p)
+            cfg{"-f", p}
+            T:no(lib.find_in_file("/proc/mounts", "/configi-test-mount", true))
+        end
+        mount("test/mount_unmounted.lua")
+    end
+T:done(N)
 
 --c.printf("\n  Summary: \n")
 --c.printf("        %s Passed\n", N.successes)
