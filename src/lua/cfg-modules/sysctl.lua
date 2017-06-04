@@ -53,7 +53,7 @@ function sysctl.write(S)
         elseif r == 0 then
             return F.result(P.key, nil, M.report.not_found)
         else
-            return F.result(P.key, ret)
+            return F.result(P.key, r)
         end
     end
 end
