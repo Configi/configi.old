@@ -241,7 +241,7 @@ function factid.gather ()
     do
         -- { 1 = { dir = "/", fsname = "root", type = "ext4", opts = "rw", freq = 0, passno = 0 } }
         local m = factid.mount()
-        fact.mount = {}
+        fact.mount = setmetatable({}, return_false)
         fact.mount.table = m
         for _, mp in ipairs(m) do
             fact.mount[mp.dir] = setmetatable({}, return_false)
