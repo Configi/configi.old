@@ -136,13 +136,15 @@ local find_string = function (tbl, str, plain)
 end
 
 --- Find string in file.
--- @Warning searches per line.
+-- @Note default is to search per line
 -- @tparam string file file to open and search in
 -- @tparam string str plain string or pattern to look for in the file
 -- @tparam bool plain if true, turns off pattern matching facilities
+-- @tparam string fmt read according to file:lines format. [DEFAULT: "L"]
 -- @treturn boo a boolean value, true if string is found, nil otherwise
-local find_in_file = function(file, str, plain)
-    for s in io.lines(file, "L") do
+local find_in_file = function(file, str, plain, fmt)
+    fmt = fmt or "L"
+    for s in io.lines(file, fmt) do
         if string.find(s, str, 1, plain) then
             return true
         end
@@ -150,13 +152,14 @@ local find_in_file = function(file, str, plain)
 end
 
 --- Match a string in a file.
--- @Warning searches per line and returns the first match
+-- @Note searches per line and returns the first match
 -- @tparam string file file to open and search in
 -- @tparam string str to look for in the file
 -- @treturn string matched string
-local match_in_file = function(file, str)
+local match_in_file = function(file, str, fmt)
     local m
-    for s in io.lines(file, "L") do
+    fmt = fmt or "L"
+    for s in io.lines(file, fmt) do
         m = string.match(s, str)
         if m then
            break
