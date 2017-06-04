@@ -33,7 +33,7 @@ function sysctl.write(S)
         if R.kept then
             return F.kept(P.key)
         end
-        local write_key = function(P)
+        local write_key = function()
             local key = string.gsub(P.key, "%.", "/")
             key = "/proc/sys/"..key
             if stat.stat(key) then
@@ -47,7 +47,7 @@ function sysctl.write(S)
                 return 0
             end
         end
-        local r = write_key(P)
+        local r = write_key()
         if r == false then
             return F.kept(P.key)
         elseif r == 0 then
