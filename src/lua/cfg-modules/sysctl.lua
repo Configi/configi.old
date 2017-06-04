@@ -51,7 +51,7 @@ function sysctl.write(S)
         if r == false then
             return F.kept(P.key)
         elseif r == 0 then
-            return F.result(P.key, nil, report.not_found)
+            return F.result(P.key, nil, M.report.not_found)
         else
             return F.result(P.key, ret)
         end
