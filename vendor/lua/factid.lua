@@ -1,11 +1,10 @@
 -- Module for gathering system "facts"
 -- @module factid
-local string = string
-local util = require"cimicida"
 local sysstat = require"posix.sys.stat"
 local dirent = require"posix.dirent"
 local lib = require"lib"
-local cmd = lib.cmd
+local string, file = lib.string, lib.file
+local cmd = lib.exec.cmd
 local factid = require"factidC"
 local qhttp = require"qhttp"
 local return_false = { __index = function() return false end }
@@ -18,8 +17,8 @@ _ENV = ENV
 function factid.osfamily ()
     local id
     if sysstat.stat("/etc/os-release") then
-        id = util.match_in_file("/etc/os-release", [[^ID_LIKE=[%p]*(%w+)[%p]*]])
-            or util.match_in_file("/etc/os-release", [[^ID=[%p]*(%w+)[%p]*]])
+        id = file.match("/etc/os-release", [[^ID_LIKE=[%p]*(%w+)[%p]*]])
+            or file.match("/etc/os-release", [[^ID=[%p]*(%w+)[%p]*]])
     elseif sysstat.stat("/etc/openwrt_release") then
         id = "openwrt"
     else
@@ -33,7 +32,7 @@ end
 function factid.operatingsystem ()
     local name
     if sysstat.stat("/etc/os-release") then
-        name = util.match_in_file("/etc/os-release", [[^NAME[%s]*=[%s%p]*([%w]+)]])
+        name = file.match("/etc/os-release", [[^NAME[%s]*=[%s%p]*([%w]+)]])
     elseif sysstat.stat("/etc/openwrt_release") then
         name = "OpenWRT"
     else
@@ -53,7 +52,7 @@ function factid.partitions ()
     end
     for partition in dirent.files("/sys/block/") do
         if not string.find(partition, "^%.") then
-            local size = tonumber(util.fopen("/sys/block/" .. partition .. "/size" ))
+            local size = tonumber(file.read_to_string("/sys/block/" .. partition .. "/size" ))
             partitions[partition] = size*512
         end
     end
@@ -78,7 +77,7 @@ end
 
 function factid.aws_instance_id ()
     local ok, err = qhttp.get("169.254.169.254", "/latest/meta-data/instance-id")
-    ok = lib.ln_to_tbl(ok)
+    ok = string.line_to_table(ok)
     if ok then
         return ok[#ok]
     else
