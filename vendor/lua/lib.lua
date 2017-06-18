@@ -1,9 +1,9 @@
-Configi standard library.
---- Lua extensions and some unix utilities.
------ Depends on cimicida and Luaposix.
------     VENDOR= lib cimicida inspect
------     VENDOR_C= posix px
------ @module lib
+--- Configi standard library.
+-- Lua extensions and some unix utilities.
+-- Depends on cimicida and Luaposix.
+--     VENDOR= lib cimicida inspect
+--     VENDOR_C= posix px
+-- @module lib
 
 local rename, strlen, setmetatable, next, ipairs, require, type =
   os.rename, string.len, setmetatable, next, ipairs, require, type
