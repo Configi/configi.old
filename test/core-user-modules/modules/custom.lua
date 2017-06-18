@@ -5,7 +5,7 @@
 local ENV, M, custom = {}, {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
-local cmd = lib.cmd
+local cmd = lib.exec.cmd
 _ENV = ENV
 
 M.required = { "path" }
