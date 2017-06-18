@@ -9,7 +9,8 @@ local table = table
 local cfg = require"cfg-core.lib"
 local stat = require"posix.sys.stat"
 local lib = require"lib"
-local cmd = lib.cmd
+local string = lib.string
+local cmd = lib.exec.cmd
 _ENV = ENV
 
 M.required = { "directory" }
@@ -29,57 +30,57 @@ M.alias.environment = { "env" }
 --     make = "-DNDEBUG"
 -- }
 function make.install(S)
-    M.parameters = { "configure", "make", "environment" }
-    M.report = {
-        repaired = "make.install: Successfully installed.",
-            kept = "make.install: Already installed.",
-          failed = "make.install: Error installing."
-    }
-    return function(P)
-        P.directory = S
-        local F, R = cfg.init(P, M)
-        if R.kept then
-            return F.kept(P.directory)
-        end
-        if P.environment then
-            P.environment = lib.str_to_tbl(P.environment)
-        end
-        local args, result
-        if stat.stat(P.directory .. "/configure") then
-            if P.configure then
-                args = { _env = P.environment, _cwd = P.directory }
-                lib.insertif(P.configure, args, 1, lib.str_to_tbl(P.configure))
-                result = F.run(cmd["./configure"], args)
-            else
-                result = F.run(cmd["./configure"], { _env = P.environment, _cwd = P.directory })
-            end
-            if not result then
-                return F.result(P.directory, nil, "`./configure` step failed")
-            end
-        end
-        if P.make then
-            args = { _env = P.environment, _cwd = P.directory }
-            lib.insert_if(P.make, args, 1, lib.str_to_tbl(P.make))
-            result = F.run(cmd.make, args)
-        else
-            result = F.run(cmd.make, { _env = P.environment, _cwd = P.directory })
-        end
-        if not result then
-            return F.result(P.directory, nil, "`make` step failed")
-        end
-        if P.make then
-            args = { _env = P.environment, _cwd = P.directory }
-            table.insert(args, 1, "install")
-            lib.insert_if(P.make, args, 1, lib.str_to_tbl(P.make))
-            result = F.run(cmd.make, args)
-        else
-            result = F.run(cmd.make, { "install",  _env = P.environment, _cwd = P.directory })
-        end
-        if not result then
-            return F.result(P.directory, nil, "`make install` step failed")
-        end
-        return F.result(P.directory, true)
+  M.parameters = { "configure", "make", "environment" }
+  M.report = {
+    repaired = "make.install: Successfully installed.",
+      kept = "make.install: Already installed.",
+      failed = "make.install: Error installing."
+  }
+  return function(P)
+    P.directory = S
+    local F, R = cfg.init(P, M)
+    if R.kept then
+      return F.kept(P.directory)
     end
+    if P.environment then
+      P.environment = string.to_array(P.environment)
+    end
+    local args, result
+    if stat.stat(P.directory .. "/configure") then
+      if P.configure then
+        args = { _env = P.environment, _cwd = P.directory }
+        table.insert_if(P.configure, args, 1, string.to_array(P.configure))
+        result = F.run(cmd["./configure"], args)
+      else
+        result = F.run(cmd["./configure"], { _env = P.environment, _cwd = P.directory })
+      end
+      if not result then
+        return F.result(P.directory, nil, "`./configure` step failed")
+      end
+    end
+    if P.make then
+      args = { _env = P.environment, _cwd = P.directory }
+      table.insert_if(P.make, args, 1, string.to_array(P.make))
+      result = F.run(cmd.make, args)
+    else
+      result = F.run(cmd.make, { _env = P.environment, _cwd = P.directory })
+    end
+    if not result then
+      return F.result(P.directory, nil, "`make` step failed")
+    end
+    if P.make then
+      args = { _env = P.environment, _cwd = P.directory }
+      table.insert(args, 1, "install")
+      table.insert_if(P.make, args, 1, string.to_array(P.make))
+      result = F.run(cmd.make, args)
+    else
+      result = F.run(cmd.make, { "install",  _env = P.environment, _cwd = P.directory })
+    end
+    if not result then
+      return F.result(P.directory, nil, "`make install` step failed")
+    end
+    return F.result(P.directory, true)
+  end
 end
 
 return make

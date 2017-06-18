@@ -6,6 +6,7 @@ local std = require"cfg-core.std"
 local args = require"cfg-core.args"
 local cli = require"cfg-core.cli"
 local lib = require"lib"
+local fmt, time, fd = lib.fmt, lib.time, lib.fd
 local unistd = require"posix.unistd"
 local signal = require"posix.signal"
 local sysstat = require"posix.sys.stat"
@@ -20,10 +21,10 @@ while true do
     local handle, wd
     local source, hsource, runenv, opts = cli.opt(arg, version)
     if args["d"] then
-        lib.printf("%s\n", "main")
-        lib.printf("%s\n", inspect(source))
-        lib.printf("%s\n", "handlers")
-        lib.printf("%s\n", inspect(hsource))
+        fmt.print("%s\n", "main")
+        fmt.print("%s\n", inspect(source))
+        fmt.print("%s\n", "handlers")
+        fmt.print("%s\n", inspect(hsource))
         break
     end
     ::RUN::
@@ -33,21 +34,21 @@ while true do
         R.kept = true
     end
     if opts.debug then
-        lib.printf("------------\n")
+        fmt.print("------------\n")
         if R.kept then
-            lib.printf("Kept: %s\n", R.kept)
+            fmt.print("Kept: %s\n", R.kept)
         elseif R.repaired then
-            lib.printf("Repaired: %s\n", R.repaired)
+            fmt.print("Repaired: %s\n", R.repaired)
         elseif R.failed then
-            lib.printf("Failed: %s\n", R.failed)
-            lib.errorf("Failed!\n")
+            fmt.print("Failed: %s\n", R.failed)
+            fmt.panic("Failed!\n")
         end
-        local t2 = lib.diff_time(systime.gettimeofday(), t1)
+        local t2 = time.diff(systime.gettimeofday(), t1)
         t2 = string.format("%s.%s", tostring(t2.sec), tostring(t2.usec))
         if t2 == 0 or t2 == 1.0 then
-            lib.printf("Finished run in %.f second\n", 1.0)
+            fmt.print("Finished run in %.f second\n", 1.0)
         else
-            lib.printf("Finished run in %.f seconds\n", t2)
+            fmt.print("Finished run in %.f seconds\n", t2)
         end
     else
         if R.failed then
@@ -57,9 +58,9 @@ while true do
     if opts.watch then
         if unistd.geteuid() == 0 then
             if sysstat.stat("/proc/self/oom_score_adj") then
-                lib.fdwrite("/proc/self/oom_score_adj", "-1000")
+                fd.write("/proc/self/oom_score_adj", "-1000")
             else
-                lib.fdwrite("/proc/self/oom_adj", "-1000")
+                fd.write("/proc/self/oom_adj", "-1000")
             end
         end
         handle = inotify.init()

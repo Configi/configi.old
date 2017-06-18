@@ -9,7 +9,8 @@ local string = string
 local stat = require"posix.sys.stat"
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
-local cmd = lib.cmd
+local table = lib.table
+local cmd = lib.exec.cmd
 _ENV = ENV
 
 M.required = { "package" }
@@ -17,15 +18,15 @@ M.alias = {}
 M.alias.package = { "option" } -- for clean mode
 
 local found = function(package)
-    local _, ret = cmd.yum{ "--cacheonly", "info", package }
-    if lib.find_string(ret.stdout, "Installed Packages", true) then
-        return true
-    end
+  local _, ret = cmd.yum{ "--cacheonly", "info", package }
+  if table.find(ret.stdout, "Installed Packages", true) then
+    return true
+  end
 end
 
 local found_group  = function(group)
-    local _, ret = cmd.yum{ "--cacheonly", "groups", "list", "'" .. group .. "'"}
-    return lib.find_string(ret.stdout, "Installed Groups", true)
+  local _, ret = cmd.yum{ "--cacheonly", "groups", "list", "'" .. group .. "'"}
+  return table.find(ret.stdout, "Installed Groups", true)
 end
 
 --- Add custom repository.
@@ -34,25 +35,25 @@ end
 -- @param None
 -- @usage yum.add_repo("http://openresty.org/yum/centos/OpenResty.repo")
 function yum.add_repo(S)
-    M.parameters = { "repo" }
-    M.report = {
-        repaired = "yum.add_repo: Successfully added repository.",
-            kept = "yum.add_repo: Repository already present.",
-          failed = "yum.add_repo: Error adding repository."
-    }
-    return function(P)
-        P.package = ""
-        P.repo = S
-        local F, R = cfg.init(P, M)
-        if R.kept then
-            return F.kept(P.repo)
-        end
-        local file = string.match(P.repo, "^.*/(.*)$")
-        if stat.stat("/etc/yum.repos.d/" .. file) then
-            return F.kept(P.repo)
-        end
-        return F.result(P.repo, F.run(cmd["yum-config-manager"], { "--add-repo", P.repo }))
+  M.parameters = { "repo" }
+  M.report = {
+    repaired = "yum.add_repo: Successfully added repository.",
+      kept = "yum.add_repo: Repository already present.",
+      failed = "yum.add_repo: Error adding repository."
+  }
+  return function(P)
+    P.package = ""
+    P.repo = S
+    local F, R = cfg.init(P, M)
+    if R.kept then
+      return F.kept(P.repo)
     end
+    local file = string.match(P.repo, "^.*/(.*)$")
+    if stat.stat("/etc/yum.repos.d/" .. file) then
+      return F.kept(P.repo)
+    end
+    return F.result(P.repo, F.run(cmd["yum-config-manager"], { "--add-repo", P.repo }))
+  end
 end
 
 --- Run clean mode.
@@ -61,18 +62,18 @@ end
 -- @param None
 -- @usage yum.clean("all")!
 function yum.clean(S)
-    M.report = {
-        repaired = "yum.clean: Successfully executed `yum clean`.",
-          failed = "yum.clean: Error running `yum clean`."
-    }
-    return function(P)
-        P.option = S
-        local F, R = cfg.init(P, M)
-        if R.kept then
-            return F.kept("yum clean")
-        end
-        return F.result(P.package, F.run(cmd.yum, { "--quiet", "--assumeyes", "clean", P.option }))
+  M.report = {
+    repaired = "yum.clean: Successfully executed `yum clean`.",
+      failed = "yum.clean: Error running `yum clean`."
+  }
+  return function(P)
+    P.option = S
+    local F, R = cfg.init(P, M)
+    if R.kept then
+      return F.kept("yum clean")
     end
+    return F.result(P.package, F.run(cmd.yum, { "--quiet", "--assumeyes", "clean", P.option }))
+  end
 end
 
 --- Install a package via the Yum package manager.
@@ -91,63 +92,63 @@ end
 -- @usage yum.present("strace")
 --     update: "yes"
 function yum.present(S)
-    M.parameters = {
-        "config", "nogpgcheck", "security", "bugfix", "proxy", "update", "update_minimal"
-    }
-    M.report = {
-        repaired = "yum.present: Successfully installed package.",
-            kept = "yum.present: Package already installed.",
-          failed = "yum.present: Error installing package."
-    }
-    return function(P)
-        P.package = S
-        local F, R = cfg.init(P, M)
-        if R.kept then
-            return F.kept(P.package)
-        end
-        local env, command
-        if P.proxy then
-            env = { "http_proxy=" .. P.proxy }
-        end
-        -- Update mode
-        if P.update == true or P.update_minimal == true then
-            if P.update_minimal == true then
-                command = "update-minimal"
-            elseif P.update == true then
-                command = "update"
-            end
-            local args = { _env = env, "--quiet", "--assumeyes", command, P.package }
-            local set = {
-                nogpgcheck = "--nogpgcheck",
-                  security = "--security",
-                    bugfix = "--bugfix"
-            }
-            P:insert_if(set, args, 3)
-            if P.config then
-                lib.insert_if(P.config, args, 3, "--config=" .. P.config)
-            end
-            return F.result(P.package, F.run(cmd.yum, args))
-        end
-        -- Install mode
-        if not string.find(P.package, "^@") then
-            if found(P.package) then
-                return F.kept(P.package)
-            end
-        else
-            if found_group(P.package) then
-                return F.kept(P.package)
-            end
-        end
-        local args = { _env = env, "--quiet", "--assumeyes", "install", P.package }
-        local set = {
-            nogpgcheck = "--nogpgcheck"
-        }
-        P:insert_if(set, args, 3)
-        if P.config then
-            lib.insert_if(P.config, args, 3,  "--config=" .. P.config )
-        end
-        return F.result(P.package, F.run(cmd.yum, args))
+  M.parameters = {
+    "config", "nogpgcheck", "security", "bugfix", "proxy", "update", "update_minimal"
+  }
+  M.report = {
+    repaired = "yum.present: Successfully installed package.",
+      kept = "yum.present: Package already installed.",
+      failed = "yum.present: Error installing package."
+  }
+  return function(P)
+    P.package = S
+    local F, R = cfg.init(P, M)
+    if R.kept then
+      return F.kept(P.package)
     end
+    local env, command
+    if P.proxy then
+      env = { "http_proxy=" .. P.proxy }
+    end
+    -- Update mode
+    if P.update == true or P.update_minimal == true then
+      if P.update_minimal == true then
+        command = "update-minimal"
+      elseif P.update == true then
+        command = "update"
+      end
+      local args = { _env = env, "--quiet", "--assumeyes", command, P.package }
+      local set = {
+        nogpgcheck = "--nogpgcheck",
+          security = "--security",
+          bugfix = "--bugfix"
+      }
+      P:insert_if(set, args, 3)
+      if P.config then
+        table.insert_if(P.config, args, 3, "--config=" .. P.config)
+      end
+      return F.result(P.package, F.run(cmd.yum, args))
+    end
+    -- Install mode
+    if not string.find(P.package, "^@") then
+      if found(P.package) then
+        return F.kept(P.package)
+      end
+    else
+      if found_group(P.package) then
+        return F.kept(P.package)
+      end
+    end
+    local args = { _env = env, "--quiet", "--assumeyes", "install", P.package }
+    local set = {
+      nogpgcheck = "--nogpgcheck"
+    }
+    P:insert_if(set, args, 3)
+    if P.config then
+      table.insert_if(P.config, args, 3,  "--config=" .. P.config )
+    end
+    return F.result(P.package, F.run(cmd.yum, args))
+  end
 end
 
 --- Remove a package via the Yum package manager.
@@ -159,28 +160,28 @@ end
 --     config = "/etc/yum.conf"
 -- }
 function yum.absent(S)
-    M.parameters = { "config" }
-    M.report = {
-        repaired = "yum.absent: Successfully removed package.",
-            kept = "yum.absent: Package not installed.",
-          failed = "yum.absent: Error removing package."
-    }
-    return function(P)
-        P.package = S
-        local F, R = cfg.init(P, M)
-        if R.kept or not found(P.package) then
-            return F.kept(P.package)
-        end
-        local args = { _env = P.env or P.environment, "--quiet", "--assumeyes", "remove", P.package }
-        local set = {
-            nogpgcheck = "--nogpgcheck"
-        }
-        P:insert_if(set, args, 3)
-        if P.config then
-            lib.insert_if(P.config, args, 3, "--config=" .. P.config)
-        end
-        return F.result(P.package, F.run(cmd.yum, args))
+  M.parameters = { "config" }
+  M.report = {
+    repaired = "yum.absent: Successfully removed package.",
+      kept = "yum.absent: Package not installed.",
+      failed = "yum.absent: Error removing package."
+  }
+  return function(P)
+    P.package = S
+    local F, R = cfg.init(P, M)
+    if R.kept or not found(P.package) then
+      return F.kept(P.package)
     end
+    local args = { _env = P.env or P.environment, "--quiet", "--assumeyes", "remove", P.package }
+    local set = {
+      nogpgcheck = "--nogpgcheck"
+    }
+    P:insert_if(set, args, 3)
+    if P.config then
+      table.insert_if(P.config, args, 3, "--config=" .. P.config)
+    end
+    return F.result(P.package, F.run(cmd.yum, args))
+  end
 end
 
 yum.installed = yum.present

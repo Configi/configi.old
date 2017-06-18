@@ -8,10 +8,11 @@
 
 local ENV, M, cron = {}, {}, {}
 local pcall, next = pcall, next
-local string, table = string, table
+local string = string
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
-local cmd = lib.cmd
+local table, os = lib.table, lib.os
+local cmd = lib.exec.cmd
 local tag = "#" .. string.char(9) .. "Configi: " -- hackish anti-match tech.
 _ENV = ENV
 
@@ -27,7 +28,7 @@ local list = function(P)
     local t, r = cmd["crontab"]{ "-u", P.user, "-l" }
     if t then
         -- filter out comments except for Configi tag names
-        return lib.filter_tbl_value(r.stdout, "^#[%C]+")
+        return table.filter(r.stdout, "^#[%C]+")
     else
         return {}
     end
@@ -104,7 +105,7 @@ function cron.present(S)
         if R.kept then
             return F.kept(P.name)
         end
-        P:set_if_not("user", lib.effective_username())
+        P:set_if_not("user", os.effective_name())
         local jobs = list(P)
         P.cronjob = genjob(P) -- Replace P.job with prepended scheduling info. This is used by listed()
         local islisted = listed(P)
@@ -140,7 +141,7 @@ function cron.absent(S)
         if R.kept then
             return F.kept(P.name)
         end
-        P:set_if_not("user", lib.effective_username())
+        P:set_if_not("user", os.effective_name())
         local jobs = list(P)
         if not next(jobs) or not listed(P) then
             return F.kept(P.name)
