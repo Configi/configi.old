@@ -15,7 +15,7 @@ local systime = require"posix.sys.time"
 local inotify = require"inotify"
 local inspect = require"inspect"
 local t1
-_ENV = ENV
+_ENV = nil
 
 while true do
   local handle, wd
