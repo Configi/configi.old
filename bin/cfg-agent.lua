@@ -22,9 +22,9 @@ while true do
   local source, hsource, runenv, opts = cli.opt(arg, version)
   if args["d"] then
     fmt.print("%s\n", "main")
-    fmt.print("%s\n", inspect(source))
+    fmt.print("%s\n", inspect.inspect(source))
     fmt.print("%s\n", "handlers")
-    fmt.print("%s\n", inspect(hsource))
+    fmt.print("%s\n", inspect.inspect(hsource))
     break
   end
   ::RUN::
