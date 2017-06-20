@@ -1,7 +1,7 @@
 local rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require =
   rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require
-local ENV, cli, functions = {_G=_G, package=package}, {}, {}
-local coroutine = coroutine
+local package, coroutine = package, coroutine
+local cli, functions = {}, {}
 local factid = require"factid"
 package.loaded["cfg-core.fact"] = factid.gather()
 local strings = require"cfg-core.strings"
@@ -12,8 +12,8 @@ local path, fmt, os, string, file, time = lib.path, lib.fmt, lib.os, lib.string,
 local tsort = require"tsort"
 local ep_found, policy = pcall(require, "cfg-policy")
 local cpath = std.path()
-_G.package.path = "./?.lua;"..cpath.."/?.lua;"..cpath.."/?.lua;"..cpath.."/?"
-_ENV = ENV
+package.path = "./?.lua;"..cpath.."/?.lua;"..cpath.."/?.lua;"..cpath.."/?"
+_ENV = nil
 
 --- Assign returned value from require() to the custom environment
 -- Exit with code 1 if there was an error
@@ -22,7 +22,7 @@ _ENV = ENV
 function functions.module (m, roles)
   if roles then
     for _, role in ipairs(roles) do
-      _G.package.path = std.add_to_path(_G.package.path, cpath, role)
+      package.path = std.add_to_path(package.path, cpath, role)
     end
   end
   -- Try custom modules in the arg path .. "/modules" directory first.
