@@ -5,15 +5,15 @@ local Psyslog = require"posix.syslog"
 local Psystime = require"posix.sys.time"
 local stat = require"posix.sys.stat"
 local lib = require"lib"
-local time, fmt, table, util, exec, path, os = lib.time, lib.fmt, lib.table, lib.util, lib.exec, lib.path, lib.os
+local time, fmt, table, util, exec, path, os =
+  lib.time, lib.fmt, lib.table, lib.util, lib.exec, lib.path, lib.os
 local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
 local args = require"cfg-core.args"
 local cfg = {}
 local _, policy = pcall(require, "cfg-policy")
 _ = nil
-local ENV = {}
-_ENV = ENV
+_ENV = nil
 
 --[[ Module internal functions ]]
 local Lmod = {}
