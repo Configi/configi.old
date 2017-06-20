@@ -1,9 +1,12 @@
+local ipairs, pairs = ipairs, pairs
+local arg = arg
 local lib = require"lib"
 local path, log, os = lib.path, lib.log, lib.os
 local dirent = require"posix.dirent"
 local syslog = require"posix.syslog"
 local strings = require"cfg-core.strings"
 local unistd = require"posix.unistd"
+_ENV = nil
 
 local Path = function()
   local dir = "."

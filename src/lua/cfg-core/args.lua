@@ -1,6 +1,10 @@
 local strings = require"cfg-core.strings"
 local unistd = require"posix.unistd"
+local arg = arg
+local ipairs = ipairs
 local opts = {}
+_ENV = nil
+
 for _, la in ipairs(strings.long_args) do
   opts[la[3]] = false
 end
