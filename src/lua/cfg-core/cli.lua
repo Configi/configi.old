@@ -74,7 +74,7 @@ function cli.main (opts)
   env._ = function (str)
     return string.template(str, env)
   end
-  env.sub = env._
+  env.template = env._
   env.module = function (m)
     runenv[m] = functions.module(m, roles)
   end
