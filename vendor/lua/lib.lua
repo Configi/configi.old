@@ -5,8 +5,8 @@
 --     VENDOR_C= posix px
 -- @module lib
 
-local rename, strlen, setmetatable, next, ipairs, require, type, select =
-  os.rename, string.len, setmetatable, next, ipairs, require, type, select
+local rename, strlen, setmetatable, next, ipairs, require, type =
+  os.rename, string.len, setmetatable, next, ipairs, require, type
 local syslog = require"posix.syslog"
 local unistd = require"posix.unistd"
 local stdlib = require"posix.stdlib"
@@ -472,7 +472,7 @@ exec.cmd = setmetatable({}, {__index =
     end
     return function(...)
       local args
-      if select("#", ...) == 1 then
+      if type(...) == table then
         args = ...
       else
         args = {...}
