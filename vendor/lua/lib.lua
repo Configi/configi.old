@@ -5,8 +5,8 @@
 --     VENDOR_C= posix px
 -- @module lib
 
-local rename, strlen, setmetatable, next, ipairs, require, type =
-  os.rename, string.len, setmetatable, next, ipairs, require, type
+local rename, strlen, setmetatable, next, ipairs, require, type, select =
+  os.rename, string.len, setmetatable, next, ipairs, require, type, select
 local syslog = require"posix.syslog"
 local unistd = require"posix.unistd"
 local stdlib = require"posix.stdlib"
@@ -470,7 +470,13 @@ exec.cmd = setmetatable({}, {__index =
     if strlen(path.split(bin)) == 0 then
       bin = path.bin(bin)
     end
-    return function(args)
+    return function(...)
+      local args
+      if select("#", ...) == 1 then
+        args = ...
+      else
+        args = {...}
+      end
       args._bin = bin
       return E(args)
     end
