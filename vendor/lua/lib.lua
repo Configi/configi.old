@@ -309,12 +309,11 @@ function exec.exec(args)
   copy, cerr = fdcopy(fd2, "stderr", args._stderr)
   if not copy then return nil, cerr end
   unistd.close(fd2)
-  local code
-  R.pid, R.status, code = os.wait(pid)
+  R.pid, R.status, R.code = os.wait(pid)
   if R.pid == nil then return nil, R.status end
   R.bin = args._bin
-  if code == 0 or args._ignore then
-    return code, R
+  if R.code == 0 or args._ignore then
+    return R.code, R
   else
     return nil, R
   end
@@ -323,7 +322,6 @@ end
 function exec.qexec(args)
   local pid, err = unistd.fork()
   local R = {}
-  local code
   if pid == nil or pid == -1 then
     return nil, err
   elseif pid == 0 then
@@ -336,13 +334,13 @@ function exec.qexec(args)
     local _, no = errno.errno()
     unistd._exit(no)
   else
-    R.pid, R.status, code = os.wait(pid)
+    R.pid, R.status, R.code = os.wait(pid)
     if R.pid == nil then return nil, R.status end
   end
   R.bin = args._bin
   -- return values depending on flags
-  if code == 0 or args._ignore then
-    return code, R
+  if R.code == 0 or args._ignore then
+    return R.code, R
   else
     return nil, R
   end
