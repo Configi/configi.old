@@ -1,6 +1,6 @@
 return {
     version = "Configi 2.0.0",
-    short_args = "hvtdsmjVl:p:g:r:f:e:",
+    short_args = "hvtdsmjVxl:p:g:r:f:e:",
     long_args = {
         {"help", "none", "h"},
         {"debug", "none", "v"},
@@ -15,7 +15,8 @@ return {
         {"tag", "required", "g"},
         {"runs", "required", "r"},
         {"file", "required", "f"},
-        {"embedded","required", "e"}
+        {"embedded","required", "e"},
+        {"exec", "none", "x"},
     },
     help = [[
     cfg [-h] [-V] [-v] [-d] [-t] [-w] [-p N] [-s] [-l FILE] [-m] [-g TAG] [-r N] [-f "POLICY"] [-e "POLICY"]
