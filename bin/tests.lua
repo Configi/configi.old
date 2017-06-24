@@ -12,10 +12,14 @@ local tests = {
   "test",
   "context",
   "comment",
+  "require",
+  "user-modules",
+  "template",
+  "each",
 }
 for _, t in ipairs(tests) do
   T[t] = function()
-    T.equal(cmd["bin/lua"]{"bin/tests/"..t..".lua"}, 0)
+    T.equal(cmd["bin/lua"]("bin/tests/"..t..".lua"), 0)
   end
 end
 T.summary()
