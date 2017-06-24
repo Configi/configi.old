@@ -236,7 +236,7 @@ function cfg.init(P, M)
     local ok, rt = f(...)
     local err
     if rt then
-      err = exec.exit_string(rt.bin, rt.status, ok)
+      err = exec.exit_string(rt.bin, rt.status, rt.code)
       if type(rt.stdout) == "table" then
         stdout = table.concat(rt.stdout, "\n")
       end
@@ -252,13 +252,13 @@ function cfg.init(P, M)
         string.format("stdout:\n%s\n    stderr:\n%s\n", stdout, stderr))
       return ok, rt
   end -- functime()
-  if not (args["t"] or args["v"]) then
+  if args["x"] then
     msg = Lmod.msg(C)
     C.functions.run = function (f, ...)
       local ok, rt = f(...)
       local err
       if rt then
-        err = exec.exit_string(rt.bin, rt.status, ok)
+        err = exec.exit_string(rt.bin, rt.status, rt.code)
       else
         err = "Successful execution."
       end
@@ -268,6 +268,12 @@ function cfg.init(P, M)
   elseif args["t"] or args["v"] then
     msg = Lmod.dmsg(C)
     Lmod.ignoredwarn(C) -- Warn for ignored parameters
+  else
+    msg = Lmod.msg(C)
+    C.functions.run = function(f, ...)
+      local ok, rt = f(...)
+      return ok, rt
+    end
   end
   if args["t"] then
     C.functions.run = function()
