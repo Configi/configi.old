@@ -1,6 +1,6 @@
 _ENV = require "bin/tests/ENV"
 function test(p)
-  local r, o = cfg{"-m", "-e", p}
+  local r, o = cfg("-x", "-m", "-e", p)
   T.policy = function()
     T.equal(r, 0)
   end
