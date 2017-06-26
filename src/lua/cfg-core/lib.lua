@@ -27,26 +27,26 @@ function Lmod.dmsg (C)
     local level, msg
     item = string.match(item, "([%S+]+)")
     if flag == true then
-      flag = " ok "
+      flag = " OK "
       msg = C.report.repaired
     elseif flag == false then
-      flag = "skip"
+      flag = "SKIP"
       msg = C.report.kept
     elseif flag == nil then
-      flag = "fail"
+      flag = "FAIL"
       msg = C.report.failed
       level = Psyslog.LOG_ERR
     elseif type(flag) == "string" then
       msg = flag
       if bool == true then
-        flag = " ok "
+        flag = " OK "
       elseif bool == nil then
         level = Psyslog.LOG_ERR
-        flag = "fail"
+        flag = "FAIL"
       elseif bool == false then
-        flag = "skip"
+        flag = "SKIP"
       else
-        flag = "exit"
+        flag = "INFO"
       end
     end
     local str
@@ -91,26 +91,26 @@ function Lmod.msg (C)
     local level, msg
     item = string.match(item, "([%S+]+)")
     if flag == true then
-      flag = " ok "
+      flag = " OK "
       msg = C.report.repaired
     elseif flag == false then
-      flag = "skip"
+      flag = "SKIP"
       msg = C.report.kept
     elseif flag == nil then
-      flag = "fail"
+      flag = "FAIL"
       msg = C.report.failed
       level = Psyslog.LOG_ERR
     elseif type(flag) == "string" then
       msg = flag
       if bool == true then
-        flag = " ok "
+        flag = " OK "
       elseif bool == nil then
         level = Psyslog.LOG_ERR
-        flag = "fail"
+        flag = "FAIL"
       elseif bool == false then
-        flag = "skip"
+        flag = "SKIP"
       else
-        flag = "exit"
+        flag = "INFO"
       end
     end
     local rs = string.char(9)
