@@ -88,39 +88,48 @@ end
 
 function Lmod.msg (C)
   return function (item, flag, bool)
-    local level, msg
+    local level, msg, lf
     item = string.match(item, "([%S+]+)")
     if flag == true then
-      flag = " OK "
+      flag = "\27[1;32m".."[ OK ]".."\27[0m"
+      lf =  "OK."
       msg = C.report.repaired
     elseif flag == false then
-      flag = "SKIP"
+      flag = "\27[1;33m".."[SKIP]".."\27[0m"
+      lf = "SKIP."
       msg = C.report.kept
     elseif flag == nil then
-      flag = "FAIL"
+      flag = "\27[1;31m".."[FAIL]".."\27[0m"
+      lf = "FAIL."
       msg = C.report.failed
       level = Psyslog.LOG_ERR
     elseif type(flag) == "string" then
       msg = flag
       if bool == true then
-        flag = " OK "
+        flag = "\27[1;32m".."[ OK ]".."\27[0m"
+        lf =  "OK."
       elseif bool == nil then
         level = Psyslog.LOG_ERR
-        flag = "FAIL"
+        flag = "\27[1;31m".."[FAIL]".."\27[0m"
+        lf = "FAIL."
       elseif bool == false then
-        flag = "SKIP"
+        flag = "\27[1;33m".."[SKIP]".."\27[0m"
+        lf = "SKIP."
       else
-        flag = "INFO"
+        flag = "\27[1;34m".."[INFO]".."\27[0m"
+        lf = "INFO."
       end
     end
     local rs = string.char(9)
-    local lstr
+    local lstr, llstr
     if string.len(C.parameters.comment) > 0 then
-      lstr = string.format("[%s]%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, C.parameters.comment)
+      lstr = string.format("%s%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, C.parameters.comment)
+      llstr = string.format("%s%s%s%s%s%s#%s", lf, rs, msg, rs, item, rs, C.parameters.comment)
     else
-      lstr = string.format("[%s]%s%s%s%s", flag, rs, msg, rs, item)
+      lstr = string.format("%s%s%s%s%s", flag, rs, msg, rs, item)
+      llstr = string.format("%s%s%s%s%s", lf, rs, msg, rs, item)
     end
-    std.log(args["s"], args["l"], lstr, level)
+    std.log(args["s"], args["l"], llstr, level)
     C.results.msgt[#C.results.msgt + 1] = {
       item = item,
       msg = msg,
