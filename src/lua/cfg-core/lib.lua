@@ -30,7 +30,7 @@ function Lmod.dmsg (C)
       flag = " OK "
       msg = C.report.repaired
     elseif flag == false then
-      flag = "SKIP"
+      flag = "PASS"
       msg = C.report.kept
     elseif flag == nil then
       flag = "FAIL"
@@ -44,7 +44,7 @@ function Lmod.dmsg (C)
         level = Psyslog.LOG_ERR
         flag = "FAIL"
       elseif bool == false then
-        flag = "SKIP"
+        flag = "PASS"
       else
         flag = "INFO"
       end
@@ -95,8 +95,8 @@ function Lmod.msg (C)
       lf =  "OK."
       msg = C.report.repaired
     elseif flag == false then
-      flag = "\27[1;33m".."[SKIP]".."\27[0m"
-      lf = "SKIP."
+      flag = "\27[1;33m".."[PASS]".."\27[0m"
+      lf = "PASS."
       msg = C.report.kept
     elseif flag == nil then
       flag = "\27[1;31m".."[FAIL]".."\27[0m"
@@ -113,8 +113,8 @@ function Lmod.msg (C)
         flag = "\27[1;31m".."[FAIL]".."\27[0m"
         lf = "FAIL."
       elseif bool == false then
-        flag = "\27[1;33m".."[SKIP]".."\27[0m"
-        lf = "SKIP."
+        flag = "\27[1;33m".."[PASS]".."\27[0m"
+        lf = "PASS."
       else
         flag = "\27[1;34m".."[INFO]".."\27[0m"
         lf = "INFO."
