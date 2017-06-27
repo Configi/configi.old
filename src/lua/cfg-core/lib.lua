@@ -66,7 +66,7 @@ function Lmod.dmsg (C)
     %s%s]],
     flag, msg, sec, extra or "", "\n")
     end
-    local rs = string.char(9)
+    local rs = strings.rs
     local lstr
     sec = sec or ""
     if string.len(C.parameters.comment) > 0 then
@@ -120,7 +120,7 @@ function Lmod.msg (C)
         lf = "INFO."
       end
     end
-    local rs = string.char(9)
+    local rs = strings.rs
     local lstr, llstr
     if string.len(C.parameters.comment) > 0 then
       lstr = string.format("%s%s%s%s%s%s#%s", flag, rs, msg, rs, item, rs, C.parameters.comment)

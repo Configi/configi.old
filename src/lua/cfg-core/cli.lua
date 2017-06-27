@@ -96,7 +96,7 @@ function cli.main (opts)
             return function (ptbl) -- mod.func
               ptbl = ptbl or {}
               local tag = ptbl.handle
-              local rs = string.char(9)
+              local rs = strings.rs
               local is_string = (type(promiser) == "string")
               if not is_string then
                 fmt.warn("%sIgnoring promise. \"%s\" is not set, passed to %s.%s()\n",
@@ -175,7 +175,7 @@ function cli.main (opts)
         end
       else
         local e = {}
-        local rs = string.char(9)
+        local rs = strings.rs
         setmetatable(e, {
           __index = function(_, mod)
             local t = setmetatable({}, {
