@@ -44,5 +44,6 @@ return {
   WARN = "WARNING: ",
   SERR = "POLICY ERROR: ",
   MERR = "MODULE ERROR: ",
-  EXEC = "EXECUTION: "
+  EXEC = "EXECUTION: ",
+  rs = string.char(32)
 }
