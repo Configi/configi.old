@@ -16,6 +16,13 @@ local tests = {
   "user-modules",
   "template",
   "each",
+  "module.hostname",
+  "module.cron",
+  "module.template",
+  "module.edit",
+  "module.shell",
+  "module.yum",
+  "module.user",
 }
 for _, t in ipairs(tests) do
   T[t] = function()
