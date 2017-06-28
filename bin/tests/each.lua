@@ -11,3 +11,4 @@ function test(p)
   end
 end
 test "test/core-each.lua"
+T.summary()

@@ -10,3 +10,4 @@ function test(p)
   end
 end
 test "test/core-context.lua"
+T.summary()

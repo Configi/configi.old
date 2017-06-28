@@ -10,4 +10,4 @@ function test(p)
   end
 end
 test "test/core-log.lua"
-
+T.summary()

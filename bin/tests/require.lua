@@ -42,3 +42,4 @@ function test(p1, p2)
 end
 test("test/core-require.lua",
   "test/core-require-nodeps.lua")
+T.summary()

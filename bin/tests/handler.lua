@@ -14,3 +14,4 @@ function test(p1, p2)
 end
 test("test/core-handler.lua",
   "test/core-handler2.lua")
+T.summary()

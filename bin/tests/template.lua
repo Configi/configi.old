@@ -8,3 +8,4 @@ function test(p)
   end
 end
 test "test/core-template.lua"
+T.summary()

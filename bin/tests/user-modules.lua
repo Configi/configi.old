@@ -9,3 +9,4 @@ function test(p)
   end
 end
 test "test/core-user-modules/test.lua"
+T.summary()

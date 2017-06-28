@@ -50,3 +50,4 @@ function test(p)
   end
 end
 test "test/core-structure/test.lua"
+T.summary()

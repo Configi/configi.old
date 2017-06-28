@@ -11,3 +11,4 @@ function test(p)
   end
 end
 test "test/core-comment.lua"
+T.summary()
