@@ -15,5 +15,12 @@ E.cmd = E.lib.exec.cmd
 E.cfg = E.cmd["bin/cfg-agent.lua"]
 E.file = E.lib.file
 E.path = E.lib.path
+E.util = E.lib.util
+E.OK = function(t)
+  return string.find(t.stderr[1], ".+%[%sOK%s%].*")
+end
+E.PASS = function(t)
+  return string.find(t.stderr[1], ".+%[PASS%].*")
+end
 E.dir = "test/tmp/"
 return E
