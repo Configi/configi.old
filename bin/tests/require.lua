@@ -1,10 +1,10 @@
 _ENV = require "bin/tests/ENV"
 function test(p1, p2)
   local r, o
-  T.policy = function()
+  T.core["require policy"] = function()
     r, o = cfg("-x", "-m", "-f", p1)
   end
-  T.ordering = function()
+  T.core["require ordering check"] = function()
     T.is_not_nil(string.find(o.stderr[1], "[%g%s^#]+#1st"))
     T.is_not_nil(string.find(o.stderr[2], "[%g%s^#]+#2nd"))
     T.is_not_nil(string.find(o.stderr[3], "[%g%s^#]+#2nd"))
@@ -24,10 +24,10 @@ function test(p1, p2)
     os.remove(dir.."core-require-another")
     os.remove(dir.."core-require")
   end
-  T.policy = function()
+  T.core["require nodeps policy"] = function()
     r, o = cfg("-x", "-m", "-f", p2)
   end
-  T.nodeps = function()
+  T.core["require nodeps check"] = function()
     T.is_not_nil(string.find(o.stderr[1], "[%g%s^#]+#nodeps"))
     T.is_not_nil(string.find(o.stderr[2], "[%g%s^#]+#nodeps"))
     T.is_not_nil(string.find(o.stderr[3], "[%g%s^#]+#2nd"))

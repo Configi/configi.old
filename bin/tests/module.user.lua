@@ -1,14 +1,14 @@
 _ENV = require "bin/tests/ENV"
 function present(p)
   local r, t
-  T.policy = function()
+  T.user["present policy"] = function()
     r, t = cfg("-m", "-f", p)
     T.equal(r, 0)
   end
-  T.present = function()
-    T.is_not_nil(string.find(t.stderr[1], ".+%[ OK %].*"))
+  T.user["present check"] = function()
+    T.is_not_nil(OK(t))
     r, t = cfg("-m", "-f", p)
-    T.is_not_nil(string.find(t.stderr[1], ".+%[PASS%].*"))
+    T.is_not_nil(PASS(t))
   end
 end
 present("test/user_present.lua")
@@ -19,9 +19,9 @@ function absent(p)
     T.equal(r, 0)
   end
   T.absent = function()
-    T.is_not_nil(string.find(t.stderr[1], ".+%[ OK %].*"))
+    T.is_not_nil(OK(t))
     r, t = cfg("-m", "-f", p)
-    T.is_not_nil(string.find(t.stderr[1], ".+%[PASS%].*"))
+    T.is_not_nil(PASS(t))
   end
 end
 absent("test/user_absent.lua")

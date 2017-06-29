@@ -1,12 +1,12 @@
 _ENV = require "bin/tests/ENV"
 function test(p)
   local temp = dir.."core-test.txt"
-  file.write_all(temp, "test")
-  T.policy = function()
+  file.write(temp, "test")
+  T.core["test policy"] = function()
     T.equal(cfg{"-t", "-f", p}, 0)
   end
-  T.functionality = function()
-    T.equal(file.read_to_string(temp), "test")
+  T.core["test check"] = function()
+    T.equal(file.read(temp), "test")
     os.remove(temp)
   end
 end

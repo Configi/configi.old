@@ -14,12 +14,12 @@ function test(p)
     "core-role-policy-one",
     "core-role-top",
   }
-  T.policy = function()
-    local r = cfg{"-f", p}
+  T.core["roles policy"] = function()
+    local r = cfg("-f", p)
     T.equal(r, 0)
   end
   for _, t in ipairs(f) do
-    T.functionality = function()
+    T.core["roles check"] = function()
       T.is_not_nil(stat.stat(dir..t))
       os.remove(dir..t)
     end

@@ -26,10 +26,10 @@ function test(p)
       pretty = hostnames.pretty,
       static = hostnames.static
     }
-    T.policy = function()
+    T.hostname["set policy"] = function()
       T.equal(cfg("-f", p), 0)
     end
-    T.set = function()
+    T.hostname["set check"] = function()
       local after = current_hostnames()
       T.equal(after.transient, "testing.configi.org")
       T.equal(after.pretty, "Testing Configi")
