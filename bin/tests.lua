@@ -23,10 +23,16 @@ local tests = {
   "module.shell",
   "module.yum",
   "module.user",
+  "module.hash",
+  "module.systemd",
+  "module.file",
+  "module.authorized_keys",
 }
-for _, t in ipairs(tests) do
-  T[t] = function()
-    T.equal(cmd["bin/lua"]("bin/tests/"..t..".lua"), 0)
+function T.Configi()
+  for _, t in ipairs(tests) do
+    T[t] = function()
+      T.equal(cmd["bin/lua"]("bin/tests/"..t..".lua"), 0)
+    end
   end
 end
 T.summary()
