@@ -1,5 +1,5 @@
-local rawget, type, pcall, load, setmetatable, ipairs, next, pairs, error, getmetatable =
-      rawget, type, pcall, load, setmetatable, ipairs, next, pairs, error, getmetatable
+local tonumber, rawget, type, pcall, load, setmetatable, ipairs, next, pairs, error, getmetatable =
+      tonumber, rawget, type, pcall, load, setmetatable, ipairs, next, pairs, error, getmetatable
 
 local fix_return_values = function(ok, ...)
   if ok then
@@ -543,6 +543,12 @@ local read_all = function(file)
   io.close()
   io.input(o)
   return str
+end
+
+local octal = function(num)
+  local s = string.format("%o", num)
+  local n = tonumber(s)
+  return n, s
 end
 
 table.find = t_find
