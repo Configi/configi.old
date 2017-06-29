@@ -90,10 +90,6 @@
 /* standard library  -- not used by luac */
 #ifndef MAKE_LUAC
 #include "lbaselib.c"
-#if defined(LUA_COMPAT_BITLIB)
-#include "lbitlib.h"
-#include "lbitlib.c"
-#endif
 #include "lcorolib.c"
 #include "ldblib.c"
 #include "liolib.c"
