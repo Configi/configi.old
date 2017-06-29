@@ -4,18 +4,18 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, template = {}, {}, {}
-local ipairs, io, tonumber, table, os, require =
-  ipairs, io, tonumber, table, os, require
+local template, M = {}, {}
+local ipairs, tonumber, table, os, require =
+  ipairs, tonumber, table, os, require
 local cfg = require"cfg-core.lib"
 local std = require"cfg-core.std"
 local roles = require"cfg-core.roles"
 local lib = require"lib"
 local path, file, string = lib.path, lib.file, lib.string
-local crc = require"crc32"
+local crc32 = require"plc.checksum".crc32
 local stat = require"posix.sys.stat"
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "path" }
 M.alias = {}
@@ -64,14 +64,15 @@ end
 function template.render(S)
   M.parameters = { "src", "lua", "table", "mode", "diff" }
   M.report = {
-      repaired = "template.render: Successfully rendered textfile.",
-        kept = "template.render: No difference detected, not overwriting existing destination.",
-      failed = "template.render: Error rendering textfile.",
+    repaired = "template.render: Successfully rendered textfile.",
+    kept = "template.render: No difference detected, not overwriting existing destination.",
+    failed = "template.render: Error rendering textfile.",
     missingsrc = "template.render: Can't access or missing source file.",
   }
   return function(P)
     P.path = S
     local F, R = cfg.init(P, M)
+    if R.kept then return F.kept(P.path) end
     local ppath = std.path()
     local from_templates = ppath.."/templates/"..P.src
     if stat.stat(from_templates) then
@@ -85,9 +86,6 @@ function template.render(S)
         end
       end
     end
-    if R.kept then
-      return F.kept(P.path)
-    end
     P.mode = P.mode or "0600"
     local mode = tonumber(P.mode, 8)
     if mode then P.mode = mode end
@@ -97,18 +95,8 @@ function template.render(S)
     end
     P._input = string.template(ti, P.table)
     if stat.stat(P.path) then
-      do -- compare P.path and rendered text
-        local i
-        for b in io.lines(P.path, 2^12) do
-          if i == nil then
-            i = crc.crc32_string(b)
-          else
-            i = crc.crc32(b, crc.crc32(i))
-          end
-        end
-        if i == crc.crc32_string(P._input) then
-          return F.kept(P.path)
-        end
+      if crc32(file.read_to_string(P.path)) == crc32(P._input) then
+        return F.kept(P.path)
       end
     end
     return write(F, P, R)
