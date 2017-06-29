@@ -605,7 +605,9 @@ return {
     to_array = f_to_seq,
     test = test,
     read_to_string = f_read,
+    read = f_read,
     write_all = f_write,
+    write = f_write,
     line = line,
     truncate = truncate,
     read_all = read_all
@@ -628,7 +630,7 @@ return {
     truthy = truthy,
     falsy = falsy,
     return_if = return_if,
-    return_if_not = return_if_not
-
+    return_if_not = return_if_not,
+    octal = octal,
   }
 }
