@@ -1,4 +1,7 @@
 _ENV = require "bin/tests/ENV"
+if not path.bin "yum" then
+  T.yum.skip = true
+end
 function present(p)
   T.yum["present policy"] = function()
     T.equal(cfg("-f", p), 0)
