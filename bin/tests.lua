@@ -27,8 +27,14 @@ local tests = {
   "module.systemd",
   "module.file",
   "module.authorized_keys",
+  "module.git",
+  "module.unarchive",
+  "module.iptables",
+  "module.make",
+  "module.process",
+  "module.mount",
 }
-function T.Configi()
+function T["Configi Tests"]()
   for _, t in ipairs(tests) do
     T[t] = function()
       T.equal(cmd["bin/lua"]("bin/tests/"..t..".lua"), 0)
