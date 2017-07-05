@@ -23,6 +23,7 @@ local find_proc = function(exe, cmdline, name)
     if string.find(pid[n], "%d+") then
       local proc_exe = unistd.readlink("/proc/"..pid[n].."/exe") or ""
       local proc_cmdline = file.read_to_string("/proc/"..pid[n].."/cmdline") or ""
+      proc_cmdline = string.gsub(proc_cmdline, "[%c]", " ")
       local proc_name = file.read_to_string("/proc/"..pid[n].."/status") or ""
       if E == nil then
         E = exe or proc_exe
