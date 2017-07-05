@@ -470,7 +470,9 @@ exec.cmd = setmetatable({}, {__index =
     end
     return function(...)
       local args
-      if type(...) == "table" then
+      if not (...) then
+        args = {}
+      elseif type(...) == "table" then
         args = ...
       else
         args = {...}
