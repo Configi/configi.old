@@ -65,7 +65,7 @@ function hostname.set(S)
         if hostnames.static == P.hostname then
           return F.kept(P.hostname)
         end
-        return F.result(P.hostname, F.run(cmd.hostnamectl{ "--static", "set-hostname", P.hostname }))
+        return F.result(P.hostname, F.run(cmd.hostnamectl, { "--static", "set-hostname", P.hostname }))
       end
       -- Static may override Transient in some cases so it's the last one here.
       local kept = true
@@ -91,7 +91,7 @@ function hostname.set(S)
       if P.hostname == fact.hostname[P.hostname] then
         return F.kept(P.hostname)
       end
-      return F.result(P.hostname, F.run(cmd.hostname{ P.hostname }))
+      return F.result(P.hostname, F.run(cmd.hostname, {P.hostname}))
     end
   end
 end
