@@ -47,7 +47,7 @@ function test(p)
     T.set = function()
       _, t = cmd.hostname()
       T.equal(t.stdout[1], "testing")
-      cmd.hostname(before)
+      T.equal(cmd.hostname(before), 0)
       _, t = cmd.hostname()
       T.equal(t.stdout[1], before)
     end
