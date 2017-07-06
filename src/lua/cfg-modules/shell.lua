@@ -92,11 +92,10 @@ function shell.command(S)
     for c in string.gmatch(P.string, "%S+") do
       args[#args + 1] = c
     end
-    args._bin = table.remove(args, 1)
-    args._cwd = P.cwd
-    args._return_code = true
+    args.exe = table.remove(args, 1)
+    args.cwd = P.cwd
     if P.env then
-      args._env = envt(P)
+      args.env = envt(P)
     end
     -- passing a dummy arg if no arguments
     args[2] = args[2] or true
@@ -242,13 +241,13 @@ function shell.popen3(S)
       str = P.string
     end
     local args = string.to_array(str)
-    args._bin = table.remove(args, 1)
-    if P.stdin then args._stdin = P.stdin end
-    if P.cwd then args._cwd = P.cwd end
-    if P.env then args._env = envt(P) end
-    if P.error == "ignore" then args._ignore = true end
+    args.exe = table.remove(args, 1)
+    if P.stdin then args.stdin = P.stdin end
+    if P.cwd then args.cwd = P.cwd end
+    if P.env then args.env = envt(P) end
+    if P.error == "ignore" then args.ignore = true end
     local res, rt = exec.exec(args)
-    local err = exec.exit_string(rt.bin, rt.status, res)
+    local err = exec.exit_string(rt.exe, rt.status, res)
     F.msg(args[1], err, res or nil)
     if P.stdout then
       if P.test then
