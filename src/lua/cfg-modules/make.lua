@@ -33,8 +33,8 @@ function make.install(S)
   M.parameters = { "configure", "make", "environment" }
   M.report = {
     repaired = "make.install: Successfully installed.",
-      kept = "make.install: Already installed.",
-      failed = "make.install: Error installing."
+    kept = "make.install: Already installed.",
+    failed = "make.install: Error installing."
   }
   return function(P)
     P.directory = S
@@ -52,29 +52,29 @@ function make.install(S)
         table.insert_if(P.configure, args, 1, string.to_array(P.configure))
         result = F.run(cmd["./configure"], args)
       else
-        result = F.run(cmd["./configure"], { _env = P.environment, _cwd = P.directory })
+        result = F.run(cmd["./configure"], { env = P.environment, cwd = P.directory })
       end
       if not result then
         return F.result(P.directory, nil, "`./configure` step failed")
       end
     end
     if P.make then
-      args = { _env = P.environment, _cwd = P.directory }
+      args = { env = P.environment, cwd = P.directory }
       table.insert_if(P.make, args, 1, string.to_array(P.make))
       result = F.run(cmd.make, args)
     else
-      result = F.run(cmd.make, { _env = P.environment, _cwd = P.directory })
+      result = F.run(cmd.make, { env = P.environment, cwd = P.directory })
     end
     if not result then
       return F.result(P.directory, nil, "`make` step failed")
     end
     if P.make then
-      args = { _env = P.environment, _cwd = P.directory }
+      args = { env = P.environment, cwd = P.directory }
       table.insert(args, 1, "install")
       table.insert_if(P.make, args, 1, string.to_array(P.make))
       result = F.run(cmd.make, args)
     else
-      result = F.run(cmd.make, { "install",  _env = P.environment, _cwd = P.directory })
+      result = F.run(cmd.make, { "install",  env = P.environment, cwd = P.directory })
     end
     if not result then
       return F.result(P.directory, nil, "`make install` step failed")
