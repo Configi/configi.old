@@ -183,19 +183,6 @@ local f_to_seq = function(file, fmt)
   end
 end
 
-local copy = function(tbl)
-  local copy = {}
-  local iter = tbl[1] and ipairs or pairs
-  for f, v in iter(tbl) do
-    if type(v) == "table" then
-      copy[f] = {}
-    else
-      copy[f] = v
-    end
-  end
-  return copy
-end
-
 local clone
 clone = function(tbl, seen)
   seen = seen or {}
