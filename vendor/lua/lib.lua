@@ -228,7 +228,7 @@ function path.bin(bin)
 end
 
 local pexec = function(args)
-  if args._bin == nil then
+  if args.exe == nil then
     return nil, "No executable or program passed."
   end
   local stdin, fd0 = unistd.pipe()
@@ -250,13 +250,13 @@ local pexec = function(args)
     unistd.close(stdin)
     unistd.close(stdout)
     unistd.close(stderr)
-    if args._cwd then
+    if args.cwd then
       local res
-      res, err = os.chdir(args._cwd)
+      res, err = os.chdir(args.cwd)
       if not res then return nil, err end
     end
     os.closefrom()
-    P.execve(args._bin, args, args._env)
+    P.execve(args.exe, args, args.env)
     local _, no = errno.errno()
     unistd._exit(no)
   end
@@ -300,22 +300,22 @@ function exec.exec(args)
     end
     return true
   end
-  if args._stdin then
-    local res, msg = fd.write(fd0, args._stdin)
+  if args.stdin then
+    local res, msg = fd.write(fd0, args.stdin)
     if not res then return nil, msg end
   end
   unistd.close(fd0)
   local copy, cerr
-  copy, cerr = fdcopy(fd1, "stdout", args._stdout)
+  copy, cerr = fdcopy(fd1, "stdout", args.stdout)
   if not copy then return nil, cerr end
   unistd.close(fd1)
-  copy, cerr = fdcopy(fd2, "stderr", args._stderr)
+  copy, cerr = fdcopy(fd2, "stderr", args.stderr)
   if not copy then return nil, cerr end
   unistd.close(fd2)
   R.pid, R.status, R.code = os.wait(pid)
   if R.pid == nil then return nil, R.status end
-  R.bin = args._bin
-  if R.code == 0 or args._ignore then
+  R.exe = args.exe
+  if R.code == 0 or args.ignore then
     return R.code, R
   else
     return nil, R
@@ -328,21 +328,21 @@ function exec.qexec(args)
   if pid == nil or pid == -1 then
     return nil, err
   elseif pid == 0 then
-    if args._cwd then
-      local r, e = os.chdir(args._cwd)
+    if args.cwd then
+      local r, e = os.chdir(args.cwd)
       if not r then return nil, e end
     end
     os.closefrom()
-    P.execve(args._bin, args, args._env)
+    P.execve(args.exe, args, args.env)
     local _, no = errno.errno()
     unistd._exit(no)
   else
     R.pid, R.status, R.code = os.wait(pid)
     if R.pid == nil then return nil, R.status end
   end
-  R.bin = args._bin
+  R.exe = args.exe
   -- return values depending on flags
-  if R.code == 0 or args._ignore then
+  if R.code == 0 or args.ignore then
     return R.code, R
   else
     return nil, R
