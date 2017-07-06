@@ -484,18 +484,18 @@ end
 
 exec.cmd = setmetatable({}, {__index =
   function (_, key)
-    local E, bin
+    local E, exe
     -- silent execution (exec.qexec) when prepended with "-".
     if string.sub(key, 1, 1) == "-" then
       E = exec.qexec
-      bin = string.sub(key, 2)
+      exe = string.sub(key, 2)
     else
       E = exec.exec
-      bin = key
+      exe = key
     end
     -- Search common executable directories if not a full path.
-    if strlen(path.split(bin)) == 0 then
-      bin = path.bin(bin)
+    if strlen(path.split(exe)) == 0 then
+      exe = path.bin(exe)
     end
     return function(...)
       local args
@@ -506,7 +506,7 @@ exec.cmd = setmetatable({}, {__index =
       else
         args = {...}
       end
-      args._bin = bin
+      args.exe = exe
       return E(args)
     end
   end
