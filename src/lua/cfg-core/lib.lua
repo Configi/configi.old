@@ -245,7 +245,7 @@ function cfg.init(P, M)
     local ok, rt = f(...)
     local err
     if rt then
-      err = exec.exit_string(rt.bin, rt.status, rt.code)
+      err = exec.exit_string(rt.exe, rt.status, rt.code)
       if type(rt.stdout) == "table" then
         stdout = table.concat(rt.stdout, "\n")
       end
@@ -267,7 +267,7 @@ function cfg.init(P, M)
       local ok, rt = f(...)
       local err
       if rt then
-        err = exec.exit_string(rt.bin, rt.status, rt.code)
+        err = exec.exit_string(rt.exe, rt.status, rt.code)
       else
         err = "Successful execution."
       end
