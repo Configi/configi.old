@@ -20,7 +20,7 @@ local try_f = function(fn)
     if ok then
       return ok, ...
     else
-      if fn then fn() end
+      if fn then fn(...) end
       error((...), 0)
     end
   end
@@ -343,7 +343,7 @@ local popen = function(str, cwd, ignore)
   end
   local _, code
   _, R.status, code = io.close(pipe)
-  R.bin = "io.popen"
+  R.exe = "io.popen"
   if code == 0 or ignore then
     return code, R
   else
@@ -367,7 +367,7 @@ local pwrite = function(str, data, cwd, ignore)
   local _, code
   local R = {}
   _, R.status, code = io.close(pipe)
-  R.bin = "io.popen"
+  R.exe = "io.popen"
   if code == 0 or ignore then
     return code, R
   else
@@ -391,7 +391,7 @@ local system = function(str, cwd, ignore)
   local _, code
   local R = {}
   _, R.status, code = os.execute(str)
-  R.bin = "os.execute"
+  R.exe = "os.execute"
   if code == 0 or ignore then
     return code, R
   else
@@ -407,7 +407,7 @@ local script = function(str, ignore)
   local _, code
   local R = {}
   _, R.status, code = os.execute(set..str)
-  R.bin = "os.execute"
+  R.exe = "os.execute"
   if code == 0 or ignore then
     return code, R
   else
@@ -555,7 +555,6 @@ table.find = t_find
 table.to_dict = t_to_dict
 table.to_hash = t_to_dict
 table.filter = t_filter
-table.copy = copy
 table.clone = clone
 table.insert_if = insert_if
 table.auto = autotable
