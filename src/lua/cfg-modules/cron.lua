@@ -116,7 +116,7 @@ function cron.present(S)
         jobs[#jobs + 1] = P.cronjob
         jobs = table.concat(jobs, "\n") -- tostring(jobs)
         jobs = jobs .. "\n" -- vixie-cron needs a blank line at the end. Complains about a premature EOF.
-        return F.result(P.name, F.run(cmd["crontab"], { _stdin = jobs, "-u", P.user, "-" }))
+        return F.result(P.name, F.run(cmd["crontab"], { stdin = jobs, "-u", P.user, "-" }))
     end
 end
 
@@ -149,7 +149,7 @@ function cron.absent(S)
         P.cronjob = genjob(P)
         jobs = table.concat(remove(jobs, string.format("%s%s", tag, P.name)), "\n")
         jobs = jobs .. "\n"
-        return F.result(P.name, F.run(cmd["crontab"], { _stdin = jobs, "-u", P.user, "-"}))
+        return F.result(P.name, F.run(cmd["crontab"], { stdin = jobs, "-u", P.user, "-"}))
     end
 end
 
