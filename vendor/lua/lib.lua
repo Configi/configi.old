@@ -456,6 +456,32 @@ function os.real_name()
   return pwd.getpwuid(unistd.getuid()).pw_name
 end
 
+function exec.command(str)
+  local E, exe, args
+  if string.sub(str, 1, 1) == "-" then
+    E = exec.qexec
+    exe = string.sub(str, 2)
+  else
+    E = exec.exec
+    exe = str
+  end
+  if strlen(path.split(exe)) == 0 then
+    args = {exe = path.bin(exe)}
+  else
+    args = {exe = exe}
+  end
+  return setmetatable(args, {__call = function(_, ...)
+    local a = {}
+    table.copy(a, args)
+    if (...) then
+      for _, k in ipairs({...}) do
+        a[#a+1] = k
+      end
+    end
+    return E(a)
+  end})
+end
+
 exec.cmd = setmetatable({}, {__index =
   function (_, key)
     local E, bin
