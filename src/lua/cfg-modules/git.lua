@@ -59,7 +59,7 @@ function git.clone(S)
       return F.kept(P.repository)
     elseif ret == nil then
       dir, res = cmd.mkdir{ "-p", P.path }
-      err = exec.exit_string(res.bin, res.status, res.bin)
+      err = exec.exit_string(res.exe, res.status, res.exe)
       if not dir then
         return F.result(P.path, nil, err)
       end
