@@ -15,6 +15,7 @@ local errno = require"posix.errno"
 local fcntl = require"posix.fcntl"
 local wait = require"posix.sys.wait"
 local stat = require"posix.sys.stat"
+local A = require"array"
 local P = require"px"
 local I = require"inspect"
 local C = require"cimicida"
@@ -37,6 +38,8 @@ end
 
 -- Aliases
 table.inspect = I.inspect
+table.array = A
+table.copy = P.t_copy
 fd.close = unistd.close
 path.base = libgen.basename
 path.dir = libgen.dirname
