@@ -469,16 +469,16 @@ T["All tests"] = function()
         rm tmp/Makefile
       ]]
     end
-    T.exec.command = function()
+    T.exec.context = function()
       local stdin = ".PHONY: test\ntest:\n\techo $(TEST)"
-      local tee = exec.command("tee")
+      local tee = exec.context("tee")
       tee.stdin = stdin
       local res, tbl = tee("tmp/Makefile")
       T.equal(res, 0)
       tee.stdout = "tmp/Makefile2"
       res, tbl = tee()
       T.equal(res, 0)
-      local make = exec.command("make")
+      local make = exec.context("make")
       make.env = {"TEST=ok"}
       make.cwd = "tmp"
       res, tbl = make("-f", "Makefile2")

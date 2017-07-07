@@ -456,7 +456,7 @@ function os.real_name()
   return pwd.getpwuid(unistd.getuid()).pw_name
 end
 
-function exec.command(str)
+function exec.context(str)
   local E, exe, args
   if string.sub(str, 1, 1) == "-" then
     E = exec.qexec
