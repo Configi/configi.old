@@ -43,7 +43,7 @@ function luarocks.present(S)
     if R.kept or found(P.rock) then
       return F.kept(P.rock)
     end
-    return F.result(P.rock, F.run(cmd.luarocks, { _env = env, "install", P.rock }))
+    return F.result(P.rock, F.run(cmd.luarocks, { env = env, "install", P.rock }))
   end
 end
 

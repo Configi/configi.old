@@ -117,7 +117,7 @@ function yum.present(S)
       elseif P.update == true then
         command = "update"
       end
-      local args = { _env = env, "--quiet", "--assumeyes", command, P.package }
+      local args = { env = env, "--quiet", "--assumeyes", command, P.package }
       local set = {
         nogpgcheck = "--nogpgcheck",
           security = "--security",
@@ -139,7 +139,7 @@ function yum.present(S)
         return F.kept(P.package)
       end
     end
-    local args = { _env = env, "--quiet", "--assumeyes", "install", P.package }
+    local args = { env = env, "--quiet", "--assumeyes", "install", P.package }
     local set = {
       nogpgcheck = "--nogpgcheck"
     }
@@ -172,7 +172,7 @@ function yum.absent(S)
     if R.kept or not found(P.package) then
       return F.kept(P.package)
     end
-    local args = { _env = P.env or P.environment, "--quiet", "--assumeyes", "remove", P.package }
+    local args = { env = P.env or P.environment, "--quiet", "--assumeyes", "remove", P.package }
     local set = {
       nogpgcheck = "--nogpgcheck"
     }

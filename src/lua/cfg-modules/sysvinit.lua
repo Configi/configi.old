@@ -39,7 +39,7 @@ function sysvinit.started(S)
     if R.kept or pgrep(P.service) then
       return F.kept(P.service)
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "start", _ignore = true })
+    F.run(cmd["-/etc/init.d/" .. P.service], { "start", ignore = true })
     return F.result(P.service, pgrep(P.service))
   end
 end
@@ -61,7 +61,7 @@ function sysvinit.stopped(S)
     if R.kept or not pgrep(P.service) then
       return F.kept(P.service)
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "stop", _ignore = true })
+    F.run(cmd["-/etc/init.d/" .. P.service], { "stop", ignore = true })
     return F.result(P.service, (pgrep(P.service) == false))
   end
 end
@@ -83,7 +83,7 @@ function sysvinit.restart(S)
     if R.kept or not pid then
       return F.kept(P.service)
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "restart", _ignore = true })
+    F.run(cmd["-/etc/init.d/" .. P.service], { "restart", ignore = true })
     local _, npid = pgrep(P.service)
     return F.result(P.service, (pid ~= npid))
   end
@@ -108,7 +108,7 @@ function sysvinit.reload(S)
       return F.kept(P.service)
     end
     -- Assumed to always succeed
-    F.run(cmd["-/etc/init.d/" .. P.service], { "reload", _ignore = true })
+    F.run(cmd["-/etc/init.d/" .. P.service], { "reload", ignore = true })
     return F.result(P.service, true)
   end
 end
@@ -132,7 +132,7 @@ function sysvinit.enabled(S)
     if F.run(cmd["-/etc/init.d/" .. P.service], { "enabled" }) then
       return F.kept(P.service)
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "enable", _ignore = true })
+    F.run(cmd["-/etc/init.d/" .. P.service], { "enable", ignore = true })
     return F.result(P.service, F.run(cmd["-/etc/init.d/" .. P.service], { "enabled"}))
   end
 end
@@ -154,7 +154,7 @@ function sysvinit.disabled(S)
     if R.kept or not ok then
       return F.kept(P.service)
     end
-    F.run(cmd["-/etc/init.d/" .. P.service], { "disable", _ignore = true })
+    F.run(cmd["-/etc/init.d/" .. P.service], { "disable", ignore = true })
     ok = cmd["-/etc/init.d/" .. P.service]{ "enabled" }
     return F.result(P.service, (not ok))
   end

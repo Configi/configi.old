@@ -48,7 +48,7 @@ function make.install(S)
     local args, result
     if stat.stat(P.directory .. "/configure") then
       if P.configure then
-        args = { _env = P.environment, _cwd = P.directory }
+        args = { env = P.environment, _cwd = P.directory }
         table.insert_if(P.configure, args, 1, string.to_array(P.configure))
         result = F.run(cmd["./configure"], args)
       else

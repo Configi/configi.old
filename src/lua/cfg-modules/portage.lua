@@ -163,7 +163,7 @@ function portage.absent(S)
     local env = { "CLEAN_DELAY=0", "PATH=/bin:/usr/bin:/sbin:/usr/sbin" } -- PORTAGE_BZIP2_COMMAND needs $PATH
     local A = decompose(P)
     local atom = string.format("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
-    local args = { _env = env, "--quiet", "-C", atom }
+    local args = { env = env, "--quiet", "-C", atom }
     table.insert_if(P.depclean, args, 2, "--depclean")
     return F.result(atom, F.run(cmd["/usr/bin/emerge"], args))
   end

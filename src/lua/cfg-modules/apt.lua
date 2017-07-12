@@ -51,7 +51,7 @@ function apt.present(S)
     if P.proxy then
       env = { "http_proxy=" .. P.proxy }
     end
-    local args = { _env = env, "-q", "-y", "install", P.package }
+    local args = { env = env, "-q", "-y", "install", P.package }
     local set = {
       no_upgrade = "--no-upgrade",
     }

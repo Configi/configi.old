@@ -29,7 +29,7 @@ function systemd.started(S)
     if R.kept then
       return F.kept(P.service)
     end
-    local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _ignore = true })
+    local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, ignore = true })
     if code == 0 then
       return F.kept(P.service)
     end
@@ -54,7 +54,7 @@ function systemd.stopped(S)
     if R.kept then
       return F.kept(P.service)
     end
-    local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _ignore = true })
+    local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, ignore = true })
     if code ~= 0 then
       return F.kept(P.service)
     end
@@ -79,7 +79,7 @@ function systemd.restart(S)
     if R.kept then
       return F.kept(P.service)
     end
-    local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _ignore = true})
+    local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, ignore = true})
     if code ~= 0 then
       return F.kept(P.service)
     end
@@ -103,7 +103,7 @@ function systemd.reload(S)
     if R.kept then
       return F.kept(P.service)
     end
-    local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, _ignore = true})
+    local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, ignore = true})
     if code ~= 0 then
       return F.kept(P.service)
     end
@@ -127,7 +127,7 @@ function systemd.enabled(S)
     if R.kept then
       return F.kept(P.service)
     end
-    local code = F.run(cmd["systemctl"], { "--quiet", "is-enabled", P.service, _ignore = true})
+    local code = F.run(cmd["systemctl"], { "--quiet", "is-enabled", P.service, ignore = true})
     if code == 0 then
       return F.kept(P.service)
     end
@@ -151,7 +151,7 @@ function systemd.disabled(S)
     if R.kept then
       return F.kept(P.service)
     end
-    local code = F.run(cmd["systemctl"], { "--quiet", "is-enabled", P.service, _ignore = true })
+    local code = F.run(cmd["systemctl"], { "--quiet", "is-enabled", P.service, ignore = true })
     if code ~= 0 then
       return F.kept(P.service)
     end

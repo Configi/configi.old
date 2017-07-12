@@ -61,13 +61,13 @@ function opkg.present(S)
     end
     -- Update mode
     if P.update == true then
-      return F.result(P.package, F.run(cmd.opkg, { _env = env, "update", P.package}))
+      return F.result(P.package, F.run(cmd.opkg, { env = env, "update", P.package}))
     end
     -- Install mode
     if R.kept or found(P.package) then
       return F.kept(P.package)
     end
-    local args = { _env = env, "install", P.package }
+    local args = { env = env, "install", P.package }
     local set = {
          force_depends = "--force-depends",
        force_reinstall = "--force-reinstall",
