@@ -1,7 +1,7 @@
 _ENV = require "bin/tests/ENV"
 local osfamily = require"factid".osfamily()
 if not osfamily == "gentoo" then
-  T.emerge.skip = true
+  T.portage.skip = true
 end
 function present(p)
   T.portage["present policy"] = function()
