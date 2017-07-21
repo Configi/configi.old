@@ -25,6 +25,16 @@
 #define black2gray(x)	resetbit(x->marked, BLACKBIT)
 #define linkgclist(o,p)	((o)->gclist = (p), (p) = obj2gco(o))
 
+/*
+ * lcleartable
+ */
+#define gnodelast(h)    gnode(h, cast(size_t, sizenode(h)))
+#define dummynode               (&dummynode_)
+static const Node dummynode_ = {
+	{NILCONSTANT},  /* value */
+	{{NILCONSTANT, 0}}  /* key */
+};
+
 #include "flopen.h"
 #include "closefrom.h"
 
@@ -41,6 +51,20 @@ static int pusherrno(lua_State *L, char *error)
         lua_pushfstring(L, LUA_QS" : "LUA_QS, error, strerror(errno));
         lua_pushinteger(L, errno);
         return 3;
+}
+
+static void
+lcleartable(lua_State *L) {
+	luaL_checktype(L, 1, LUA_TTABLE);
+	Table *h = (Table *)lua_topointer(L, 1);
+	unsigned int i;
+	for (i = 0; i < h->sizearray; i++)
+		setnilvalue(&h->array[i]);
+	if (h->node != dummynode) {
+		Node *n, *limit = gnodelast(h);
+		for (n = gnode(h, 0); n < limit; n++)   //traverse hash part
+			setnilvalue(gval(n));
+	}
 }
 
 /*
@@ -287,6 +311,7 @@ luaL_Reg syslib[] =
 	{"fdopen", Cfdopen},
 	{"execve", Cexecve},
 	{"t_copy", lclonetable},
+	{"t_clear", lcleartable},
 	{NULL, NULL}
 };
 
