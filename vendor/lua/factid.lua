@@ -89,6 +89,15 @@ function factid.aws_instance_id ()
   end
 end
 
+function factid.modules()
+  local modules = file.to_table("/proc/modules", "l")
+  local t = {}
+  for n, m in ipairs(modules) do
+    t[n] = string.match(m, "([%g]+)%s")
+  end
+  return t
+end
+
 -- WORK IN PROGRESS
 function factid.gather ()
   local fact = {}
@@ -255,6 +264,15 @@ function factid.gather ()
       fact.mount[mp.dir][mp.opts] = true
       fact.mount[mp.dir][mp.freq] = true
       fact.mount[mp.dir][mp.passno] = true
+    end
+  end
+
+  do
+    local m = factid.modules()
+    fact.modules = setmetatable({}, return_false)
+    fact.modules.table = m
+    for _, mod in ipairs(m) do
+      fact.modules[mod] = true
     end
   end
 
