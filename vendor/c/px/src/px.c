@@ -310,8 +310,8 @@ luaL_Reg syslib[] =
 	{"closefrom", Cclosefrom},
 	{"fdopen", Cfdopen},
 	{"execve", Cexecve},
-	{"t_copy", lclonetable},
-	{"t_clear", lcleartable},
+	{"table_copy", lclonetable},
+	{"table_clear", lcleartable},
 	{NULL, NULL}
 };
 

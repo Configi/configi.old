@@ -39,7 +39,8 @@ end
 -- Aliases
 table.inspect = I.inspect
 table.array = A
-table.copy = P.t_copy
+table.copy = P.table_copy
+table.clear = P.table_clear
 fd.close = unistd.close
 path.base = libgen.basename
 path.dir = libgen.dirname
