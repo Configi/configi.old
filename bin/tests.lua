@@ -33,6 +33,7 @@ local tests = {
   "module.make",
   "module.process",
   "module.mount",
+  "module.portage",
 }
 T["Configi Tests"] = function()
   for _, t in ipairs(tests) do
