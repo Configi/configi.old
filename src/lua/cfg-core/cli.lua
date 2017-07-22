@@ -142,7 +142,7 @@ function cli.main (opts)
     i = i + 1
     temp, htemp = source, hsource
     source, hsource = {}, {}
-    cli.compile(scripts[next(scripts)], env)
+    cli.compile(scripts[i], env)
     scripts[i] = nil
     -- main queue
     for n = 1, #temp do
