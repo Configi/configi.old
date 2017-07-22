@@ -128,7 +128,6 @@ function cli.main (opts)
   end
   cli.compile(scripts[1], env)
   -- We should only populate roles.
-  source, hsource = {}, {}
   scripts = std.add_from_dirs(scripts, cpath)
   if #roles > 0 then
     for _, role in ipairs(roles) do
@@ -138,6 +137,7 @@ function cli.main (opts)
   end
   -- scripts queue
   local i, temp, htemp = 0
+  source, hsource = {}, {}
   while next(scripts) do
     i = i + 1
     temp, htemp = source, hsource
