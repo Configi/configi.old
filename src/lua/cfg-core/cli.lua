@@ -141,10 +141,10 @@ function cli.main (opts)
   while next(scripts) do
     i = i + 1
     temp, htemp = source, hsource
-    source, hsource = {}, {}
     cli.compile(scripts[i], env)
     scripts[i] = nil
     -- main queue
+    source, hsource = {}, {}
     for n = 1, #temp do
       source[#source + 1] = temp[n]
     end
