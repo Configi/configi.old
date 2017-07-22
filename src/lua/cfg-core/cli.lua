@@ -140,10 +140,12 @@ function cli.main (opts)
   source, hsource = {}, {}
   while next(scripts) do
     i = i + 1
+    -- Should be a reference. Copying does not work.
     temp, htemp = source, hsource
     cli.compile(scripts[i], env)
     scripts[i] = nil
     -- main queue
+    -- Should be new tables. Clearing does not work.
     source, hsource = {}, {}
     for n = 1, #temp do
       source[#source + 1] = temp[n]
