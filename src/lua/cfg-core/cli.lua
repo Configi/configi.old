@@ -144,13 +144,13 @@ function cli.main (opts)
     temp, htemp = source, hsource
     cli.compile(scripts[i], env)
     scripts[i] = nil
-    -- main queue
-    -- Should be new tables. Clearing does not work.
+    -- Main queue
+    -- Should be new empty tables. Clearing does not work.
     source, hsource = {}, {}
     for n = 1, #temp do
       source[#source + 1] = temp[n]
     end
-    -- handlers queue
+    -- Handlers queue
     for t, _ in next, htemp do
       for n = 1, #htemp[t] do
         if hsource[t] and next(hsource[t]) then
