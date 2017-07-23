@@ -136,7 +136,8 @@ function cli.main (opts)
     end
   end
   -- scripts queue
-  local i, temp, htemp = 0
+  local i = 0
+  local temp, htemp
   source, hsource = {}, {}
   while next(scripts) do
     i = i + 1
