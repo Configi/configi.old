@@ -23,6 +23,7 @@ local function get_mods()
 end
 --- Ensure that a specified Linux kernel module is loaded.
 -- @Promiser module
+-- @Aliases loaded
 -- @usage lkm.inserted("vfat"){
 --   comment = "Linux kernel module for the VFAT file system"
 -- }
@@ -50,6 +51,7 @@ function lkm.inserted(S)
 end
 --- Ensure that a specified Linux kernel module is unloaded.
 -- @Promiser module
+-- @Aliases unloaded
 -- @usage lkm.removed("vfat")()
 function lkm.removed(S)
   M.report = {
