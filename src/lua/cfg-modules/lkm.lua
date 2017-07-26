@@ -41,7 +41,7 @@ function lkm.inserted(S)
       return F.kept(P.module)
     end
     if not F.run(cmd.modprobe, "-q", "--first-time", P.module) then
-      return F.result(P.module, nil, modprobe_failed)
+      return F.result(P.module, nil, M.modprobe_failed)
     end
     if not get_mods()[P.module] then
       return F.result(P.module)
@@ -67,7 +67,7 @@ function lkm.removed(S)
       return F.kept(P.module)
     end
     if not F.run(cmd.modprobe, "-r", "-q", "--first-time", P.module) then
-      return F.result(P.module, nil, modprobe_failed)
+      return F.result(P.module, nil, M.modprobe_failed)
     end
     if get_mods()[P.module] then
       return F.result(P.module)
