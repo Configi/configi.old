@@ -3,119 +3,76 @@
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
-local ENV, M, lkm = {}, {}, {}
-local ipairs, string = ipairs, string
+local M, lkm = {}, {}
+local pairs, string = pairs, string
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
-local table, util = lib.table, lib.util
+local file = lib.file
 local cmd = lib.exec.cmd
 local fact = require"cfg-core.fact"
-_ENV = ENV
-
-M.required = { "dir" }
-
---- Relkm a filesystem with specified options
--- @Promiser lkm lkm point to relkm
--- @param value value to write
--- @usage lkm.opts"/tmp"{
---    nodev = true
+_ENV = nil
+M.required = { "module" }
+local function get_mods()
+  local modules = file.to_table("/proc/modules", "l")
+  local t = {}
+  for _, m in pairs(modules) do
+    m = string.match(m, "([%g]+)%s")
+    t[m] = true
+  end
+  return t
+end
+--- Ensure that a specified Linux kernel module is loaded.
+-- @Promiser module
+-- @usage lkm.inserted("vfat"){
+--   comment = "Linux kernel module for the VFAT file system"
 -- }
-function lkm.opts(S)
-  M.parameters = {
-  }
+function lkm.inserted(S)
   M.report = {
-    repaired = "lkm.insert: Successfully relkmed lkm point.",
-      kept = "lkm.relkm: lkm option already set.",
-      failed = "lkm.relkm: Error relkming lkm point.",
-     unlkmed = "lkm.relkm: Error relkming unlkmed lkm point."
+    repaired = "lkm.inserted: Module loaded.",
+    kept = "lkm.inserted: Module already loaded.",
+    failed = "lkm.inserted: Failure loading module.",
+    modprobe_failed = "lkm.inserted: modprobe(8) command failed."
   }
   return function(P)
-    P.dir = S
+    P.module = S
     local F, R = cfg.init(P, M)
-    if R.kept then
-      return F.kept(P.dir)
+    if R.kept or fact.modules[P.module] or get_mods()[P.module] then
+      return F.kept(P.module)
     end
-    if fact.lkm[P.dir] == false then
-      return F.result(P.dir, nil, M.report.unlkmed)
+    if not F.run(cmd.modprobe, "-q", "--first-time", P.module) then
+      return F.result(P.module, nil, modprobe_failed)
     end
-    local tmp = {}
-    for _, o in ipairs(M.parameters) do
-      table.insert_if(P[o], tmp, -1, o)
+    if not get_mods()[P.module] then
+      return F.result(P.module)
     end
-    local to = {}
-    for _, o in ipairs(tmp) do
-      if P[o] == true or util.truthy(P[o]) then
-        to[#to+1] = o
-      elseif P[o] then
-        to[#to+1] = o.."="..P[o]
-      end
-    end
-    local co
-    for _, o in ipairs(fact.lkm.table) do
-      if P.dir == o.dir then
-        co = o.opts
-        break
-      end
-    end
-    local st
-    for _, o in ipairs(to) do
-      st = string.find(co, o, 1, true)
-      if st == nil then
-        local r = F.run(cmd.lkm, { "-o", "relkm,"..table.concat(to, ","), P.dir })
-        return F.result(P.dir, r)
-      end
-    end
-    if st then
-      return F.kept(P.dir)
-    end
+    return F.result(P.module, true)
   end
 end
-
-function lkm.insert(S)
-  M.parameters = {
-  }
-  M.alias = {}
-  M.alias.dev = { "device" }
+--- Ensure that a specified Linux kernel module is unloaded.
+-- @Promiser module
+-- @usage lkm.removed("vfat")()
+function lkm.removed(S)
   M.report = {
-    repaired = "lkm.insert: Successfully inserted Linux kernel module.",
-      kept = "lkm.insert: Linux kernel module already inserted.",
-      failed = "lkm.insert: Failed to insert module."
+    repaired = "lkm.removed: Module unloaded.",
+    kept = "lkm.removed: Module already unloaded.",
+    failed = "lkm.removed: Failure to unload module.",
+    modprobe_failed = "lkm.removed: modprobe(8) command failed."
   }
   return function(P)
-    P.dir = S
+    P.module = S
     local F, R = cfg.init(P, M)
-    if R.kept or fact.lkm[P.dir] then
-      return F.kept(P.dir)
-    else
-      local a = { P.dir }
-      table.insert_if(P.dev, a, 1, P.dev)
-      local r = F.run(cmd.lkm, a)
-      return F.result(P.dir, r)
+    if R.kept or not fact.modules[P.module] or not get_mods()[P.module] then
+      return F.kept(P.module)
     end
-
+    if not F.run(cmd.modprobe, "-r", "-q", "--first-time", P.module) then
+      return F.result(P.module, nil, modprobe_failed)
+    end
+    if get_mods()[P.module] then
+      return F.result(P.module)
+    end
+    return F.result(P.module, true)
   end
 end
-
-function lkm.unlkmed(S)
-  M.report = {
-    repaired = "lkm.umlkmed: Successfully unlkmed.",
-      kept = "lkm.unlkmed: Already unlkmed.",
-      failed = "lkm.unlkmed: Failed to unlkm."
-  }
-  return function(P)
-    P.dir = S
-    local F, R = cfg.init(P, M)
-    if R.kept or fact.lkm[P.dir] == false then
-      return F.kept(P.dir)
-    else
-      local r = F.run(cmd.ulkm, { P.dir })
-      return F.result(P.dir, r)
-    end
-  end
-end
-
-
-cmd.modprobe{"-q", "--first-time" }
 lkm.loaded = lkm.inserted
 lkm.unloaded = lkm.removed
 return lkm
