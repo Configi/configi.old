@@ -257,7 +257,7 @@ function shell.popen3(S)
           F.msg(P.stdout, report.shell_popen3stdout_ok, true)
         else
           res = false
-          F.msg(P.stdout, report.shell_popen3stdout_fail, false)
+          F.msg(P.stdout, report.shell_popen3stdout_fail, nil)
         end
       end
     end
@@ -269,7 +269,7 @@ function shell.popen3(S)
           res = true
           F.msg(P.stderr, report.shell_popen3stderr_ok, true)
         else
-          F.msg(P.stderr, report.shell_popen3stderr_fail, false)
+          F.msg(P.stderr, report.shell_popen3stderr_fail, nil)
         end
       end
     end
