@@ -75,6 +75,27 @@ function lkm.removed(S)
     return F.result(P.module, true)
   end
 end
+--- Ensure that a specified Linux kernel module cannot be loaded.
+-- @Promiser module
+-- @usage lkm.disabled("vfat"()
+function lkm.disabled(S)
+  M.report = {
+    kept = "lkm.disabled: Module is already disabled.",
+    failed = "lkm.disabled: Module loaded."
+  }
+  return function(P)
+    P.module = S
+    local F, R = cfg.init(P, M)
+    if R.kept then
+      return F.kept(P.module)
+    end
+    cmd.modprobe("-q", P.module)
+    if get_mods()[P.module] then
+      return F.result(P.module)
+    end
+    return F.result(P.module, true)
+  end
+end
 lkm.loaded = lkm.inserted
 lkm.unloaded = lkm.removed
 return lkm
