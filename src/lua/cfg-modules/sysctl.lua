@@ -12,7 +12,7 @@ local lib = require"lib"
 local file = lib.file
 _ENV = nil
 
-M.required = { "value" }
+M.required = { "key", "value" }
 
 --- Write value to a sysctl key
 -- @Promiser key sysctl key to write to
