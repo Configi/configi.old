@@ -4,12 +4,12 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, unarchive = {}, {}, {}
+local M, unarchive = {}, {}
 local string = string
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "src", "dest" }
 M.alias = {}
@@ -40,14 +40,14 @@ end
 -- @param dest path where the archive should unpacked [REQUIRED] [ALIAS: directory]
 -- @param creates path to a file, if already existing will skip the unpacking step
 -- @usage unarchive.unpack("/tmp/file.tar"){
---      dest = "/tmp/test"
---     creates = "/tmp/test/file.1"
+--   dest = "/tmp/test"
+--   creates = "/tmp/test/file.1"
 -- }
 function unarchive.unpack(S)
   M.report = {
     repaired = "unarchive.unpack: Successfully unpacked archive.",
-      kept = "unarchive.unpack: Archive already unpacked.",
-      failed = "unarchive.unpack: Error unpacking archive.",
+    kept = "unarchive.unpack: Archive already unpacked.",
+    failed = "unarchive.unpack: Error unpacking archive.",
   }
   return function(P)
     P.src = S

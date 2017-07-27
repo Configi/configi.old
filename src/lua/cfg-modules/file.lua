@@ -4,7 +4,7 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, file = {}, {}, {}
+local M, file = {}, {}
 local ipairs, tostring, os, string = ipairs, tostring, os, string
 local cfg = require"cfg-core.lib"
 local std = require"cfg-core.std"
@@ -16,7 +16,7 @@ local stat = require"posix.sys.stat"
 local unistd = require"posix.unistd"
 local pwd = require"posix.pwd"
 local grp = require"posix.grp"
-_ENV = ENV
+_ENV = nil
 
 M.required = { "path" }
 M.alias = {}
@@ -122,9 +122,9 @@ end
 -- @param owner set the uid/owner [ALIAS: uid]
 -- @param group set the gid/group [ALIAS: gid]
 -- @usage file.attributes("/etc/shadow"){
---    mode = 0600,
---     owner = "root",
---     group = "root"
+--   mode = 0600,
+--   owner = "root",
+--   group = "root"
 -- }
 function file.attributes(S)
   M.parameters = { "mode", "owner", "group" }
@@ -146,14 +146,14 @@ end
 -- @param src path where the symlink points to [REQUIRED]
 -- @param force remove existing symlink
 -- @usage file.link("/home/ed/root"){
---     src = "/"
+--   src = "/"
 -- }
 function file.link(S)
   M.parameters = { "src", "force", "owner", "group", "mode" }
   M.report = {
     repaired = "file.link: Symlink created.",
-      kept = "file.link: Already a symlink.",
-      failed = "file.link: Error creating symlink."
+    kept = "file.link: Already a symlink.",
+    failed = "file.link: Error creating symlink."
   }
   return function(P)
     P.path = S
@@ -182,14 +182,14 @@ end
 -- @param src path where the hard link points to [REQUIRED]
 -- @param force remove existing hard link
 -- @usage file.hard("/home/ed/root"){
---     src = "/"
+--   src = "/"
 -- }
 function file.hard(S)
   M.parameters = { "src", "force", "owner", "group", "mode" }
   M.report = {
     repaired = "file.hard: Hardlink created.",
-      kept = "file.hard: Already a hardlink.",
-      failed = "file.hard: Error creating hardlink."
+    kept = "file.hard: Already a hardlink.",
+    failed = "file.hard: Error creating hardlink."
   }
   return function(P)
     P.path = S
@@ -229,8 +229,8 @@ function file.directory(S)
   M.parameters = { "mode", "owner", "group", "force", "backup" }
   M.report = {
     repaired = "file.directory: Directory created.",
-      kept = "file.directory: Already a directory.",
-      failed = "file.directory: Error creating directory."
+    kept = "file.directory: Already a directory.",
+    failed = "file.directory: Error creating directory."
   }
   return function(P)
     P.path = S
@@ -269,7 +269,7 @@ function file.touch(S)
   M.parameters = { "mode", "owner", "group" }
   M.report = {
     repaired = "file.touch: touch(1) succeeded.",
-      failed = "file.touch: touch(1) failed."
+    failed = "file.touch: touch(1) failed."
   }
   return function(P)
     P.path = S
@@ -292,8 +292,8 @@ end
 function file.absent(S)
   M.report = {
     repaired = "file.absent: Successfully removed.",
-      kept = "file.absent: Already absent.",
-      failed = "file.absent: Error removing path.",
+    kept = "file.absent: Already absent.",
+    failed = "file.absent: Error removing path.",
   }
   return function(P)
     P.path = S
@@ -312,14 +312,14 @@ end
 -- @param force remove existing destination before copying [DEFAULT: "no", false]
 -- @param backup rename existing path and prepend '._configi_' to the name [DEFAULT: "no", false]
 -- @usage file.copy("/home/ed"){
---     dest = "/mnt/backups"
+--   dest = "/mnt/backups"
 -- }
 function file.copy(S)
   M.parameters = { "src", "path", "recurse", "force", "backup" }
   M.report = {
     repaired = "file.copy: Copy succeeded.",
-      kept = "file.copy: Not copying over destination.",
-      failed = "file.copy: Error copying."
+    kept = "file.copy: Not copying over destination.",
+    failed = "file.copy: Error copying."
   }
   return function(P)
     P.src = S
@@ -363,4 +363,3 @@ function file.copy(S)
 end
 
 return file
-

@@ -4,11 +4,11 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, systemd = {}, {}, {}
+local M, systemd = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "service" }
 
@@ -20,8 +20,8 @@ M.required = { "service" }
 function systemd.started(S)
   M.report = {
     repaired = "systemd.started: Successfully started service.",
-      kept = "systemd.started: Service already started.",
-      failed = "systemd.started: Error starting service."
+    kept = "systemd.started: Service already started.",
+    failed = "systemd.started: Error starting service."
   }
   return function(P)
     P.service = S
@@ -45,8 +45,8 @@ end
 function systemd.stopped(S)
   M.report = {
     repaired = "systemd.stopped: Successfully stopped service.",
-      kept = "systemd.stopped: Service already stopped.",
-      failed = "systemd.stopped: Error stopping service."
+    kept = "systemd.stopped: Service already stopped.",
+    failed = "systemd.stopped: Error stopping service."
   }
   return function(P)
     P.service = S
@@ -70,8 +70,8 @@ end
 function systemd.restart(S)
   M.report = {
     repaired = "systemd.restart: Successfully restarted service.",
-      kept = "systemd.restart: Service not active.",
-      failed = "systemd.restart: Error restarting service."
+    kept = "systemd.restart: Service not active.",
+    failed = "systemd.restart: Error restarting service."
   }
   return function(P)
     P.service = S
@@ -94,8 +94,8 @@ end
 function systemd.reload(S)
   M.report = {
     repaired = "system.reload: Successfully reloaded service.",
-      kept = "system.reload: Service not active.",
-      failed = "systemd.reload: Error reloading service."
+    kept = "system.reload: Service not active.",
+    failed = "systemd.reload: Error reloading service."
   }
   return function(P)
     P.service = S
@@ -118,8 +118,8 @@ end
 function systemd.enabled(S)
   M.report = {
     repaired = "systemd.enabled: Successfully enabled service.",
-      kept = "systemd.enabled: Service already enabled.",
-      failed = "systemd.enabled: Error enabling service."
+    kept = "systemd.enabled: Service already enabled.",
+    failed = "systemd.enabled: Error enabling service."
   }
   return function(P)
     P.service = S
@@ -142,8 +142,8 @@ end
 function systemd.disabled(S)
   M.report = {
     repaired = "systemd.disabled: Successfully disabled service.",
-      kept = "systemd.disabled: Service already disabled.",
-      failed = "systemd.disabled: Error disabling service."
+    kept = "systemd.disabled: Service already disabled.",
+    failed = "systemd.disabled: Error disabling service."
   }
   return function(P)
     P.service = S

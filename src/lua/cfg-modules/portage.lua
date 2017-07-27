@@ -4,7 +4,7 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, portage = {}, {}, {}
+local M, portage = {}, {}
 local string = string
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
@@ -12,7 +12,7 @@ local path, table, os = lib.path, lib.table, lib.os
 local cmd = lib.exec.cmd
 local stat = require"posix.sys.stat"
 local dirent = require"posix.dirent"
-_ENV = ENV
+_ENV = nil
 
 M.required = { "atom" }
 
@@ -83,7 +83,7 @@ end
 -- @param update update package to the best version [Default: false]
 -- @param unmask enable auto-unmask and auto-unmask-write options [Default: false]
 -- @usage portage.present("dev-util/strace"){
---     version = "4.8"
+--   version = "4.8"
 -- }
 -- portage.present("dev-util/strace-4.8")()
 -- portage.present("dev-util/strace")()
@@ -93,8 +93,8 @@ function portage.present(S)
   }
   M.report = {
     repaired = "portage.present: Successfully installed package.",
-      kept = "portage.present: Package already installed.",
-      failed = "portage.present: Error installing package."
+    kept = "portage.present: Package already installed.",
+    failed = "portage.present: Error installing package."
   }
   return function(P)
     P.atom = S
@@ -120,12 +120,12 @@ function portage.present(S)
     local atom = string.format("%s%s/%s%s", A.lead or "", A.category, A.package, A.version)
     local args = { "--quiet", "--quiet-build", atom }
     local set = {
-         deep = "--deep",
-         newuse = "--newuse",
-         nodeps = "--nodeps",
+      deep = "--deep",
+      newuse = "--newuse",
+      nodeps = "--nodeps",
       noreplace = "--noreplace",
-        oneshot = "-1",
-       onlydeps = "--onlydeps"
+      oneshot = "-1",
+      onlydeps = "--onlydeps"
     }
     P:insert_if(set, args, 3)
     if P.unmask then
@@ -151,8 +151,8 @@ function portage.absent(S)
   M.parameters = { "depclean" }
   M.report = {
     repaired = "portage.absent: Successfully removed package.",
-      kept = "portage.absent: Package not installed.",
-      failed = "portage.absent: Error removing package."
+    kept = "portage.absent: Package not installed.",
+    failed = "portage.absent: Error removing package."
   }
   return function(P)
     P.atom = S

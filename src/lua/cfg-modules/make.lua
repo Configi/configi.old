@@ -4,14 +4,14 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.7
 
-local ENV, M, make = {}, {}, {}
+local M, make = {}, {}
 local table = table
 local cfg = require"cfg-core.lib"
 local stat = require"posix.sys.stat"
 local lib = require"lib"
 local string = lib.string
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "directory" }
 M.alias = {}
@@ -27,7 +27,7 @@ M.alias.environment = { "env" }
 -- @param installs path of installed executable. Considered kept if it exists [ALIAS: creates]
 -- @param environment space delimited string that contains environment passed to `./configure` and `make` [ALIAS: env]
 -- @usage make.install"/home/ed/Downloads/something-1.0.0"{
---     make = "-DNDEBUG"
+--   make = "-DNDEBUG"
 -- }
 function make.install(S)
   M.parameters = { "configure", "make", "environment" }

@@ -4,14 +4,14 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, yum = {}, {}, {}
+local M, yum = {}, {}
 local string = string
 local stat = require"posix.sys.stat"
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table = lib.table
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "package" }
 M.alias = {}
@@ -38,8 +38,8 @@ function yum.add_repo(S)
   M.parameters = { "repo" }
   M.report = {
     repaired = "yum.add_repo: Successfully added repository.",
-      kept = "yum.add_repo: Repository already present.",
-      failed = "yum.add_repo: Error adding repository."
+    kept = "yum.add_repo: Repository already present.",
+    failed = "yum.add_repo: Error adding repository."
   }
   return function(P)
     P.package = ""
@@ -64,7 +64,7 @@ end
 function yum.clean(S)
   M.report = {
     repaired = "yum.clean: Successfully executed `yum clean`.",
-      failed = "yum.clean: Error running `yum clean`."
+    failed = "yum.clean: Error running `yum clean`."
   }
   return function(P)
     P.option = S
@@ -90,15 +90,15 @@ end
 -- @param update update all packages to the latest version [CHOICES: "yes","no"]
 -- @param update_minimal only update to the version with a bugfix or security errata [CHOICES: "yes","no"]
 -- @usage yum.present("strace")
---     update: "yes"
+--   update: "yes"
 function yum.present(S)
   M.parameters = {
     "config", "nogpgcheck", "security", "bugfix", "proxy", "update", "update_minimal"
   }
   M.report = {
     repaired = "yum.present: Successfully installed package.",
-      kept = "yum.present: Package already installed.",
-      failed = "yum.present: Error installing package."
+    kept = "yum.present: Package already installed.",
+    failed = "yum.present: Error installing package."
   }
   return function(P)
     P.package = S
@@ -120,9 +120,9 @@ function yum.present(S)
       local args = { env = env, "--quiet", "--assumeyes", command, P.package }
       local set = {
         nogpgcheck = "--nogpgcheck",
-          security = "--security",
-          bugfix = "--bugfix"
-      }
+        security = "--security",
+        bugfix = "--bugfix"
+     }
       P:insert_if(set, args, 3)
       if P.config then
         table.insert_if(P.config, args, 3, "--config=" .. P.config)
@@ -157,14 +157,14 @@ end
 -- @Aliases remove
 -- @param config yum config file location
 -- @usage yum.absent("strace"){
---     config = "/etc/yum.conf"
+--   config = "/etc/yum.conf"
 -- }
 function yum.absent(S)
   M.parameters = { "config" }
   M.report = {
     repaired = "yum.absent: Successfully removed package.",
-      kept = "yum.absent: Package not installed.",
-      failed = "yum.absent: Error removing package."
+    kept = "yum.absent: Package not installed.",
+    failed = "yum.absent: Error removing package."
   }
   return function(P)
     P.package = S

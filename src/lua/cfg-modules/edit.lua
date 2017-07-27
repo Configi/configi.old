@@ -4,15 +4,14 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
 
-local ENV, M, edit = {}, {}, {}
-local table, os, require =
-    table, os, require
+local M, edit = {}, {}
+local table, os, require = table, os, require
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local path, file, string = lib.path, lib.file, lib.string
 local stat = require"posix.sys.stat"
 local cmd = lib.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "path" }
 M.alias = {}
@@ -54,10 +53,10 @@ end
 -- @param before [DEFAULT: "no", false]
 -- @param after [DEFAULT: "yes", true]
 -- @usage edit.insert_line("/etc/sysctl.conf"){
---     pattern = "# http://cr.yp.to/syncookies.html",
---     content = "net.ipv4.tcp_syncookies = 1",
---     after = true,
---    plain  = true
+--   pattern = "# http://cr.yp.to/syncookies.html",
+--   content = "net.ipv4.tcp_syncookies = 1",
+--   after = true,
+--   plain  = true
 -- }
 function edit.insert_line(S)
   M.parameters = { "diff", "line", "plain", "pattern", "before_pattern", "after_pattern", "inserts" }
@@ -125,16 +124,16 @@ end
 -- @param pattern text pattern to remove [REQUIRED] [ALIAS: match]
 -- @param plain turn on or off pattern matching facilities [DEFAULT: "yes"]
 -- @usage edit.remove_line("/etc/sysctl.conf"){
---     match = "net.ipv4.ip_forward = 1",
---     plain = true
+--   match = "net.ipv4.ip_forward = 1",
+--   plain = true
 -- }
 function edit.remove_line(S)
   M.parameters = { "pattern", "plain", "diff" }
   M.report = {
     repaired = "edit.remove_line: Successfully removed line.",
-      kept = "edit.remove_line: Line not found.",
-      failed = "edit.remove_line: Error removing line.",
-     missing = "edit.remove_line: Can't access or missing file."
+    kept = "edit.remove_line: Line not found.",
+    failed = "edit.remove_line: Error removing line.",
+    missing = "edit.remove_line: Can't access or missing file."
   }
   return function(P)
     P.path = S

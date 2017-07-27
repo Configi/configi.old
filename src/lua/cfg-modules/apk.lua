@@ -4,12 +4,12 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, apk = {}, {}, {}
+local M, apk = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table = lib.table
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "package" }
 
@@ -33,8 +33,8 @@ function apk.present(S)
   M.parameters = { "update_cache" }
   M.report = {
     repaired = "apk.present: Successfully installed package.",
-      kept = "apk.present: Package already installed.",
-      failed = "apk.present: Error installing package."
+    kept = "apk.present: Package already installed.",
+    failed = "apk.present: Error installing package."
   }
   return function(P)
     P.package = S
@@ -57,8 +57,8 @@ end
 function apk.absent(S)
   M.report = {
     repaired = "apk.absent: Successfully removed package",
-      kept = "apk.absent: Package not installed.",
-      failed = "apk.absent: Error removing package."
+    kept = "apk.absent: Package not installed.",
+    failed = "apk.absent: Error removing package."
   }
   return function(P)
     P.package = S

@@ -4,14 +4,14 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, hostname = {}, {}, {}
+local M, hostname = {}, {}
 local string, ipairs, next = string, ipairs, next
 local cfg = require"cfg-core.lib"
 local fact = require"cfg-core.fact"
 local lib = require"lib"
 local path = lib.path
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "hostname" }
 
@@ -41,15 +41,15 @@ end
 -- @Promiser hostname
 -- @usage hostname.set("aardvark")()
 -- @usage hostname.set("aardvark"){
---     transient = "aardvark.configi.org",
---     pretty = "Aardvark host"
+--   transient = "aardvark.configi.org",
+--   pretty = "Aardvark host"
 -- }
 function hostname.set(S)
   M.parameters = { "static", "transient", "pretty" }
   M.report = {
     repaired = "hostname.set: Successfully set hostname(s).",
-      kept = "hostname.set: Hostname already set.",
-      failed = "hostname.set: Error setting hostname.",
+    kept = "hostname.set: Hostname already set.",
+    failed = "hostname.set: Error setting hostname.",
   }
   return function(P)
     P.hostname = S

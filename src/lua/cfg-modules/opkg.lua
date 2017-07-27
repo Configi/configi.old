@@ -4,12 +4,12 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, opkg = {}, {}, {}
+local M, opkg = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table = lib.table
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "package" }
 
@@ -34,23 +34,23 @@ end
 -- @param proxy HTTP proxy to use for connections
 -- @param update update package [Default: false]
 -- @usage opkg.present("strace") {
---     update = true
+--   update = true
 -- }
 function opkg.present(S)
   M.parameters = {
-       "force_depends",
-     "force_reinstall",
-      "force_ovewrite",
-     "force_downgrade",
+    "force_depends",
+    "force_reinstall",
+    "force_ovewrite",
+    "force_downgrade",
     "force_maintainer",
-          "nodeps",
-           "proxy",
-          "update"
+    "nodeps",
+    "proxy",
+    "update"
   }
   M.report = {
     repaired = "opkg.present: Successfully installed package.",
-      kept = "opkg.present: Package already installed.",
-      failed = "opkg.present: Error installing package."
+    kept = "opkg.present: Package already installed.",
+    failed = "opkg.present: Error installing package."
   }
   return function(P)
     P.package = S
@@ -69,12 +69,12 @@ function opkg.present(S)
     end
     local args = { env = env, "install", P.package }
     local set = {
-         force_depends = "--force-depends",
-       force_reinstall = "--force-reinstall",
-       force_downgrade = "--force-downgrade",
-        force_remove = "--force-remove",
+      force_depends = "--force-depends",
+      force_reinstall = "--force-reinstall",
+      force_downgrade = "--force-downgrade",
+      force_remove = "--force-remove",
       force_maintainer = "--force-maintainer",
-            nodeps = "--nodeps",
+      nodeps = "--nodeps",
     }
     P:insert_if(set, args, 1)
     return F.result(P.package, F.run(cmd.opkg, args))
@@ -90,7 +90,7 @@ end
 -- @param autoremove Remove packages that were installed to satisfy dependencies [Default: false]
 -- @param force_removal_of_dependent_packages Remove package and all dependencies [Default: false]
 -- @usage opkg.absent("ncurses"){
---     force_remove = true
+--   force_remove = true
 -- }
 function opkg.absent(S)
   M.parameters = { "force_depends", "force_remove", "autoremove", "force_removal_of_dependent_packages" }

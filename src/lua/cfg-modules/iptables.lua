@@ -5,14 +5,14 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.7
 
-local ENV, M, iptables = {}, {}, {}
+local M, iptables = {}, {}
 local io = io
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table, string = lib.table, lib.string
 local cmd = lib.exec.cmd
 local stat = require"posix.sys.stat"
-_ENV = ENV
+_ENV = nil
 
 M.required = { "chain" }
 M.alias = {}
@@ -32,12 +32,12 @@ M.alias.match = { "module" }
 -- @param ipv6 Use ip6tables
 -- @param ipv4 Use iptables [DEFAULT: "yes", true]
 -- @usage iptables.append("comment"){
---      table = "filter",
---      chain = "input",
---     target = "accept",
---     source = "6.6.6.6",
---     protocol = "tcp",
---    options = "-m tcp --sport 31337 --dport 31337"
+--   table = "filter",
+--   chain = "input",
+--   target = "accept",
+--   source = "6.6.6.6",
+--   protocol = "tcp",
+--   options = "-m tcp --sport 31337 --dport 31337"
 -- }
 function iptables.append(S)
   --[[
@@ -45,23 +45,23 @@ function iptables.append(S)
      --sport 31337 --dport 8080 --tcp-option 16 --tcp-flags SYN FIN -j ACCEPT
     ]]
   M.parameters = {
-        "table",
-        "chain",
-       "source",
+    "table",
+    "chain",
+    "source",
     "destination",
-       "protocol",
-       "target",
-      "options",
-        "match",
-         "in",
-        "out",
-         "ipv6",
-         "ipv4"
+    "protocol",
+    "target",
+    "options",
+    "match",
+    "in",
+    "out",
+    "ipv6",
+    "ipv4"
   }
   M.report = {
     repaired = "iptables.append: Successfully appended rule.",
-      kept = "iptables.append: Rule already present.",
-      failed = "iptables.append: Failed to append rule."
+    kept = "iptables.append: Rule already present.",
+    failed = "iptables.append: Failed to append rule."
   }
   return function(P)
     P.tag = S -- currently unused
@@ -176,8 +176,8 @@ function iptables.default(S)
   M.parameters = { "source", "host", "ssh" }
   M.report = {
     repaired = "iptables.default: Successfully added rules.",
-      kept = "iptables.default: Rules already present",
-      failed = "iptables.default: Error adding rules."
+    kept = "iptables.default: Rules already present",
+    failed = "iptables.default: Error adding rules."
   }
   return function(P)
     local F, R = cfg.init(P, M)

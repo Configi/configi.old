@@ -4,7 +4,7 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
 
-local ENV, M, process = {}, {}, {}
+local M, process = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local file = lib.file
@@ -12,7 +12,7 @@ local dirent = require"posix.dirent"
 local unistd = require"posix.unistd"
 local signal = require"posix.signal"
 local string = string
-_ENV = ENV
+_ENV = nil
 
 -- We do not check if the PID of exe, cmdline and name are the same.
 -- In some cases different PIDs can have the same exe symlink, cmdline string and Name in status.
@@ -60,16 +60,16 @@ end
 -- @param cmdline the string in /proc/$pid/cmdline
 -- @param name the Name field in /proc/$pid/status
 -- @usage process.signal"nginx-sighup"{
---     signal = "SIGHUP",
---      exe = "/usr/sbin/nginx"
+--   signal = "SIGHUP",
+--   exe = "/usr/sbin/nginx"
 -- }
 function process.signal(S)
   M.parameters = {"signal", "exe", "cmdline", "name"}
   M.report = {
     repaired = "process.signal: Successfully sent signal to process.",
-      failed = "process.signal: Error sending signal to process -- ",
-     missing = "process.signal: Missing required parameter."
-    }
+    failed = "process.signal: Error sending signal to process -- ",
+    missing = "process.signal: Missing required parameter."
+  }
   return function(P)
     P.handle = S
     local F, R = cfg.init(P, M)
@@ -105,13 +105,13 @@ end
 -- @param cmdline string from /proc/$pid/cmdline
 -- @param name Name field in /proc/$pid/status
 -- @usage process.running("/usr/bin/rsyncd"){
---      requires = "start-rsyncd",
---     notify_failed = "start-rsyncd"
+--   requires = "start-rsyncd",
+--   notify_failed = "start-rsyncd"
 -- }
 function process.running(S)
   M.parameters = { "exe", "cmdline", "name" }
   M.report = {
-      kept = "process.running: Process found.",
+    kept = "process.running: Process found.",
     failed = "process.running: Process not found"
   }
   return function(P)

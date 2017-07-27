@@ -23,7 +23,7 @@ M.alias.hash = { "digest", "signature" }
 -- @Aliases sha256
 -- @param hash the alphanumeric string to match for [ALIAS: digest, signature] [REQUIRED]
 -- @usage hash.sha2("/etc/passwd"){
---     hash = "09e40b7b232c4abb427f1344e636e44ebf5684f70fb6cd67507e88955064255d"
+--   hash = "09e40b7b232c4abb427f1344e636e44ebf5684f70fb6cd67507e88955064255d"
 -- }
 function hash.sha2(S)
   M.report = {

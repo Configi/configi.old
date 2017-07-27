@@ -3,14 +3,14 @@
 -- @author Eduardo Tongson <propolice@gmail.com>
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
-local ENV, M, mount = {}, {}, {}
+local M, mount = {}, {}
 local ipairs, string = ipairs, string
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table, util = lib.table, lib.util
 local cmd = lib.exec.cmd
 local fact = require"cfg-core.fact"
-_ENV = ENV
+_ENV = nil
 
 M.required = { "dir" }
 
@@ -18,7 +18,7 @@ M.required = { "dir" }
 -- @Promiser mount mount point to remount
 -- @param value value to write
 -- @usage mount.opts"/tmp"{
---    nodev = true
+--   nodev = true
 -- }
 function mount.opts(S)
   M.parameters = {
@@ -58,9 +58,9 @@ function mount.opts(S)
   }
   M.report = {
     repaired = "mount.remount: Successfully remounted mount point.",
-      kept = "mount.remount: Mount option already set.",
-      failed = "mount.remount: Error remounting mount point.",
-     unmounted = "mount.remount: Error remounting unmounted mount point."
+    kept = "mount.remount: Mount option already set.",
+    failed = "mount.remount: Error remounting mount point.",
+    unmounted = "mount.remount: Error remounting unmounted mount point."
   }
   return function(P)
     P.dir = S
@@ -112,8 +112,8 @@ function mount.mounted(S)
   M.alias.dev = { "device" }
   M.report = {
     repaired = "mount.mounted: Successfully mounted.",
-      kept = "mount.mounted: Already mounted.",
-      failed = "mount.mounted: Failed to mount."
+    kept = "mount.mounted: Already mounted.",
+    failed = "mount.mounted: Failed to mount."
   }
   return function(P)
     P.dir = S
@@ -133,8 +133,8 @@ end
 function mount.unmounted(S)
   M.report = {
     repaired = "mount.ummounted: Successfully unmounted.",
-      kept = "mount.unmounted: Already unmounted.",
-      failed = "mount.unmounted: Failed to unmount."
+    kept = "mount.unmounted: Already unmounted.",
+    failed = "mount.unmounted: Failed to unmount."
   }
   return function(P)
     P.dir = S

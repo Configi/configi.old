@@ -144,8 +144,8 @@ end
 function sysvinit.disabled(S)
   M.report = {
     repaired = "sysvinit.disabled: Successfully disabled service.",
-      kept = "sysvinit.disabled: Service already disabled.",
-      failed = "sysvinit.disabled: Error disabling service."
+    kept = "sysvinit.disabled: Service already disabled.",
+    failed = "sysvinit.disabled: Error disabling service."
   }
   return function(P)
     P.service = S

@@ -4,12 +4,12 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, shell = {}, {}, {}
+local M, shell = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local file, table, string, exec, os = lib.file, lib.table, lib.string, lib.exec, lib.os
 local stat = require"posix.sys.stat"
-_ENV = ENV
+_ENV = nil
 
 M.required = { "string" }
 M.alias = {}
@@ -71,16 +71,16 @@ end
 -- @param creates a filename, if found will not run the command
 -- @param removes a filename, if not found will not run the command
 -- @usage shell.command("touch test"){
---       cwd = "/tmp",
---       env = "test=this whatever=youwant",
---     creates = "test"
+--    cwd = "/tmp",
+--    env = "test=this whatever=youwant",
+--    creates = "test"
 -- }
 function shell.command(S)
   M.parameters = { "cwd" }
   M.report = {
     repaired = "shell.command: Command successfully executed.",
-      kept = "shell.command: `creates` or `removes` parameter satisfied.",
-      failed = "shell.command: Error executing command."
+    kept = "shell.command: `creates` or `removes` parameter satisfied.",
+    failed = "shell.command: Error executing command."
   }
   return function(P)
     P.string = S
@@ -120,8 +120,8 @@ end
 function shell.system(S)
   M.report = {
     repaired = "shell.system: Script successfully executed.",
-      kept = "shell.system: `creates` or `removes` parameter satisfied.",
-      failed = "shell.system: Error executing script."
+    kept = "shell.system: `creates` or `removes` parameter satisfied.",
+    failed = "shell.system: Error executing script."
   }
   return function(P)
     P.string = S
@@ -149,8 +149,8 @@ end
 -- @param removes a filename, if not found will not run the command
 -- @param expects instead of the exit code, use a string match as a test for success
 -- @usage shell.popen("ls -la"){
---       cwd = "/tmp",
---     expects = ".X11-unix"
+--   cwd = "/tmp",
+--   expects = ".X11-unix"
 -- }
 function shell.popen(S)
   local report = {
@@ -160,8 +160,8 @@ function shell.popen(S)
   M.parameters = { "cwd", "expects" }
   M.report = {
     repaired = "shell.popen: Command or script successfully executed.",
-      kept = "shell.popen: `creates` or `removes` parameter satisfied.",
-      failed = "shell.popen: Command or script error."
+    kept = "shell.popen: `creates` or `removes` parameter satisfied.",
+    failed = "shell.popen: Command or script error."
   }
   return function(P)
     P.string = S
@@ -212,21 +212,21 @@ end
 -- @param stderr test for a string from STDERR
 -- @param error ignore errors when set to "ignore" [Default: false]
 -- @usage shell.popen3("ls"){
---      cwd = "/tmp",
---     stdout = ".X11-unix"
+--   cwd = "/tmp",
+--   stdout = ".X11-unix"
 -- }
 function shell.popen3(S)
   local report = {
-      shell_popen3stdout_ok = "stdout: Expected stdout pattern found.",
+    shell_popen3stdout_ok = "stdout: Expected stdout pattern found.",
     shell_popen3stdout_fail = "stdout: Expectd stdout pattern not found.",
-      shell_popen3stderr_ok = "stderr: Expected stderr pattern found.",
+    shell_popen3stderr_ok = "stderr: Expected stderr pattern found.",
     shell_popen3stderr_fail = "stderr: Expected stderr pattern not found."
   }
   M.parameters = { "cwd", "stdin", "stdout", "stderr", "error" }
   M.report = {
     repaired = "shell.popen3: Command or script successfully executed.",
-      kept = "shell.popen3: `creates` or `removes` parameter satisfied.",
-      failed = "shell.popen3: Command or script error."
+    kept = "shell.popen3: `creates` or `removes` parameter satisfied.",
+    failed = "shell.popen3: Command or script error."
   }
   return function(P)
     P.string = S

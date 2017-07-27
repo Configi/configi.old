@@ -4,12 +4,12 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 1.0.0
 
-local ENV, M, apt = {}, {}, {}
+local M, apt = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table = lib.table
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "package" }
 M.alias = {}
@@ -30,7 +30,7 @@ end
 -- @param update_cache Run `apt-get update` before any operation [DEFAULT: false]
 -- @param no_upgrade Prevent upgrade of specified package if already installed [DEFAULT: false]
 -- @usage apt.present("strace"){
---     update_cache = true
+--   update_cache = true
 -- }
 function apt.present(S)
   M.parameters = {
@@ -38,8 +38,8 @@ function apt.present(S)
   }
   M.report = {
     repaired = "apt.present: Successfully installed package.",
-      kept = "apt.present: Package already installed.",
-      failed = "apt.present: Error installing package."
+    kept = "apt.present: Package already installed.",
+    failed = "apt.present: Error installing package."
   }
   return function(P)
     P.package = S
@@ -81,8 +81,8 @@ end
 function apt.absent(S)
   M.report = {
     repaired = "apt.absent: Successfully removed package.",
-      kept = "apt.absent: Package not installed.",
-      failed = "apt.absent: Error removing package."
+    kept = "apt.absent: Package not installed.",
+    failed = "apt.absent: Error removing package."
   }
   return function(P)
     P.package = S

@@ -4,7 +4,7 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, authorized_keys = {}, {}, {}
+local M, authorized_keys = {}, {}
 local string = string
 local cfg = require"cfg-core.lib"
 local stat = require"posix.sys.stat"
@@ -12,7 +12,7 @@ local pwd = require"posix.pwd"
 local fact = require"cfg-core.fact"
 local lib = require"lib"
 local os, file, table = lib.os, lib.file, lib.table
-_ENV = ENV
+_ENV = nil
 
 M.required = { "type", "key" }
 M.alias = {}
@@ -77,18 +77,18 @@ end
 -- @param options a comma-separated options specifications
 -- @param create create ~/.ssh directory or not [DEFAULT: "yes", true]
 -- @usage authorized_keys.present("AAAAA...."){
---     options = "yaaaya",
---      user = "ed",
---      id = "etongson",
---      type = "ssh-rsa",
---    create = false
+--   options = "yaaaya",
+--   user = "ed",
+--   id = "etongson",
+--   type = "ssh-rsa",
+--   create = false
 -- }
 function authorized_keys.present(S)
   M.parameters = { "user", "options", "id", "create" }
   M.report = {
-      repaired = "authorized_keys.present: Key successfully added.",
-        kept = "authorized_keys.present: Key already present.",
-        failed = "authorized_keys.present: Error adding key.",
+    repaired = "authorized_keys.present: Key successfully added.",
+    kept = "authorized_keys.present: Key already present.",
+    failed = "authorized_keys.present: Error adding key.",
   }
   return function(P)
     if fact.osfamily.openwrt then
@@ -130,15 +130,15 @@ end
 -- [ALIAS: login] [DEFAULT: Effective user ID]
 -- @param type SSH key type
 -- @usage authorized_keys.absent"AAAAA..."{
---     user = "ed",
---     type = "ssh-rsa"
+--   user = "ed",
+--   type = "ssh-rsa"
 -- }
 function authorized_keys.absent(S)
   M.parameters =  { "user", "options", "id", "create" } -- make it easier to toggle a key
   M.report = {
     repaired = "authorized_keys.absent: Key successfully removed.",
-      kept = "authorized_keys.absent: Key already absent.",
-      failed = "authorized_keys.absent: Error removing key."
+    kept = "authorized_keys.absent: Key already absent.",
+    failed = "authorized_keys.absent: Error removing key."
   }
   return function(P)
     if fact.osfamily.openwrt then

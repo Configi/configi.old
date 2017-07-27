@@ -4,13 +4,13 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, git = {}, {}, {}
+local M, git = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local file, table, exec = lib.file, lib.table, lib.exec
 local stat = require"posix.sys.stat"
 local cmd = exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "path" }
 M.alias = {}
@@ -38,14 +38,14 @@ end
 -- @Aliases cloned
 -- @param repository The URL of the repository. [ALIAS: url,repo] [REQUIRED]
 -- @usage git.repo"/home/user/work"{
---     repo = "https://github.com/torvalds/linux.git"
+--   repo = "https://github.com/torvalds/linux.git"
 -- }
 function git.clone(S)
   M.parameters = { "repository" }
   M.report = {
     repaired = "git.clone: Successfully cloned Git repository.",
-      kept = "git.clone: Already a git repository.",
-      failed = "git.clone: Error running `git clone`."
+    kept = "git.clone: Already a git repository.",
+    failed = "git.clone: Error running `git clone`."
   }
   return function(P)
     P.path = S
@@ -76,13 +76,13 @@ end
 -- @Promiser path where to clone the repository
 -- @param repository The URL of the repository. [ALIAS: url,repo] [REQUIRED]
 -- @usage git.pull("/home/user/work"){
---     repo = "https://github.com/torvalds/linux.git"
+--   repo = "https://github.com/torvalds/linux.git"
 -- }
 function git.pull(S)
   M.report = {
     repaired = "git.pull: Successfully pulled Git repository.",
-      kept = "git.pull: Path is non-existent or not a Git repository.",
-      failed = "git.pull: Error running `git pull`."
+    kept = "git.pull: Path is non-existent or not a Git repository.",
+    failed = "git.pull: Error running `git pull`."
   }
   return function(P)
     P.path = S

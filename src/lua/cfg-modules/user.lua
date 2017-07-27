@@ -4,14 +4,14 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, user = {}, {}, {}
+local M, user = {}, {}
 local tostring, string = tostring, string
 local pwd = require"posix.pwd"
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local path, table = lib.path, lib.table
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "login" }
 
@@ -31,20 +31,20 @@ M.required = { "login" }
 -- @param groups supplementary groups for the user account
 -- @param user_group whether to create a new group with the same name as the user account [DEFAULT: false]
 -- @usage user.present("ed"){
---      uid = "666",
---      gid = "777",
---    shell = "/usr/bin/mksh",
---     groups = "kvm"
+--   uid = "666",
+--   gid = "777",
+--   shell = "/usr/bin/mksh",
+--   groups = "kvm"
 -- }
 function user.present(S)
   M.report = {
-     repaired = "user.present: Successfully created user login.",
-       kept = "user.present: User login exists.",
-       failed = "user.present: Error creating user login.",
+    repaired = "user.present: Successfully created user login.",
+    kept = "user.present: User login exists.",
+    failed = "user.present: Error creating user login.",
     mod_shell = "user.present: Modified shell.",
-     mod_home = "user.present: Modified home directory.",
-      mod_uid = "user.present: Modified uid.",
-      mod_gid = "user.present: Modified gid."
+    mod_home = "user.present: Modified home directory.",
+    mod_uid = "user.present: Modified uid.",
+    mod_gid = "user.present: Modified gid."
   }
   M.parameters = { "uid", "gid", "shell", "home", "create_home", "description",
         "expire_date", "groups", "user_group", "no_user_group" }
@@ -95,8 +95,8 @@ function user.present(S)
     if path.bin"useradd" then
       args = { P.login }
       set = {
-           user_group = "-U",
-          create_home = "-m",
+        user_group = "-U",
+        create_home = "-m",
         no_user_group = "-N"
       }
       P:insert_if(set, args, 1)
@@ -125,14 +125,14 @@ end
 -- @Aliases remove
 -- @param remove delete home directory [DEFAULT: false]
 -- @usage user.absent("ed"){
---     remove = true
+--   remove = true
 -- }
 function user.absent(S)
   M.parameters = { "remove" }
   M.report = {
     repaired = "user.absent: Successfully deleted user login.",
-      kept = "user.absent: User login already absent.",
-      failed = "user.absent: Error deleting user login"
+    kept = "user.absent: User login already absent.",
+    failed = "user.absent: Error deleting user login"
   }
   return function(P)
     P.login = S

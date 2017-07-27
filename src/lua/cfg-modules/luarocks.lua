@@ -4,12 +4,12 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
 
-local ENV, M, luarocks = {}, {}, {}
+local M, luarocks = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table = lib.table
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "rock" }
 M.alias = {}
@@ -30,8 +30,8 @@ function luarocks.present(S)
   M.parameters = { "proxy" }
   M.report = {
     repaired = "luarocks.present: Successfully installed rock.",
-      kept = "luarocks.present: Rock already installed.",
-      failed = "luarocks.present: Error installing rock."
+    kept = "luarocks.present: Rock already installed.",
+    failed = "luarocks.present: Error installing rock."
   }
   return function(P)
     P.rock = S
@@ -55,8 +55,8 @@ end
 function luarocks.absent(S)
   M.report = {
     repaired = "luarocks.absent: Successfully removed rock.",
-      kept = "luarocks.absent: Rock not installed.",
-      failed = "luarocks.absent: Error removing rock."
+    kept = "luarocks.absent: Rock not installed.",
+    failed = "luarocks.absent: Error removing rock."
   }
   return function(P)
     P.rock = S

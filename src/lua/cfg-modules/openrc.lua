@@ -8,12 +8,12 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 0.9.0
 
-local ENV, M, openrc = {}, {}, {}
+local M, openrc = {}, {}
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table, string = lib.table, lib.string
 local cmd = lib.exec.cmd
-_ENV = ENV
+_ENV = nil
 
 M.required = { "service" }
 
@@ -25,8 +25,8 @@ M.required = { "service" }
 function openrc.started(S)
   M.report = {
     repaired = "openrc.started: Successfully started service.",
-      kept = "openrc.started: Service already started.",
-      failed = "openrc.started: Error starting service"
+    kept = "openrc.started: Service already started.",
+    failed = "openrc.started: Error starting service"
   }
   return function(P)
     P.service = S
@@ -53,8 +53,8 @@ end
 function openrc.stopped(S)
   M.report = {
     repaired = "openrc.stopped: Successfully stopped service.",
-      kept = "openrc.stopped: Service already stopped.",
-      failed = "openrc.stopped: Error stopping service."
+    kept = "openrc.stopped: Service already stopped.",
+    failed = "openrc.stopped: Error stopping service."
   }
   return function(P)
     P.service = S
@@ -103,7 +103,7 @@ end
 function openrc.reload(S)
   M.report = {
     repaired = "openrc.reload: Successfully reloaded service",
-      failed = "openrc.reload: Error reloading service."
+    failed = "openrc.reload: Error reloading service."
   }
   return function(P)
     P.service = S
@@ -123,14 +123,14 @@ end
 -- @Promiser service
 -- @param runlevel runlevel to add to [REQUIRED] [DEFAULT: default]
 -- @usage openrc.add("rsyncd"){
---     runlevel = "default"
+--   runlevel = "default"
 -- }
 function openrc.add(S)
   M.parameters = { "runlevel" }
   M.report = {
     repaired = "openrc.add: Successfully added service to runlevel.",
-      kept = "openrc.add: Service already in the runlevel.",
-      failed = "openrc.add: Error adding service to runlevel."
+    kept = "openrc.add: Service already in the runlevel.",
+    failed = "openrc.add: Error adding service to runlevel."
   }
   return function(P)
     P.service = S
@@ -157,14 +157,14 @@ end
 -- @Aliases del
 -- @param runlevel runlevel to remove from [REQUIRED] [DEFAULT: default]
 -- @usage openrc.delete("rsyncd"){
---     runlevel = "default"
+--   runlevel = "default"
 -- }
 function openrc.delete(S)
   M.parameters = { "runlevel" }
   M.report = {
     repaired = "openrc.delete: Successfully deleted service from runlevel.",
-      kept = "openrc.delete: Service already absent from runlevel.",
-      failed = "openrc.delete: Error deleting service from runlevel."
+    kept = "openrc.delete: Service already absent from runlevel.",
+    failed = "openrc.delete: Error deleting service from runlevel."
   }
   return function(P)
     P.service = S
