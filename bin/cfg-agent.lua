@@ -1,6 +1,6 @@
 #!bin/lua
-local ENV, os, string, arg, next, tostring, collectgarbage =
-  {}, os, string, arg, next, tostring, collectgarbage
+local os, string, arg, next, tostring, collectgarbage =
+  os, string, arg, next, tostring, collectgarbage
 local version = require"cfg-core.strings".version
 local std = require"cfg-core.std"
 local args = require"cfg-core.args"
