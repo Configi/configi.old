@@ -4,13 +4,13 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
 
-local ENV, M, sysctl = {}, {}, {}
+local M, sysctl = {}, {}
 local string = string
 local tostring = tostring
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local file = lib.file
-_ENV = ENV
+_ENV = nil
 
 M.required = { "value" }
 
@@ -23,9 +23,9 @@ M.required = { "value" }
 function sysctl.write(S)
   M.report = {
     repaired = "sysctl.write: Successfully wrote value.",
-      kept = "sysctl.write: Value already set.",
-      failed = "sysctl.write: Error writing value.",
-     not_found = "sysctl.write: Sysctl key not found."
+    kept = "sysctl.write: Value already set.",
+    failed = "sysctl.write: Error writing value.",
+    not_found = "sysctl.write: Sysctl key not found."
   }
   return function(P)
     P.key = S
