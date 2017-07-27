@@ -57,5 +57,34 @@ function sysctl.write(S)
     end
   end
 end
+--- Read value from a sysctl key then compare from expected value.
+-- @Promiser key sysctl key to read from
+-- @param value expected value
+-- @usage sysctl.read"vm.swappiness"{
+--   value = 0
+-- }
+function sysctl.read(S)
+  M.report = {
+    kept = "sysctl.read: ",
+    failed = "systctl.read: ",
+    not_found = "sysctl.read:"
+  }
+  return function(P)
+    P.key = S
+    local F, R = cfg.init(P, M)
+    if R.kept then
+      return F.kept(P.key)
+    end
+    local key = string.gsub(P.key, "%.", "/")
+    key = "/proc/sys/"..key
+    if not file.stat(key) then
+      return F.result(P.key, nil, M.report.not_found)
+    end
+    if file.read(key) ~= P.value then
+      return F.result(P.key)
+    end
+    return F.result(P.key, true)
+  end
+end
 
 return sysctl
