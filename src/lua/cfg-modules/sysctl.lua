@@ -65,9 +65,9 @@ end
 -- }
 function sysctl.read(S)
   M.report = {
-    kept = "sysctl.read: ",
-    failed = "systctl.read: ",
-    not_found = "sysctl.read:"
+    kept = "sysctl.read: Current sysctl key value matched.",
+    failed = "systctl.read: Current sysctl key value does not match.",
+    not_found = "sysctl.read: Sysctl key not found."
   }
   return function(P)
     P.key = S
