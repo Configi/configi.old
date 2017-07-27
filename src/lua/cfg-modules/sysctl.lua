@@ -10,7 +10,6 @@ local tostring = tostring
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local file = lib.file
-local stat = require"posix.sys.stat"
 _ENV = ENV
 
 M.required = { "value" }
@@ -37,7 +36,7 @@ function sysctl.write(S)
     local write_key = function()
       local key = string.gsub(P.key, "%.", "/")
       key = "/proc/sys/"..key
-      if stat.stat(key) then
+      if file.stat(key) then
         local write = tostring(P.value)
         if file.read_all(key) == write then
           return false
