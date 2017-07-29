@@ -47,6 +47,7 @@ path.dir = libgen.dirname
 os.closefrom = P.closefrom
 os.chroot = P.chroot
 file.stat = stat.stat
+file.mkdir = stat.mkdir
 
 -- Handle EINTR
 os.chdir = retry(unistd.chdir)
