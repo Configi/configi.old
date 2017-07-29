@@ -98,6 +98,32 @@ function factid.modules()
   return t
 end
 
+function factid.local_fs()
+  local fs = {
+    ["tmpfs"] = true,
+    ["ext4"] = true,
+    ["ext3"] = true,
+    ["ext2"] = true,
+    ["xfs"] = true,
+    ["btrfs"] = true,
+    ["vfat"] = true
+  }
+  local t = {}
+  for _, ln in ipairs(file.to_table("/proc/self/mountinfo")) do
+    local c = string.to_table(ln)
+    local i = 8
+    while not (c[i] == "-") do
+      i = i+1
+    end
+    if c[4] == "/" and fs[c[i+1]]  then
+      t[#t+1] = c[5]
+    elseif c[5] == "/" and fs[c[i+1]] then
+      t[#t+1] = "/"
+    end
+  end
+  return t
+end
+
 -- WORK IN PROGRESS
 function factid.gather ()
   local fact = {}
