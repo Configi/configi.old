@@ -1,6 +1,6 @@
 return {
   version = "Configi 2.0.0",
-  short_args = "hvtdsmjVxl:p:g:r:f:e:",
+  short_args = "hvtdsmjFVxl:p:g:r:f:e:",
   long_args = {
     {"help", "none", "h"},
     {"debug", "none", "v"},
@@ -11,6 +11,7 @@ return {
     {"syslog", "none", "s"},
     {"log", "required", "l"},
     {"msg", "none", "m"},
+    {"facts", "none", "F"},
     {"version", "none", "V"},
     {"tag", "required", "g"},
     {"runs", "required", "r"},
@@ -19,7 +20,7 @@ return {
     {"exec", "none", "x"},
   },
   help = [[
-  cfg-agent [-h] [-V] [-d] [-t] [-w] [-p N] [-s] [-m] [-x] [-v] [-l FILE] [-g TAG] [-r N] [-f POLICY] [-e POLICY]
+  cfg-agent [-h] [-V] [-d] [-t] [-w] [-p N] [-s] [-m] [-x] [-F] [-v] [-l FILE] [-g TAG] [-r N] [-f POLICY] [-e POLICY]
 
       Options:
           -h  This help text.
@@ -32,6 +33,7 @@ return {
           -l  Log to an specified FILE.
           -m  Show minimal debug and test messages.
           -x  Show execution debug messages.
+          -F  Gather system facts.
           -v  Show full debugging messages.
           -g  Only run specified TAG(s).
           -r  Run the policy N times if a failure is encountered. Default is 3.

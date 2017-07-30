@@ -3,9 +3,11 @@ local rawget, type, pcall, next, setmetatable, load, pairs, ipairs, require =
 local package, coroutine = package, coroutine
 local cli, functions = {}, {}
 local factid = require"factid"
-package.loaded["cfg-core.fact"] = factid.gather()
-local strings = require"cfg-core.strings"
 local args = require"cfg-core.args"
+if args["F"] then
+  package.loaded["cfg-core.fact"] = factid.gather()
+end
+local strings = require"cfg-core.strings"
 local std = require"cfg-core.std"
 local lib = require"lib"
 local path, fmt, os, string, file, time = lib.path, lib.fmt, lib.os, lib.string, lib.file, lib.time
@@ -60,7 +62,12 @@ function cli.main (opts)
   local runenv = {}
   local roles = {}
   local scripts = { [1] = opts.script }
-  local env = { fact = package.loaded["cfg-core.fact"] }
+  local env
+  if args["F"] then
+    env = { fact = package.loaded["cfg-core.fact"] }
+  else
+    env = {}
+  end
 
   -- Built-in functions inside scripts --
   env.roles = function(r)
