@@ -10,17 +10,20 @@ local lib = require"lib"
 local file = lib.file
 local cmd = lib.exec.cmd
 local fact = require"cfg-core.fact"
+local factid = require"factid"
 _ENV = nil
+
 M.required = { "module" }
+
 local function get_mods()
-  local modules = file.to_table("/proc/modules", "l")
+  local m = factid.modules()
   local t = {}
-  for _, m in pairs(modules) do
-    m = string.match(m, "([%g]+)%s")
-    t[m] = true
+  for _, lkm in ipairs(m) do
+    t[lkm] = true
   end
   return t
 end
+
 --- Ensure that a specified Linux kernel module is loaded.
 -- @Promiser module
 -- @Aliases loaded

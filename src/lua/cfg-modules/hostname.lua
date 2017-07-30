@@ -8,6 +8,7 @@ local M, hostname = {}, {}
 local string, ipairs, next = string, ipairs, next
 local cfg = require"cfg-core.lib"
 local fact = require"cfg-core.fact"
+local factid = require"factid"
 local lib = require"lib"
 local path = lib.path
 local cmd = lib.exec.cmd
@@ -88,7 +89,7 @@ function hostname.set(S)
       -- Everything went well so pass true to the result().
       return F.result(P.hostname, true)
     else
-      if P.hostname == fact.hostname[P.hostname] then
+      if fact.hostname[P.hostname] or (P.hostname == factid.hostname()) then
         return F.kept(P.hostname)
       end
       return F.result(P.hostname, F.run(cmd.hostname, {P.hostname}))

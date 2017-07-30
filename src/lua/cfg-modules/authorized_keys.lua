@@ -10,6 +10,7 @@ local cfg = require"cfg-core.lib"
 local stat = require"posix.sys.stat"
 local pwd = require"posix.pwd"
 local fact = require"cfg-core.fact"
+local factid = require"factid"
 local lib = require"lib"
 local os, file, table = lib.os, lib.file, lib.table
 _ENV = nil
@@ -18,10 +19,18 @@ M.required = { "type", "key" }
 M.alias = {}
 M.alias.user = { "login" }
 
+local osfamily = function()
+  local t = {}
+  for _, f in ipairs(factid.osfamily()) do
+    t[f] = true
+  end
+  return t
+end
+
 local keyfile = function(P)
   local user, kf, dir
   P:set_if_not("user", os.effective_name())
-  if fact.osfamily.openwrt then
+  if fact.osfamily.openwrt or osfamily().openwrt then
     kf = "/etc/dropbear/authorized_keys"
     dir = "/etc/dropbear"
   else
@@ -91,7 +100,7 @@ function authorized_keys.present(S)
     failed = "authorized_keys.present: Error adding key.",
   }
   return function(P)
-    if fact.osfamily.openwrt then
+    if fact.osfamily.openwrt or osfamily().openwrt then
       P.type = "ssh-dss"
     end
     P.key = S
@@ -141,7 +150,7 @@ function authorized_keys.absent(S)
     failed = "authorized_keys.absent: Error removing key."
   }
   return function(P)
-    if fact.osfamily.openwrt then
+    if fact.osfamily.openwrt or osfamily().openwrt then
       P.type = "ssh-dss"
     end
     P.key = S
