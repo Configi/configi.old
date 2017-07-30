@@ -9,6 +9,7 @@ local M, sticky = {}, {}
 local table = table
 local cfg = require"cfg-core.lib"
 local exec = require"lib".exec
+local factid = require"factid"
 _ENV = nil
 
 local function local_0777(b)
