@@ -71,7 +71,7 @@ end
 --- See emerge(1).
 -- @Promiser package atom. Can be "category/package" or "category/package-version"
 -- @Aliases installed
--- @Aliases install
+-- @Aliases add
 -- @param version package version
 -- @param deep evaluate entire dependency tree [Default: false]
 -- @param newuse reinstall packages that had a change in its USE flags [Default: false]
@@ -143,6 +143,7 @@ end
 
 --- Remove package atom.
 -- @Promiser package atom. Can be "category/package" or "category/package-version"
+-- @Aliases uninstalled
 -- @Aliases remove
 -- @param atom package atom to unmerge [REQUIRED] [ALIAS: package]
 -- @param depclean Remove packages not associated with explicitly installed packages [DEFAULT: false]
@@ -170,6 +171,7 @@ function portage.absent(S)
 end
 
 portage.installed = portage.present
-portage.install = portage.present
+portage.add = portage.present
+portage.uninstalled = portage.absent
 portage.remove = portage.absent
 return portage
