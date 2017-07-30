@@ -4,22 +4,19 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
 local M, lkm = {}, {}
-local pairs, string = pairs, string
 local cfg = require"cfg-core.lib"
-local lib = require"lib"
-local file = lib.file
-local cmd = lib.exec.cmd
+local cmd = require"lib".exec.cmd
 local fact = require"cfg-core.fact"
 local factid = require"factid"
 _ENV = nil
 
 M.required = { "module" }
 
-local function get_mods()
+local function modules()
   local m = factid.modules()
   local t = {}
-  for _, lkm in ipairs(m) do
-    t[lkm] = true
+  for _, mod in ipairs(m) do
+    t[mod] = true
   end
   return t
 end
@@ -40,13 +37,13 @@ function lkm.inserted(S)
   return function(P)
     P.module = S
     local F, R = cfg.init(P, M)
-    if R.kept or fact.modules[P.module] or get_mods()[P.module] then
+    if R.kept or fact.modules[P.module] or modules()[P.module] then
       return F.kept(P.module)
     end
     if not F.run(cmd.modprobe, "-q", "--first-time", P.module) then
       return F.result(P.module, nil, M.modprobe_failed)
     end
-    if not get_mods()[P.module] then
+    if not modules()[P.module] then
       return F.result(P.module)
     end
     return F.result(P.module, true)
@@ -66,13 +63,13 @@ function lkm.removed(S)
   return function(P)
     P.module = S
     local F, R = cfg.init(P, M)
-    if R.kept or not fact.modules[P.module] or not get_mods()[P.module] then
+    if R.kept or not fact.modules[P.module] or not modules()[P.module] then
       return F.kept(P.module)
     end
     if not F.run(cmd.modprobe, "-r", "-q", "--first-time", P.module) then
       return F.result(P.module, nil, M.modprobe_failed)
     end
-    if get_mods()[P.module] then
+    if modules()[P.module] then
       return F.result(P.module)
     end
     return F.result(P.module, true)
@@ -93,7 +90,7 @@ function lkm.disabled(S)
       return F.kept(P.module)
     end
     cmd.modprobe("-q", P.module)
-    if get_mods()[P.module] then
+    if modules()[P.module] then
       return F.result(P.module)
     end
     return F.result(P.module, true)
