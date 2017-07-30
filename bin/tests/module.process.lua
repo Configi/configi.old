@@ -2,7 +2,7 @@ _ENV = require "bin/tests/ENV"
 function running(p)
   local r, t
   T.process["running policy"] = function()
-    r, t = cfg("-m", "-f", p)
+    r, t = cfg("-F", "-m", "-f", p)
     T.equal(r, 0)
   end
   T.process["running pass"] = function()
@@ -17,7 +17,7 @@ running("test/process_running.lua")
 function not_running(p)
   local r, t
   T.process["running notify_failed policy"] = function()
-    r, t = cfg("-m", "-f", p)
+    r, t = cfg("-F", "-m", "-f", p)
     T.equal(r, 0)
   end
   T.process["running notify_failed fail"] = function()

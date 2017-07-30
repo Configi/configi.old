@@ -2,7 +2,7 @@ _ENV = require "bin/tests/ENV"
 function test(p)
   local r, o
   T.core["fact policy"] = function()
-    r, o = cfg("-f", p)
+    r, o = cfg("-F", "-f", p)
     T.equal(r, 0)
   end
   T.core["fact check"] = function()

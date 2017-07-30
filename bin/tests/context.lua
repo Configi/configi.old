@@ -1,7 +1,7 @@
 _ENV = require "bin/tests/ENV"
 function test(p)
   T.core["context policy"] = function()
-    T.equal(cfg("-f", p), 0)
+    T.equal(cfg("-F", "-f", p), 0)
   end
   T.core["context check"] = function()
     T.is_nil(stat.stat(dir.."core-context"))

@@ -27,7 +27,7 @@ function test(p)
       static = hostnames.static
     }
     T.hostname["set policy"] = function()
-      T.equal(cfg("-f", p), 0)
+      T.equal(cfg("-F", "-f", p), 0)
     end
     T.hostname["set check"] = function()
       local after = current_hostnames()
