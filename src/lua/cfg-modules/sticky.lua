@@ -17,12 +17,9 @@ local function local_0777(b)
   local xargs = exec.context"xargs"
   xargs.stdin = dirs
   if not b then
-    return xargs("-I", "'{}'",
-      "find", "'{}'", "-xdev", "-type", "d", "(","-perm", "-0002", "-a", "!", "-perm", "-1000", ")")
+    return xargs("-I '{}' find '{}' -xdev -type d ( -perm -0002 -a ! -perm -1000 )")
   else
-    return xargs("-I", "'{}'",
-      "find", "'{}'", "-xdev", "-type", "d", "(","-perm", "-0002", "-a", "!", "-perm", "-1000", ")", "-exec",
-      "chmod", "a+t", "{}", "+")
+    return xargs("-I '{}' find '{}' -xdev -type d ( -perm -0002 -a ! -perm -1000 ) -exec chmod a+t {} +")
   end
 end
 --- Find world writable directories and set the sticky bit if not already.
