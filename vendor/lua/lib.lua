@@ -5,8 +5,8 @@
 --     VENDOR_C= posix px
 -- @module lib
 
-local rename, strlen, setmetatable, next, ipairs, require, type =
-  os.rename, string.len, setmetatable, next, ipairs, require, type
+local rename, strlen, select, setmetatable, next, ipairs, require, type =
+  os.rename, string.len, select, setmetatable, next, ipairs, require, type
 local syslog = require"posix.syslog"
 local unistd = require"posix.unistd"
 local stdlib = require"posix.stdlib"
@@ -476,7 +476,11 @@ function exec.context(str)
   return setmetatable(args, {__call = function(_, ...)
     local a = {}
     table.copy(a, args)
-    if (...) then
+    if select("#", ...) == 1 then
+      for k in string.gmatch(..., "%S+") do
+        a[#a+1] = k
+      end
+    elseif select("#", ...) > 1 then
       for _, k in ipairs({...}) do
         a[#a+1] = k
       end
