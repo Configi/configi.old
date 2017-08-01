@@ -12,7 +12,7 @@ _ENV = nil
 
 M.required = { "module" }
 
-local function modules()
+local function get_modules()
   local m = factid.modules()
   local t = {}
   for _, mod in ipairs(m) do
@@ -20,7 +20,7 @@ local function modules()
   end
   return t
 end
-
+local modules = get_modules()
 --- Ensure that a specified Linux kernel module is loaded.
 -- @Promiser module
 -- @Aliases loaded
@@ -37,13 +37,13 @@ function lkm.inserted(S)
   return function(P)
     P.module = S
     local F, R = cfg.init(P, M)
-    if R.kept or fact.modules[P.module] or modules()[P.module] then
+    if R.kept or fact.modules[P.module] or modules[P.module] then
       return F.kept(P.module)
     end
     if not F.run(cmd.modprobe, "-q", "--first-time", P.module) then
       return F.result(P.module, nil, M.modprobe_failed)
     end
-    if not modules()[P.module] then
+    if not modules[P.module] then
       return F.result(P.module)
     end
     return F.result(P.module, true)
@@ -63,13 +63,13 @@ function lkm.removed(S)
   return function(P)
     P.module = S
     local F, R = cfg.init(P, M)
-    if R.kept or not fact.modules[P.module] or not modules()[P.module] then
+    if R.kept or not fact.modules[P.module] or not modules[P.module] then
       return F.kept(P.module)
     end
     if not F.run(cmd.modprobe, "-r", "-q", "--first-time", P.module) then
       return F.result(P.module, nil, M.modprobe_failed)
     end
-    if modules()[P.module] then
+    if modules[P.module] then
       return F.result(P.module)
     end
     return F.result(P.module, true)
@@ -90,7 +90,7 @@ function lkm.disabled(S)
       return F.kept(P.module)
     end
     cmd.modprobe("-q", P.module)
-    if modules()[P.module] then
+    if modules[P.module] then
       return F.result(P.module)
     end
     return F.result(P.module, true)
