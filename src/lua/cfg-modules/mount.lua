@@ -15,13 +15,15 @@ _ENV = nil
 
 M.required = { "dir" }
 
-local function mounts()
+local function get_mounts()
   local t = {}
   for _, m in ipairs(factid.mount()) do
     t[m.dir] = m.opts
   end
   return t
 end
+
+local mounts = get_mounts()
 
 --- Remount a filesystem with specified options
 -- @Promiser mount mount point to remount
@@ -77,7 +79,7 @@ function mount.opts(S)
     if R.kept then
       return F.kept(P.dir)
     end
-    if fact.mount[P.dir] == false or mounts()[P.dir] then
+    if fact.mount[P.dir] == false or mounts[P.dir] then
       return F.result(P.dir, nil, M.report.unmounted)
     end
     local tmp = {}
@@ -101,7 +103,7 @@ function mount.opts(S)
         end
       end
     else
-      for _, m in pairs(mounts()) do
+      for _, m in pairs(mounts) do
         if m[P.dir] then
           co = m[P.dir]
         end
