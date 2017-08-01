@@ -476,11 +476,12 @@ function exec.context(str)
   return setmetatable(args, {__call = function(_, ...)
     local a = {}
     table.copy(a, args)
-    if select("#", ...) == 1 then
+    local n = select("#", ...)
+    if n == 1 then
       for k in string.gmatch(..., "%S+") do
         a[#a+1] = k
       end
-    elseif select("#", ...) > 1 then
+    elseif n > 1 then
       for _, k in ipairs({...}) do
         a[#a+1] = k
       end
