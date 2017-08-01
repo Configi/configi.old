@@ -19,7 +19,7 @@ M.required = { "type", "key" }
 M.alias = {}
 M.alias.user = { "login" }
 
-local osfamily = function()
+local get_osfamily = function()
   local t = {}
   for _, f in ipairs(factid.osfamily()) do
     t[f] = true
@@ -27,10 +27,12 @@ local osfamily = function()
   return t
 end
 
+local osfamily = get_osfamily()
+
 local keyfile = function(P)
   local user, kf, dir
   P:set_if_not("user", os.effective_name())
-  if fact.osfamily.openwrt or osfamily().openwrt then
+  if fact.osfamily.openwrt or osfamily.openwrt then
     kf = "/etc/dropbear/authorized_keys"
     dir = "/etc/dropbear"
   else
@@ -100,7 +102,7 @@ function authorized_keys.present(S)
     failed = "authorized_keys.present: Error adding key.",
   }
   return function(P)
-    if fact.osfamily.openwrt or osfamily().openwrt then
+    if fact.osfamily.openwrt or osfamily.openwrt then
       P.type = "ssh-dss"
     end
     P.key = S
@@ -150,7 +152,7 @@ function authorized_keys.absent(S)
     failed = "authorized_keys.absent: Error removing key."
   }
   return function(P)
-    if fact.osfamily.openwrt or osfamily().openwrt then
+    if fact.osfamily.openwrt or osfamily.openwrt then
       P.type = "ssh-dss"
     end
     P.key = S
