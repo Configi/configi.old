@@ -39,7 +39,7 @@ udp(lua_State *L)
 	int fd;
 	socklen_t socklen;
 	fd_set set;
-	int r_select;
+	int select_r;
 	ssize_t recvfrom_r;
 	int saved;
 
@@ -104,15 +104,15 @@ udp(lua_State *L)
 		FD_ZERO(&set);
 		FD_SET(fd, &set);
 		errno = 0;
-		r_select = select(fd+1, &set, NULL, NULL, &tv);
-		if (!r_select) {
+		select_r = select(fd+1, &set, NULL, NULL, &tv);
+		if (!select_r) {
 			saved = errno;
 			shutdown(fd, SHUT_RDWR);
 			close(fd);
 			errno = saved;
 			return luaX_pusherror(L, "select(2) timed out.");
 		}
-		if (0 > r_select) {
+		if (0 > select_r) {
 			saved = errno;
 			shutdown(fd, SHUT_RDWR);
 			close(fd);
