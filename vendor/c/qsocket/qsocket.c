@@ -40,7 +40,7 @@ udp(lua_State *L)
 	socklen_t socklen;
 	fd_set set;
 	int r_select;
-	ssize_t r_recvfrom;
+	ssize_t recvfrom_r;
 	int saved;
 
 	errno = 0;
@@ -122,13 +122,13 @@ udp(lua_State *L)
 		if(!FD_ISSET(fd, &set)) continue;
 		socklen = sizeof(struct sockaddr_in);
 		errno = 0;
-		r_recvfrom = recvfrom(fd, rbuf, BUFSZ, 0, (struct sockaddr *)&resp_src, &socklen);
+		recvfrom_r = recvfrom(fd, rbuf, BUFSZ, 0, (struct sockaddr *)&resp_src, &socklen);
 		saved = errno;
 		shutdown(fd, SHUT_RDWR);
 		close(fd);
 		errno = saved;
-		if (0 > r_recvfrom) return luaX_pusherror(L, "recvfrom(2) error in udp().");
-		lua_pushlstring(L, rbuf, (size_t)r_recvfrom);
+		if (0 > recvfrom_r) return luaX_pusherror(L, "recvfrom(2) error in udp().");
+		lua_pushlstring(L, rbuf, (size_t)recvfrom_r);
 		lua_pushstring(L, inet_ntoa(resp_src.sin_addr));
 		lua_pushinteger(L, htons(resp_src.sin_port));
 		return 3;
