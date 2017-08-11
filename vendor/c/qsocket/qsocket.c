@@ -27,7 +27,7 @@ udp(lua_State *L)
 	const char *ip = luaL_checkstring(L, 1);
 	lua_Number port = luaL_checknumber(L, 2);
 	const char *payload;
-	size_t len;
+	size_t payload_sz;
 	char buf[BUFSZ] = {0};
 	char rbuf[BUFSZ] = {0};
 	struct timeval tv = {0};
@@ -74,16 +74,16 @@ udp(lua_State *L)
 	dst.sin_port = htons(port);
 	if (3 == lua_gettop(L)) {
 		payload = luaL_checkstring(L, 3);
-		len = lua_rawlen(L, 3);
-		if (len > BUFSZ) len = BUFSZ;
-		memcpy(buf, payload, len);
+		payload_sz = lua_rawlen(L, 3);
+		if (payload_sz > BUFSZ) payload_sz = BUFSZ;
+		memcpy(buf, payload, payload_sz);
 	} else {
-		len = 1;
+		payload_sz = 1;
 		buf[0] = '\0';
 	}
 
 	errno = 0;
-	if (0 > sendto(fd, buf, len, 0, (struct sockaddr *)&dst, sizeof(dst))) {
+	if (0 > sendto(fd, buf, payload_sz, 0, (struct sockaddr *)&dst, sizeof(dst))) {
 		saved = errno;
 		shutdown(fd, SHUT_RDWR);
 		close(fd);
