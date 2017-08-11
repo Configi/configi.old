@@ -139,11 +139,11 @@ static const
 luaL_Reg send_funcs[] =
 {
 	{"udp", udp},
-  {NULL, NULL}
+	{NULL, NULL}
 };
 
 int
-luaopen_send(lua_State *L)
+luaopen_qsocket(lua_State *L)
 {
 	luaL_newlib(L, send_funcs);
 	return 1;
