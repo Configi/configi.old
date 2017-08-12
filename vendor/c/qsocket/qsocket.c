@@ -237,7 +237,7 @@ error:
 
 
 static const
-luaL_Reg send_funcs[] =
+luaL_Reg qsocket_funcs[] =
 {
 	{"udp", udp},
 	{"tcp", tcp},
@@ -247,6 +247,6 @@ luaL_Reg send_funcs[] =
 int
 luaopen_qsocket(lua_State *L)
 {
-	luaL_newlib(L, send_funcs);
+	luaL_newlib(L, qsocket_funcs);
 	return 1;
 }
