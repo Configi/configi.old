@@ -44,34 +44,19 @@ udp(lua_State *L)
 	int saved;
 
 	errno = 0;
-	if (lua_gettop(L) < 2) return luaX_pusherror(L, "Not enough arguments.");
-
+	if (2 > lua_gettop(L)) return luaX_pusherror(L, "Not enough arguments.");
+	dst.sin_family = AF_INET;
+	dst.sin_port = htons(port);
+	errno = 0;
+	if (1 != inet_pton(AF_INET, ip, &dst.sin_addr.s_addr)) return luaX_pusherror(L, "Invalid IP address passed.");
 	errno = 0;
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
-	if (0 > fd) return luaX_pusherror(L, "socket(2) error in udp().");
-
+	if (0 > fd) goto error;
 	src.sin_family = AF_INET;
 	src.sin_addr.s_addr = htonl(INADDR_ANY);
 	src.sin_port = htons(0);
-
 	errno = 0;
-	if (0 > bind(fd, (struct sockaddr *)&src, sizeof(src))) {
-		saved = errno;
-		shutdown(fd, SHUT_RDWR);
-		close(fd);
-		errno = saved;
-		return luaX_pusherror(L, "bind(2) error in udp().");
-	}
-	dst.sin_family = AF_INET;
-	errno = 0;
-	if (0 > inet_pton(AF_INET, ip, &dst.sin_addr.s_addr)) {
-		saved = errno;
-		shutdown(fd, SHUT_RDWR);
-		close(fd);
-		errno = saved;
-		return luaX_pusherror(L, "inet_pton(2) error in udp().");
-	}
-	dst.sin_port = htons(port);
+	if (0 > bind(fd, (struct sockaddr *)&src, sizeof(src))) goto error;
 	if (3 == lua_gettop(L)) {
 		payload = luaL_checkstring(L, 3);
 		payload_sz = lua_rawlen(L, 3);
@@ -83,21 +68,17 @@ udp(lua_State *L)
 	}
 
 	errno = 0;
-	if (0 > sendto(fd, buf, payload_sz, 0, (struct sockaddr *)&dst, sizeof(dst))) {
-		saved = errno;
-		shutdown(fd, SHUT_RDWR);
-		close(fd);
-		errno = saved;
-		return luaX_pusherror(L, "sendto(2) error in udp().");
-	}
+	if (0 > sendto(fd, buf, payload_sz, 0, (struct sockaddr *)&dst, sizeof(dst))) goto error;
 
 	time(&start);
 	while(1) {
 		tv = (struct timeval){0};
 		time(&now);
 		if (TIMEOUT <= now-start) {
+			shutdown(fd, SHUT_RDWR);
+			close(fd);
 			errno = 0;
-			return luaX_pusherror(L, "udp() timed out.");
+			return luaX_pusherror(L, "qsocket.udp() timed out.");
 		}
 		tv.tv_sec = TIMEOUT-(now-start);
 		tv.tv_usec = 0;
@@ -112,13 +93,7 @@ udp(lua_State *L)
 			errno = saved;
 			return luaX_pusherror(L, "select(2) timed out.");
 		}
-		if (0 > select_r) {
-			saved = errno;
-			shutdown(fd, SHUT_RDWR);
-			close(fd);
-			errno = saved;
-			return luaX_pusherror(L, "select(2) error in udp().");
-		}
+		if (0 > select_r) goto error;
 		if(!FD_ISSET(fd, &set)) continue;
 		socklen = sizeof(struct sockaddr_in);
 		errno = 0;
@@ -133,6 +108,12 @@ udp(lua_State *L)
 		lua_pushinteger(L, htons(resp_src.sin_port));
 		return 3;
 	}
+error:
+	saved = errno;
+	shutdown(fd, SHUT_RDWR);
+	close(fd);
+	errno = saved;
+	return luaX_pusherror(L, "Encountered error in qsocket.udp().");
 }
 
 static int
