@@ -127,8 +127,6 @@ tcp(lua_State *L)
 
 	struct timeval tv = {0};
 	struct sockaddr_in dst = {0};
-	time_t start;
-	time_t now;
 
 	ssize_t recv_r;
 	char recv_buf[BUFSZ] = {0};
