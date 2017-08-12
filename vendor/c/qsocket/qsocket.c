@@ -135,10 +135,112 @@ udp(lua_State *L)
 	}
 }
 
+static int
+tcp(lua_State *L)
+{
+	const char *ip = luaL_checkstring(L, 1);
+	lua_Number port = luaL_checknumber(L, 2);
+	const char *payload;
+	char payload_buf[BUFSZ] = {0};
+	size_t payload_sz;
+
+	struct timeval tv = {0};
+	struct sockaddr_in dst = {0};
+	time_t start;
+	time_t now;
+
+	ssize_t recv_r;
+	char recv_buf[BUFSZ] = {0};
+	int fd;
+	fd_set set;
+	int select_r;
+	int connect_r;
+	int luabuf_sz;
+	int saved;
+	socklen_t connect_len;
+
+	errno = 0;
+	if (lua_gettop(L) < 2) return luaX_pusherror(L, "Not enough arguments.");
+
+  dst.sin_family = AF_INET;
+	dst.sin_port = htons(port);
+	errno = 0;
+	if (1 != inet_pton(AF_INET, ip, &dst.sin_addr.s_addr)) return luaX_pusherror(L, "Invalid IP address passed.");
+	if (3 == lua_gettop(L)) {
+		payload = luaL_checkstring(L, 3);
+		payload_sz = lua_rawlen(L, 3);
+		if (payload_sz > BUFSZ) payload_sz = BUFSZ;
+		memcpy(payload_buf, payload, payload_sz);
+	} else {
+		payload_sz = 1;
+		payload_buf[0] = '\0';
+	}
+
+	errno = 0;
+	fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (0 > fd) return luaX_pusherror(L, "Cannot create FD from socket(2) in qsocket.tcp().");
+	tv.tv_sec = TIMEOUT;
+	tv.tv_usec = 0;
+	FD_ZERO(&set);
+	FD_SET(fd, &set);
+	errno = 0;
+	if (0 > fcntl(fd, F_SETFL, O_NONBLOCK)) goto error;
+	errno = 0;
+	if (0 > connect(fd, (struct sockaddr*)&dst, sizeof(dst))) {
+		if (EINPROGRESS != errno) goto error;
+		errno = 0;
+		select_r = select(fd+1, NULL, &set, NULL, &tv);
+		if (!select_r) {
+			saved = errno;
+			shutdown(fd, SHUT_RDWR);
+			close(fd);
+			errno = saved;
+			return luaX_pusherror(L, "select(2) timed out in qsocket.tcp().");
+		}
+		if (0 > select_r) goto error;
+		connect_len = sizeof(connect_r);
+		errno = 0;
+		if (0 > getsockopt(fd, SOL_SOCKET, SO_ERROR, &connect_r, &connect_len)) goto error;
+		if (0 > connect_r) goto error;
+	}
+	errno = 0;
+	if (0 > fcntl(fd, F_SETFL, (fcntl(fd, F_GETFL, 0) & ~O_NONBLOCK))) goto error;
+	errno = 0;
+	if (0 > send(fd, payload_buf, payload_sz, 0)) goto error;
+	lua_settop(L, 0);
+	while (1) {
+		auxL_bzero(recv_buf, BUFSZ);
+		REQUIRE(auxL_assert_bzero(recv_buf, BUFSZ) == 0, "auxL_bzero() failed. Compiler behavior changed!");
+		errno = 0;
+		recv_r = recv(fd, recv_buf, BUFSZ, 0);
+		if (0 < recv_r) {
+			lua_pushlstring(L, recv_buf, (size_t)recv_r);
+			lua_checkstack(L, 1);
+		} else if (0 == recv_r) {
+			break;
+		} else {
+			goto error;
+		}
+	}
+	shutdown(fd, SHUT_RDWR);
+	close(fd);
+	luabuf_sz = lua_gettop(L);
+	lua_concat(L, luabuf_sz);
+	return 1;
+error:
+	saved = errno;
+	shutdown(fd, SHUT_RDWR);
+	close(fd);
+	errno = saved;
+	return luaX_pusherror(L, "Encountered error in qsocket.tcp().");
+}
+
+
 static const
 luaL_Reg send_funcs[] =
 {
 	{"udp", udp},
+	{"tcp", tcp},
 	{NULL, NULL}
 };
 
