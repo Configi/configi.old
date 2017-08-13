@@ -28,7 +28,7 @@ auxL_bzero(void *ptr, size_t len)
 }
 
 int
-auxL_assert_bzero(unsigned char *buf, size_t len)
+auxL_assert_bzero(char *buf, size_t len)
 {
 	int z = 0;
 	size_t i;
