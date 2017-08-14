@@ -154,19 +154,18 @@ tcp(lua_State *L)
 		payload_sz = 1;
 		payload_buf[0] = '\0';
 	}
-
 	errno = 0;
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (0 > fd) return luaX_pusherror(L, "Cannot create FD from socket(2) in qsocket.tcp().");
-	tv.tv_sec = TIMEOUT;
-	tv.tv_usec = 0;
-	FD_ZERO(&set);
-	FD_SET(fd, &set);
 	errno = 0;
 	if (0 > fcntl(fd, F_SETFL, O_NONBLOCK)) goto error;
 	errno = 0;
 	if (0 > connect(fd, (struct sockaddr*)&dst, sizeof(dst))) {
 		if (EINPROGRESS != errno) goto error;
+		tv.tv_sec = TIMEOUT;
+		tv.tv_usec = 0;
+		FD_ZERO(&set);
+		FD_SET(fd, &set);
 		errno = 0;
 		select_r = select(fd+1, NULL, &set, NULL, &tv);
 		if (!select_r) {
