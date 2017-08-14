@@ -168,7 +168,7 @@ tcp(lua_State *L)
 			shutdown(fd, SHUT_RDWR);
 			close(fd);
 			errno = saved;
-			return luaX_pusherror(L, "select(2) timed out in qsocket.tcp().");
+			return luaX_pusherror(L, "'select(2) timed out in qsocket.tcp().' : 'Connection timed out.'");
 		}
 		if (0 > select_r) goto error;
 		while(!FD_ISSET(fd, &set)) continue;
