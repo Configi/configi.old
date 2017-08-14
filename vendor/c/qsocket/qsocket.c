@@ -24,6 +24,7 @@
 static int
 udp(lua_State *L)
 {
+	errno = 0;
 	const char *ip = luaL_checkstring(L, 1);
 	lua_Number port = luaL_checknumber(L, 2);
 	const char *payload;
@@ -43,13 +44,11 @@ udp(lua_State *L)
 	ssize_t recvfrom_r;
 	int saved;
 
-	errno = 0;
 	if (2 > lua_gettop(L)) return luaX_pusherror(L, "Not enough arguments.");
 	dst.sin_family = AF_INET;
 	dst.sin_port = htons(port);
 	errno = 0;
 	if (1 != inet_pton(AF_INET, ip, &dst.sin_addr.s_addr)) return luaX_pusherror(L, "Invalid IP address passed.");
-	errno = 0;
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (0 > fd) goto error;
 	src.sin_family = AF_INET;
@@ -119,6 +118,7 @@ error:
 static int
 tcp(lua_State *L)
 {
+	errno = 0;
 	const char *ip = luaL_checkstring(L, 1);
 	lua_Number port = luaL_checknumber(L, 2);
 	const char *payload;
@@ -138,12 +138,10 @@ tcp(lua_State *L)
 	int saved;
 	socklen_t connect_len;
 
-	errno = 0;
 	if (lua_gettop(L) < 2) return luaX_pusherror(L, "Not enough arguments.");
 
   dst.sin_family = AF_INET;
 	dst.sin_port = htons(port);
-	errno = 0;
 	if (1 != inet_pton(AF_INET, ip, &dst.sin_addr.s_addr)) return luaX_pusherror(L, "Invalid IP address passed.");
 	if (3 == lua_gettop(L)) {
 		payload = luaL_checkstring(L, 3);
@@ -154,12 +152,9 @@ tcp(lua_State *L)
 		payload_sz = 1;
 		payload_buf[0] = '\0';
 	}
-	errno = 0;
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (0 > fd) return luaX_pusherror(L, "Cannot create FD from socket(2) in qsocket.tcp().");
-	errno = 0;
 	if (0 > fcntl(fd, F_SETFL, O_NONBLOCK)) goto error;
-	errno = 0;
 	if (0 > connect(fd, (struct sockaddr*)&dst, sizeof(dst))) {
 		if (EINPROGRESS != errno) goto error;
 		tv.tv_sec = TIMEOUT;
@@ -186,7 +181,6 @@ tcp(lua_State *L)
 	}
 	errno = 0;
 	if (0 > fcntl(fd, F_SETFL, (fcntl(fd, F_GETFL, 0) & ~O_NONBLOCK))) goto error;
-	errno = 0;
 	if (0 > send(fd, payload_buf, payload_sz, 0)) goto error;
 	lua_settop(L, 0);
 	while (1) {
