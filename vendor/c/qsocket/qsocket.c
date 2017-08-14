@@ -187,8 +187,11 @@ tcp(lua_State *L)
 		auxL_bzero(recv_buf, BUFSZ);
 		REQUIRE(auxL_assert_bzero(recv_buf, BUFSZ) == 0, "auxL_bzero() failed. Compiler behavior changed!");
 		errno = 0;
-		recv_r = recv(fd, recv_buf, BUFSZ, 0);
-		if (0 < recv_r) {
+		recv_r = recv(fd, recv_buf, BUFSZ, MSG_DONTWAIT);
+		if (0 > recv_r && (EAGAIN == errno || EWOULDBLOCK == errno)) {
+			errno = 0;
+			continue;
+		} else if (0 < recv_r) {
 			lua_pushlstring(L, recv_buf, (size_t)recv_r);
 			lua_checkstack(L, 1);
 		} else if (0 == recv_r) {
@@ -209,7 +212,6 @@ error:
 	errno = saved;
 	return luaX_pusherror(L, "Encountered error in qsocket.tcp().");
 }
-
 
 static const
 luaL_Reg qsocket_funcs[] =
