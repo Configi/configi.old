@@ -83,11 +83,13 @@ get(lua_State *L)
 			return luaX_pusherror(L, "select(2) timed out in qhttp.get().");
 		}
 		if (0 > select_r) goto error;
-		int connect_r;
-		socklen_t connect_len = sizeof(connect_r);
+		while (!FD_ISSET(fd, &set) continue;
+		int connect_e = 0;
+		socklen_t connect_len = sizeof(connect_e);
 		errno = 0;
-		if (0 > getsockopt(fd, SOL_SOCKET, SO_ERROR, &connect_r, &connect_len)) goto error;
-		if (0 > connect_r) goto error;
+		if (0 > getsockopt(fd, SOL_SOCKET, SO_ERROR, &connect_e, &connect_len)) goto error;
+		errno = connect_e
+		if (connect_e) goto error;
 	}
 	errno = 0;
 	if (0 > fcntl(fd, F_SETFL, (fcntl(fd, F_GETFL, 0) & ~O_NONBLOCK))) goto error;
