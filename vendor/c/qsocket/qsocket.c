@@ -133,7 +133,7 @@ tcp(lua_State *L)
 	int fd;
 	fd_set set;
 	int select_r;
-	int connect_r;
+	int connect_e;
 	int luabuf_sz;
 	int saved;
 	socklen_t connect_len;
@@ -177,10 +177,13 @@ tcp(lua_State *L)
 			return luaX_pusherror(L, "select(2) timed out in qsocket.tcp().");
 		}
 		if (0 > select_r) goto error;
-		connect_len = sizeof(connect_r);
+		while(!FD_ISSET(fd, &set)) continue;
+		connect_e = 0;
+		connect_len = sizeof(connect_e);
 		errno = 0;
-		if (0 > getsockopt(fd, SOL_SOCKET, SO_ERROR, &connect_r, &connect_len)) goto error;
-		if (0 > connect_r) goto error;
+		if (0 > getsockopt(fd, SOL_SOCKET, SO_ERROR, &connect_e, &connect_len)) goto error;
+		errno = connect_e;
+		if (connect_e) goto error;
 	}
 	errno = 0;
 	if (0 > fcntl(fd, F_SETFL, (fcntl(fd, F_GETFL, 0) & ~O_NONBLOCK))) goto error;
