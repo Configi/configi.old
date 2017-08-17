@@ -119,7 +119,8 @@ static int
 tcp(lua_State *L)
 {
 	errno = 0;
-	const char *ip = luaL_checkstring(L, 1);
+	const char *arg_ip = luaL_checkstring(L, 1);
+	char ip[16] = {0};
 	lua_Number port = luaL_checknumber(L, 2);
 	const char *payload;
 	char payload_buf[BUFSZ] = {0};
@@ -137,13 +138,20 @@ tcp(lua_State *L)
 	int luabuf_sz;
 	int saved;
 	socklen_t connect_len;
+	int zero = 0;
 
 	if (lua_gettop(L) < 2) return luaX_pusherror(L, "Not enough arguments.");
-
+	if (arg_ip[0] != '-') {
+		auxL_strnmove(ip, arg_ip, 16);
+	} else {
+		zero = 1;
+		auxL_strnmove(ip, arg_ip+1, 16);
+	}
+	if (15 < strlen(ip)) return luaX_pusherror(L, "IP argument cannot exceed 15 characters.");
   dst.sin_family = AF_INET;
 	dst.sin_port = htons(port);
 	if (1 != inet_pton(AF_INET, ip, &dst.sin_addr.s_addr)) return luaX_pusherror(L, "Invalid IP address passed.");
-	if (3 == lua_gettop(L)) {
+	if (3 == lua_gettop(L) && lua_isstring(L, 3)) {
 		payload = luaL_checkstring(L, 3);
 		payload_sz = lua_rawlen(L, 3);
 		if (payload_sz > BUFSZ) payload_sz = BUFSZ;
@@ -178,6 +186,12 @@ tcp(lua_State *L)
 		if (0 > getsockopt(fd, SOL_SOCKET, SO_ERROR, &connect_e, &connect_len)) goto error;
 		errno = connect_e;
 		if (connect_e) goto error;
+	}
+	if (zero) {
+		shutdown(fd, SHUT_RDWR);
+		close(fd);
+		lua_pushboolean(L, 1);
+		return 1;
 	}
 	errno = 0;
 	if (0 > fcntl(fd, F_SETFL, (fcntl(fd, F_GETFL, 0) & ~O_NONBLOCK))) goto error;
