@@ -98,8 +98,9 @@ get(lua_State *L)
 	ssize_t send_bytes;
 	errno = 0;
 	if (!zero) {
-		send_bytes = strlen(arg_uri) + strlen(arg_host) + 27;
-		if (0 > snprintf(buf, send_bytes, "GET %s HTTP/1.1\r\nHost: %s\r\n\r\n\r\n", arg_uri, arg_host)) goto error;
+		send_bytes = strlen(arg_uri) + strlen(arg_host) + 46;
+		if (0 > snprintf(buf, send_bytes,
+					"GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n\r\n", arg_uri, arg_host)) goto error;
 	} else {
 		send_bytes = strlen(arg_uri) + 21;
 		if (0 > snprintf(buf, send_bytes, "GET %s HTTP/1.0\r\n\r\n\r\n\r\n", arg_uri)) goto error;
