@@ -11,10 +11,6 @@
 #include <fcntl.h>
 #include <string.h>
 
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-
 /*
  * lclonetable
  */
@@ -35,23 +31,13 @@ static const Node dummynode_ = {
 	{{NILCONSTANT, 0}}  /* key */
 };
 
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
+#include "auxlib.h"
+
 #include "flopen.h"
 #include "closefrom.h"
-
-static int pusherror(lua_State *L, const char *error)
-{
-        lua_pushnil(L);
-        lua_pushstring(L, error);
-        return 2;
-}
-
-static int pusherrno(lua_State *L, char *error)
-{
-        lua_pushnil(L);
-        lua_pushfstring(L, LUA_QS" : "LUA_QS, error, strerror(errno));
-        lua_pushinteger(L, errno);
-        return 3;
-}
 
 static void
 lcleartable(lua_State *L) {
@@ -154,8 +140,9 @@ static int
 Cchroot(lua_State *L)
 {
 	const char *path = luaL_checkstring(L, 1);
-	if (chroot(path) == -1) {
-		return pusherrno(L, "chroot(2) error");
+	errno = 0;
+	if (0 > chroot(path)) {
+		return luaX_pusherror(L, "chroot(2) error");
 	}
 	lua_pushboolean(L, 1);
 	return 1;
@@ -171,9 +158,9 @@ static int
 Cfdclose (lua_State *L)
 {
 	FILE *f = *(FILE**)luaL_checkudata(L, 1, LUA_FILEHANDLE);
-	int res = close(fileno(f));
-	if (res == -1) {
-		return pusherrno(L, "close(2) error");
+	errno = 0;
+	if (0 > close(fileno(f))) {
+		return luaX_pusherror(L, "close(2) error");
 	}
 	lua_pushboolean(L, 1);
 	return 1;
@@ -202,11 +189,11 @@ Cflopen(lua_State *L)
 {
 	const char *path = luaL_checkstring(L, 1);
 	int flags = luaL_optinteger(L, 2, O_NONBLOCK | O_RDWR);
-	mode_t mode = luaL_optinteger(L, 3, 0700);
-	int fd = flopen(path, flags, mode);
+	int fd = flopen(path, flags, 0700);
 	LStream *p = newfile(L);
-	if (fd == -1) {
-		return pusherrno(L, "open(2) error");
+	if (0 > fd) {
+		errno = 0;
+		return luaX_pusherror(L, "flopen(2) error");
 	}
 	p->f = fdopen(fd, "rwe");
 	return (p->f == NULL) ? luaL_fileresult(L, 0, NULL) : 1;
@@ -222,7 +209,7 @@ static int
 Cfdopen (lua_State *L)
 {
 	int fd = luaL_checkinteger(L, 1);
-  	const char *mode = luaL_optstring(L, 2, "re");
+ 	const char *mode = luaL_optstring(L, 2, "re");
 	LStream *p = newfile(L);
 	p->f = fdopen(fd, mode);
 	return (p->f == NULL) ? luaL_fileresult(L, 0, NULL) : 1;
@@ -261,44 +248,45 @@ Cexecve(lua_State *L)
 	const char *path = luaL_checkstring(L, 1);
 	int n;
 	int i;
-	if (lua_type(L, 2) != LUA_TTABLE) {
-		return pusherror(L, "bad argument #2 to 'execve' (table expected)");
+	if (LUA_TTABLE != lua_type(L, 2)) {
+		errno = 0;
+		return luaX_pusherror(L, "bad argument #2 to 'execve' (table expected)");
 	}
-
 	n = lua_rawlen(L, 2);
-	argv = lua_newuserdata(L, (n + 2) * sizeof(char*));
-	argv[0] = (char*) path;
+	argv = lua_newuserdata(L, (n+2)*sizeof(char*));
+	argv[0] = (char*)path;
 	lua_pushinteger(L, 0);
 	lua_gettable(L, 2);
-
-	if (lua_type(L, -1) == LUA_TSTRING) {
+	if (LUA_TSTRING == lua_type(L, -1)) {
 		argv[0] = (char*)lua_tostring(L, -1);
 	} else {
 		lua_pop(L, 1);
 	}
-
 	for (i=1; i<=n; i++) {
 		lua_pushinteger(L, i);
 		lua_gettable(L, 2);
 		argv[i] = (char*)lua_tostring(L, -1);
 	}
-
-	argv[n+1] = NULL;
-
-	if (lua_type(L, 3) == LUA_TTABLE) {
+	argv[n+1] = 0;
+	int exec_r;
+	if (LUA_TTABLE != lua_type(L, 3)) {
+		errno = 0;
+		if (0 > execv(path, argv)) return luaX_pusherror(L, path);
+	} else if (LUA_TTABLE == lua_type(L, 3)) {
 		int e = lua_rawlen(L, 3);
-		env = lua_newuserdata(L, (e + 2) * sizeof(char*));
-		for (i=0; i<=e; i++) {
-			lua_pushinteger(L, i + 1);
+		env = lua_newuserdata(L, (e+2)*sizeof(char*));
+		for (i=1; i<=e; i++) {
+			lua_pushinteger(L, i);
 			lua_gettable(L, 3);
 			env[i] = (char*)lua_tostring(L, -1);
 		}
-		env[e+1] = NULL;
-		execve(path, argv, env);
-	} else {
-		execv(path, argv);
+		env[e+1] = 0;
+		errno = 0;
+		if (0 > execve(path, argv, env)) return luaX_pusherror(L, path);
+	}	else {
+		errno = 0;
+		return luaX_pusherror(L, "bad argument #3 to 'execve' (none or table expected)");
 	}
-	return pusherror(L, path);
 }
 
 static const
