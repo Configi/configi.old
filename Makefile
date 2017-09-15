@@ -1,4 +1,4 @@
-.DEFAULT_GOAL= development
+.DEFAULT_GOAL= release
 EXE:= cfg-agent
 SRC:= cfg-policy
 SRC_DIR:= cfg-modules cfg-core
