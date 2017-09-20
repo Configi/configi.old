@@ -39,7 +39,7 @@ static const Node dummynode_ = {
 #include "flopen.h"
 #include "closefrom.h"
 
-static void
+static int
 lcleartable(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 	Table *h = (Table *)lua_topointer(L, 1);
@@ -51,6 +51,7 @@ lcleartable(lua_State *L) {
 		for (n = gnode(h, 0); n < limit; n++)   //traverse hash part
 			setnilvalue(gval(n));
 	}
+	return 0;
 }
 
 /*
