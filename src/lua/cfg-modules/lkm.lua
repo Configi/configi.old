@@ -4,6 +4,7 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
 local M, lkm = {}, {}
+local ipairs = ipairs
 local cfg = require"cfg-core.lib"
 local cmd = require"lib".exec.cmd
 local fact = require"cfg-core.fact"
@@ -93,7 +94,7 @@ function lkm.disabled(S)
     if modules[P.module] then
       return F.result(P.module)
     end
-    return F.result(P.module, true)
+    return F.result(P.module, false)
   end
 end
 lkm.loaded = lkm.inserted
