@@ -196,18 +196,19 @@ function iptables.default(S)
       { "-P", "FORWARD", "DROP" },
       { "-A", "INPUT", "-i", "lo", "-j", "ACCEPT" },
       { "-A", "OUTPUT", "-o", "lo", "-j", "ACCEPT" },
+      { "-A", "INPUT", "-s", "127.0.0.0/8", "-j", "DROP" },
       { "", "INPUT", "-p", "tcp", "-s", P.source, "-d", P.host, "--sport", "513:65535", "--dport", P.ssh,
         "-m", "state", "--state", "NEW,ESTABLISHED", "-j", "ACCEPT" },
       { "", "OUTPUT", "-p", "tcp", "-s", P.host, "-d", P.source, "--sport", P.ssh, "--dport", "513:65535",
         "-m", "state", "--state", "ESTABLISHED", "-j", "ACCEPT" }
     }
-    args[8][1] = "-C"
     args[9][1] = "-C"
+    args[10][1] = "-C"
     if cmd.iptables(args[8]) and cmd.iptables(args[9]) then
       return F.kept("iptables.default")
     else
-      args[8][1] = "-A"
       args[9][1] = "-A"
+      args[10][1] = "-A"
       for n = 1, #args do
         cmd.iptables(args[n])
       end
