@@ -80,10 +80,10 @@ function sysctl.read(S)
     if not file.stat(key) then
       return F.result(P.key, nil, M.report.not_found)
     end
-    if file.read(key) ~= tostring(P.value) then
+    if file.read(key) ~= tostring(P.value.."\n") then
       return F.result(P.key)
     end
-    return F.result(P.key, true)
+    return F.result(P.key, false)
   end
 end
 
