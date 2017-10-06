@@ -490,6 +490,7 @@ function exec.context(str)
   end})
 end
 
+exec.ctx = exec.context
 exec.cmd = setmetatable({}, {__index =
   function (_, key)
     local E, exe
