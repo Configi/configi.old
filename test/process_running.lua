@@ -10,7 +10,7 @@ process.running"/usr/bin/login"{
 
 process.running"/bin/login"{
     cmdline = "/bin/login --",
-    context = fact.osfamily.gentoo,
+    context = fact.osfamily.gentoo or fact.osfamily.debian,
     name = "login",
     notify_kept = "running"
 }
