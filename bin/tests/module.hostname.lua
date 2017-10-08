@@ -42,7 +42,7 @@ function test(p)
     local _, t = cmd.hostname()
     local before = t.stdout[1]
     T.policy = function()
-      T.equal(cfg("-f", p), 0)
+      T.equal(cfg("-F", "-f", p), 0)
     end
     T.set = function()
       _, t = cmd.hostname()
