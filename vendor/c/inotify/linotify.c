@@ -126,7 +126,7 @@ static int handle_read(lua_State *L)
     }
     lua_newtable(L);
 
-    while(bytes >= sizeof(struct inotify_event)) {
+    while((size_t)bytes >= sizeof(struct inotify_event)) {
         iev = (struct inotify_event *) (buffer + i);
 
         push_inotify_event(L, iev);
