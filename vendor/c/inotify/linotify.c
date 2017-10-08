@@ -35,7 +35,7 @@
 struct inotify_context {
     char buffer[READ_BUFFER_SIZE];
     int offset;
-    int bytes_remaining;
+    size_t bytes_remaining;
 };
 
 void push_inotify_handle(lua_State *L, int fd)
@@ -145,6 +145,7 @@ handle_events_iterator(lua_State *L)
     struct inotify_context *context;
     struct inotify_event *event;
     int fd;
+    ssize_t read_bytes = 0;
 
     fd      = get_inotify_handle(L, 1);
     context = lua_touserdata(L, lua_upvalueindex(1));
@@ -152,7 +153,7 @@ handle_events_iterator(lua_State *L)
     if(context->bytes_remaining < sizeof(struct inotify_event)) {
         context->offset = 0;
 
-        if((context->bytes_remaining = read(fd, context->buffer, READ_BUFFER_SIZE)) < 0) {
+        if((read_bytes = read(fd, context->buffer, READ_BUFFER_SIZE)) < 0) {
             if(errno == EAGAIN || errno == EWOULDBLOCK) {
                 lua_pushnil(L);
                 return 1;
@@ -161,7 +162,7 @@ handle_events_iterator(lua_State *L)
         }
     }
     event = (struct inotify_event *) (context->buffer + context->offset);
-
+    context->bytes_remaining = (size_t)read_bytes;
     context->bytes_remaining -= (sizeof(struct inotify_event) + event->len);
     context->offset          += (sizeof(struct inotify_event) + event->len);
 
