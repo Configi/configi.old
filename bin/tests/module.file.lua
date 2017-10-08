@@ -3,7 +3,7 @@ local pwd = require "posix.pwd"
 local grp = require "posix.grp"
 function attributes(p)
   local nobody = pwd.getpwnam("nobody")
-  local nogroup = grp.getgrnam("nobody")
+  local nogroup = grp.getgrnam("nobody") or grp.getgrnam("nogroup")
   local r, t
   T.file["attributes policy"] = function()
     r, t = cfg("-m", "-f", p)
