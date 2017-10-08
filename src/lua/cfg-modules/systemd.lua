@@ -94,7 +94,7 @@ end
 function systemd.reload(S)
   M.report = {
     repaired = "system.reload: Successfully reloaded service.",
-    kept = "system.reload: Service not active.",
+    not_active = "system.reload: Service not active.",
     failed = "systemd.reload: Error reloading service."
   }
   return function(P)
@@ -105,7 +105,7 @@ function systemd.reload(S)
     end
     local code = F.run(cmd["systemctl"], { "--quiet", "is-active", P.service, ignore = true})
     if code ~= 0 then
-      return F.kept(P.service)
+      return F.result(P.service, nil, M.report.not_active)
     end
     return F.result(P.service, F.run(cmd["systemctl"], { "--quiet", "reload", P.service }))
   end
