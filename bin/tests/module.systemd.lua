@@ -34,17 +34,19 @@ function restarted(p)
   end
 end
 restarted("test/systemd_restart.lua")
-function reloaded(p)
-  local r, t
-  T.systemd["reloaded policy"] = function()
-    r, t = cfg("-m", "-f", p)
-    T.equal(r, 0)
+if not factid.osfamily() == "debian" then
+  function reloaded(p)
+    local r, t
+    T.systemd["reloaded policy"] = function()
+      r, t = cfg("-m", "-f", p)
+      T.equal(r, 0)
+    end
+    T.systemd["reloaded ok"] = function()
+      T.is_not_nil(string.find(t.stderr[1], ".+%[%sOK%s%].*"))
+    end
   end
-  T.systemd["reloaded ok"] = function()
-    T.is_not_nil(string.find(t.stderr[1], ".+%[%sOK%s%].*"))
-  end
+  reloaded("test/systemd_reload.lua")
 end
-reloaded("test/systemd_reload.lua")
 function stopped(p)
   local r, t
   T.systemd["stopped policy"] = function()
