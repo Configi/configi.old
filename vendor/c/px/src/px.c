@@ -269,7 +269,6 @@ Cexecve(lua_State *L)
 		argv[i] = (char*)lua_tostring(L, -1);
 	}
 	argv[n+1] = 0;
-	int exec_r;
 	if (LUA_TTABLE != lua_type(L, 3)) {
 		errno = 0;
 		if (0 > execv(path, argv)) return luaX_pusherror(L, "execv(3) error");
