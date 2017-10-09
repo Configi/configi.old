@@ -34,7 +34,7 @@ function restarted(p)
   end
 end
 restarted("test/systemd_restart.lua")
-if not factid.osfamily() == "debian" then
+if not factid.osfamily()[1] == "debian" then
   function reloaded(p)
     local r, t
     T.systemd["reloaded policy"] = function()

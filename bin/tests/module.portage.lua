@@ -1,6 +1,6 @@
 _ENV = require "bin/tests/ENV"
 local osfamily = require"factid".osfamily()
-if not osfamily == "gentoo" then
+if not osfamily[1] == "gentoo" then
   T.portage.skip = true
 end
 function present(p)

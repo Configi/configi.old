@@ -1,7 +1,7 @@
 _ENV = require "bin/tests/ENV"
 local osfamily = require"factid".osfamily()
 function test(p1, p2)
-  if osfamily == "openwrt" then
+  if osfamily[1] == "openwrt" then
     cmd.touch("/etc/crontabs/root")
   end
   cmd.crontab("-r")
