@@ -288,6 +288,7 @@ Cexecve(lua_State *L)
 		errno = 0;
 		return luaX_pusherror(L, "bad argument #3 to 'execve' (none or table expected)");
 	}
+	return 0;
 }
 
 static const
