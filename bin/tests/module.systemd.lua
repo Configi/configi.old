@@ -56,6 +56,7 @@ function stopped(p)
   T.systemd["stopped ok"] = function()
     T.is_not_nil(string.find(t.stderr[1], ".+%[%sOK%s%].*"))
   end
+  cmd.sleep("1")
   T.systemd["stopped check"] = function()
     T.is_nil(cmd.pgrep("nscd"))
   end
