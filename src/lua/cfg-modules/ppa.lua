@@ -63,10 +63,10 @@ function ppa.present(S)
     if R.kept or found(S) then
       return F.result(S, false)
     end
-    if not path.bin("apt-add-repository") then
+    if not path.bin("add-apt-repository") then
       if install(P) == nil then return F.result(S, nil, M.report.failed_install) end
     end
-    local add = exec.ctx("apt-add-repository")
+    local add = exec.ctx("add-apt-repository")
     if P.proxy then
       add.env = {"http_proxy="..P.proxy}
     end
@@ -98,11 +98,11 @@ function ppa.absent(S)
     if R.kept or not found(S) then
       return F.result(S, false)
     end
-    if not path.bin("apt-add-repository") then
+    if not path.bin("add-apt-repository") then
       if install(P) == nil then return F.result(S, nil, M.report.failed_install) end
     end
     local codename = file.match("/etc/os-release", [[^UBUNTU_CODENAME=[%p]*(%w+)[%p]*]])
-    local del = exec.ctx("apt-add-repository")
+    local del = exec.ctx("add-apt-repository")
     if not F.run(del, "-r", "-y", "ppa:"..S) then return F.result(S) end
     local u, p = string.match(S, "([^%G/]+)/([^$G/]+)")
     if not u or not p then return F.result(S) end
