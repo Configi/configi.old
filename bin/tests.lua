@@ -35,6 +35,7 @@ local tests = {
   "module.mount",
   "module.portage",
   "module.apt",
+  "module.ppa",
   "module.sticky",
   "module.port",
 }
