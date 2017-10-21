@@ -331,6 +331,7 @@ local popen = function(str, cwd, ignore)
   local _, code
   _, R.status, code = io.close(pipe)
   R.exe = "io.popen"
+  R.code = code
   if code == 0 or ignore then
     return code, R
   else
