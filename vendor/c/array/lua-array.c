@@ -11,7 +11,7 @@ lnewindex(lua_State *L) {
 	}
 	lua_settop(L, 3);
 	lua_rawseti(L, 1, idx);
-	ptrdiff_t rawlen = lua_rawlen(L, 1);
+	size_t rawlen = lua_rawlen(L, 1);
 	if (rawlen >= idx) {
 		return 0;
 	}
@@ -58,7 +58,7 @@ insert(lua_State *L, lua_Integer key, int n) {
 
 static lua_Integer
 sort_sparse(lua_State *L, lua_Integer sparselen) {
-	ptrdiff_t rawlen = lua_rawlen(L, 1);
+	size_t rawlen = lua_rawlen(L, 1);
 	lua_Integer i, n=0;
 	// insertion sort
 	for (i=0; i<sparselen; i++) {
@@ -112,9 +112,9 @@ lnext(lua_State *L) {
 		return 2;
 	}
 
-	ptrdiff_t rawlen = lua_rawlen(L, 1);
+	size_t rawlen = lua_rawlen(L, 1);
 	if (rawlen >= idx) {
-		ptrdiff_t i;
+		size_t i;
 		for (i = idx + 1; i <= rawlen; i++) {
 			if (lua_rawgeti(L, 1, i) != LUA_TNIL) {
 				lua_pushinteger(L, i);
