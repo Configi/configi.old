@@ -256,7 +256,7 @@ function shell.popen3(S)
         if table.find(rt.stdout, P.stdout, true) then
           F.msg(P.stdout, report.shell_popen3stdout_ok, true)
         else
-          res = false
+          res = nil
           F.msg(P.stdout, report.shell_popen3stdout_fail, nil)
         end
       end
