@@ -175,14 +175,15 @@ function shell.popen(S)
     end
     local ok, t = F.run(exec.popen, str, P.cwd)
     if P.expects then
+      local expects = '"'..P.expects..'"'
       if P.test then
-        return F.result(P.expects, false, M.report.expect_ok)
+        return F.result(expects, false, M.report.expect_ok)
       else
         if not t.output then t.output[1] = "" end
         if table.find(t.output, P.expects, true) then
-          return F.result(P.expects, false, M.report.expect_ok)
+          return F.result(expects, false, M.report.expect_ok)
         else
-          return F.result(P.expects, nil, M.report.expect_fail)
+          return F.result(expects, nil, M.report.expect_fail)
         end
       end
     end
