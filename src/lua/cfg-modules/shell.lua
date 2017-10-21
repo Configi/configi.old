@@ -153,15 +153,13 @@ end
 --   expects = ".X11-unix"
 -- }
 function shell.popen(S)
-  local report = {
-    shell_popenexpect_ok = "expects: Expected pattern found.",
-    shell_popenexpect_fail = "expects: Expected pattern not found."
-  }
   M.parameters = { "cwd", "expects" }
   M.report = {
     repaired = "shell.popen: Command or script successfully executed.",
     kept = "shell.popen: `creates` or `removes` parameter satisfied.",
-    failed = "shell.popen: Command or script error."
+    failed = "shell.popen: Command or script error.",
+    expect_ok = "shell.popen: Expected pattern found.",
+    expect_fail = "shell.popen: Expected pattern not found."
   }
   return function(P)
     P.string = S
@@ -175,27 +173,21 @@ function shell.popen(S)
     else
       str = P.string
     end
-    local code, t = F.run(exec.popen, str, P.cwd)
-    local res, ok
+    local ok, t = F.run(exec.popen, str, P.cwd)
     if P.expects then
       if P.test then
-        F.msg(P.expects, report.shell_popenexpect_ok, true)
+        return F.result(P.expects, false, M.report.expect_ok)
       else
+        if not t.output then t.output[1] = "" end
         if table.find(t.output, P.expects, true) then
-          res = true
-          F.msg(P.expects, report.shell_popenexpect_ok, true)
-        end
-        if not res then
-          F.msg(P.expects, report.shell_popenexpect_fail, nil)
+          return F.result(P.expects, false, M.report.expect_ok)
+        else
+          return F.result(P.expects, nil, M.report.expect_fail)
         end
       end
-    else
-      res = code
     end
     if P.test then
       ok = true
-    else
-      ok = res
     end
     return F.result(P.string, ok)
   end
