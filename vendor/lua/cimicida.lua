@@ -380,6 +380,7 @@ local system = function(str, cwd, ignore)
   local R = {}
   _, R.status, code = os.execute(str)
   R.exe = "os.execute"
+  R.code = code
   if code == 0 or ignore then
     return code, R
   else
