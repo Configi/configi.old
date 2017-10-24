@@ -11,125 +11,12 @@
 #include <fcntl.h>
 #include <string.h>
 
-/*
- * lclonetable
- */
-#include <lobject.h>
-#include <ltable.h>
-#include <lgc.h>
-#include <lstate.h>
-#define black2gray(x)	resetbit(x->marked, BLACKBIT)
-#define linkgclist(o,p)	((o)->gclist = (p), (p) = obj2gco(o))
-
-/*
- * lcleartable
- */
-#define gnodelast(h)    gnode(h, cast(size_t, sizenode(h)))
-#define dummynode               (&dummynode_)
-static const Node dummynode_ = {
-	{NILCONSTANT},  /* value */
-	{{NILCONSTANT, 0}}  /* key */
-};
-
 #include "lua.h"
 #include "lauxlib.h"
-#include "lualib.h"
 #include "auxlib.h"
 
 #include "flopen.h"
 #include "closefrom.h"
-
-static int
-lcleartable(lua_State *L) {
-	luaL_checktype(L, 1, LUA_TTABLE);
-	Table *h = (Table *)lua_topointer(L, 1);
-	unsigned int i;
-	for (i = 0; i < h->sizearray; i++)
-		setnilvalue(&h->array[i]);
-	if (h->node != dummynode) {
-		Node *n, *limit = gnodelast(h);
-		for (n = gnode(h, 0); n < limit; n++)   //traverse hash part
-			setnilvalue(gval(n));
-	}
-	return 0;
-}
-
-/*
- * From:
- * http://lua-users.org/lists/lua-l/2017-07/msg00075.html
- * https://gist.github.com/cloudwu/a48200653b6597de0446ddb7139f62e3
- */
-static void
-barrierback(lua_State *L, Table *t)
-{
-	if (isblack(t)) {
-		global_State *g = G(L);
-		black2gray(t);  /* make table gray (again) */
-		linkgclist(t, g->grayagain);
-	}
-}
-
-static int
-lclonetable(lua_State *L)
-{
-	luaL_checktype(L, 1, LUA_TTABLE);
-	luaL_checktype(L, 2, LUA_TTABLE);
-	Table * to = (Table *)lua_topointer(L, 1);
-	const Table * from = lua_topointer(L, 2);
-	void *ud;
-	lua_Alloc alloc = lua_getallocf(L, &ud);
-	if (from->lsizenode != to->lsizenode) {
-		if (isdummy(from)) {
-			// free to->node
-			if (!isdummy(to))
-				alloc(ud, to->node, sizenode(to) * sizeof(Node), 0);
-			to->node = from->node;
-		} else {
-			unsigned int size = sizenode(from) * sizeof(Node);
-			Node *node = alloc(ud, NULL, 0, size);
-			if (node == NULL)
-				luaL_error(L, "Out of memory");
-			memcpy(node, from->node, size);
-			// free to->node
-			if (!isdummy(to))
-				alloc(ud, to->node, sizenode(to) * sizeof(Node), 0);
-			to->node = node;
-		}
-		to->lsizenode = from->lsizenode;
-	} else if (!isdummy(from)) {
-		unsigned int size = sizenode(from) * sizeof(Node);
-		if (isdummy(to)) {
-			Node *node = alloc(ud, NULL, 0, size);
-			if (node == NULL)
-				luaL_error(L, "Out of memory");
-			to->node = node;
-		}
-		memcpy(to->node, from->node, size);
-	}
-	if (from->lastfree) {
-		int lastfree = from->lastfree - from->node;
-		to->lastfree = to->node + lastfree;
-	} else {
-		to->lastfree = NULL;
-	}
-	if (from->sizearray != to->sizearray) {
-		if (from->sizearray) {
-			TValue *array = alloc(ud, NULL, 0, from->sizearray * sizeof(TValue));
-			if (array == NULL)
-				luaL_error(L, "Out of memory");
-			alloc(ud, to->array, to->sizearray * sizeof(TValue), 0);
-			to->array = array;
-		} else {
-			alloc(ud, to->array, to->sizearray * sizeof(TValue), 0);
-			to->array = NULL;
-		}
-		to->sizearray = from->sizearray;
-	}
-	memcpy(to->array, from->array, from->sizearray * sizeof(TValue));
-	barrierback(L,to);
-	lua_settop(L, 1);
-	return 1;
-}
 
 /***
 chroot(2) wrapper.

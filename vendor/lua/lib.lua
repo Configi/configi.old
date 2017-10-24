@@ -17,6 +17,7 @@ local wait = require"posix.sys.wait"
 local stat = require"posix.sys.stat"
 local ptime = require"posix.time"
 local A = require"array"
+local Aux = require"auxlib"
 local P = require"px"
 local I = require"inspect"
 local C = require"cimicida"
@@ -40,8 +41,8 @@ end
 -- Aliases
 table.inspect = I.inspect
 table.array = A
-table.copy = P.table_copy
-table.clear = P.table_clear
+table.copy = Aux.table_copy
+table.clear = Aux.table_clear
 fd.close = unistd.close
 path.base = libgen.basename
 path.dir = libgen.dirname
