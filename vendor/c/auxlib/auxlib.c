@@ -239,3 +239,9 @@ luaL_Reg auxlib_funcs[] =
 	{NULL, NULL}
 };
 
+int
+luaopen_auxlib(lua_State *L)
+{
+	luaL_newlib(L, auxlib_funcs);
+	return 1;
+}
