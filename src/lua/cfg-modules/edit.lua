@@ -41,13 +41,12 @@ local write = function(F, P)
       return F.result(P.path)
     end
   end
-  return F.result(P.path, file.atomic_write(P.path, P._input, P.mode))
+  return F.result(P.path, file.atomic_write(P.path, P._input, P._mode))
 end
 
 --- Insert lines into an existing file.
 -- @Promiser path of text file to modify
 -- @param line to insert [REQUIRED] [ALIAS: content]
--- @param inserts a line (string) if found, skips the operation
 -- @param pattern line is added before or after this pattern [ALIAS: match]
 -- @param plain turn on or off pattern matching facilities [DEFAULT: "yes", true]
 -- @param before [DEFAULT: "no", false]
@@ -59,7 +58,7 @@ end
 --   plain  = true
 -- }
 function edit.insert_line(S)
-  M.parameters = { "diff", "line", "plain", "pattern", "before_pattern", "after_pattern", "inserts" }
+  M.parameters = { "diff", "line", "plain", "pattern", "before_pattern", "after_pattern" }
   M.report = {
     repaired = "edit.insert_line: Successfully inserted line.",
     kept = "edit.insert_line: Insert cancelled, found a matching line.",
@@ -72,40 +71,21 @@ function edit.insert_line(S)
     if R.kept then
       return F.kept(P.path)
     end
-    P.plain = P.plain or true
-    local inserts, line, pattern
-    if not P.plain then
-      inserts = string.escape_pattern(P.inserts)
-      line = string.escape_pattern(P.line)
-      pattern = string.escape_pattern(P.pattern)
-    else
-      inserts = P.inserts
-      line = P.line
-      pattern = P.pattern
-    end
     local tf = file.to_table(P.path, "L")
-    if not tf then
-      return F.result(P.path, nil, M.report.missing)
+    if not tf then return F.result(P.path, nil, M.report.missing) end
+    if table.find(tf, P.line, true) then
+      return F.kept(P.path)
     end
-    P.mode = stat.stat(P.path).st_mode
-    if P.inserts then
-      if table.find(tf, inserts, P.plain) then
-        return F.kept(P.path)
-      end
-    end
+    P.plain = P.plain or true
     if not P.pattern then
-      if table.find(tf, line, P.plain) then
-        return F.kept(P.path)
-      else
-        tf[#tf + 1] = P.line .. "\n"
-      end
+      tf[#tf + 1] = P.line.."\n"
     else
       local x, n, nf = 1, 1, #tf
       if P.before_pattern then -- after_pattern "yes" is default
         x = 0
       end
       repeat
-        if string.find(tf[n], pattern, 1, P.plain) then
+        if string.find(tf[n], P.pattern, 1, P.plain) then
           table.insert(tf, n + x, P.line.."\n")
           nf = nf + 1
           n = n + 2
@@ -115,6 +95,7 @@ function edit.insert_line(S)
       until n == nf
     end
     P._input = table.concat(tf)
+    P._mode = stat.stat(P.path).st_mode
     return write(F, P)
   end
 end
@@ -152,11 +133,11 @@ function edit.remove_line(S)
     if not tf then
       return F.result(P.path, nil, M.report.missing)
     end
-    P.mode = stat.stat(P.path).st_mode
     if not table.find(tf, pattern, P.plain) then
       return F.kept(P.path)
     end
     P._input = table.concat(table.filter(tf, pattern, P.plain))
+    P._mode = stat.stat(P.path).st_mode
     return write(F, P)
   end
 end
