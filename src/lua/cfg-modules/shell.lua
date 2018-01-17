@@ -5,8 +5,11 @@
 -- @added 0.9.0
 
 local M, shell = {}, {}
+local ipairs = ipairs
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
+local std = require"cfg-core.std"
+local roles = require"cfg-core.roles"
 local file, table, string, exec, os = lib.file, lib.table, lib.string, lib.exec, lib.os
 local stat = require"posix.sys.stat"
 _ENV = nil
@@ -125,6 +128,19 @@ function shell.system(S)
   }
   return function(P)
     P.string = S
+    local ppath = std.path()
+    local from_scripts = ppath.."/scripts/"..P.string
+    if stat.stat(from_scripts) then
+      P.string = from_scripts
+    elseif #roles > 0 then
+      for _, r in ipairs(roles) do
+        from_scripts = ppath.."/roles/"..r.."/scripts/"..P.string
+        if stat.stat(from_scripts) then
+          P.string = from_scripts
+          break
+        end
+      end
+    end
     local F = cfg.init(P, M)
     local script
     if os.is_file(P.string) then
