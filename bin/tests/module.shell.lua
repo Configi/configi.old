@@ -21,6 +21,28 @@ function system(p)
   end
 end
 system("test/shell_system.lua")
+function script(p)
+  T.shell["script policy"] = function()
+    T.equal(cfg("-f", p), 0)
+  end
+  T.shell["script check"] = function()
+    local f = dir.."shell_script.txt"
+    T.is_not_nil(os.is_file(f))
+    os.remove(f)
+  end
+end
+script("test/shell_script.lua")
+function script_roles(p)
+  T.shell["script roles policy"] = function()
+    T.equal(cfg("-f", p), 0)
+  end
+  T.shell["script roles check"] = function()
+    local f = dir.."shell_script-roles.txt"
+    T.is_not_nil(os.is_file(f))
+    os.remove(f)
+  end
+end
+script_roles("test/shell_script-roles/test.lua")
 function popen(p1, p2)
   T.shell["popen policy"] = function()
     T.equal(cfg("-f", p1), 0)
