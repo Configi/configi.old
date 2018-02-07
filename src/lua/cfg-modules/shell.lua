@@ -5,7 +5,7 @@
 -- @added 0.9.0
 
 local M, shell = {}, {}
-local ipairs = ipairs
+local ipairs, next = ipairs, next
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local std = require"cfg-core.std"
@@ -195,7 +195,7 @@ function shell.popen(S)
       if P.test then
         return F.result(expects, false, M.report.expect_ok)
       else
-        if not t.output then t.output[1] = "" end
+        if not next(t.output) then t.output[1] = "" end
         if table.find(t.output, P.expects, true) then
           return F.result(expects, false, M.report.expect_ok)
         else
