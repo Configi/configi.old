@@ -171,6 +171,7 @@ end
 -- @param host IP of the local host [DEFAULT: 0.0.0.0]
 -- @param source IP of host to white list [DEFAULT: 0.0.0.0]
 -- @param ssh SSH port [DEFAULT: 22]
+-- @param outgoing Allow locally initiated outgoing connections [DEFAULT: false]
 -- @usage iptables.default("comment")()
 function iptables.default(S)
   M.parameters = { "source", "host", "ssh" }
@@ -212,6 +213,18 @@ function iptables.default(S)
       args[10][1] = "-A"
       for n = 1, #args do
         cmd.iptables(args[n])
+      end
+    end
+    if P.outgoing then
+      local output = {"-C", "OUTPUT", "-d", "0.0.0.0/0", "-j", "ACCEPT"}
+      local input = {"-C", "INPUT", "-m", "state", "--state", "ESTABLISHED,RELATED", "-j", "ACCEPT"}
+      if not cmd.iptables(output) then
+        output[1] = "-I"
+        cmd.iptables(output)
+      end
+      if not cmd.iptables(input) then
+        input[1] = "-I"
+        cmd.iptables(input)
       end
     end
   end
