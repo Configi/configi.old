@@ -38,7 +38,7 @@ function sysctl.write(S)
       key = "/proc/sys/"..key
       if file.stat(key) then
         local write = tostring(P.value)
-        if file.read_all(key) == write then
+        if file.read_line(key) == write then
           return false
         end
         return file.write_all(key, write)
