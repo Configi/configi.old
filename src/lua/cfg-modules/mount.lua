@@ -94,8 +94,8 @@ function mount.opts(S)
         to[#to+1] = o.."="..P[o]
       end
     end
-    local co
-    if fact.mount then
+    local co = ""
+    if next(fact.mount) then
       for _, o in ipairs(fact.mount.table) do
         if P.dir == o.dir then
           co = o.opts
