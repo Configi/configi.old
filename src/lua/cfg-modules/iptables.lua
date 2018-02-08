@@ -180,6 +180,7 @@ function iptables.default(S)
     failed = "iptables.default: Error adding rules."
   }
   return function(P)
+    P.chain = "input" -- dummy
     local F, R = cfg.init(P, M)
     P.source = P.source or "0/0"
     P.host = P.host or "0/0"
