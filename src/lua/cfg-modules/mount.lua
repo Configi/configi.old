@@ -4,7 +4,7 @@
 -- @license MIT <http://opensource.org/licenses/MIT>
 -- @added 2.0.0
 local M, mount = {}, {}
-local ipairs, string = ipairs, string
+local ipairs, string, next, pairs = ipairs, string, next, pairs
 local cfg = require"cfg-core.lib"
 local lib = require"lib"
 local table, util = lib.table, lib.util
