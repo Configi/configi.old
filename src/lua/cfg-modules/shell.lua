@@ -116,7 +116,6 @@ end
 -- <br />
 -- STDIN and STDERR are closed and STDOUT is piped to /dev/null
 -- @Promiser script or command to execute
--- @Aliases script
 -- @param creates a filename, if found will not run the script
 -- @param removes a filename, if not found will not run the script
 -- @usage shell.system("/root/test.sh")()
@@ -128,19 +127,6 @@ function shell.system(S)
   }
   return function(P)
     P.string = S
-    local ppath = std.path()
-    local from_scripts = ppath.."/scripts/"..P.string
-    if stat.stat(from_scripts) then
-      P.string = from_scripts
-    elseif #roles > 0 then
-      for _, r in ipairs(roles) do
-        from_scripts = ppath.."/roles/"..r.."/scripts/"..P.string
-        if stat.stat(from_scripts) then
-          P.string = from_scripts
-          break
-        end
-      end
-    end
     local F = cfg.init(P, M)
     local script
     if os.is_file(P.string) then
@@ -154,7 +140,7 @@ function shell.system(S)
     if rc(F, P) then
       return F.kept(P.string)
     end
-    return F.result(P.string, F.run(exec.script, script))
+    return F.result(P.string, F.run(exec.system, script))
   end
 end
 
@@ -292,5 +278,62 @@ function shell.popen3(S)
   end
 end
 
-shell.script = shell.system
+--- Run a script via io.popen.
+-- @Promiser script to execute
+-- @param creates a filename, if found will not run the command
+-- @param removes a filename, if not found will not run the command
+-- @param expects instead of the exit code, use a string match as a test for success
+-- @param error ignore errors when set to "ignore" [Default: false]
+-- @usage shell.script("/root/script"){
+--   expects = "0"
+-- }
+function shell.script(S)
+  M.parameters = { "expects", "error" }
+  M.report = {
+    repaired = "shell.script: Script successfully executed.",
+    kept = "shell.script: `creates` or `removes` parameter satisfied.",
+    failed = "shell.script: Script error.",
+    expect_ok = "shell.script: Expected pattern found.",
+    expect_fail = "shell.script: Expected pattern not found."
+  }
+  return function(P)
+    P.string = S
+    local ppath = std.path()
+    local from_scripts = ppath.."/scripts/"..P.string
+    if stat.stat(from_scripts) then
+      P.string = from_scripts
+    elseif #roles > 0 then
+      for _, r in ipairs(roles) do
+        from_scripts = ppath.."/roles/"..r.."/scripts/"..P.string
+        if stat.stat(from_scripts) then
+          P.string = from_scripts
+          break
+        end
+      end
+    end
+    local F = cfg.init(P, M)
+    if rc(F, P) then
+      return F.kept(P.string)
+    end
+    local ok, t = F.run(exec.script, P.string, P.error)
+    if P.expects then
+      local expects = '"'..P.expects..'"'
+      if P.test then
+        return F.result(expects, false, M.report.expect_ok)
+      else
+        if not next(t.output) then t.output[1] = "" end
+        if table.find(t.output, P.expects, true) then
+          return F.result(expects, false, M.report.expect_ok)
+        else
+          return F.result(expects, nil, M.report.expect_fail)
+        end
+      end
+    end
+    if P.test then
+      ok = true
+    end
+    return F.result(P.string, ok)
+  end
+end
+
 return shell
