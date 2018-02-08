@@ -205,7 +205,7 @@ function iptables.default(S)
     }
     args[9][1] = "-C"
     args[10][1] = "-C"
-    if cmd.iptables(args[8]) and cmd.iptables(args[9]) then
+    if cmd.iptables(args[9]) and cmd.iptables(args[10]) then
       return F.kept("iptables.default")
     else
       args[9][1] = "-A"
