@@ -17,15 +17,16 @@
       (if (or (= owner u.pw_name) (= owner (tostring u.pw_uid)))
       (C.skip true)
       (C.equal 0 (chown owner path)))))))
-(local group (fn [group path]
-  (local chgrp (exec.ctx "chgrp"))
-  (local info (stat.stat path))
-  (local g (grp.getgrgid info.st_gid))
-  (local cg (string.format "%s(%s)" (. g "gr_gid") (. g "gr_name")))
-  (tset C (.. "file.group :: " path " "  cg "->" group) (fn []
-    (if (or (= group g.gr_name) (= group (tostring g.gr_gid)))
-       (C.skip true)
-       (C.equal 0 (chgrp group path)))))))
+(defn group [group path]
+      (let [info (stat.stat path)
+            g (grp.getgrgid info.st_gid)
+            cg (string.format "%s(%s)" g.gr_gid g.gr_name)]
+            (tset C (.. "file.group :: " path " "  cg "->" group)
+                  (fn []
+                      (if (or (= group g.gr_name) (= group (tostring g.gr_gid)))
+                        (C.skip true)
+                        (let [chgrp (exec.ctx "chgrp")]
+                          (C.equal 0 (chgrp group path))))))))
 (defn directory [d]
       (tset C (.. "file.directory :: " d)
             (fn []
