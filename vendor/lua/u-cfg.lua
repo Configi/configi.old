@@ -106,10 +106,7 @@ api.equal = function (l, r)
 end
 
 api.skip = function (l, r)
-    if l == r then
 	skip()
-	return true
-    end
 end
 
 api.not_equal = function (l, r)
