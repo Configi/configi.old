@@ -1,4 +1,4 @@
--- COMAND LINE ----------------------------------------------------------------
+-- COMMAND LINE ----------------------------------------------------------------
 local function print_help()
     print "Usage: target.lua [options] [regex]"
     print "\t-h show this message"
@@ -41,7 +41,7 @@ local failed_tag   = red    "[  FAILED  ]"
 
 local ntests = 0
 local failed = false
-local nfailed = 0
+local failed_list = {}
 
 local function trace(start_frame)
     print "Trace:"
@@ -187,23 +187,27 @@ local function run_test(test_suite, test_name, test_function, ...)
                             os.difftime(stop, start)))
 
     if is_test_failed then
-        nfailed = nfailed + 1
+        table.insert(failed_list, full_test_name)
     end
 end
 
 api.summary = function ()
     log(done_tag)
+    local nfailed = #failed_list
     if nfailed == 0 then
         log(passed_tag .. " " .. ntests .. " test(s)")
         os.exit(0)
     else
-        log(failed_tag .. " " .. nfailed .. " out of " .. ntests)
+        log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":")
+        for _, test_name in ipairs(failed_list) do
+            log(failed_tag .. "\t" .. test_name)
+        end
         os.exit(1)
     end
 end
 
 api.result = function ( ... )
-    return ntests, nfailed
+    return ntests, #failed_list
 end
 
 local default_start_up = function () end
@@ -221,7 +225,9 @@ local function handle_new_test(suite, test_name, test_function)
     all_test_cases[suite_name][test_name] = test_function
 
     local info = debug.getinfo(test_function)
-    if info.nparams == 0 then
+    if info.nparams == nil and
+            string.sub(test_name, #test_name - 1, #test_name) ~= "_p"
+            or info.nparams == 0 then
         run_test(suite, test_name, test_function)
     end
 end
@@ -236,9 +242,10 @@ local function lookup_test_with_params(suite, test_name)
                 , all_test_cases[suite_name][test_name], ...)
         end
     else
-        nfailed = nfailed + 1
+        local full_test_name = test_pretty_name(suite_name, test_name)
+        table.insert(failed_list, full_test_name)
         ntests = ntests + 1
-        log(fail_tag .. " No " .. test_pretty_name(suite_name, test_name) .. " parametrized test case!")
+        log(fail_tag .. " No " .. full_test_name .. " parametrized test case!")
     end
 end
 

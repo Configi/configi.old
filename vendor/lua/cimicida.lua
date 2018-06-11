@@ -111,6 +111,14 @@ local t_to_dict = function(tbl, def)
   return t
 end
 
+local t_to_seq = function(tbl)
+  local t = {}
+  for k, _ in pairs(tbl) do
+    t[#t+1] = k
+  end
+  return t
+end
+
 local line_to_seq = function(str)
   local tbl = {}
   if not str then
@@ -261,27 +269,8 @@ local line = function(file, ln)
   end
 end
 
-local template = function(str, tbl)
-  local t, _ = {}, nil
-  _, str = pcall(string.gsub, str, "%${[%s]-([^}%G]+)[%s]-}",
-    function (s)
-      t.type = type
-      local code = [[
-        V=%s
-        if type(V) == "function" then
-          V=V()
-        end
-      ]]
-      local lua = string.format(code, s)
-      local chunk = load(lua, lua, "t", setmetatable(t, {__index=tbl}))
-      if chunk then
-        chunk()
-        return rawget(t, "V") or s
-      else
-        return s
-      end
-    end)
-  return str
+local template = function(s, v)
+  return string.gsub(s, "%${[%s]-([^}%G]+)[%s]-}", v)
 end
 
 local exit_string = function(proc, status, code)
@@ -499,7 +488,7 @@ autotable = function(t)
   return t
 end
 
-local count = function(t, maxn)
+local t_len = function(t, maxn)
   local n = 0
   if maxn then
     for _ in pairs(t) do
@@ -512,6 +501,26 @@ local count = function(t, maxn)
     end
   end
   return n
+end
+
+local t_count = function(t, i)
+  local n = 0
+  for _, v in pairs(t) do
+    if i == v then
+      n = n + 1
+    end
+  end
+  return n
+end
+
+local t_unique = function(t)
+  local nt = {}
+  for _, v in pairs(t) do
+    if t_count(nt, v) == 0 then
+      nt[#nt+1] = v
+    end
+  end
+  return nt
 end
 
 local truncate = function(file)
@@ -556,11 +565,16 @@ end
 table.find = t_find
 table.to_dict = t_to_dict
 table.to_hash = t_to_dict
+table.to_seq = t_to_seq
+table.to_array = t_to_seq
 table.filter = t_filter
 table.clone = clone
 table.insert_if = insert_if
 table.auto = autotable
-table.count = count
+table.len = t_len
+table.count = t_count
+table.unique = t_unique
+table.uniq = t_unique
 string.append = append
 string.line_to_table = line_to_seq
 string.line_to_array = line_to_seq
@@ -577,7 +591,9 @@ return {
   string = string,
   func = {
     pcall_f = pcall_f,
+    pcall = pcall_f,
     try_f = try_f,
+    try = try_f,
     time = time
   },
   fmt = {

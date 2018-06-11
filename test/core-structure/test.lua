@@ -1,4 +1,0 @@
-roles{
-    "test-role"
-}
-

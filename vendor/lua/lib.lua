@@ -17,7 +17,6 @@ local wait = require"posix.sys.wait"
 local stat = require"posix.sys.stat"
 local ptime = require"posix.time"
 local A = require"array"
-local Aux = require"auxlib"
 local P = require"px"
 local I = require"inspect"
 local C = require"cimicida"
@@ -41,8 +40,8 @@ end
 -- Aliases
 table.inspect = I.inspect
 table.array = A
-table.copy = Aux.table_copy
-table.clear = Aux.table_clear
+table.copy = P.table_copy
+table.clear = P.table_clear
 fd.close = unistd.close
 path.base = libgen.basename
 path.dir = libgen.dirname
@@ -328,6 +327,28 @@ function exec.exec(args)
 end
 
 function exec.qexec(args)
+  local flags = {}
+  flags.stdin = args.stdin
+  flags.stdout = args.stdout
+  flags.stderr = args.stderr
+  flags.timeout = args.timeout
+  flags.ignore = args.ignore
+  local argv = {}
+  for _, v in ipairs(args) do
+    argv[#argv + 1] = v
+  end
+  local R, xs, xe = P.posix_spawn(args.exe, argv, args.env, flags)
+  R.error = xs
+  R.errno = xe
+  R.exe = args.exe
+  if (R.code == 0) or args.ignore then
+    return R.code, R
+  else
+    return nil, R
+  end
+end
+
+function exec._qexec(args)
   local pid, err = unistd.fork()
   local R = {}
   if pid == nil or pid == -1 then
@@ -461,15 +482,8 @@ function os.real_name()
   return pwd.getpwuid(unistd.getuid()).pw_name
 end
 
-function exec.context(str)
-  local E, exe, args
-  if string.sub(str, 1, 1) == "-" then
-    E = exec.qexec
-    exe = string.sub(str, 2)
-  else
-    E = exec.exec
-    exe = str
-  end
+function exec.context(exe)
+  local args
   if strlen(path.split(exe)) == 0 then
     args = {exe = path.bin(exe)}
   else
@@ -488,20 +502,19 @@ function exec.context(str)
         a[#a+1] = k
       end
     end
-    return E(a)
+    return exec.qexec(a)
   end})
 end
 
 exec.ctx = exec.context
 exec.cmd = setmetatable({}, {__index =
   function (_, key)
-    local E, exe
+    local silent, exe
     -- silent execution (exec.qexec) when prepended with "-".
     if string.sub(key, 1, 1) == "-" then
-      E = exec.qexec
+      silent = true
       exe = string.sub(key, 2)
     else
-      E = exec.exec
       exe = key
     end
     -- Search common executable directories if not a full path.
@@ -518,7 +531,11 @@ exec.cmd = setmetatable({}, {__index =
         args = {...}
       end
       args.exe = exe
-      return E(args)
+      if silent then
+	args.stdout = false
+        args.stderr = false
+      end
+      return exec.exec(args)
     end
   end
 })

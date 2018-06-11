@@ -13,8 +13,7 @@ local ENV = {}
 _ENV = ENV
 
 --- Deduce the distro ID from /etc/os-release or /etc/*release.
--- The ID may be multiple so a table is used.
--- @return the id as a array-table (TABLE)
+-- @return the id as a string (STRING)
 function factid.osfamily ()
   local id = {}
   if sysstat.stat("/etc/os-release") then

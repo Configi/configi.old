@@ -15,15 +15,15 @@ C_MODULES+= $(foreach m, $(posixA), posix.$m.a)
 C_MODULES:= $(filter-out posix.a, $(C_MODULES))
 VENDOR+= posix
 CLEAN+= clean_posix
-luaposixDEFINES+= -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -DPACKAGE=\"luaposix\" -DVERSION=\"34.0-1\" -DHAVE_STATVFS -DHAVE_FDATASYNC -DHAVE_NET_IF_H -DHAVE_SYS_MSG_H -DHAVE_MSGRCV -DHAVE_MSGSND
+luaposixDEFINES+= -D_POSIX_C_SOURCE=200809L -D_BSD_SOURCE -D_GNU_SOURCE -D_XOPEN_SOURCE=700 -DPACKAGE=\"luaposix\" -DVERSION=\"34.0-1\" -DHAVE_STATVFS -DHAVE_FDATASYNC -DHAVE_NET_IF_H -DHAVE_SYS_MSG_H -DHAVE_MSGRCV -DHAVE_MSGSND
 
 $(posix_P)/sys/socket.o:  $(posix_P)/sys/socket.c
 	$(ECHOT) CC $@
-	$(TARGET_DYNCC) -Wno-error=address -Wno-error=unused-function -Wno-error=unused-variable -o $@ $(luaposixDEFINES) -I$(posix_P) $(TARGET_FLAGS) -c $<
+	$(TARGET_DYNCC) -w -o $@ $(luaposixDEFINES) -I$(posix_P) $(TARGET_FLAGS) -c $<
 
 $(posix_P)/sys/%.o:  $(posix_P)/sys/%.c
 	$(ECHOT) CC $@
-	$(TARGET_DYNCC) -Wno-error=unused-function -Wno-error=unused-variable -o $@ $(luaposixDEFINES) -I$(posix_P) $(TARGET_FLAGS) -c $<
+	$(TARGET_DYNCC) -w -o $@ $(luaposixDEFINES) -I$(posix_P) $(TARGET_FLAGS) -c $<
 
 posix.sys.%.a: $(posix_P)/sys/%.o
 	$(ECHOT) AR $@
@@ -32,11 +32,11 @@ posix.sys.%.a: $(posix_P)/sys/%.o
 
 $(posix_P)/unistd.o:  $(posix_P)/unistd.c
 	$(ECHOT) CC $@
-	$(TARGET_DYNCC) -Wno-error=redundant-decls -Wno-error=unused-function -Wno-error=unused-variable -o $@ $(luaposixDEFINES) -I$(posix_P) $(TARGET_FLAGS) -c $<
+	$(TARGET_DYNCC) -w -o $@ $(luaposixDEFINES) -I$(posix_P) $(TARGET_FLAGS) -c $<
 
 $(posix_P)/%.o:  $(posix_P)/%.c
 	$(ECHOT) CC $@
-	$(TARGET_DYNCC) -Wno-error=unused-function -Wno-error=unused-variable -o $@ $(luaposixDEFINES) -I$(posix_P) $(TARGET_FLAGS) -c $<
+	$(TARGET_DYNCC) -w -o $@ $(luaposixDEFINES) -I$(posix_P) $(TARGET_FLAGS) -c $<
 
 
 posix.%.a: $(posix_P)/%.o

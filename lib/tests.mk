@@ -35,6 +35,11 @@ ifeq ($(IS_CC), GCC)
   TARGET_CFLAGS+= -static-libgcc
 endif
 
+ENVIRON_DECLARED:= $(shell $(CONFIGURE_P)/test-environ.sh $(TARGET_STCC))
+ifeq ($(ENVIRON_DECLARED), 1)
+  luaposixDEFINES+= -DHAVE_EXTERN_ENVIRON_DECLARED
+endif
+
 # Replace --gc-sections with -dead-strip on Mac
 IS_APPLE:= $(shell $(CONFIGURE_P)/test-mac.sh $(TARGET_STCC))
 ifeq ($(IS_APPLE), APPLE)
@@ -58,9 +63,9 @@ ifneq (,$(findstring enable-lto,$(shell $(TARGET_STCC) -v 2>&1)))
     ifeq ($(shell $(CONFIGURE_P)/test-binutils-plugins.sh $(CROSS)$(AR)), true)
       TARGET_CFLAGS+= -fwhole-program -flto -fuse-linker-plugin
       TARGET_LDFLAGS+= -fwhole-program -flto
-      TARGET_RANLIB:= $(CROSS)$(RANLIB)
-      TARGET_AR:= $(CROSS)$(AR)
-      TARGET_NM:= $(CROSS)$(NM)
+      TARGET_RANLIB:= $(CROSS)gcc-$(RANLIB)
+      TARGET_AR:= $(CROSS)gcc-$(AR)
+      TARGET_NM:= $(CROSS)gcc-$(NM)
     endif
   endif
 endif
@@ -108,7 +113,7 @@ ifeq ($(HAVE_FCNTL_CLOSEM), true)
 endif
 
 ifeq ($(or $(MAKECMDGOALS),$(.DEFAULT_GOAL)), development)
-  CCWARN:= -Wall -Wextra -Wredundant-decls -Wshadow -Wpointer-arith -Werror -Wfatal-errors
+  CCWARN:= -Wall -Wextra -Wredundant-decls -Wshadow -Wpointer-arith -Wstrict-prototypes -Wno-unused-function
   TARGET_CFLAGS:= -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -O1 -fno-omit-frame-pointer -ggdb
   CFLAGS:= -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -O1 -fno-omit-frame-pointer -ggdb
   FOUND_ASAN:= $(shell $(CONFIGURE_P)/test-lasan.sh $(TARGET_STCC))
