@@ -43,6 +43,7 @@ local failed_tag   = red    "[  FAILED  ]"
 
 local ntests = 0
 local failed = false
+local skipped = false
 local failed_list = {}
 
 local function trace(start_frame)
@@ -184,6 +185,7 @@ local function run_test(test_suite, test_name, test_function, ...)
 
     ntests = ntests + 1
     failed = false
+    skipped = false
 
     log(run_tag .. " " .. full_test_name)
 
