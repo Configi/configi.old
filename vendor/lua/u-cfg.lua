@@ -29,13 +29,15 @@ local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m"
 local function blue(str)   return grey and str or "\27[1;34m" .. str .. "\27[0m" end
 local function green(str)  return grey and str or "\27[1;32m" .. str .. "\27[0m" end
 local function yellow(str) return grey and str or "\27[1;33m" .. str .. "\27[0m" end
+local function magenta(str) return grey and str or "\27[1;35m" .. str .. "\27[0m" end
 
 local tab_tag      = blue   "[----------]"
 local done_tag     = blue   "[==========]"
 local run_tag      = blue   "[ RUN      ]"
 local ok_tag       = green  "[       OK ]"
+local skip_tag     = yellow "[      SKIP]"
 local fail_tag     = red    "[      FAIL]"
-local disabled_tag = yellow "[ DISABLED ]"
+local disabled_tag = magenta"[ DISABLED ]"
 local passed_tag   = green  "[  PASSED  ]"
 local failed_tag   = red    "[  FAILED  ]"
 
@@ -70,6 +72,10 @@ local function fail(msg, start_frame)
     trace(start_frame or 4)
 end
 
+local function skip()
+    skipped = true
+end
+
 local function stringize_var_arg(varg, ...)
     if varg then
         local rest = stringize_var_arg(...)
@@ -92,10 +98,17 @@ local function test_pretty_name(suite_name, test_name)
 end
 
 -- PUBLIC API -----------------------------------------------------------------
-local api = { test_suite_name = "__root", skip = false }
+local api = { test_suite_name = "__root", disabled = false }
 api.equal = function (l, r)
     if l ~= r then
         fail(tostring(l) .. " ~= " .. tostring(r))
+    end
+end
+
+api.skip = function (l, r)
+    if l == r then
+	skip()
+	return true
     end
 end
 
@@ -151,7 +164,7 @@ local function run_test(test_suite, test_name, test_function, ...)
         return
     end
 
-    if test_suite.skip then
+    if test_suite.disabled then
         log(disabled_tag .. " " .. full_test_name)
         return
     end
@@ -182,7 +195,7 @@ local function run_test(test_suite, test_name, test_function, ...)
 
     local is_test_failed = not status or failed
     log(string.format("%s %s %d sec",
-                            is_test_failed and fail_tag or ok_tag,
+                            (is_test_failed and fail_tag) or (skipped and skip_tag) or ok_tag,
                             full_test_name,
                             os.difftime(stop, start)))
 
