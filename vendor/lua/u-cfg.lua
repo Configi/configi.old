@@ -105,8 +105,18 @@ api.equal = function (l, r)
     end
 end
 
-api.skip = function (l, r)
-	skip()
+api.skip = function (v)
+    if v then
+      skip()
+      return true
+    end
+end
+
+api.nskip = function (v)
+    if not v then
+        skip()
+        return true
+    end
 end
 
 api.not_equal = function (l, r)
