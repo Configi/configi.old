@@ -46,6 +46,15 @@
         (if (= contents v.contents)
           (C.skip true)
           (C.equal true (file.write v.path v.contents))))))))
+(defn mode [m f]
+      (let [mode-arg (tostring m)
+            info (stat.stat f)
+            len (- 0 (string.len mode-arg))
+            current-mode (string.sub (tostring (string.format "%o" info.st_mode)) len -1)]
+        (if (= current-mode (string.sub mode-arg len -1))
+          (C.skip true)
+          (let [chmod (exec.ctx "chmod")]
+            (C.equal 0 (chmod mode-arg f))))))
 (tset F "directory" directory)
 (tset F "absent" absent)
 (tset F "managed" managed)
@@ -53,4 +62,6 @@
 (tset F "chown" owner)
 (tset F "group" group)
 (tset F "chgrp" group)
+(tset F "mode" mode)
+(tset F "access" mode)
 F
