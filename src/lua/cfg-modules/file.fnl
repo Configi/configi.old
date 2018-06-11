@@ -13,10 +13,7 @@
   (local test-absent (func.skip (fn []
     (let [rm (exec.ctx "rm")]
       (C.equal 0 (rm "-r" "-f" f))))))
-  (let [nstat (stat.stat f)]
-    (if (= nil nstat)
-      (test-absent (C.skip true))
-      (test-absent (C.skip false))))))
+  (test-absent (C.nskip (stat.stat f)))))
 (tset F "directory" directory)
 (tset F "absent" absent)
 F
