@@ -26,12 +26,13 @@
     (if (or (= group g.gr_name) (= group (tostring g.gr_gid)))
        (C.skip true)
        (C.equal 0 (chgrp group path)))))))
-(local directory (fn [d]
-  (tset C (.. "file.directory :: " d) (fn []
-    (local test-directory (func.skip (fn []
-      (let [mkdir (exec.ctx "mkdir")]
-        (C.equal 0 (mkdir d))))))
-    (test-directory (C.skip (os.is_dir d)))))))
+(defn directory [d]
+      (tset C (.. "file.directory :: " d)
+            (fn []
+                (local test-directory (func.skip (fn []
+                                                    (let [mkdir (exec.ctx "mkdir")]
+                                                      (C.equal 0 (mkdir d))))))
+                (test-directory (C.skip (os.is_dir d))))))
 (defn absent [f]
       (tset C (.. "file.absent :: " f)
             (fn []
