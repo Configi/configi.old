@@ -32,12 +32,14 @@
       (let [mkdir (exec.ctx "mkdir")]
         (C.equal 0 (mkdir d))))))
     (test-directory (C.skip (os.is_dir d)))))))
-(local absent (fn [f]
-  (tset C (.. "file.absent :: " f) (fn []
-    (local test-absent (func.skip (fn []
-      (let [rm (exec.ctx "rm")]
-        (C.equal 0 (rm "-r" "-f" f))))))
-    (test-absent (C.nskip (stat.stat f)))))))
+(defn absent [f]
+      (tset C (.. "file.absent :: " f)
+            (fn []
+                (local test-absent (func.skip
+                                     (fn []
+                                         (let [rm (exec.ctx "rm")]
+                                           (C.equal 0 (rm "-r" "-f" f))))))
+                (test-absent (C.nskip (stat.stat f))))))
 (defn managed [f]
       (each [k v (pairs (require (.. "files." f)))]
         (tset C (.. "file.managed :: " k ":"  v.path)
