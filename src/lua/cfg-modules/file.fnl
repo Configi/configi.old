@@ -2,6 +2,7 @@
 (local F {})
 (local lib (require "lib"))
 (local (os exec) (values lib.os lib.exec))
+(global _ENV nil)
 (local directory (fn [d]
   (let [td (os.is_dir(d))]
     (if (= td d)
