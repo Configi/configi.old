@@ -38,14 +38,14 @@
       (let [rm (exec.ctx "rm")]
         (C.equal 0 (rm "-r" "-f" f))))))
     (test-absent (C.nskip (stat.stat f)))))))
-(local managed (fn [f]
-  (local t (require (.. "files." f)))
-    (each [k v (pairs t)]
-      (tset C (.. "file.managed :: " k ":"  v.path) (fn []
-        (local contents (file.read_to_string v.path))
-        (if (= contents v.contents)
-          (C.skip true)
-          (C.equal true (file.write v.path v.contents))))))))
+(defn managed [f]
+      (each [k v (pairs (require (.. "files." f)))]
+        (tset C (.. "file.managed :: " k ":"  v.path)
+              (fn []
+                  (let [contents (file.read_to_string v.path)]
+                    (if (= contents v.contents)
+                      (C.skip true)
+                      (C.equal true (file.write v.path v.contents))))))))
 (defn mode [m f]
       (let [mode-arg (tostring m)
             info (stat.stat f)
