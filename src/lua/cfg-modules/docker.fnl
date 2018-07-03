@@ -4,6 +4,21 @@
 (local (exec) (values lib.exec))
 (local (docker) (exec.ctx "docker"))
 (global _ENV nil)
+;; docker.image(string)
+;;
+;; Ensure that a Docker image is pulled locally.
+;; Does not update the existing local image.
+;;
+;; Arguments:
+;;     #1 (string) = The url of the image.
+;;
+;; Results:
+;;     Skip = Image already pulled.
+;;     Ok   = Successfully pulled image.
+;;     Fail = Failed to pull the image.
+;;
+;; Examples:
+;;     docker.image("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 (defn image [i]
   (tset C (.. "docker.image :: " i)
     (fn []
