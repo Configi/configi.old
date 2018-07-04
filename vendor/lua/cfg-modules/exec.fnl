@@ -24,7 +24,7 @@
 (defn simple [cmd tbl path]
   (tset C (.. "exec.simple :: " cmd)
     (fn []
-        (if (= nil (stat.stat path))
+        (if (or (= nil path) (= nil (stat.stat path)))
           (let [command tbl]
             (tset command "exe" cmd)
             (C.equal 0 (exec.qexec command)))
