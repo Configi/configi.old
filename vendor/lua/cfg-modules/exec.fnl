@@ -12,7 +12,7 @@
 ;; Arguments:
 ;;     #1 (string) = Path of executable.
 ;;     #2 (table)  = Arguments as a table sequence.
-;;     #3 (string) = A precondition. Path should NOT exist before running the executable.
+;;     #3 (string) = A precondition. Path MUST NOT exist before running the executable.
 ;;
 ;; Results:
 ;;     Ok   = Successfully executed.
