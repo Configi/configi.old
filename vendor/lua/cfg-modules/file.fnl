@@ -10,24 +10,42 @@
 (global _ENV nil)
 (defn owner [owner path]
   (let [info (stat.stat path)
-        u (pwd.getpwuid info.st_uid)
-        uid (string.format "%s(%s)" u.pw_uid u.pw_name)]
-    (tset C (.. "file.owner :: " path " " uid "-> " owner)
+        u (pwd.getpwuid info.st_uid)]
+    (var uid (values nil))
+    (var pw_uid (values nil))
+    (var pw_name (values nil))
+    (if (= nil u)
+       (do (set uid (tostring info.st_uid))
+           (set pw_uid (tostring info.st_uid))
+           (set pw_name (tostring info.st_uid)))
+       (do (set uid (string.format "%s(%s)" u.pw_uid u.pw_name))
+           (set pw_uid u.pw_uid)
+           (set pw_name u.pw_name)))
+    (tset C (.. "file.owner :: " path " " uid " -> " owner)
       (fn []
-        (if (or (= owner u.pw_name) (= owner (tostring u.pw_uid)))
+        (if (or (= owner pw_name) (= owner (tostring u.pw_uid)))
           (C.skip true)
           (let [chown (exec.ctx "chown")]
             (C.equal 0 (chown owner path))))))))
 (defn group [group path]
   (let [info (stat.stat path)
-        g (grp.getgrgid info.st_gid)
-        cg (string.format "%s(%s)" g.gr_gid g.gr_name)]
-    (tset C (.. "file.group :: " path " "  cg "->" group)
+        g (grp.getgrgid info.st_gid)]
+    (var cg (values nil))
+    (var gr_gid (values nil))
+    (var gr_name (values nil))
+    (if (= nil g)
+      (do (set cg (tostring info.st_gid))
+          (set gr_gid (tostring info.st_gid))
+          (set gr_name (tostring info.st_gid)))
+      (do (set cg (string.format "%s(%s)" g.gr_gid g.gr_name))
+          (set gr_gid g.gr_gid)
+          (set gr_name g.gr_name))
+    (tset C (.. "file.group :: " path " "  cg " -> " group)
       (fn []
-        (if (or (= group g.gr_name) (= group (tostring g.gr_gid)))
+        (if (or (= group gr_name) (= group (tostring gr_gid)))
           (C.skip true)
           (let [chgrp (exec.ctx "chgrp")]
-            (C.equal 0 (chgrp group path))))))))
+            (C.equal 0 (chgrp group path)))))))))
 (defn directory [d]
   (tset C (.. "file.directory :: " d)
     (fn []
