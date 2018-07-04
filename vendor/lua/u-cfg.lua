@@ -24,6 +24,11 @@ if arg then
         end
     end
 end
+
+if os.getenv("CFG_QUIET") == "true" then
+  quiet = true
+end
+
 -- UTILS -----------------------------------------------------------------------
 local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m" end
 local function blue(str)   return grey and str or "\27[1;34m" .. str .. "\27[0m" end
