@@ -109,19 +109,20 @@ api.equal = function (l, r)
     if l ~= r then
         fail(tostring(l) .. " ~= " .. tostring(r))
     end
+    return true, "ok"
 end
 
 api.skip = function (v)
     if v then
       skip()
-      return true
+      return true, "skip"
     end
 end
 
 api.nskip = function (v)
     if not v then
         skip()
-        return true
+        return true, "skip"
     end
 end
 
@@ -129,30 +130,35 @@ api.not_equal = function (l, r)
     if l == r then
         fail(tostring(l) .. " == " .. tostring(r))
     end
+    return true, "ok"
 end
 
 api.almost_equal = function (l, r, diff)
     if require("math").abs(l - r) > diff then
         fail("|" .. tostring(l) .. " - " .. tostring(r) .."| > " .. tostring(diff))
     end
+    return true, "ok"
 end
 
 api.is_false = function (maybe_false)
     if maybe_false or type(maybe_false) ~= "boolean" then
         fail("got " .. tostring(maybe_false) .. " instead of false")
     end
+    return true, "ok"
 end
 
 api.is_true = function (maybe_true)
     if not maybe_true or type(maybe_true) ~= "boolean" then
         fail("got " .. tostring(maybe_true) .. " instead of true")
     end
+    return true, "ok"
 end
 
 api.is_not_nil = function (maybe_not_nil)
     if type(maybe_not_nil) == "nil" then
         fail("got nil")
     end
+    return true, "ok"
 end
 
 local function make_type_checker(typename)
