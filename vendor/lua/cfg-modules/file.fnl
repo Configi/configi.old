@@ -49,17 +49,17 @@
 (defn directory [d]
   (tset C (.. "file.directory :: " d)
     (fn []
-      (local test-directory (func.skip (fn []
-        (let [mkdir (exec.ctx "mkdir")]
-          (C.equal 0 (mkdir d))))))
-      (test-directory (C.skip (os.is_dir d))))))
+      (let [mkdir (exec.ctx "mkdir")]
+        (if (= d (os.is_dir d))
+          (C.skip true)
+          (C.equal 0 (mkdir d)))))))
 (defn absent [f]
   (tset C (.. "file.absent :: " f)
     (fn []
-      (local test-absent (func.skip (fn []
-        (let [rm (exec.ctx "rm")]
-          (C.equal 0 (rm "-r" "-f" f))))))
-      (test-absent (C.nskip (stat.stat f))))))
+      (let [rm (exec.ctx "rm")]
+        (if (= nil (stat.stat f))
+          (C.skip true)
+          (C.equal 0 (rm "-r" "-f" f)))))))
 (defn managed [f]
   (each [k v (pairs (require (.. "files." f)))]
     (tset C (.. "file.managed :: " k ":"  v.path)
