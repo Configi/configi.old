@@ -4,22 +4,22 @@
 (local (tonumber tostring ipairs) (values tonumber tostring ipairs))
 (local (exec path string table) (values lib.exec lib.path lib.string lib.table))
 (global _ENV nil)
-;; iptables.default(table)
+;; iptables.default(string/number)
 ;;
 ;; Add baseline iptables rules.
-;; Sets the default policy to DROP and open ports indicated in the table argument.
+;; Sets the default policy to DROP and open specified port.
 ;;
 ;; Arguments:
-;;     #1 (table) = Sequence of ports to open.
+;;     #1 (string/number) = Port to open.
 ;;
 ;; Results:
-;;     Skip = A port is already opened.
-;;     Ok   = The policy was implemented.
-;;     Fail = Failed implementing policy.
+;;     Pass     = Port is already opened.
+;;     Repaired = The policy was implemented.
+;;     Fail     = Failed implementing policy.
 ;;
 ;; Examples:
-;;     iptables.default({22, 443})
-(defn default [ports]
+;;     iptables.default(22)
+(defn default [port]
   (local policy [["-F"]
                  ["-X"]
                  ["-P" "INPUT" "DROP"]
@@ -47,21 +47,20 @@
             (let [ret (exec.qexec iptables)]
               (if (= nil ret)
                 (C.equal ret 0))))))
-      (each [_ p (ipairs ports)]
-        (each [_ i (ipairs rules)]
-          (local iptables (table.copy i))
-          (tset iptables "exe" (path.bin "iptables"))
-          (tset iptables 1 "-C")
-          (if (= "INPUT" (. iptables 2))
-            (tset iptables 12 (tostring p)))
-          (if (= "OUTPUT" (. iptables 2))
-            (tset iptables 10 (tostring p)))
-          (if (= nil (exec.qexec iptables))
-            (do (tset iptables 1 "-A")
-              (let [ret (exec.qexec iptables)]
-                (if (= nil ret)
-                  (C.equal ret 0)))))))
-       (C.equal 0 0))))
+      (each [_ i (ipairs rules)]
+        (local iptables (table.copy i))
+        (tset iptables "exe" (path.bin "iptables"))
+        (tset iptables 1 "-C")
+        (if (= "INPUT" (. iptables 2))
+          (tset iptables 12 (tostring port)))
+        (if (= "OUTPUT" (. iptables 2))
+          (tset iptables 10 (tostring port)))
+        (if (= nil (exec.qexec iptables))
+          (do (tset iptables 1 "-A")
+            (let [ret (exec.qexec iptables)]
+              (if (= nil ret)
+                (C.equal ret 0)))))))
+      (C.equal 0 0)))
 ;; iptables.add(string)
 ;;
 ;; Add an iptables rule. Omit the append (-A) or insert (-I) command from the rule.
