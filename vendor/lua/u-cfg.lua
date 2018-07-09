@@ -114,10 +114,6 @@ api.pass = function (v)
     pass()
 end
 
-api.npass = function (v)
-    pass()
-end
-
 api.fail = function(s)
     fail("Error: " .. tostring(s))
 end
