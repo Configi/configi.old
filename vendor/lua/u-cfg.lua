@@ -52,15 +52,13 @@ local skipped = false
 local failed_list = {}
 
 local function trace(start_frame)
-    print "Trace:"
     local frame = start_frame
     while true do
         local info = debug.getinfo(frame, "Sl")
         if not info then break end
-        if info.what == "C" then
-            print(frame - start_frame, "??????")
-        else
-            print(frame - start_frame, info.short_src .. ":" .. info.currentline .. " ")
+        local d = frame - start_frame
+        if ((d >= 3) and (d <= 4)) then
+          print("  --> " .. (string.gsub(info.source, "%.", "/")) ..  ".lua:" .. info.currentline)
         end
         frame = frame + 1
     end
