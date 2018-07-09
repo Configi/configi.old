@@ -190,7 +190,7 @@ local function run_test(test_suite, test_name, test_function, ...)
     failed = false
     passed = false
 
-    log(run_tag .. " " .. full_test_name)
+    log(start_tag .. " " .. full_test_name)
 
     local start = os.time()
 
