@@ -111,17 +111,11 @@ api.equal = function (l, r)
 end
 
 api.pass = function (v)
-    if v then
-      pass()
-      return true, "pass"
-    end
+    pass()
 end
 
 api.npass = function (v)
-    if not v then
-        pass()
-        return true, "pass"
-    end
+    pass()
 end
 
 api.fail = function(s)
