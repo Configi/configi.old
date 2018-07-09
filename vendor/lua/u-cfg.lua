@@ -38,9 +38,9 @@ local function magenta(str) return grey and str or "\27[1;35m" .. str .. "\27[0m
 
 local tab_tag      = blue   "[----------]"
 local done_tag     = blue   "[==========]"
-local run_tag      = blue   "[ RUN      ]"
-local ok_tag       = green  "[       OK ]"
-local skip_tag     = yellow "[      SKIP]"
+local start_tag    = blue   "[ START    ]"
+local repaired_tag = green  "[ REPAIRED ]"
+local pass_tag     = yellow "[      PASS]"
 local fail_tag     = red    "[      FAIL]"
 local disabled_tag = magenta"[ DISABLED ]"
 local passed_tag   = green  "[  PASSED  ]"
@@ -48,7 +48,7 @@ local failed_tag   = red    "[  FAILED  ]"
 
 local ntests = 0
 local failed = false
-local skipped = false
+local passed = false
 local failed_list = {}
 
 local function trace(start_frame)
@@ -76,8 +76,8 @@ local function fail(msg, start_frame)
     trace(start_frame or 4)
 end
 
-local function skip()
-    skipped = true
+local function pass()
+    passed = true
 end
 
 local function stringize_var_arg(varg, ...)
@@ -110,22 +110,22 @@ api.equal = function (l, r)
     return true, "ok"
 end
 
-api.skip = function (v)
+api.pass = function (v)
     if v then
-      skip()
-      return true, "skip"
+      pass()
+      return true, "pass"
     end
 end
 
-api.nskip = function (v)
+api.npass = function (v)
     if not v then
-        skip()
-        return true, "skip"
+        pass()
+        return true, "pass"
     end
 end
 
 api.fail = function(s)
-    fail(tostring(s))
+    fail("Error: " .. tostring(s))
 end
 
 api.not_equal = function (l, r)
@@ -198,7 +198,7 @@ local function run_test(test_suite, test_name, test_function, ...)
 
     ntests = ntests + 1
     failed = false
-    skipped = false
+    passed = false
 
     log(run_tag .. " " .. full_test_name)
 
@@ -217,7 +217,7 @@ local function run_test(test_suite, test_name, test_function, ...)
 
     local is_test_failed = not status or failed
     log(string.format("%s %s %d sec",
-                            (is_test_failed and fail_tag) or (skipped and skip_tag) or ok_tag,
+                            (is_test_failed and fail_tag) or (passed and pass_tag) or repaired_tag,
                             full_test_name,
                             os.difftime(stop, start)))
 
@@ -283,7 +283,7 @@ local function new_test_suite(_, name)
         test_suite_name = name,
         start_up = default_start_up,
         tear_down = default_tear_down,
-        skip = false }
+        passed = false }
 
     setmetatable(test_suite, {
         __newindex = handle_new_test,

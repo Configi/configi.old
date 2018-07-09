@@ -24,7 +24,7 @@
     (tset C (.. "file.owner :: " path " " uid " -> " owner)
       (fn []
         (if (or (= owner pw_name) (= owner (tostring u.pw_uid)))
-          (C.skip true)
+          (C.pass true)
           (let [chown (exec.ctx "chown")]
             (C.equal 0 (chown owner path))))))))
 (defn group [group path]
@@ -43,7 +43,7 @@
     (tset C (.. "file.group :: " path " "  cg " -> " group)
       (fn []
         (if (or (= group gr_name) (= group (tostring gr_gid)))
-          (C.skip true)
+          (C.pass true)
           (let [chgrp (exec.ctx "chgrp")]
             (C.equal 0 (chgrp group path)))))))))
 (defn directory [d]
@@ -51,14 +51,14 @@
     (fn []
       (let [mkdir (exec.ctx "mkdir")]
         (if (= d (os.is_dir d))
-          (C.skip true)
+          (C.pass true)
           (C.equal 0 (mkdir d)))))))
 (defn absent [f]
   (tset C (.. "file.absent :: " f)
     (fn []
       (let [rm (exec.ctx "rm")]
         (if (= nil (stat.stat f))
-          (C.skip true)
+          (C.pass true)
           (C.equal 0 (rm "-r" "-f" f)))))))
 (defn managed [f]
   (each [k v (pairs (require (.. "files." f)))]
@@ -66,7 +66,7 @@
       (fn []
         (let [contents (file.read_to_string v.path)]
           (if (= contents v.contents)
-            (C.skip true)
+            (C.pass true)
             (C.equal true (file.write v.path v.contents))))))))
 (defn mode [m f]
   (let [mode-arg (tostring m)
@@ -76,7 +76,7 @@
     (tset C (.. "file.mode :: " f ": " current-mode " -> " m)
       (fn []
         (if (= current-mode (string.sub mode-arg len -1))
-          (C.skip true)
+          (C.pass true)
           (let [chmod (exec.ctx "chmod")]
             (C.equal 0 (chmod mode-arg f))))))))
 (tset F "directory" directory)

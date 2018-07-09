@@ -12,9 +12,9 @@
 ;;     #1 (string) = The url of the image.
 ;;
 ;; Results:
-;;     Skip = Image already pulled.
-;;     Ok   = Successfully pulled image.
-;;     Fail = Failed to pull the image.
+;;     Pass     = Image already pulled.
+;;     Repaired = Successfully pulled image.
+;;     Fail     = Failed to pull the image.
 ;;
 ;; Examples:
 ;;     podman.image("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
@@ -24,6 +24,6 @@
       (let [r (exec.popen (.. "podman history " i))]
         (if (= r nil)
           (C.equal 0 (exec.popen (.. "podman pull " i)))
-          (C.skip true))))))
+          (C.pass true))))))
 (tset P "image" image)
 P

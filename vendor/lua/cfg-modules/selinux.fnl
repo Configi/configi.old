@@ -11,9 +11,9 @@
 ;;     #1 (string) = The type to set.
 ;;
 ;; Results:
-;;     Skip = Type is already set permissive.
-;;     Ok   = Type successfully set permissive.
-;;     Fail = Failed to set the type.
+;;     Pass     = Type is already set permissive.
+;;     Repaired = Type successfully set permissive.
+;;     Fail     = Failed to set the type.
 ;;
 ;; Examples:
 ;;    selinux.permissive("container_t")
@@ -25,6 +25,6 @@
         (let [semanage ["permissive" "-a" type]]
           (tset semanage "exe" "/usr/sbin/semanage")
           (C.equal 0 (exec.qexec semanage)))
-        (C.skip true))))))
+        (C.pass true))))))
 (tset S "permissive" permissive)
 S

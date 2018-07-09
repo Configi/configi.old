@@ -13,9 +13,9 @@
 ;;     #1 (string) = The url of the image.
 ;;
 ;; Results:
-;;     Skip = Image already pulled.
-;;     Ok   = Successfully pulled image.
-;;     Fail = Failed to pull the image.
+;;     Pass     = Image already pulled.
+;;     Repaired = Successfully pulled image.
+;;     Fail     = Failed to pull the image.
 ;;
 ;; Examples:
 ;;     docker.image("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
@@ -25,6 +25,6 @@
       (let [r (docker "history" i)]
         (if (= r nil)
           (C.equal 0 (docker "pull" i))
-          (C.skip true))))))
+          (C.pass true))))))
 (tset D "image" image)
 D

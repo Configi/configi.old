@@ -15,9 +15,9 @@
 ;;     #3 (string) = A precondition. Path MUST NOT exist before running the executable.
 ;;
 ;; Results:
-;;     Ok   = Successfully executed.
-;;     Fail = Error encountered when running executable+arguments.
-;;     Skip = The specified file already exists.
+;;     Repaired = Successfully executed.
+;;     Fail     = Error encountered when running executable+arguments.
+;;     Pass     = The specified file already exists.
 ;;
 ;; Examples:
 ;;     exec.simple("/bin/touch", {"/tmp/touch"}, "/tmp/touch")
@@ -28,6 +28,6 @@
           (let [command tbl]
             (tset command "exe" cmd)
             (C.equal 0 (exec.qexec command)))
-          (C.skip true)))))
+          (C.pass true)))))
 (tset E "simple" simple)
 E

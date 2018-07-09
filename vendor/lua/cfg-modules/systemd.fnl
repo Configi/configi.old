@@ -12,9 +12,9 @@
 ;;     #1 (string) = The systemd unit.
 ;;
 ;; Results:
-;;     Skip = The service is active.
-;;     Ok   = Successfully started service.
-;;     Fail = Failed to start service.
+;;     Pass     = The service is active.
+;;     Repaired = Successfully started service.
+;;     Fail     = Failed to start service.
 ;;
 ;; Examples:
 ;;     systemd.active("unbound")
@@ -24,6 +24,6 @@
       (systemctl "daemon-reload")
       (if (= nil (systemctl "is-active" unit))
         (C.equal 0 (systemctl "start" unit))
-        (C.skip true)))))
+        (C.pass true)))))
 (tset S "active" active)
 S
