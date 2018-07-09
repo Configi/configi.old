@@ -124,6 +124,10 @@ api.nskip = function (v)
     end
 end
 
+api.fail = function(s)
+    fail(tostring(s))
+end
+
 api.not_equal = function (l, r)
     if l == r then
         fail(tostring(l) .. " == " .. tostring(r))
