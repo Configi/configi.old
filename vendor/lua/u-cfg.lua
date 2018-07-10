@@ -43,10 +43,12 @@ local repaired_tag = green  "[ REPAIRED ]"
 local pass_tag     = yellow "[      PASS]"
 local fail_tag     = red    "[      FAIL]"
 local disabled_tag = magenta"[ DISABLED ]"
-local passed_tag   = green  "[  PASSED  ]"
+local tpass_tag    = green  "[  PASSED  ]"
+local trepair_tag  = green  "[ REPAIRED ]"
 local failed_tag   = red    "[  FAILED  ]"
 
 local ntests = 0
+local npassed = 0
 local failed = false
 local passed = false
 local failed_list = {}
@@ -78,6 +80,7 @@ end
 
 local function pass()
     passed = true
+    npassed = npassed + 1
 end
 
 local function stringize_var_arg(varg, ...)
@@ -220,7 +223,8 @@ api.summary = function ()
     log(done_tag)
     local nfailed = #failed_list
     if nfailed == 0 then
-        log(passed_tag .. " " .. ntests .. " test(s)")
+        log(trepair_tag .. " Total: " .. ntests)
+        log(tpass_tag .. " Total: " .. npassed)
         os.exit(0)
     else
         log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":")
