@@ -63,7 +63,7 @@
       (C.equal 0 0)))
 ;; iptables.add(string)
 ;;
-;; Add an iptables rule. Omit the append (-A) or insert (-I) command from the rule.
+;; Add an iptables rule.
 ;;
 ;; Arguments:
 ;;     #1 (string) = The rule to add.
@@ -74,12 +74,12 @@
 ;;     Fail     = Failed adding the rule. Likely an invalid iptables rule.
 ;;
 ;; Examples:
-;;     iptables.add("INPUT -p udp -m udp --dport 53 -j ACCEPT")
+;;     iptables.add("-A INPUT -p udp -m udp --dport 53 -j ACCEPT")
 (defn add [rule]
   (tset C (.. "iptables.add :: "  rule)
     (fn []
       (let [iptables (string.to_table rule)]
-        (table.insert iptables 1 "-C")
+        (tset iptables 1 "-C")
         (tset iptables "exe" (path.bin "iptables"))
       (if (= nil (exec.qexec iptables))
         (do (tset iptables 1 "-A")
