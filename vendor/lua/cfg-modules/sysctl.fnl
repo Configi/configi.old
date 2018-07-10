@@ -1,7 +1,7 @@
 (local C (require "u-cfg"))
 (local S {})
 (local lib (require "lib"))
-(local (file) (values lib.file))
+(local (string tostring file) (values string tostring lib.file))
 (global _ENV nil)
 ;; sysctl.write(string, string/number)
 ;;
