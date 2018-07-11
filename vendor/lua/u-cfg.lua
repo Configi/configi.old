@@ -227,6 +227,8 @@ api.summary = function ()
         log(tpass_tag .. " Total: " .. npassed)
         os.exit(0)
     else
+        log(trepair_tag .. " Total: " .. ((ntests - nfailed) - npassed))
+        log(tpass_tag .. " Total: " .. npassed)
         log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":")
         for _, test_name in ipairs(failed_list) do
             log(failed_tag .. "\t" .. test_name)
