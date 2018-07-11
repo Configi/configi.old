@@ -223,7 +223,7 @@ api.summary = function ()
     log(done_tag)
     local nfailed = #failed_list
     if nfailed == 0 then
-        log(trepair_tag .. " Total: " .. ntests)
+        log(trepair_tag .. " Total: " .. (ntests - npassed))
         log(tpass_tag .. " Total: " .. npassed)
         os.exit(0)
     else
