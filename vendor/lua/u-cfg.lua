@@ -223,12 +223,12 @@ api.summary = function ()
     log(done_tag)
     local nfailed = #failed_list
     if nfailed == 0 then
-        log(trepair_tag .. " Total: " .. (ntests - npassed))
-        log(tpass_tag .. " Total: " .. npassed)
+        log(trepair_tag .. " " .. (ntests - npassed) .. " out of " .. ntests)
+        log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
         os.exit(0)
     else
-        log(trepair_tag .. " Total: " .. ((ntests - nfailed) - npassed))
-        log(tpass_tag .. " Total: " .. npassed)
+        log(trepair_tag .. " " .. ((ntests - nfailed) - npassed) .. " out of " .. ntests)
+        log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
         log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":")
         for _, test_name in ipairs(failed_list) do
             log(failed_tag .. "\t" .. test_name)
