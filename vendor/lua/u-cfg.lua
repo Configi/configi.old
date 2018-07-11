@@ -118,7 +118,7 @@ api.pass = function (v)
 end
 
 api.fail = function(s)
-    fail("Error: " .. tostring(s))
+    fail(tostring(s))
 end
 
 api.not_equal = function (l, r)
