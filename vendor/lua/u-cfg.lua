@@ -209,7 +209,7 @@ local function run_test(test_suite, test_name, test_function, ...)
     local stop = os.time()
 
     local is_test_failed = not status or failed
-    log(string.format("%s %s %d sec",
+    log(string.format("%s %s --> %d sec",
                             (is_test_failed and fail_tag) or (passed and pass_tag) or repaired_tag,
                             full_test_name,
                             os.difftime(stop, start)))
