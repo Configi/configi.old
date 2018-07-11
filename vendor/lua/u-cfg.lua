@@ -36,16 +36,16 @@ local function green(str)  return grey and str or "\27[1;32m" .. str .. "\27[0m"
 local function yellow(str) return grey and str or "\27[1;33m" .. str .. "\27[0m" end
 local function magenta(str) return grey and str or "\27[1;35m" .. str .. "\27[0m" end
 
-local tab_tag      = blue   "[----------]"
-local done_tag     = blue   "[==========]"
-local start_tag    = blue   "[ START    ]"
-local repaired_tag = green  "[ REPAIRED ]"
-local pass_tag     = yellow "[      PASS]"
-local fail_tag     = red    "[      FAIL]"
-local disabled_tag = magenta"[ DISABLED ]"
-local tpass_tag    = green  "[  PASSED  ]"
-local trepair_tag  = green  "[ REPAIRED ]"
-local failed_tag   = red    "[  FAILED  ]"
+local tab_tag      = blue   "[-----------]"
+local done_tag     = blue   "[===========]"
+local start_tag    = blue   "[START      ]"
+local repair_tag   = green  "[     REPAIR]"
+local pass_tag     = yellow "[       PASS]"
+local fail_tag     = red    "[       FAIL]"
+local disabled_tag = magenta"[   DISABLED]"
+local tpass_tag    = green  "[ Compliant ]"
+local trepair_tag  = green  "[  Repaired ]"
+local failed_tag   = red    "[    Failed ]"
 
 local ntests = 0
 local npassed = 0
@@ -210,7 +210,7 @@ local function run_test(test_suite, test_name, test_function, ...)
 
     local is_test_failed = not status or failed
     log(string.format("%s %s --> %d sec",
-                            (is_test_failed and fail_tag) or (passed and pass_tag) or repaired_tag,
+                            (is_test_failed and fail_tag) or (passed and pass_tag) or repair_tag,
                             full_test_name,
                             os.difftime(stop, start)))
 
