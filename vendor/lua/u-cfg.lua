@@ -36,8 +36,8 @@ local function green(str)  return grey and str or "\27[1;32m" .. str .. "\27[0m"
 local function yellow(str) return grey and str or "\27[1;33m" .. str .. "\27[0m" end
 local function magenta(str) return grey and str or "\27[1;35m" .. str .. "\27[0m" end
 
-local tab_tag      = blue   "[-----------]"
-local done_tag     = blue   "[===========]"
+local configi_tag  = blue   "[ Configi   ]"
+local done_tag     = blue   "[ ---- Done ]"
 local start_tag    = blue   "[ START     ]"
 local repair_tag   = green  "[    REPAIR ]"
 local pass_tag     = yellow "[      PASS ]"
@@ -185,7 +185,7 @@ local function run_test(test_suite, test_name, test_function, ...)
 
 
     if suite_name ~= last_test_suite then
-        log(tab_tag)
+        log(configi_tag)
         last_test_suite = suite_name
     end
 
