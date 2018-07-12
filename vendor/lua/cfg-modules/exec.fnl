@@ -20,7 +20,7 @@
 ;;     Pass     = The specified file already exists.
 ;;
 ;; Examples:
-;;     exec.simple("/bin/touch", {"/tmp/touch"}, "/tmp/touch")
+;;     exec.simple("/bin/touch", "/tmp/touch", "/tmp/touch")
 (defn simple [cmd args path]
   (tset C (.. "exec.simple :: " cmd)
     (fn []
