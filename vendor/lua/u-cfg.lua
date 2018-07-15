@@ -114,7 +114,7 @@ api.equal = function (l, r)
     return true, "ok"
 end
 
-api.pass = function (v)
+api.pass = function ()
     pass()
 end
 
