@@ -30,16 +30,18 @@
                  ["" "INPUT" "-s" "127.0.0.1/8" "-j" "DROP"]])
   (local rules [["" "INPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "513:65535" "--dport" ""  "-m" "state" "--state" "NEW,ESTABLISHED" "-j" "ACCEPT"]
                 ["" "OUTPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "" "--dport" "513:65535" "-m" "state" "--state" "ESTABLISHED" "-j" "ACCEPT"]])
-  (tset C (.. "iptables.default :: " (table.concat ports ", "))
+  (tset C (.. "iptables.default :: " (tostring port))
     (fn []
       (each [_ i (ipairs policy)]
-        (local iptables (table.copy i))
+        (local iptables {})
+        (table.copy iptables i)
         (tset iptables "exe" (path.bin "iptables"))
         (let [ret (exec.qexec iptables)]
           (if (= nil ret)
             (C.equal ret 0))))
       (each [_ i (ipairs localhost)]
-        (local iptables (table.copy i))
+        (local iptables {})
+        (table.copy iptables i)
         (tset iptables "exe" (path.bin "iptables"))
         (tset iptables 1 "-C")
         (if (= nil (exec.qexec iptables))
@@ -48,7 +50,8 @@
               (if (= nil ret)
                 (C.equal ret 0))))))
       (each [_ i (ipairs rules)]
-        (local iptables (table.copy i))
+        (local iptables {})
+        (table.copy iptables i)
         (tset iptables "exe" (path.bin "iptables"))
         (tset iptables 1 "-C")
         (if (= "INPUT" (. iptables 2))
