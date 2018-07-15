@@ -107,21 +107,6 @@ end
 -- PUBLIC API -----------------------------------------------------------------
 local api = { test_suite_name = "__root", disabled = false }
 
-api.procs = function (p)
-    setmetatable(p, { __index = {
-        set_if_not = function(self, test, value)
-            if not self[test] then
-              self[test] = value
-            end
-        end,
-        set_if = function(self, test, value)
-            if self[test] then
-             self[test] = value
-            end
-        end
-    }})
-end
-
 api.equal = function (l, r)
     if l ~= r then
         fail(tostring(l) .. " ~= " .. tostring(r))
