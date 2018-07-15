@@ -38,14 +38,14 @@ local function magenta(str) return grey and str or "\27[1;35m" .. str .. "\27[0m
 
 local configi_tag  = blue   " ---- Configi"
 local done_tag     = blue   " ------- Done"
-local start_tag    = blue   "     START  :"
-local repair_tag   = green  "    REPAIR  :"
-local pass_tag     = yellow "      PASS  :"
-local fail_tag     = red    "      FAIL  :"
-local disabled_tag = magenta"  DISABLED  :"
-local tpass_tag    = green  " Compliant  :"
-local trepair_tag  = green  "  Repaired  :"
-local failed_tag   = red    "    Failed  :"
+local start_tag    = blue   " START      :"
+local repair_tag   = green  "     REPAIR :"
+local pass_tag     = yellow "       PASS :"
+local fail_tag     = red    "       FAIL :"
+local disabled_tag = magenta"   DISABLED :"
+local tpass_tag    = green  "  Compliant :"
+local trepair_tag  = green  "   Repaired :"
+local failed_tag   = red    "     Failed :"
 
 local ntests = 0
 local npassed = 0
