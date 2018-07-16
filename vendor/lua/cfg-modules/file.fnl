@@ -2,7 +2,7 @@
 (local F {})
 (local lib (require "lib"))
 (local (require pairs string tostring) (values require pairs string tostring))
-(local (os exec func file) (values lib.os lib.exec lib.func lib.file))
+(local (os exec file) (values lib.os lib.exec lib.file))
 (local stat (require "posix.sys.stat"))
 (local pwd (require "posix.pwd"))
 (local grp (require "posix.grp"))
