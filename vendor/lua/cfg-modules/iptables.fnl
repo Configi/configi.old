@@ -32,38 +32,40 @@
                 ["" "OUTPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "" "--dport" "513:65535" "-m" "state" "--state" "ESTABLISHED" "-j" "ACCEPT"]])
   (tset C (.. "iptables.default :: " (tostring port))
     (fn []
-      (each [_ i (ipairs policy)]
-        (local iptables {})
-        (table.copy iptables i)
-        (tset iptables "exe" (path.bin "iptables"))
-        (let [ret (exec.qexec iptables)]
-          (if (= nil ret)
-            (C.equal ret 0))))
-      (each [_ i (ipairs localhost)]
-        (local iptables {})
-        (table.copy iptables i)
+      (let [iptables {}]
+        (table.copy iptables (. rules 1))
         (tset iptables "exe" (path.bin "iptables"))
         (tset iptables 1 "-C")
-        (if (= nil (exec.qexec iptables))
-          (do (tset iptables 1 "-A")
+        (if (= 0 (exec.qexec iptables))
+          (C.pass "Rule already in place")
+        (do (each [_ i (ipairs policy)]
+            (table.copy iptables i)
+            (tset iptables "exe" (path.bin "iptables"))
             (let [ret (exec.qexec iptables)]
               (if (= nil ret)
-                (C.equal ret 0))))))
-      (each [_ i (ipairs rules)]
-        (local iptables {})
-        (table.copy iptables i)
-        (tset iptables "exe" (path.bin "iptables"))
-        (tset iptables 1 "-C")
-        (if (= "INPUT" (. iptables 2))
-          (tset iptables 12 (tostring port)))
-        (if (= "OUTPUT" (. iptables 2))
-          (tset iptables 10 (tostring port)))
-        (if (= nil (exec.qexec iptables))
-          (do (tset iptables 1 "-A")
-            (let [ret (exec.qexec iptables)]
-              (if (= nil ret)
-                (C.equal ret 0)))))))
-      (C.equal 0 0)))
+                (C.equal ret 0))))
+          (each [_ i (ipairs localhost)]
+            (table.copy iptables i)
+            (tset iptables "exe" (path.bin "iptables"))
+            (tset iptables 1 "-C")
+            (if (= nil (exec.qexec iptables))
+              (do (tset iptables 1 "-A")
+                (let [ret (exec.qexec iptables)]
+                  (if (= nil ret)
+                    (C.equal ret 0))))))
+          (each [_ i (ipairs rules)]
+            (table.copy iptables i)
+            (tset iptables "exe" (path.bin "iptables"))
+            (tset iptables 1 "-C")
+            (if (= "INPUT" (. iptables 2))
+              (tset iptables 12 (tostring port)))
+            (if (= "OUTPUT" (. iptables 2))
+              (tset iptables 10 (tostring port)))
+            (if (= nil (exec.qexec iptables))
+              (do (tset iptables 1 "-A")
+                (let [ret (exec.qexec iptables)]
+                  (if (= nil ret)
+                    (C.equal ret 0))))))))))))
 ;; iptables.add(string)
 ;;
 ;; Add an iptables rule.
