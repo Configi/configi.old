@@ -39,7 +39,7 @@ scan = (p) ->
 open = (port) ->
     return (p) ->
         p.port = tostring(port)
-        C.procs(p)
+        C.parameter_funcs(p)
         p\set_if_not("protocol", "tcp")
         p\set_if_not("host", "127.0.0.1")
         p\set_if_not("expect", true)

@@ -107,7 +107,7 @@ end
 -- PUBLIC API -----------------------------------------------------------------
 local api = { test_suite_name = "__root", disabled = false }
 
-api.procs = function (p)
+api.parameter_funcs = function (p)
     return setmetatable(p, { __index = {
         set_if_not = function(self, test, value)
             if not self[test] then
