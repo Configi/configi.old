@@ -1,7 +1,7 @@
 C = require "u-cfg"
 P = {}
 S = require "qsocket"
-setmetatable, tostring = setmetatable, tostring
+tostring = tostring
 export _ENV = nil
 scan = (p) ->
     if not p.payload
