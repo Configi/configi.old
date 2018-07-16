@@ -188,7 +188,7 @@ local function make_type_checker(typename)
 end
 
 local supported_types = {"nil", "boolean", "string", "number", "userdata", "table", "function", "thread"}
-for i, supported_type in ipairs(supported_types) do
+for _, supported_type in ipairs(supported_types) do
     make_type_checker(supported_type)
 end
 
@@ -260,7 +260,7 @@ api.summary = function ()
     end
 end
 
-api.result = function ( ... )
+api.result = function ()
     return ntests, #failed_list
 end
 
