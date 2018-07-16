@@ -7,7 +7,7 @@
 (local pwd (require "posix.pwd"))
 (local grp (require "posix.grp"))
 (global _ENV nil)
-(defn owner [owner path]
+(defn owner [user path]
   (let [info (stat.stat path)
         u (pwd.getpwuid info.st_uid)]
     (var uid (values nil))
@@ -20,12 +20,12 @@
        (do (set uid (string.format "%s(%s)" u.pw_uid u.pw_name))
            (set pw_uid u.pw_uid)
            (set pw_name u.pw_name)))
-    (tset C (.. "file.owner :: " path " " uid " -> " owner)
+    (tset C (.. "file.owner :: " path " " uid " -> " user)
       (fn []
-        (if (or (= owner pw_name) (= owner (tostring u.pw_uid)))
+        (if (or (= user pw_name) (= user (tostring u.pw_uid)))
           (C.pass true)
           (let [chown (exec.ctx "chown")]
-            (C.equal 0 (chown owner path))))))))
+            (C.equal 0 (chown user path))))))))
 (defn group [group path]
   (let [info (stat.stat path)
         g (grp.getgrgid info.st_gid)]
