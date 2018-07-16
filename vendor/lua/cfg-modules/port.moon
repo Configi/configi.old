@@ -44,7 +44,9 @@ open = (port) ->
         p\set_if_not("host", "127.0.0.1")
         p\set_if_not("expect", true)
         C["port.open :: #{p.host}:#{p.port}"] = ->
-            C.pass(p.expect, scan(p))
-            C.fail("Port is closed or expected response not received.")
+            if p.expect == scan(p)
+                C.pass!
+            else
+                C.fail("Port is closed or expected response not received.")
 P.open = open
 P
