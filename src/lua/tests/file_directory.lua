@@ -9,5 +9,6 @@ local a = "tmp/cfg_test__file_directory"
 file.directory(a)
 U["file.directory"] = function()
   U.equal(a, os.is_dir(a))
+  U.equal(0, rmdir(a))
 end
 return T
