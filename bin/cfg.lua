@@ -1,11 +1,12 @@
-local argparse = require("argparse")
-local argparser = argparse("Configi", "Test")
-argparser:argument("test")
-local args = argparser:parse()
-local C = require("u-cfg")
-local file = require("cfg-modules.file")
-if (args.test == "test") then
-  C["test"] = function()
-    return file.directory("xlib")
-  end
+local T = {
+  "file_directory",
+  "file_absent",
+  "file_managed",
+}
+os.execute "mkdir tmp"
+local CFG = require "u-cfg"
+for _, t in ipairs(T) do
+local L = require("tests."..t)
 end
+os.execute "rmdir tmp"
+CFG.summary()
