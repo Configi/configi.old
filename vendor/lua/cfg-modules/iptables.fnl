@@ -107,7 +107,7 @@
 (defn count [tbl no]
   (tset C (.. "iptables.count :: " tbl " == " (tostring no))
     (fn []
-      (let [(r t) (exec.cmd.iptables "-S" "-t" tbl)]
+      (let [(_ t) (exec.cmd.iptables "-S" "-t" tbl)]
         (if (= (# t.stdout) (tonumber no))
            (C.pass true)
            (C.fail "Unexpected number of rules."))))))
