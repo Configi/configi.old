@@ -129,8 +129,15 @@ api.equal = function (l, r)
     return true, "ok"
 end
 
-api.pass = function ()
-    pass()
+api.pass = function (...)
+    local ok
+    local n = select('#', ...)
+    if (n == 0) or (n == 1) then ok = true end
+    if n == 2 then
+      local a, b = select(1, ...)
+      if a == b then ok = true end
+    end
+    if ok then pass() end
 end
 
 api.fail = function(s)
