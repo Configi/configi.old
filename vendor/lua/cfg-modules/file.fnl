@@ -1,5 +1,4 @@
 (local C (require "u-cfg"))
-(local print (values print))
 (local F {})
 (local lib (require "lib"))
 (local (require pairs string tostring) (values require pairs string tostring))
