@@ -1,7 +1,7 @@
 (local C (require "u-cfg"))
 (local P {})
 (local lib (require "lib"))
-(local (exec) (values lib.exec))
+(local (exec table) (values lib.exec lib.table))
 (global _ENV nil)
 ;; podman.image(string)
 ;;
