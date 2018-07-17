@@ -3,6 +3,7 @@ local U = require"u-test"
 local lib = require"lib"
 local exec, table = lib.exec, lib.table
 local rmdir = exec.ctx"rmdir"
+local rm = exec.ctx"rm"
 local r, t
 local T = function(t)
   return exec.popen("bin/lua " .. "bin/tests/" .. t .. ".lua")
@@ -41,6 +42,25 @@ U["file.absent"] = function()
     r, t = T"file.absent"
     U.equal(0, r)
     U.is_true(table.find(t.output, OK))
+  end
+end
+U["exec.simple"] = function()
+  local a = "tmp/touch"
+  U["- run"] = function()
+    r, t = T"exec.simple"
+    U.equal(0, r)
+  end
+  U["- if executed"] = function()
+    U.is_true(table.find(t.output, OK))
+    U.equal(a, os.is_file(a))
+  end
+  U["- expected file exists"] = function()
+    r, t = T"exec.simple"
+    U.equal(0, r)
+    U.is_true(table.find(t.output, SKIP))
+  end
+  U["- tear down"] = function()
+    U.equal(0, rm(a))
   end
 end
 os.execute "rmdir tmp"
