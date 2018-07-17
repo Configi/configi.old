@@ -26,7 +26,7 @@
           (C.pass true)
           (let [chown (exec.ctx "chown")]
             (C.equal 0 (chown user path))))))))
-(defn group [group path]
+(defn group [grp path]
   (let [info (stat.stat path)
         g (grp.getgrgid info.st_gid)]
     (var cg (values nil))
@@ -39,12 +39,12 @@
       (do (set cg (string.format "%s(%s)" g.gr_gid g.gr_name))
           (set gr_gid g.gr_gid)
           (set gr_name g.gr_name))
-    (tset C (.. "file.group :: " path " "  cg " -> " group)
+    (tset C (.. "file.group :: " path " "  cg " -> " grp)
       (fn []
-        (if (or (= group gr_name) (= group (tostring gr_gid)))
+        (if (or (= grp gr_name) (= grp (tostring gr_gid)))
           (C.pass true)
           (let [chgrp (exec.ctx "chgrp")]
-            (C.equal 0 (chgrp group path)))))))))
+            (C.equal 0 (chgrp grp path)))))))))
 (defn directory [d]
   (tset C (.. "file.directory :: " d)
     (fn []
