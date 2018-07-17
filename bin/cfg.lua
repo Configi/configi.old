@@ -1,7 +1,7 @@
 local OK, SKIP = "REPAIR", "PASS"
 local U = require"u-test"
 local lib = require"lib"
-local os, exec, table = os, lib.exec, lib.table
+local file, os, exec, table = lib.file, lib.os, lib.exec, lib.table
 local rmdir = exec.ctx"rmdir"
 local rm = exec.ctx"rm"
 local T = function(t)
@@ -61,6 +61,21 @@ U["exec.simple"] = function()
   end
   U["- tear down"] = function()
     U.equal(0, rm(a))
+  end
+end
+U["file.managed"] = function()
+  local f = "tmp/____configi_test"
+  U[" - run"] = function()
+    r, t = T"file.managed"
+    U.equal(0, r)
+  end
+  U[" - plain"] = function()
+    U.is_true(table.find(t.output, OK))
+    U.equal(f, os.is_file(f))
+    U.equal(file.read_all(f), "Contents of the file \"tmp/____configi_test\"\n")
+  end
+  U[" - tear down"] = function()
+    U.equal(0, rm("-f", f))
   end
 end
 os.execute "rmdir tmp"
