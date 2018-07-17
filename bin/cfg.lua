@@ -8,24 +8,39 @@ local T = function(t)
   return exec.popen("bin/lua " .. "bin/tests/" .. t .. ".lua")
 end
 os.execute "mkdir tmp"
-U["file.directory"]= function()
+U["file.directory"] = function()
   local a = "tmp/cfg_test__file_directory"
   U["  - run"] = function()
     r, t = T"file.directory"
     U.equal(0, r)
   end
-  U["  - output"] = function()
+  U["  - directory created"] = function()
     U.is_true(table.find(t.output, OK))
-  end
-  U["  - op"] = function()
     U.equal(a, os.is_dir(a))
   end
-  U["  - if compliant"] = function()
+  U["  - if directory exists"] = function()
     r, t = T"file.directory"
     U.is_true(table.find(t.output, SKIP))
   end
   U["  - tear down"] = function()
     U.equal(0, rmdir(a))
+  end
+end
+U["file.absent"] = function()
+  local a = "tmp/cfg_test__file_absent"
+  U["  - run"] = function()
+    r, t = T"file.absent"
+    U.equal(0, r)
+  end
+  U["  - file already absent"] = function()
+    U.is_true(table.find(t.output, SKIP))
+    U.equal(nil, os.is_file(a))
+  end
+  U["  - removing file"] = function()
+    os.execute("touch " .. a)
+    r, t = T"file.absent"
+    U.equal(0, r)
+    U.is_true(table.find(t.output, OK))
   end
 end
 os.execute "rmdir tmp"
