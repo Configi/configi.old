@@ -1,13 +1,13 @@
 local OK, SKIP = "REPAIR", "PASS"
 local U = require"u-test"
 local lib = require"lib"
-local exec, table = lib.exec, lib.table
+local os, exec, table = os, lib.exec, lib.table
 local rmdir = exec.ctx"rmdir"
 local rm = exec.ctx"rm"
-local r, t
 local T = function(t)
   return exec.popen("bin/lua " .. "bin/tests/" .. t .. ".lua")
 end
+local r, t
 os.execute "mkdir tmp"
 U["file.directory"] = function()
   local a = "tmp/cfg_test__file_directory"
