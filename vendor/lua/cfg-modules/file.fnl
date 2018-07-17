@@ -29,22 +29,19 @@
 (defn group [grp path]
   (let [info (stat.stat path)
         g (Pgrp.getgrgid info.st_gid)]
-    (var cg (values nil))
-    (var gr_gid (values nil))
-    (var gr_name (values nil))
-    (if (= nil g)
-      (do (set cg (tostring info.st_gid))
-          (set gr_gid (tostring info.st_gid))
-          (set gr_name (tostring info.st_gid)))
-      (do (set cg (string.format "%s(%s)" g.gr_gid g.gr_name))
-          (set gr_gid g.gr_gid)
-          (set gr_name g.gr_name))
+    (var cg (string.format "%s(%s)" g.gr_gid g.gr_name))
+    (var gr_gid g.gr_gid)
+    (var gr_name g.gr_name)
+    (when (= nil g)
+      (set cg (tostring info.st_gid))
+      (set gr_gid (tostring info.st_gid))
+      (set gr_name (tostring info.st_gid)))
     (tset C (.. "file.group :: " path " "  cg " -> " grp)
       (fn []
         (if (or (= grp gr_name) (= grp (tostring gr_gid)))
           (C.pass true)
           (let [chgrp (exec.ctx "chgrp")]
-            (C.equal 0 (chgrp grp path)))))))))
+            (C.equal 0 (chgrp grp path))))))))
 (defn directory [d]
   (tset C (.. "file.directory :: " d)
     (fn []
