@@ -22,7 +22,7 @@
            (set pw_name u.pw_name)))
     (tset C (.. "file.owner :: " path " " uid " -> " user)
       (fn []
-        (if (or (= user pw_name) (= user (tostring u.pw_uid)))
+        (if (or (= user pw_name) (= user (tostring pw_uid)))
           (C.pass true)
           (let [chown (exec.ctx "chown")]
             (C.equal 0 (chown user path))))))))
