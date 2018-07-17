@@ -4,12 +4,12 @@
 (local (require pairs string tostring) (values require pairs string tostring))
 (local (os exec file) (values lib.os lib.exec lib.file))
 (local stat (require "posix.sys.stat"))
-(local pwd (require "posix.pwd"))
-(local grp (require "posix.grp"))
+(local Ppwd (require "posix.pwd"))
+(local Pgrp (require "posix.grp"))
 (global _ENV nil)
 (defn owner [user path]
   (let [info (stat.stat path)
-        u (pwd.getpwuid info.st_uid)]
+        u (Ppwd.getpwuid info.st_uid)]
     (var uid (values nil))
     (var pw_uid (values nil))
     (var pw_name (values nil))
@@ -28,7 +28,7 @@
             (C.equal 0 (chown user path))))))))
 (defn group [grp path]
   (let [info (stat.stat path)
-        g (grp.getgrgid info.st_gid)]
+        g (Pgrp.getgrgid info.st_gid)]
     (var cg (values nil))
     (var gr_gid (values nil))
     (var gr_name (values nil))
