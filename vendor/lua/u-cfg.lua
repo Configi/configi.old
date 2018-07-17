@@ -25,12 +25,6 @@ if arg then
     end
 end
 
-if os.getenv("CFG_QUIET") == "true" then
-  quiet = true
-  grey = true
-end
-local fd = require "lib".fd
-
 -- UTILS -----------------------------------------------------------------------
 local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m" end
 local function blue(str)   return grey and str or "\27[1;34m" .. str .. "\27[0m" end
@@ -71,8 +65,6 @@ end
 local function log(msg)
     if not quiet then
         print(msg)
-    else
-        fd.printf(4635, msg)
     end
 end
 
