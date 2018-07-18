@@ -79,8 +79,8 @@
         (fn []
           (if (= current-mode (string.sub mode-arg len -1))
             (C.pass)
-            (let [chmod (exec.ctx "chmod")]
-              (C.equal 0 (chmod mode-arg f)))))))))
+            (let [chmod1 (exec.ctx "chmod")]
+              (C.equal 0 (chmod1 mode-arg f)))))))))
 (tset F "directory" directory)
 (tset F "absent" absent)
 (tset F "managed" managed)
