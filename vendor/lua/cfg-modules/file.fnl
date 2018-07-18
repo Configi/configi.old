@@ -58,13 +58,17 @@
           (C.pass true)
           (C.equal 0 (rm "-r" "-f" f)))))))
 (defn managed [f]
-  (each [k v (pairs (require (.. "files." f)))]
-    (tset C (.. "file.managed :: " k ":"  v.path)
-      (fn []
-        (let [contents (file.read_to_string v.path)]
-          (if (= contents v.contents)
-            (C.pass true)
-            (C.equal true (file.write v.path v.contents))))))))
+  (fn [p]
+    (each [k v (pairs (require (.. "files." f)))]
+      (tset C (.. "file.managed :: " k ":"  v.path)
+        (fn []
+          (var payload v.contents)
+          (if (= "table" (type p))
+            (set payload (string.template v.contents p)))
+          (let [contents (file.read_to_string v.path)]
+            (if (= contents payload)
+              (C.pass)
+              (C.equal true (file.write v.path v.contents)))))))))
 (defn chmod [f]
   (fn [p]
     (let [mode-arg (tostring (. p "mode"))
