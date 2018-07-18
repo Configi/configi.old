@@ -14,7 +14,7 @@
           u (Ppwd.getpwuid info.st_uid)]
       (var uid (tostring info.st_uid))
       (var pw_uid (tostring info.st_uid))
-      (var pw_name (tostring info.st_uid)))
+      (var pw_name (tostring info.st_uid))
       (when (~= nil u)
         (set uid (string.format "%s(%s)" u.pw_uid u.pw_name))
         (set pw_uid u.pw_uid)
@@ -24,7 +24,7 @@
           (if (or (= user pw_name) (= user (tostring pw_uid)))
             (C.pass true)
             (let [chown (exec.ctx "chown")]
-              (C.equal 0 (chown user path))))))))
+              (C.equal 0 (chown user path)))))))))
 (defn group [path]
   (fn [p]
     (local grp (tostring (. p "group")))
