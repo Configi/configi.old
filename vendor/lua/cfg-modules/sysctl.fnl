@@ -21,7 +21,9 @@
 ;;     Fail     = Failed to set value.
 ;;
 ;; Examples:
-;;     sysctl.write("vm.swappiness", 0)
+;;     sysctl.write("vm.swappiness"){
+;;        value = 0
+;;     }
 (defn write [key]
   (fn [p]
     (local value (tostring (. p "value")))
