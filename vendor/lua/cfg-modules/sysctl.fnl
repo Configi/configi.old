@@ -26,6 +26,8 @@
 ;;     }
 (defn write [key]
   (fn [p]
+    (if (= nil (. p "value"))
+      (C.fail "required table key 'value' missing"))
     (local value (tostring (. p "value")))
     (tset C (.. "sysctl.write :: " key " = " value)
       (fn []
