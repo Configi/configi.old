@@ -67,6 +67,86 @@
                 (let [ret (exec.qexec iptables)]
                   (if (= nil ret)
                     (C.equal ret 0))))))))))))
+;; iptables.allow(string/number)
+;;
+;; Allow stateful port.
+;;
+;; Arguments:
+;;     #1 (string/number) = Port to open.
+;;
+;; Results:
+;;     Pass     = Port is already opened.
+;;     Repaired = Port opened.
+;;     Fail     = Failed to open port.
+;;
+;; Examples:
+;;     iptables.allow(443)
+(defn allow [port]
+  (local rules [["" "INPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "513:65535" "--dport" ""  "-m" "state" "--state" "NEW,ESTABLISHED" "-j" "ACCEPT"]
+                ["" "OUTPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "" "--dport" "513:65535" "-m" "state" "--state" "ESTABLISHED" "-j" "ACCEPT"]])
+  (tset C (.. "iptables.allow :: " (tostring port))
+    (fn []
+      (let [iptables {}]
+        (table.copy iptables (. rules 1))
+        (tset iptables "exe" (path.bin "iptables"))
+        (tset iptables 1 "-C")
+        (tset iptables 12 (tostring port))
+        (if (= 0 (exec.qexec iptables))
+          (C.pass "Rule already in place")
+	  (do
+            (each [_ i (ipairs rules)]
+              (table.copy iptables i)
+              (tset iptables "exe" (path.bin "iptables"))
+              (tset iptables 1 "-C")
+              (if (= "INPUT" (. iptables 2))
+                (tset iptables 12 (tostring port)))
+              (if (= "OUTPUT" (. iptables 2))
+                (tset iptables 10 (tostring port)))
+              (if (= nil (exec.qexec iptables))
+                (do (tset iptables 1 "-A")
+                  (let [ret (exec.qexec iptables)]
+                    (if (= nil ret)
+                      (C.equal ret 0))))))))))))
+;; iptables.outgoing
+;;
+;; Allow outgoing connections from the specified interface.
+;;
+;; Arguments:
+;;     #1 (string) = Interface to allow.
+;;
+;; Results:
+;;     Pass     = Interface already allowed.
+;;     Repaired = Rule for interface added.
+;;     Fail     = Failed to add rule.
+;;
+;; Examples:
+;;     iptables.outgoing(eth0)
+(defn outgoing [interface]
+  (local rules [["" "OUTPUT" "-d" "0/0" "-o" "" "-j" "ACCEPT"]
+                ["" "INPUT" "-i" "" "-m" "state" "--state" "ESTABLISHED,RELATED" "-j" "ACCEPT"]])
+  (tset C (.. "iptables.outgoing :: " interface)
+    (fn []
+      (let [iptables {}]
+        (table.copy iptables (. rules 1))
+        (tset iptables "exe" (path.bin "iptables"))
+        (tset iptables 1 "-C")
+        (tset iptables 6 interface)
+        (if (= 0 (exec.qexec iptables))
+          (C.pass "Rule already in place")
+	  (do
+            (each [_ i (ipairs rules)]
+              (table.copy iptables i)
+              (tset iptables "exe" (path.bin "iptables"))
+              (tset iptables 1 "-C")
+              (if (= "OUTPUT" (. iptables 2))
+                (tset iptables 6 interface))
+              (if (= "INPUT" (. iptables 2))
+                (tset iptables 4 interface))
+              (if (= nil (exec.qexec iptables))
+                (do (tset iptables 1 "-A")
+                  (let [ret (exec.qexec iptables)]
+                    (if (= nil ret)
+                      (C.equal ret 0))))))))))))
 ;; iptables.add(string)
 ;;
 ;; Add an iptables rule.
@@ -114,5 +194,7 @@
            (C.fail "Unexpected number of rules."))))))
 (tset I "default" default)
 (tset I "add" add)
+(tset I "allow" allow)
 (tset I "count" count)
+(tset I "outgoing" outgoing)
 I
