@@ -36,6 +36,7 @@
         (table.copy iptables (. rules 1))
         (tset iptables "exe" (path.bin "iptables"))
         (tset iptables 1 "-C")
+        (tset iptables 12 (tostring port))
         (if (= 0 (exec.qexec iptables))
           (C.pass "Rule already in place")
         (do (each [_ i (ipairs policy)]
