@@ -1,7 +1,7 @@
 (local C (require "u-cfg"))
 (local F {})
 (local lib (require "lib"))
-(local (require type pairs tostring) (values require type pairs tostring))
+(local (require pairs tostring) (values require pairs tostring))
 (local (string os exec file) (values lib.string lib.os lib.exec lib.file))
 (local stat (require "posix.sys.stat"))
 (local Ppwd (require "posix.pwd"))
@@ -58,17 +58,23 @@
           (C.pass true)
           (C.equal 0 (rm "-r" "-f" f)))))))
 (defn managed [f]
+  (each [k v (pairs (require (.. "files." f)))]
+    (tset C (.. "file.managed :: " k ":"  v.path)
+      (fn []
+        (let [contents (file.read_to_string v.path)]
+          (if (= contents v.contents)
+            (C.pass)
+            (C.equal true (file.write v.path v.contents))))))))
+(defn templated [f]
   (fn [p]
     (each [k v (pairs (require (.. "files." f)))]
-      (tset C (.. "file.managed :: " k ":"  v.path)
+      (tset C (.. "file.templated :: " k ":"  v.path)
         (fn []
-          (var payload v.contents)
-          (if (= "table" (type p))
-            (set payload (string.template v.contents p)))
-          (let [contents (file.read_to_string v.path)]
+          (let [contents (file.read_to_string v.path)
+                payload (string.template v.contents p)]
             (if (= contents payload)
               (C.pass)
-              (C.equal true (file.write v.path v.contents)))))))))
+              (C.equal true (file.write v.path payload)))))))))
 (defn chmod [f]
   (fn [p]
     (let [mode-arg (tostring (. p "mode"))
@@ -84,6 +90,7 @@
 (tset F "directory" directory)
 (tset F "absent" absent)
 (tset F "managed" managed)
+(tset F "templated" templated)
 (tset F "owner" owner)
 (tset F "chown" owner)
 (tset F "group" group)
