@@ -64,18 +64,44 @@ U["exec.simple"] = function()
   end
 end
 U["file.managed"] = function()
-  local f = "tmp/____configi_test"
+  local f = "tmp/____configi_test_file_managed"
   U[" - run"] = function()
     r, t = T"file.managed"
     U.equal(0, r)
   end
-  U[" - plain"] = function()
+  U[" - result"] = function()
     U.is_true(table.find(t.output, OK))
     U.equal(f, os.is_file(f))
-    U.equal(file.read_all(f), "Contents of the file \"tmp/____configi_test\"\n")
+    U.equal(file.read_all(f), "Contents of the file \"tmp/____configi_test_file_managed\"\n")
+  end
+  U[" - pass"] = function()
+    r, t = T"file.managed"
+    U.equal(0, r)
+    U.is_true(table.find(t.output, SKIP))
   end
   U[" - tear down"] = function()
-    U.equal(0, rm("-f", f))
+     U.equal(0, rm("-f", f))
+  end
+end
+U["file.templated"] = function()
+  local f = "tmp/____configi_test_file_templated"
+  U[" - run"] = function()
+    r, t = T"file.templated"
+    U.equal(0, r)
+  end
+  U[" - result"] = function()
+    U.is_true(table.find(t.output, OK))
+    U.equal(f, os.is_file(f))
+    U.equal(file.read_all(f), "Contents of the file \"tmp/____configi_test_file_templated\"\nMy name is Ed\nAge is 2\n")
+  end
+  U[" - pass"] = function()
+    r, t = T"file.templated"
+    U.equal(0, r)
+    U.is_true(table.find(t.output, SKIP))
+    U.equal(f, os.is_file(f))
+  end
+  U[" - tear down"] = function()
+     U.equal(0, rm("-f", f))
   end
 end
 os.execute "rmdir tmp"
