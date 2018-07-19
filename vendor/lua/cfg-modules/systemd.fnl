@@ -21,9 +21,12 @@
 (defn active [unit]
   (tset C (.. "systemd.active :: " unit)
     (fn []
-      (systemctl "daemon-reload")
-      (if (= nil (systemctl "is-active" unit))
-        (C.equal 0 (systemctl "start" unit))
-        (C.pass true)))))
+      (if (= 0 (systemctl "is-active" unit))
+        (C.pass)
+        (do
+          (systemctl "daemon-reload")
+          (if (= nil (systemctl "enable" unit))
+            (C.fail "systemctl enable failed.")
+            (C.equal 0 (systemctl "start" unit))))))))
 (tset S "active" active)
 S
