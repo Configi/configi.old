@@ -26,5 +26,40 @@
           (tset semanage "exe" "/usr/sbin/semanage")
           (C.equal 0 (exec.qexec semanage)))
         (C.pass true))))))
+;; selinux.port
+;;
+;; Add a port to the specified context.
+;;
+;; Arguments:
+;;     (string) = The context to add to.
+;;
+;; Parameters:
+;;    (table)
+;;            port = Port to add (string/number)
+;;        protocol = Protocol of port (string)
+;;
+;; Results:
+;;     Pass     = Port already enabled for context.
+;;     Repaired = Port added to context.
+;;     Fail     = Failed to add port.
+;;
+;; Examples:
+;;    selinux.port("ssh_port_t"){
+;;      port = 1822,
+;;      protocol = "tcp"
+;;    }
+(defn port [type]
+  (fn [p]
+    (local nport (tostring (. p "port")))
+    (local protocol (. p "protocol"))
+    (tset C (.. "selinux.port :: " type " + " protocol ":" nport)
+      (fn []
+        (let [(_ t) (exec.cmd.semanage "port" "-l")]
+        (if (= (table.find t.stdout (.. type "%s+" protocol "%s+" "[%d]*[%s,]" nport)) nil)
+          (let [semanage ["port" "-a" "-t" type "-p" protocol nport]]
+            (tset semanage "exe" "/usr/sbin/semanage")
+            (C.equal 0 (exec.qexec semanage)))
+          (C.pass)))))))
 (tset S "permissive" permissive)
+(tset S "port" port)
 S
