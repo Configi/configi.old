@@ -1,10 +1,10 @@
 .DEFAULT_GOAL= development
 EXE:= cfg
 SRC:=
-SRC_DIR:= tests files
+SRC_DIR:= files
 SRC_C:=
-VENDOR:= u-cfg cimicida lib inspect argparse u-test
-VENDOR_DIR:= cfg-modules
+VENDOR:= u-cfg cimicida lib inspect u-test
+VENDOR_DIR:= cfg-modules plc
 VENDOR_C:= lfs posix px auxlib array qhttp qsocket
 MAKEFLAGS= --silent
 HOST_CC= cc
@@ -21,4 +21,7 @@ include lib/tests.mk
 include lib/std.mk
 include lib/rules.mk
 test:
-	CFG_QUIET=true bin/lua bin/cfg.lua
+	bin/luacheck.lua --no-max-line-length bin/cfg.lua
+	bin/luacheck.lua --no-max-line-length vendor/lua/u-cfg.lua
+	bin/luacheck.lua --no-max-line-length vendor/lua/cfg-modules/*.lua
+	bin/lua bin/cfg.lua
