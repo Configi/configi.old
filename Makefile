@@ -21,6 +21,7 @@ include lib/tests.mk
 include lib/std.mk
 include lib/rules.mk
 test:
+	cp vendor/lua/cfg-modules/*.lua cfg-modules
 	bin/luacheck.lua --no-max-line-length bin/cfg.lua
 	bin/luacheck.lua --no-max-line-length vendor/lua/u-cfg.lua
 	bin/luacheck.lua --no-max-line-length vendor/lua/cfg-modules/*.lua
