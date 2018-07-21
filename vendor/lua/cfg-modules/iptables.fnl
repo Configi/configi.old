@@ -1,4 +1,4 @@
-(local C (require "u-cfg"))
+(local C (require "configi"))
 (local I {})
 (local lib (require "lib"))
 (local (tonumber tostring ipairs) (values tonumber tostring ipairs))
@@ -171,20 +171,25 @@
         (do (tset iptables 1 "-A")
             (C.equal 0 (exec.qexec iptables)))
         (C.pass true))))))
-;; iptables.count(string, number)
+;; iptables.count
 ;;
 ;; Compare the actual number of iptables rules in the given table with an expected number.
 ;;
-;; Arguments:
-;;      #1 (string) = The table (e.g. "nat", "filter") to count rules on.
-;;      #2 (number) = The expected number of rules in the table.
+;; Argument:
+;;      (string) = The table (e.g. "nat", "filter") to count rules on.
+;;
+;; Parameters:
+;;      (table)
+;;          expect = The expected number of rules in the table (number)
 ;;
 ;; Results:
 ;;      Pass = The actual and expected number of rules match.
 ;;      Fail = The actual and expected number of rules are different.
 ;;
 ;; Examples:
-;;      iptables.count("filter", 5)
+;;      iptables.count("filter"){
+;;        expect = 5
+;;      }
 (defn count [tbl no]
   (tset C (.. "iptables.count :: " tbl " == " (tostring no))
     (fn []

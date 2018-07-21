@@ -1,4 +1,4 @@
-C = require "u-cfg"
+C = require "configi"
 P = {}
 S = require "qsocket"
 tostring = tostring

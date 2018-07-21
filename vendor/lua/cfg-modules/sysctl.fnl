@@ -1,4 +1,4 @@
-(local C (require "u-cfg"))
+(local C (require "configi"))
 (local S {})
 (local lib (require "lib"))
 (local (string tostring file) (values string tostring lib.file))

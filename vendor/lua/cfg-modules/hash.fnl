@@ -1,4 +1,4 @@
-(local C (require "u-cfg"))
+(local C (require "configi"))
 (local H {})
 (local lib (require "lib"))
 (local bin (require "plc.bin"))

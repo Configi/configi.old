@@ -1,4 +1,4 @@
-(local C (require "u-cfg"))
+(local C (require "configi"))
 (local P {})
 (local lib (require "lib"))
 (local (exec table) (values lib.exec lib.table))

@@ -1,9 +1,12 @@
-(local C (require "u-cfg"))
+(local C (require "configi"))
 (local D {})
 (local lib (require "lib"))
 (local (exec) (values lib.exec))
 (local (docker) (exec.ctx "docker"))
 (global _ENV nil)
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
 ;; docker.image(string)
 ;;
 ;; Ensure that a Docker image is pulled locally.
