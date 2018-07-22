@@ -1,16 +1,16 @@
 (local C (require "configi"))
 (local D {})
 (local lib (require "lib"))
-(local (exec) (values lib.exec))
+(local (exec which) (values lib.exec lib.path.bin))
 (local (docker) (exec.ctx "docker"))
 (global _ENV nil)
 ;; Author: Eduardo Tongson <propolice@gmail.com>
 ;; License: MIT <http://opensource.org/licenses/MIT>
 ;;
-;; docker.image(string)
+;; docker.image
 ;;
 ;; Ensure that a Docker image is pulled locally.
-;; Does not update the existing local image.
+;; Does not update the existing local image. Requires the docker executable.
 ;;
 ;; Arguments:
 ;;     #1 (string) = The url of the image.
@@ -24,6 +24,8 @@
 ;;     docker.image("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 (defn image [i]
   (tset C (.. "docker.image :: " i)
+    (if (= nil (which "docker"))
+      (C.fail "docker executable not found."))
     (fn []
       (let [r (docker "history" i)]
         (if (= r nil)
