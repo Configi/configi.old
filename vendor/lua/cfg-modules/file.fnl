@@ -49,7 +49,7 @@
       (let [mkdir (exec.ctx "mkdir")]
         (if (= d (os.is_dir d))
           (C.pass true)
-          (C.equal 0 (mkdir d)))))))
+          (C.equal 0 (mkdir "-p" d)))))))
 (defn absent [f]
   (tset C (.. "file.absent :: " f)
     (fn []

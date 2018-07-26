@@ -17,6 +17,7 @@ local r, t
 os.execute "mkdir tmp"
 U["file.directory"] = function()
   local a = "tmp/cfg_test__file_directory"
+  local b = "tmp/cfg_test__file_directory/parents"
   U["- run"] = function()
     r, t = T"file.directory"
     U.equal(0, r)
@@ -29,7 +30,22 @@ U["file.directory"] = function()
     r, t = T"file.directory"
     U.is_true(table.find(t.output, SKIP))
   end
+  U[" - run parents"] = function()
+    U.equal(0, rmdir(a))
+    r, t = T"file.directory.parents"
+    U.equal(0, r)
+  end
+  U[" - directory created"] = function()
+    U.is_true(ok(t))
+    U.equal(b, os.is_dir(b))
+  end
+  U[" - if directory exists"] = function()
+    r, t = T"file.directory.parents"
+    U.equal(0, r)
+    U.is_true(skip(t))
+  end
   U["- tear down"] = function()
+    U.equal(0, rmdir(b))
     U.equal(0, rmdir(a))
   end
 end
