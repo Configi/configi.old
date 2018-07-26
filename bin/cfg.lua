@@ -4,6 +4,12 @@ local lib = require"lib"
 local file, os, exec, table = lib.file, lib.os, lib.exec, lib.table
 local rmdir = exec.ctx"rmdir"
 local rm = exec.ctx"rm"
+local ok = function(t)
+  return table.find(t.output, OK)
+end
+local skip = function(t)
+  return table.find(t.output, SKIP)
+end
 local T = function(t)
   return exec.popen("bin/lua " .. "bin/tests/" .. t .. ".lua")
 end
@@ -90,7 +96,7 @@ U["file.templated"] = function()
     U.equal(0, r)
   end
   U[" - result"] = function()
-    U.is_true(table.find(t.output, OK))
+    U.is_true(ok(t))
     U.equal(f, os.is_file(f))
     U.equal(file.read_all(f), "Contents of the file \"tmp/____configi_test_file_templated\"\nMy name is Ed\nAge is 2\n")
   end
@@ -102,6 +108,31 @@ U["file.templated"] = function()
   end
   U[" - tear down"] = function()
      U.equal(0, rm("-f", f))
+  end
+end
+U["hash.sha2"] = function()
+  local f = "tmp/____configi_test_hash_sha2"
+  os.execute("touch " .. f)
+  U[" - run"] = function()
+    r, t = T"hash.sha2"
+    U.equal(0, r)
+  end
+  U[" - result"] = function()
+    U.is_true(skip(t))
+  end
+  U[" - fail"] = function()
+    os.execute("echo 'x' >>" .. f)
+    r, t = T"hash.sha2"
+    U.is_nil(r)
+  end
+  U[" - fail result"] = function()
+    U.is_true(table.find(t.output, "Unexpected hash digest"))
+  end
+  U[" - file not found"] = function()
+    os.execute("rm -f " .. f)
+    r, t = T"hash.sha2"
+    U.is_nil(r)
+    U.is_true(table.find(t.output, "file not found"))
   end
 end
 os.execute "rmdir tmp"
