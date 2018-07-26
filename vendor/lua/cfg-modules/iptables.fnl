@@ -67,9 +67,9 @@
                 (let [ret (exec.qexec iptables)]
                   (if (= nil ret)
                     (C.equal ret 0))))))))))))
-;; iptables.allow(string/number)
+;; iptables.open(string/number)
 ;;
-;; Allow stateful port.
+;; Open stateful port.
 ;;
 ;; Arguments:
 ;;     #1 (string/number) = Port to open.
@@ -80,11 +80,11 @@
 ;;     Fail     = Failed to open port.
 ;;
 ;; Examples:
-;;     iptables.allow(443)
-(defn allow [port]
+;;     iptables.open(443)
+(defn open [port]
   (local rules [["" "INPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "513:65535" "--dport" ""  "-m" "state" "--state" "NEW,ESTABLISHED" "-j" "ACCEPT"]
                 ["" "OUTPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "" "--dport" "513:65535" "-m" "state" "--state" "ESTABLISHED" "-j" "ACCEPT"]])
-  (tset C (.. "iptables.allow :: " (tostring port))
+  (tset C (.. "iptables.open :: " (tostring port))
     (fn []
       (let [iptables {}]
         (table.copy iptables (. rules 1))
@@ -199,7 +199,8 @@
            (C.fail "Unexpected number of rules."))))))
 (tset I "default" default)
 (tset I "add" add)
-(tset I "allow" allow)
+(tset I "open" open)
+(tset I "allow" open)
 (tset I "count" count)
 (tset I "outgoing" outgoing)
 I
