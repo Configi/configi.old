@@ -3,7 +3,10 @@
 (local lib (require "lib"))
 (local (exec table which) (values lib.exec lib.table lib.path.bin))
 (global _ENV nil)
-;; podman.image(string)
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
+;; podman.image
 ;;
 ;; Ensure that a container image is pulled locally.
 ;; Does not update the existing local image.
