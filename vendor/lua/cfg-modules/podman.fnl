@@ -1,7 +1,7 @@
 (local C (require "configi"))
 (local P {})
 (local lib (require "lib"))
-(local (exec table) (values lib.exec lib.table))
+(local (exec table which) (values lib.exec lib.table lib.path.bin))
 (global _ENV nil)
 ;; podman.image(string)
 ;;
@@ -20,6 +20,8 @@
 ;;     podman.image("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 (defn image [i]
   (tset C (.. "podman.image :: " i)
+    (if (= nil (which "podman"))
+      (C.fail "podman(1) executable not found"))
     (fn []
       (let [r (exec.popen (.. "podman history " i))]
         (if (= r nil)
@@ -41,6 +43,8 @@
 ;;     podman.update("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 (defn update [i]
   (tset C (.. "podman.update :: " i)
+    (if (= nil (which "podman"))
+      (C.fail "podman(1) executable not found"))
     (fn []
       (let [(r t) (exec.popen (.. "podman pull " i))]
         (if (= r nil)
