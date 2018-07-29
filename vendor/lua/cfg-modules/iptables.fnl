@@ -154,8 +154,7 @@
               (if (= nil (exec.qexec iptables))
                 (do (tset iptables 1 "-A")
                   (let [ret (exec.qexec iptables)]
-                    (if (= nil ret)
-                      (C.equal ret 0))))))))))))
+                    (C.equal 0 ret)))))))))))
 ;; iptables.add(string)
 ;;
 ;; Add an iptables rule.
