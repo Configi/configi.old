@@ -4,7 +4,10 @@
 (local (exec) (values lib.exec))
 (local systemctl (exec.ctx "systemctl"))
 (global _ENV nil)
-;; systemd.active(string)
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
+;; systemd.active
 ;;
 ;; Ensure a systemd service is active.
 ;;
