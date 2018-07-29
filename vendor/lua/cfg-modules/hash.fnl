@@ -5,6 +5,9 @@
 (local shasum (require "plc.sha2"))
 (local (file) (values lib.file))
 (global _ENV nil)
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
 ;; hash.sha2
 ;;
 ;; Check that a given sha256 hash value matches the actual hash value of a file.
