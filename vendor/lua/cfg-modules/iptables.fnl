@@ -70,8 +70,7 @@
             (if (= nil (exec.qexec iptables))
               (do (tset iptables 1 "-A")
                 (let [ret (exec.qexec iptables)]
-                  (if (= nil ret)
-                    (C.equal ret 0))))))))))))
+                  (C.equal ret 0)))))))))))
 ;; iptables.open(string/number)
 ;;
 ;; Open stateful port.
@@ -112,8 +111,7 @@
               (if (= nil (exec.qexec iptables))
                 (do (tset iptables 1 "-A")
                   (let [ret (exec.qexec iptables)]
-                    (if (= nil ret)
-                      (C.equal ret 0))))))))))))
+                    (C.equal ret 0)))))))))))
 ;; iptables.outgoing
 ;;
 ;; Allow outgoing connections from the specified interface.
