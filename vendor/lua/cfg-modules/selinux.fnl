@@ -3,7 +3,10 @@
 (local lib (require "lib"))
 (local (exec table) (values lib.exec lib.table))
 (global _ENV nil)
-;; selinux.permissive(string)
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
+;; selinux.permissive
 ;;
 ;; Set a process type to be permissive.
 ;;
