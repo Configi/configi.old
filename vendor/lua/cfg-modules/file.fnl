@@ -20,9 +20,9 @@
         (set pw_uid u.pw_uid)
         (set pw_name u.pw_name))
       (tset C (.. "file.owner :: " path " " uid " -> " user)
-        (if (= nil (which "chown"))
-          (C.fail "chown(1) executable not found"))
-        (fn []
+       (fn []
+          (if (= nil (which "chown"))
+            (C.fail "chown(1) executable not found"))
           (if (or (= user pw_name) (= user (tostring pw_uid)))
             (C.pass true)
             (let [chown (exec.ctx "chown")]
@@ -40,27 +40,27 @@
         (set gr_gid g.gr_gid)
         (set gr_name g.gr_name))
       (tset C (.. "file.group :: " path " "  cg " -> " grp)
-        (if (= nil (which "chgrp"))
-          (C.fail "chgrp(1) executable not found"))
         (fn []
+          (if (= nil (which "chgrp"))
+            (C.fail "chgrp(1) executable not found"))
           (if (or (= grp gr_name) (= grp (tostring gr_gid)))
             (C.pass true)
             (let [chgrp (exec.ctx "chgrp")]
               (C.equal 0 (chgrp grp path)))))))))
 (defn directory [d]
   (tset C (.. "file.directory :: " d)
-    (if (= nil (which "mkdir"))
-      (C.fail "mkdir(1) executable not found"))
     (fn []
+      (if (= nil (which "mkdir"))
+        (C.fail "mkdir(1) executable not found"))
       (let [mkdir (exec.ctx "mkdir")]
         (if (= d (os.is_dir d))
           (C.pass true)
           (C.equal 0 (mkdir "-p" d)))))))
 (defn absent [f]
   (tset C (.. "file.absent :: " f)
-    (if (= nil (which "rm"))
-      (C.fail "rm(1) executable not found"))
     (fn []
+      (if (= nil (which "rm"))
+        (C.fail "rm(1) executable not found"))
       (let [rm (exec.ctx "rm")]
         (if (= nil (stat.stat f))
           (C.pass true)
@@ -90,9 +90,9 @@
           len (- 0 (string.len mode-arg))
           current-mode (string.sub (tostring (string.format "%o" info.st_mode)) len -1)]
       (tset C (.. "file.mode :: " f ": " current-mode " -> " mode-arg)
-        (if (= nil (which "chmod"))
-          (C.fail "chmod(1) executable not found"))
         (fn []
+          (if (= nil (which "chmod"))
+            (C.fail "chmod(1) executable not found"))
           (if (= current-mode (string.sub mode-arg len -1))
             (C.pass)
             (let [chmod1 (exec.ctx "chmod")]
