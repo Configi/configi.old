@@ -4,7 +4,10 @@
 (local (tonumber tostring ipairs) (values tonumber tostring ipairs))
 (local (exec path string table which) (values lib.exec lib.path lib.string lib.table lib.path.bin))
 (global _ENV nil)
-;; iptables.default(string/number)
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
+;; iptables.default
 ;;
 ;; Add baseline iptables rules.
 ;; Sets the default policy to DROP and open specified port.
