@@ -4,6 +4,9 @@
 (local (exec string)  (values lib.exec lib.string))
 (local stat (require "posix.sys.stat"))
 (global _ENV nil)
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
 ;; exec.simple
 ;;
 ;; Run executable and arguments through posix_spawn(3).
