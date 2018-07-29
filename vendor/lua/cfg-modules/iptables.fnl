@@ -2,7 +2,7 @@
 (local I {})
 (local lib (require "lib"))
 (local (tonumber tostring ipairs) (values tonumber tostring ipairs))
-(local (exec path string table) (values lib.exec lib.path lib.string lib.table))
+(local (exec path string table which) (values lib.exec lib.path lib.string lib.table lib.path.bin))
 (global _ENV nil)
 ;; iptables.default(string/number)
 ;;
@@ -31,6 +31,8 @@
   (local rules [["" "INPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "513:65535" "--dport" ""  "-m" "state" "--state" "NEW,ESTABLISHED" "-j" "ACCEPT"]
                 ["" "OUTPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "" "--dport" "513:65535" "-m" "state" "--state" "ESTABLISHED" "-j" "ACCEPT"]])
   (tset C (.. "iptables.default :: " (tostring port))
+    (if (= nil (which "iptables"))
+      (C.fail "iptables(8) executable not found."))
     (fn []
       (let [iptables {}]
         (table.copy iptables (. rules 1))
@@ -85,6 +87,8 @@
   (local rules [["" "INPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "513:65535" "--dport" ""  "-m" "state" "--state" "NEW,ESTABLISHED" "-j" "ACCEPT"]
                 ["" "OUTPUT" "-p" "tcp" "-s" "0/0" "-d" "0/0" "--sport" "" "--dport" "513:65535" "-m" "state" "--state" "ESTABLISHED" "-j" "ACCEPT"]])
   (tset C (.. "iptables.open :: " (tostring port))
+    (if (= nil (which "iptables"))
+      (C.fail "iptables(8) executable not found."))
     (fn []
       (let [iptables {}]
         (table.copy iptables (. rules 1))
@@ -125,6 +129,8 @@
   (local rules [["" "OUTPUT" "-d" "0/0" "-o" "" "-j" "ACCEPT"]
                 ["" "INPUT" "-i" "" "-m" "state" "--state" "ESTABLISHED,RELATED" "-j" "ACCEPT"]])
   (tset C (.. "iptables.outgoing :: " interface)
+    (if (= nil (which "iptables"))
+      (C.fail "iptables(8) executable not found."))
     (fn []
       (let [iptables {}]
         (table.copy iptables (. rules 1))
@@ -163,6 +169,8 @@
 ;;     iptables.add("-A INPUT -p udp -m udp --dport 53 -j ACCEPT")
 (defn add [rule]
   (tset C (.. "iptables.add :: "  rule)
+    (if (= nil (which "iptables"))
+      (C.fail "iptables(8) executable not found."))
     (fn []
       (let [iptables (string.to_table rule)]
         (tset iptables 1 "-C")
@@ -192,6 +200,8 @@
 ;;      }
 (defn count [tbl no]
   (tset C (.. "iptables.count :: " tbl " == " (tostring no))
+    (if (= nil (which "iptables"))
+      (C.fail "iptables(8) executable not found."))
     (fn []
       (let [(_ t) (exec.cmd.iptables "-S" "-t" tbl)]
         (if (= (# t.stdout) (tonumber no))
