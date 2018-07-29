@@ -20,9 +20,9 @@
 ;;     podman.image("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 (defn image [i]
   (tset C (.. "podman.image :: " i)
-    (if (= nil (which "podman"))
-      (C.fail "podman(1) executable not found"))
     (fn []
+      (if (= nil (which "podman"))
+        (C.fail "podman(1) executable not found"))
       (let [r (exec.popen (.. "podman history " i))]
         (if (= r nil)
           (C.equal 0 (exec.popen (.. "podman pull " i)))
@@ -43,9 +43,9 @@
 ;;     podman.update("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 (defn update [i]
   (tset C (.. "podman.update :: " i)
-    (if (= nil (which "podman"))
-      (C.fail "podman(1) executable not found"))
     (fn []
+      (if (= nil (which "podman"))
+        (C.fail "podman(1) executable not found"))
       (let [(r t) (exec.popen (.. "podman pull " i))]
         (if (= r nil)
           (C.fail "Failed to update image.")
