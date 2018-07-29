@@ -177,8 +177,8 @@
         (tset iptables "exe" (path.bin "iptables"))
       (if (= nil (exec.qexec iptables))
         (do (tset iptables 1 "-A")
-            (C.equal 0 (exec.qexec iptables)))
-        (C.pass true))))))
+          (C.equal 0 (exec.qexec iptables)))
+        (C.pass))))))
 ;; iptables.count
 ;;
 ;; Compare the actual number of iptables rules in the given table with an expected number.
@@ -205,8 +205,8 @@
         (C.fail "iptables(8) executable not found."))
       (let [(_ t) (exec.cmd.iptables "-S" "-t" tbl)]
         (if (= (# t.stdout) (tonumber no))
-           (C.pass true)
-           (C.fail "Unexpected number of rules."))))))
+          (C.pass true)
+          (C.fail "Unexpected number of rules."))))))
 (tset I "default" default)
 (tset I "add" add)
 (tset I "open" open)
