@@ -3,6 +3,9 @@
 (local lib (require "lib"))
 (local (string tostring file) (values string tostring lib.file))
 (global _ENV nil)
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
 ;; sysctl.write
 ;;
 ;; Kernel paramater modification through sysctl as implemented in procfs.d
