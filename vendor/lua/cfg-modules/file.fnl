@@ -2,7 +2,7 @@
 (local F {})
 (local lib (require "lib"))
 (local (require pairs tostring) (values require pairs tostring))
-(local (string os exec file) (values lib.string lib.os lib.exec lib.file))
+(local (string os exec file which) (values lib.string lib.os lib.exec lib.file lib.path.bin))
 (local stat (require "posix.sys.stat"))
 (local Ppwd (require "posix.pwd"))
 (local Pgrp (require "posix.grp"))
@@ -20,6 +20,8 @@
         (set pw_uid u.pw_uid)
         (set pw_name u.pw_name))
       (tset C (.. "file.owner :: " path " " uid " -> " user)
+        (if (= nil (which "chown"))
+          (C.fail "chown(1) executable not found"))
         (fn []
           (if (or (= user pw_name) (= user (tostring pw_uid)))
             (C.pass true)
@@ -38,6 +40,8 @@
         (set gr_gid g.gr_gid)
         (set gr_name g.gr_name))
       (tset C (.. "file.group :: " path " "  cg " -> " grp)
+        (if (= nil (which "chgrp"))
+          (C.fail "chgrp(1) executable not found"))
         (fn []
           (if (or (= grp gr_name) (= grp (tostring gr_gid)))
             (C.pass true)
@@ -45,6 +49,8 @@
               (C.equal 0 (chgrp grp path)))))))))
 (defn directory [d]
   (tset C (.. "file.directory :: " d)
+    (if (= nil (which "mkdir"))
+      (C.fail "mkdir(1) executable not found"))
     (fn []
       (let [mkdir (exec.ctx "mkdir")]
         (if (= d (os.is_dir d))
@@ -52,6 +58,8 @@
           (C.equal 0 (mkdir "-p" d)))))))
 (defn absent [f]
   (tset C (.. "file.absent :: " f)
+    (if (= nil (which "rm"))
+      (C.fail "rm(1) executable not found"))
     (fn []
       (let [rm (exec.ctx "rm")]
         (if (= nil (stat.stat f))
@@ -82,6 +90,8 @@
           len (- 0 (string.len mode-arg))
           current-mode (string.sub (tostring (string.format "%o" info.st_mode)) len -1)]
       (tset C (.. "file.mode :: " f ": " current-mode " -> " mode-arg)
+        (if (= nil (which "chmod"))
+          (C.fail "chmod(1) executable not found"))
         (fn []
           (if (= current-mode (string.sub mode-arg len -1))
             (C.pass)
