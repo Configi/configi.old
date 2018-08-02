@@ -97,6 +97,18 @@
             (C.pass)
             (let [chmod1 (exec.ctx "chmod")]
               (C.equal 0 (chmod1 mode-arg f)))))))))
+(defn copy [f]
+  (fn [p]
+    (local destination (. p "target"))
+    (tset C (.. "file.copy :: " f " -> " destination)
+      (fn []
+        (if (= nil (which "cp"))
+          (C.fail "cp(1) executable not found"))
+        (if (= nil (file.stat destination))
+          (let [cp ["-R" "-f" f destination]]
+            (tset cp "exe" (which "cp"))
+            (C.equal 0 (exec.qexec(cp))))
+          (C.pass))))))
 (tset F "directory" directory)
 (tset F "absent" absent)
 (tset F "managed" managed)
@@ -107,4 +119,5 @@
 (tset F "chgrp" group)
 (tset F "chmod" chmod)
 (tset F "access" chmod)
+(tset F "copy" copy)
 F
