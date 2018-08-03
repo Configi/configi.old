@@ -1,29 +1,4 @@
--- COMMAND LINE ----------------------------------------------------------------
-local function print_help()
-    print "Usage: target.lua [options] [regex]"
-    print "\t-h show this message"
-    print "\t-q quiet mode"
-    print "\t-s disable colours"
-end
-
 local quiet, grey, test_regex
-if arg then
-    for i = 1, #arg do
-        if arg[i] == "-h" then
-            print_help()
-            os.exit(0)
-        elseif arg[i] == "-q" then
-            quiet = true
-        elseif arg[i] == "-s" then
-            grey = true
-        elseif not test_regex then
-            test_regex = arg[i]
-        else
-            print_help()
-            os.exit(1)
-        end
-    end
-end
 
 -- UTILS -----------------------------------------------------------------------
 local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m" end
