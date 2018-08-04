@@ -1,6 +1,14 @@
-local quiet, grey, test_regex
+local ntests = 0
+local npassed = 0
+local failed = false
+local passed = false
+local failed_list = {}
+local quiet = false
+local grey = false
+local test_regex = false
+local remote = false
+local argparse = require"argparse"
 
--- UTILS -----------------------------------------------------------------------
 local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m" end
 local function blue(str)   return grey and str or "\27[1;34m" .. str .. "\27[0m" end
 local function green(str)  return grey and str or "\27[1;32m" .. str .. "\27[0m" end
@@ -18,12 +26,6 @@ local tpass_tag    = green  "  Compliant :"
 local trepair_tag  = green  "   Repaired :"
 local failed_tag   = red    "     Failed :"
 
-local ntests = 0
-local npassed = 0
-local failed = false
-local passed = false
-local failed_list = {}
-
 local function trace(start_frame)
     local frame = start_frame
     while true do
@@ -40,6 +42,8 @@ end
 local function log(msg)
     if not quiet then
         print(msg)
+    end
+    if remote then
     end
 end
 
@@ -213,22 +217,42 @@ local function run_test(test_suite, test_name, test_function, ...)
     end
 end
 
-api.summary = function ()
-    log(done_tag)
-    local nfailed = #failed_list
-    if nfailed == 0 then
-        log(trepair_tag .. " " .. (ntests - npassed) .. " out of " .. ntests)
-        log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
-        os.exit(0)
-    else
-        log(trepair_tag .. " " .. ((ntests - nfailed) - npassed) .. " out of " .. ntests)
-        log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
-        log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":")
-        for _, test_name in ipairs(failed_list) do
-            log(failed_tag .. "\t" .. test_name)
+api.INIT = function(a)
+    local env = {
+        SUMMARY = function ()
+            log(done_tag)
+            local nfailed = #failed_list
+            if nfailed == 0 then
+                log(trepair_tag .. " " .. (ntests - npassed) .. " out of " .. ntests)
+                log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
+                os.exit(0)
+            else
+                log(trepair_tag .. " " .. ((ntests - nfailed) - npassed) .. " out of " .. ntests)
+                log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
+                log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":")
+                for _, test_name in ipairs(failed_list) do
+                    log(failed_tag .. "\t" .. test_name)
+                end
+                os.exit(1)
+            end
         end
-        os.exit(1)
-    end
+    }
+    local parser = argparse(a[0], "Options")
+    parser:option("-g --log", "Log to remote IP")
+    local args = parser:parse()
+    remote = args.log
+    return setmetatable(env, {
+        __index = function(_, m)
+           local rb, rm = pcall(require, "modules." .. m)
+           if not rb then
+              rb, rm = pcall(require, "cfg-modules." .. m)
+              if not rb then
+                  return log(string.format("%s%s\n%s\n", "Not found", m, rm))
+              end
+           end
+           return rm
+        end}
+    )
 end
 
 api.result = function ()
