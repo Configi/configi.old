@@ -238,9 +238,11 @@ api.INIT = function(a)
         end
     }
     local parser = argparse(a[0], "Options")
+    parser:flag("-q --quiet", "Silent output")
     parser:option("-g --log", "Log to remote IP")
     local args = parser:parse()
     remote = args.log
+    quiet = args.quiet
     return setmetatable(env, {
         __index = function(_, m)
            local rb, rm = pcall(require, "modules." .. m)
