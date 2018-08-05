@@ -28,7 +28,7 @@
   (tset C (.. "apt.installed :: " package)
     (fn []
       (if (= nil (found package))
-        (let [apt-get ["-q" "-y" "install" package]]
+        (let [apt-get ["--no-install-recommends" "-q" "-y" "install" package]]
           (tset apt-get "exe" (which "apt-get"))
           (C.equal 0 (exec.qexec apt-get)))
         (C.pass)))))
