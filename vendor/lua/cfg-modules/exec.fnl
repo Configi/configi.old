@@ -42,4 +42,5 @@
               (C.equal 0 (exec.qexec command)))
             (C.pass))))))
 (tset E "simple" simple)
+(tset E "spawn" simple)
 E
