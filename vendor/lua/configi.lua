@@ -218,6 +218,7 @@ local function run_test(test_suite, test_name, test_function, ...)
 end
 
 api.INIT = function(a)
+    local start = os.time()
     local env = {
         SUMMARY = function ()
             log(done_tag)
@@ -225,6 +226,7 @@ api.INIT = function(a)
             if nfailed == 0 then
                 log(trepair_tag .. " " .. (ntests - npassed) .. " out of " .. ntests)
                 log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
+                log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " seconds")
                 os.exit(0)
             else
                 log(trepair_tag .. " " .. ((ntests - nfailed) - npassed) .. " out of " .. ntests)
