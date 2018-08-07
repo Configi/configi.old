@@ -47,7 +47,7 @@ end
 
 local function log(msg, tag, name, tm)
   if not quiet then
-    print(msg)
+    fmt.print(msg.."\n")
   end
   if remote then
     seq = seq + 1
@@ -232,7 +232,7 @@ local function run_test(test_suite, test_name, test_function, ...)
     status, err = pcall(f, ...)
     if not status then
       failed = true
-      print(tostring(err))
+      fmt.print(tostring(err))
     end
   end
 
