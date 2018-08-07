@@ -151,6 +151,10 @@ api.fail = function(s)
   fail(tostring(s))
 end
 
+api.print = function(s)
+  log(s, "Output")
+end
+
 api.not_equal = function (l, r)
   if l == r then
     fail(tostring(l) .. " == " .. tostring(r))
