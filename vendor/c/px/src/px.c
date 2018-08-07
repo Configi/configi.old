@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
-#include <stdio.h>
 #include <spawn.h>
 #include <sys/poll.h>
 #include <sys/wait.h>
@@ -147,36 +146,17 @@ lclonetable(lua_State *L)
 }
 
 static int
-argtypeerror(lua_State *L, int narg, const char *expected)
+Chostname(lua_State *L)
 {
-	const char *got = luaL_typename(L, narg);
-	return luaL_argerror(L, narg,
-		lua_pushfstring(L, "%s expected, got %s", expected, got));
-}
-
-static lua_Integer
-checkinteger(lua_State *L, int narg, const char *expected)
-{
-	lua_Integer d = lua_tointeger(L, narg);
-	if (d == 0 && !lua_isinteger(L, narg))
-		 argtypeerror(L, narg, expected);
-	return d;
-}
-
-static int
-checkint(lua_State *L, int narg)
-{
-	return (int)checkinteger(L, narg, "int");
-}
-
-static int
-Cdprintf(lua_State *L)
-{
-	int fd = checkint(L, 1);
-	const char *str = luaL_checkstring(L, 2);
-	int ret = dprintf(fd, "%s\n", str);
-	lua_pushinteger(L, ret);
-	return 1;
+        char hostname[1026]; // NI_MAXHOST + 1
+        size_t len = 1025;
+        if (!gethostname(hostname, len)) {
+                hostname[1025] = '\0';
+                lua_pushstring(L, hostname);
+        } else {
+                return luaX_pusherror(L, "gethostname(2) error");
+        }
+        return 1;
 }
 
 /***
@@ -531,6 +511,7 @@ error:
 static const
 luaL_Reg syslib[] =
 {
+	{"hostname", Chostname},
 	{"chroot", Cchroot},
 	{"fdclose", Cfdclose},
 	{"flopen", Cflopen},
@@ -540,7 +521,6 @@ luaL_Reg syslib[] =
 	{"posix_spawn", Cposix_spawn},
 	{"table_copy", lclonetable},
 	{"table_clear", lcleartable},
-	{"dprintf", Cdprintf},
 	{NULL, NULL}
 };
 
