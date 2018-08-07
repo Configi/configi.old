@@ -24,7 +24,7 @@
 (defn active [unit]
   (tset C (.. "systemd.active :: " unit)
     (fn []
-      (if (= 0 (systemctl "is-active" unit))
+      (if (= 0 (systemctl "-q" "is-active" unit))
         (C.pass)
         (do
           (systemctl "daemon-reload")
