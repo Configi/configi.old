@@ -7,7 +7,11 @@ local quiet = false
 local grey = false
 local test_regex = false
 local remote = false
+local UUID = false
+local seq = 0
 local argparse = require"argparse"
+local lib = require"lib"
+local fmt = lib.fmt
 
 local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m" end
 local function blue(str)   return grey and str or "\27[1;34m" .. str .. "\27[0m" end
@@ -26,31 +30,60 @@ local tpass_tag    = green  "  Compliant :"
 local trepair_tag  = green  "   Repaired :"
 local failed_tag   = red    "     Failed :"
 
-local function trace(start_frame)
+local function trace(msg, start_frame)
+  local o = {msg}
   local frame = start_frame
   while true do
     local info = debug.getinfo(frame, "Sl")
     if not info then break end
     local d = frame - start_frame
     if ((d >= 3) and (d <= 4)) then
-      print("  --> " .. (string.gsub(info.source, "%.", "/")) ..  ".lua:" .. info.currentline)
+      o[#o + 1] = "  --> " .. (string.gsub(info.source, "%.", "/")) ..  ".lua:" .. info.currentline
     end
     frame = frame + 1
   end
+  return table.concat(o,"\n")
 end
 
-local function log(msg)
+local function log(msg, tag, name, tm)
   if not quiet then
     print(msg)
   end
   if remote then
+    seq = seq + 1
+    tmsg, msg = pcall(string.gsub, msg, string.char(27).."[%d%p]+m", "")
+    if not tmsg then msg = nil end
+    if tag and string.find(tag, "^"..string.char(27)) then
+      ttag, tag = pcall(string.match, tag, string.char(27).."[%d%p]+m[%s]+([%w]+)[%s]+:"..string.char(27))
+      if not ttag then tag = nil end
+    end
+    local json = require"dkjson"
+    local px = require"px"
+    local payload = json.encode({ version = "1.1",
+                                     host = px.hostname(),
+                            short_message = "configi: " .. (tag or ""),
+                             full_message = (name or msg),
+                                    _uuid = UUID,
+                                _sequence = seq,
+                                 _elapsed = (tm or nil)})
+    local ip, port = string.match(remote, "([%d]+%.[%d]+%.[%d]+%.[%d]*)[%:]?([%d]*)")
+    if port == "" then port = 12201 end
+    local socket = require"lsocket"
+    local client, err = socket.connect(ip, port)
+    socket.select(nil, {client})
+    local ok , err = client:status()
+    if not ok then fmt.warn("Error connecting to remote GELF endpoint. ("..err..")\n") end
+    ok, err = client:send(payload)
+    if not ok then fmt.warn("Error connecting to remote GELF endpoint. ("..err..")\n") end
+    client:close()
   end
 end
 
 local function fail(msg, start_frame)
   failed = true
-  print("Fail: " .. msg)
-  trace(start_frame or 4)
+  msg = "Fail: " .. msg
+  local backtrace = trace(msg, start_frame or 4)
+  log(backtrace, "FAIL")
 end
 
 local function pass()
@@ -176,13 +209,13 @@ local function run_test(test_suite, test_name, test_function, ...)
   end
 
   if test_suite.disabled then
-    log(disabled_tag .. " " .. full_test_name)
+    log(disabled_tag .. " " .. full_test_name, disabled_tag)
     return
   end
 
 
   if suite_name ~= last_test_suite then
-    log(configi_tag)
+    log(configi_tag, "Begin")
     last_test_suite = suite_name
   end
 
@@ -190,7 +223,7 @@ local function run_test(test_suite, test_name, test_function, ...)
   failed = false
   passed = false
 
-  log(start_tag .. " " .. full_test_name)
+  log(start_tag .. " " .. full_test_name, start_tag, full_test_name)
 
   local start = os.time()
 
@@ -205,11 +238,10 @@ local function run_test(test_suite, test_name, test_function, ...)
 
   local stop = os.time()
 
+  local difftime = os.difftime(stop, start)
   local is_test_failed = not status or failed
-  log(string.format("%s %s = %d sec",
-      (is_test_failed and fail_tag) or (passed and pass_tag) or repair_tag,
-      full_test_name,
-    os.difftime(stop, start)))
+  local tag = (is_test_failed and fail_tag) or (passed and pass_tag) or repair_tag
+  log(string.format("%s %s = %d sec", tag, full_test_name, difftime), tag, full_test_name, difftime)
 
   if is_test_failed then
     table.insert(failed_list, full_test_name)
@@ -220,19 +252,19 @@ api.INIT = function(a)
   local start = os.time()
   local env = {
     SUMMARY = function ()
-      log(done_tag)
+      log(done_tag, "Done")
       local nfailed = #failed_list
       if nfailed == 0 then
-        log(trepair_tag .. " " .. (ntests - npassed) .. " out of " .. ntests)
-        log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
-        log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " seconds")
+        log(trepair_tag .. " " .. (ntests - npassed) .. " out of " .. ntests, "Summary")
+        log(tpass_tag .. " " .. npassed .. " out of " .. ntests, "Summary")
+        log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " seconds", "Summary")
         os.exit(0)
       else
-        log(trepair_tag .. " " .. ((ntests - nfailed) - npassed) .. " out of " .. ntests)
-        log(tpass_tag .. " " .. npassed .. " out of " .. ntests)
-        log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":")
+        log(trepair_tag .. " " .. ((ntests - nfailed) - npassed) .. " out of " .. ntests, "Summary")
+        log(tpass_tag .. " " .. npassed .. " out of " .. ntests, "Summary")
+        log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":", "Summary")
         for _, test_name in ipairs(failed_list) do
-          log(failed_tag .. "\t" .. test_name)
+          log(failed_tag .. "\t" .. test_name, "Summary")
         end
         os.exit(1)
       end
@@ -240,9 +272,14 @@ api.INIT = function(a)
   }
   local parser = argparse(a[0], "Options")
   parser:flag("-q --quiet", "Silent output")
-  parser:option("-g --log", "Log to remote IP")
+  parser:option("-g --log", "Log to remote GELF TCP endpoint. Example: '127.0.0.1:12201'")
   local args = parser:parse()
   remote = args.log
+  if remote then
+    local uuid = require"uuid"
+    uuid.seed()
+    UUID = uuid.new()
+  end
   quiet = args.quiet
   return setmetatable(env, {
       __index = function(_, m)
