@@ -30,6 +30,7 @@
       (if (= nil (found package))
         (let [apt-get ["--no-install-recommends" "-q" "-y" "install" package]]
           (tset apt-get "exe" (which "apt-get"))
+          (tset apt-get "env" "DEBIAN_FRONTEND=noninteractive")
           (C.equal 0 (exec.qexec apt-get)))
         (C.pass)))))
 (tset A "installed" installed)
