@@ -21,7 +21,7 @@
 ;; Author: Eduardo Tongson <propolice@gmail.com>
 ;; License: MIT <http://opensource.org/licenses/MIT>
 ;;
-;; exec.simple
+;; exec.spawn
 ;;
 ;; Run executable and arguments through posix_spawn(3).
 ;; A path can be checked before running the executable.
@@ -40,15 +40,15 @@
 ;;     Pass     = The specified path of file passed in the `expects` parameter already exists.
 ;;
 ;; Examples:
-;;     exec.simple("/bin/touch"){
+;;     exec.spawn("/bin/touch"){
 ;;       args = "/tmp/touch",
 ;;       expects = "/tmp/touch"
 ;;     }
-(defn simple [exe]
+(defn spawn [exe]
   (fn [p]
     (local path (. p "expects"))
     (local args (. p "args"))
-    (tset C (.. "exec.simple :: " exe)
+    (tset C (.. "exec.spawn :: " exe)
       (fn []
           (if (or (= nil path) (= nil (stat.stat path)))
             (let [command (string.to_table args)]
@@ -77,7 +77,7 @@
                   (C.pass)
                   (C.equal 0 code)))
               (C.pass))))))))
-(tset E "simple" simple)
-(tset E "spawn" simple)
+(tset E "spawn" spawn)
+(tset E "simple" spawn)
 (tset E "script" script)
 E
