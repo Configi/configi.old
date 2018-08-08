@@ -55,6 +55,44 @@
               (tset command "exe" exe)
               (C.equal 0 (exec.qexec command)))
             (C.pass))))))
+;; Author: Eduardo Tongson <propolice@gmail.com>
+;; License: MIT <http://opensource.org/licenses/MIT>
+;;
+;; exec.script
+;;
+;; Runs a shell script through popen(3).
+;; A path can be checked before running the executable.
+;;
+;; The Lua module should return the body of the script.
+;; Example:
+;;     $ cat src/lua/scripts/script.lua
+;;     return [==[
+;;     echo "test"
+;;     touch "./file"
+;;     ]==]
+;; In the above example, the basename of the filename 'script' is the argument to exec.script()
+;;
+;; Arguments:
+;;     (string) = Name of shell script sourced from `src/lua/scripts`
+;;
+;; Parameters:
+;;     (table)
+;;         expects = A precondition. Path MUST NOT exist before running the executable.
+;;          ignore = if set to `true`, always pass, the shell scripts return result is ignored.
+;;          output = if set to `true`, show the popen(3) output.
+;;
+;; Results:
+;;     Repaired = Successfully executed.
+;;     Fail     = Error encountered when running script.
+;;     Pass     = The specified path of file passed in the `expects` parameter already exists. Or the popen(3) result is ignored.
+;;
+;; Examples:
+;;     exec.script("script"){
+;;       expects = "/tmp/touch",
+;;       output = true,
+;;       ignore = true
+;;     }
+;;
 (defn script [str]
   (fn [p]
     (local s (require (.. "scripts." str)))
