@@ -65,7 +65,7 @@
 ;; Parameters:
 ;;     (table)
 ;;         expects = A precondition. Path MUST NOT exist before running the executable.
-;;          ignore = if set to `true`, always pass, the shell scripts return result is ignored.
+;;          ignore = if set to `true`, always run the script, the shell script's return result is ignored.
 ;;          output = if set to `true`, show the popen(3) output.
 ;;
 ;; Results:
