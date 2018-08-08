@@ -5,19 +5,6 @@
 (local stat (require "posix.sys.stat"))
 (global _ENV nil)
 
-(defn popen [str ignore]
-  (local R {})
-  (tset R "output" {})
-  (tset R "exe" "io.popen")
-  (let [pipe (io.popen str "r")]
-    (io.flush pipe)
-    (each [ln (: pipe :lines)]
-      (tset R.output (+ 1 (# R.output)) ln))
-    (let [(_ _ code) (io.close pipe)]
-      (tset R "code" code)
-      (if (or (= 0 code) ignore)
-        (values code R)
-        (values nil R)))))
 ;; Author: Eduardo Tongson <propolice@gmail.com>
 ;; License: MIT <http://opensource.org/licenses/MIT>
 ;;
@@ -93,6 +80,19 @@
 ;;       ignore = true
 ;;     }
 ;;
+(defn popen [str ignore]
+  (local R {})
+  (tset R "output" {})
+  (tset R "exe" "io.popen")
+  (let [pipe (io.popen str "r")]
+    (io.flush pipe)
+    (each [ln (: pipe :lines)]
+      (tset R.output (+ 1 (# R.output)) ln))
+    (let [(_ _ code) (io.close pipe)]
+      (tset R "code" code)
+      (if (or (= 0 code) ignore)
+        (values code R)
+        (values nil R)))))
 (defn script [str]
   (fn [p]
     (local s (require (.. "scripts." str)))
