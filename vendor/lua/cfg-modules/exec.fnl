@@ -48,7 +48,9 @@
 ;; exec.script
 ;;
 ;; Runs a shell script through popen(3).
-;; A path can be checked before running the executable.
+;; The script is passed to /bin/sh using the -c flag; interpretation, if any, is performed by the shell.
+;;
+;; As a precondition, a path can be checked before running the script.
 ;;
 ;; The Lua module should return the body of the script.
 ;; Example:
