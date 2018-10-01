@@ -39,6 +39,6 @@ write = (key) ->
             if v == file.read_line k
                 return C.pass!
             else
-                C.is_true file.write_all(k, v)
+                return C.is_true file.write_all(k, v)
 S["write"] = write
 S
