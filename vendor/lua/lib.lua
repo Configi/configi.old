@@ -1,8 +1,8 @@
---- Configi standard library.
+--- omnia standard library.
 -- Lua extensions and some unix utilities.
--- Depends on cimicida and Luaposix.
+-- Depends on the following:
 --     VENDOR= lib cimicida inspect
---     VENDOR_C= posix px
+--     VENDOR_C= posix px array auxlib
 -- @module lib
 
 local rename, strlen, select, setmetatable, next, ipairs, require, type =
@@ -215,15 +215,6 @@ function fd.write(f, buf)
     ::continue::
   end
   return true
-end
-
-function fd.printf(f, buf)
-  local r = P.dprintf(f, buf)
-  if r > 0 then
-    return r
-  else
-    return nil, "dprintf(3) error."
-  end
 end
 
 function file.stat(str)

@@ -1,5 +1,5 @@
 T = require "u-test"
-
+REPL = require"moor"
 T["Function from a vendor/c module(lfs)"] = ->
   with T
     lfs = require"lfs"
@@ -14,7 +14,7 @@ T["Function from a src/lua module(src)"] = ->
   with T
     src = require"src"
     .equal(type(src.src), "function")
-
+REPL()
 T["Function from a src/lua module directory (moonscript) (moon.src)"] = ->
   with T
     moon_slash_src = require"moon.src"
