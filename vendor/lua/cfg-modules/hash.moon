@@ -1,6 +1,6 @@
 C = require"configi"
-lib = require"lib"
-{file} = lib
+tostring = tostring
+{:file} = require"lib"
 bin = require"plc.bin"
 shasum = require"plc.sha2"
 H = {}
