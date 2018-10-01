@@ -41,3 +41,4 @@ sha2 = (path) ->
             else
                 C.fail"file not found."
 H["sha2"] = sha2
+H
