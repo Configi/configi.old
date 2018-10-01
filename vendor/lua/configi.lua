@@ -51,6 +51,7 @@ local function log(msg, tag, name, tm)
   end
   if remote then
     seq = seq + 1
+    local tmsg, ttag
     tmsg, msg = pcall(string.gsub, msg, string.char(27).."[%d%p]+m", "")
     if not tmsg then msg = nil end
     if tag and string.find(tag, "^"..string.char(27)) then
@@ -69,7 +70,7 @@ local function log(msg, tag, name, tm)
     local ip, port = string.match(remote, "([%d]+%.[%d]+%.[%d]+%.[%d]*)[%:]?([%d]*)")
     if port == "" then port = 12201 end
     local socket = require"lsocket"
-    local client, err = socket.connect(ip, port)
+    local client = socket.connect(ip, port)
     socket.select(nil, {client})
     local ok , err = client:status()
     if not ok then fmt.warn("Error connecting to remote GELF endpoint. ("..err..")\n") end
