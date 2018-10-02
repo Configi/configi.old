@@ -61,7 +61,7 @@ port = (type) ->
             if nil == table.find(t.stdout, "#{type}%s+#{protocol}%s+[%d]*[%s,]nport")
                 semanage = {"port", "-a", "-t", type, "-p", protocol, nport}
                 semanage.exe = "/usr/sbin/semanage"
-                return C.equal(0, qexec(semanage), "semanage(8) execution failure.")
+                return C.equal(0, qexec(semanage), "Execution failure. semanage(8) returned non-zero value.")
             else
                 return C.pass!
 S["permissive"] = permissive
