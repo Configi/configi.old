@@ -51,7 +51,7 @@ systemd = (m) ->
         return C.fail "Unable to copy the Configi executable to '#{dest}'." unless install("-m", "0755", "-o", "root", "-g", "root", "-D", dest)
         return C.fail "Unable to write the systemd timer (#{timer_path})." unless file.write(timer_path, timer)
         return C.fail "Unable to write the systemd service (#{service_path})." unless file.write(service_path, service)
-        return C.fail "Unable to reload systemd units." unless systemctl "daemon-reload"
+        return C.fail "Unable to reload systemd daemon." unless systemctl "daemon-reload"
         return C.fail "Unable to enable Configi systemd timer." unless systemctl("enable", "configi")
         return C.fail "Unable to start Configi systemd timer." unless systemctl("start", "configi")
         return C.equal(0, systemctl("is-active", "configi"), "systemctl(1) returned non-zero when checking if Configi is active.")
