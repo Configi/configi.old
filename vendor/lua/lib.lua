@@ -485,7 +485,7 @@ end
 function exec.context(exe)
   local args
   if strlen(path.split(exe)) == 0 then
-    args = {exe = path.bin(exe)}
+    args = {exe = exec.path(exe)}
   else
     args = {exe = exe}
   end
@@ -519,7 +519,7 @@ exec.cmd = setmetatable({}, {__index =
     end
     -- Search common executable directories if not a full path.
     if strlen(path.split(exe)) == 0 then
-      exe = path.bin(exe)
+      exe = exec.path(exe)
     end
     return function(...)
       local args
