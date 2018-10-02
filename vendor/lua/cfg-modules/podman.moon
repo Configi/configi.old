@@ -43,9 +43,9 @@ image = (i) ->
 --     podman.update("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 update = (i) ->
     C["podman.update :: #{i}"] = ->
-        if nil == exec.path "podman" return C.fail"podman(1) executable not found."
+        return C.fail "podman(1) executable not found." unless exec.path "podman"
         r, t = exec.popen "podman pull #{i}"
-        if nil == r return C.fail"Failed to update image."
+        return C.fail "Failed to update container image. podman(1) returned '#{t.code}'." unless r
         if nil == table.find(t.output, "Copying blob", true)
             return C.pass!
         else
