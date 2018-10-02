@@ -1,123 +1,96 @@
-(local C (require "configi"))
-(local F {})
-(local lib (require "lib"))
-(local (require pairs tostring) (values require pairs tostring))
-(local (string os exec file which) (values lib.string lib.os lib.exec lib.file lib.path.bin))
-(local stat (require "posix.sys.stat"))
-(local Ppwd (require "posix.pwd"))
-(local Pgrp (require "posix.grp"))
-(global _ENV nil)
-(defn owner [path]
-  (fn [p]
-    (local user (tostring (. p "user")))
-    (let [info (stat.stat path)
-          u (Ppwd.getpwuid info.st_uid)]
-      (var uid (tostring info.st_uid))
-      (var pw_uid (tostring info.st_uid))
-      (var pw_name (tostring info.st_uid))
-      (when (~= nil u)
-        (set uid (string.format "%s(%s)" u.pw_uid u.pw_name))
-        (set pw_uid u.pw_uid)
-        (set pw_name u.pw_name))
-      (tset C (.. "file.owner :: " path " " uid " -> " user)
-       (fn []
-          (if (= nil (which "chown"))
-            (C.fail "chown(1) executable not found"))
-          (if (or (= user pw_name) (= user (tostring pw_uid)))
-            (C.pass true)
-            (let [chown (exec.ctx "chown")]
-              (C.equal 0 (chown user path)))))))))
-(defn group [path]
-  (fn [p]
-    (local grp (tostring (. p "group")))
-    (let [info (stat.stat path)
-          g (Pgrp.getgrgid info.st_gid)]
-      (var cg (tostring info.st_gid))
-      (var gr_gid (tostring info.st_gid))
-      (var gr_name (tostring info.st_gid))
-      (when (~= nil g)
-        (set cg (string.format "%s(%s)" g.gr_gid g.gr_name))
-        (set gr_gid g.gr_gid)
-        (set gr_name g.gr_name))
-      (tset C (.. "file.group :: " path " "  cg " -> " grp)
-        (fn []
-          (if (= nil (which "chgrp"))
-            (C.fail "chgrp(1) executable not found"))
-          (if (or (= grp gr_name) (= grp (tostring gr_gid)))
-            (C.pass true)
-            (let [chgrp (exec.ctx "chgrp")]
-              (C.equal 0 (chgrp grp path)))))))))
-(defn directory [d]
-  (tset C (.. "file.directory :: " d)
-    (fn []
-      (if (= nil (which "mkdir"))
-        (C.fail "mkdir(1) executable not found"))
-      (let [mkdir (exec.ctx "mkdir")]
-        (if (= d (os.is_dir d))
-          (C.pass true)
-          (C.equal 0 (mkdir "-p" d)))))))
-(defn absent [f]
-  (tset C (.. "file.absent :: " f)
-    (fn []
-      (if (= nil (which "rm"))
-        (C.fail "rm(1) executable not found"))
-      (let [rm (exec.ctx "rm")]
-        (if (= nil (stat.stat f))
-          (C.pass true)
-          (C.equal 0 (rm "-r" "-f" f)))))))
-(defn managed [f]
-  (each [k v (pairs (require (.. "files." f)))]
-    (tset C (.. "file.managed :: " k ":"  v.path)
-      (fn []
-        (let [contents (file.read_to_string v.path)]
-          (if (= contents v.contents)
-            (C.pass)
-            (C.equal true (file.write v.path v.contents))))))))
-(defn templated [f]
-  (fn [p]
-    (each [k v (pairs (require (.. "files." f)))]
-      (tset C (.. "file.templated :: " k ":"  v.path)
-        (fn []
-          (let [contents (file.read_to_string v.path)
-                payload (string.template v.contents p)]
-            (if (= contents payload)
-              (C.pass)
-              (C.equal true (file.write v.path payload)))))))))
-(defn chmod [f]
-  (fn [p]
-    (let [mode-arg (tostring (. p "mode"))
-          info (stat.stat f)
-          len (- 0 (string.len mode-arg))
-          current-mode (string.sub (tostring (string.format "%o" info.st_mode)) len -1)]
-      (tset C (.. "file.mode :: " f ": " current-mode " -> " mode-arg)
-        (fn []
-          (if (= nil (which "chmod"))
-            (C.fail "chmod(1) executable not found"))
-          (if (= current-mode (string.sub mode-arg len -1))
-            (C.pass)
-            (let [chmod1 (exec.ctx "chmod")]
-              (C.equal 0 (chmod1 mode-arg f)))))))))
-(defn copy [f]
-  (fn [p]
-    (local destination (. p "target"))
-    (tset C (.. "file.copy :: " f " -> " destination)
-      (fn []
-        (if (= nil (which "cp"))
-          (C.fail "cp(1) executable not found"))
-        (if (= nil (file.stat destination))
-          (let [cp ["-R" "-f" f destination]]
-            (tset cp "exe" (which "cp"))
-            (C.equal 0 (exec.qexec(cp))))
-          (C.pass))))))
-(tset F "directory" directory)
-(tset F "absent" absent)
-(tset F "managed" managed)
-(tset F "templated" templated)
-(tset F "owner" owner)
-(tset F "chown" owner)
-(tset F "group" group)
-(tset F "chgrp" group)
-(tset F "chmod" chmod)
-(tset F "access" chmod)
-(tset F "copy" copy)
+require, pairs, tostring = require, pairs, tostring
+C = require "configi"
+F = {}
+{:string, :os, :exec, :file} = require "lib"
+stat = require "posix.sys.stat"
+Ppwd = require "posix.pwd"
+Pgrp = require "posix.grp"
+export _ENV = nil
+owner = (path) ->
+    return C.fail "chown(1) executable not found." if nil == exec.path "chown"
+    return (p) ->
+        user = tostring p.user
+        info = stat.stat path
+        uid = tostring info.st_uid
+        pw_uid = tostring info.st_uid
+        pw_name = tostring info.st_uid
+        if u = Ppwd.getpwuid info.st_uid
+            uid = string.format("%s(%s)", u.pw_uid, u.pw_name)
+            pw_uid = u.pw_uid
+            pw_name = u.pw_name
+        C["file.owner :: #{path} #{uid} -> #{user}"] = ->
+            return C.pass! if user == pw_name or user == tostring pw_uid
+            return C.equal(0, exec.ctx("chown")(user, path), "Failure running chown(1).")
+group = (path) ->
+    return C.fail "chgrp(1) executable not found." if nil == exec.path "chgrp"
+    return (p) ->
+        grp = tostring p.group
+        info = stat.stat path
+        cg = tostring info.st_gid
+        gr_gid = tostring info.st_gid
+        gr_name = tostring info.st_gid
+        if g = Pgrp.getgrgid info.st_gid
+            cg = string.format("%s(%s)", g.gr_gid, g.gr_name)
+            gr_gid = g.gr_gid
+            gr_name = g.gr_name
+        C["file.group :: #{path} #{cg} -> #{grp}"] = ->
+            return C.pass! if grp == gr_name or grp == tostring gr_gid
+            return C.equal(0, exec.ctx("chgrp")(grp, path), "Failure running chgrp(1).")
+directory = (d) ->
+    return C.fail "mkdir(1) executable not found." if nil == exec.path "mkdir"
+    C["file.directory :: #{d}"] = ->
+        return C.pass! if os.is_dir d
+        return C.equal(0, exec.ctx("mkdir")("-p", d), "Failure creating directory #{d}.")
+absent = (f) ->
+    return C.fail "rm(1) executable not found." if nil == exec.path "rm"
+    C["file.absent :: #{f}"] = ->
+        return C.pass! if nil == stat.stat f
+        return C.equal(0, exec.ctx("rm")("-r", "-f", f), "Failure deleting #{f}.")
+managed = (f) ->
+    m = require "files.#{f}"
+    return C.fail "Source not found." if nil == m
+    for k, v in pairs m
+        C["file.managed :: #{k}: #{v.path}"] = ->
+            contents = file.read_to_string v.path
+            return C.pass! if contents == v.contents
+            return C.equal(true, file.write(v.path, v.contents), "Failure writing contents to #{v.path}.")
+templated = (f) ->
+    m = require "files.#{f}"
+    return C.fail "Source not found." if nil == m
+    return (p) ->
+        for k, v in pairs m
+            C["file.templated :: #{k}: #{v.path}"] = ->
+                payload = string.template(v.contents, p)
+                return C.pass! if file.read_to_string(v.path) == payload
+                return C.equal(true, file.write(v.path, payload), "Failure writing contents to #{v.path}.")
+chmod = (f) ->
+    return C.fail "chmod(1) executable not found" if nil == exec.path "chmod"
+    return (p) ->
+        mode_arg = tostring p.mode
+        info = stat.stat f
+        len = 0 - string.len mode_arg
+        current_mode = string.sub(tostring(string.format("%o", info.st_mode)), len, -1)
+        C["file.mode :: #{f}: #{current_mode} -> #{mode_arg}"] = ->
+            return C.pass! if current_mode == string.sub(mode_arg, len, -1)
+            return C.equal(0, exec.ctx("chmod")(mode_arg, f), "Failure running chmod(1) on #{f}.")
+copy = (f) ->
+    return C.fail "cp(1) executable not found" if nil == exec.path "cp"
+    return (p) ->
+        destination = p.target
+        force = p.force or p.overwrite
+        C["file.copy :: #{f} -> #{destination}"] = ->
+            return C.pass! if file.stat destination and not force
+            if nil == file.stat destination or force
+                return C.equal(0, exec.ctx("cp")("-R", "-f", f, destination), "Failure copying #{f} to #{destination}.")
+F["directory"] = directory
+F["absent"] = absent
+F["managed"] = managed
+F["templated"] = templated
+F["owner"] = owner
+F["chown"] = owner
+F["group"] = group
+F["chgrp"] = group
+F["chmod"] = chmod
+F["access"] = chmod
+F["copy"] = copy
 F
