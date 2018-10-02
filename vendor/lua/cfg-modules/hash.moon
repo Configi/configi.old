@@ -39,6 +39,6 @@ sha2 = (path) ->
                 else
                     C.fail"Unexpected hash digest: #{hash256}"
             else
-                C.fail"file not found."
+                C.fail"file (#{path}) not found."
 H["sha2"] = sha2
 H
