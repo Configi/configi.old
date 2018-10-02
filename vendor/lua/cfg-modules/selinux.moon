@@ -1,6 +1,6 @@
-C = require"configi"
+C = require "configi"
 S = {}
-{:exec, :table} = require"lib"
+{:exec, :table} = require "lib"
 {:cmd, :qexec} = exec
 export _ENV = nil
 -- Author: Eduardo Tongson <propolice@gmail.com>
