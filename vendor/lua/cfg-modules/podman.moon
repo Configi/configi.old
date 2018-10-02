@@ -1,6 +1,6 @@
-C = require"configi"
+C = require "configi"
 P = {}
-{:exec, :table, :path} = require"lib"
+{:exec, :table} = require "lib"
 export _ENV = nil
 -- Author: Eduardo Tongson <propolice@gmail.com>
 -- License: MIT <http://opensource.org/licenses/MIT>
@@ -22,8 +22,8 @@ export _ENV = nil
 --     podman.image("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 image = (i) ->
     C["podman.image :: #{i}"] = ->
-        if nil == path.bin"podman" return C.fail"podman(1) executable not found."
-        unless nil == exec.popen"podman history #{i}"
+        if nil == exec.path "podman" return C.fail"podman(1) executable not found."
+        unless nil == exec.popen "podman history #{i}"
             return C.pass!
         else
             return C.equal(0, exec.popen("podman pull #{i}"))
@@ -43,8 +43,8 @@ image = (i) ->
 --     podman.update("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 update = (i) ->
     C["podman.update :: #{i}"] = ->
-        if nil == path.bin"podman" return C.fail"podman(1) executable not found."
-        r, t = exec.popen("podman pull #{i}")
+        if nil == exec.path "podman" return C.fail"podman(1) executable not found."
+        r, t = exec.popen "podman pull #{i}"
         if nil == r return C.fail"Failed to update image."
         if nil == table.find(t.output, "Copying blob", true)
             return C.pass!
