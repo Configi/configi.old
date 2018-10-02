@@ -221,7 +221,7 @@ function file.stat(str)
   if stat.stat(str) then return str end
 end
 
-function path.bin(bin)
+function exec.path(bin)
   -- If executable is not in any of these directories then it should be using the complete path.
   local t = { "/usr/bin/", "/bin/", "/usr/sbin/", "/sbin/", "/usr/local/bin/", "/usr/local/sbin/" }
   for _, p in ipairs(t) do
@@ -572,4 +572,5 @@ function time.unix(t, f)
   return ptime.strftime(f, ptime.gmtime(t))
 end
 
+path.bin = exec.path
 return _ENV
