@@ -30,12 +30,12 @@ export _ENV = nil
 --     }
 write = (key) ->
     return (p) ->
-        if nil == p.value return C.fail "required table key 'value' missing."
         value = tostring p.value
         C["sysctl.write :: #{key} = #{value}"] = ->
+            return C.fail "Required parameter key 'value' missing." unless p.value
             k = "/proc/sys/" .. gsub(key, "%.", "/")
             v = tostring value
-            if nil == file.stat(k) return C.fail "sysctl key not found"
+            return C.fail "Sysctl key not found" unless file.stat(k)
             if v == file.read_line k
                 return C.pass!
             else
