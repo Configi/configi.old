@@ -20,13 +20,14 @@ export _ENV = nil
 --
 -- Examples:
 --    selinux.permissive("container_t")
-permissive = (type) ->
-    C["selinux.permissive :: #{type}"] = ->
+permissive = (setype) ->
+    C["selinux.permissive :: #{setype}"] = ->
+        return C.fail "semanage(8) executable not found." unless exec.path "semanage"
         _, t = cmd.semanage("permissive", "-l")
-        if nil == table.find(t.stdout, type)
-            semanage = {"permissive", "-a", type}
+        if nil == table.find(t.stdout, setype)
+            semanage = {"permissive", "-a", setype}
             semanage.exe = "/usr/sbin/semanage"
-            return C.equal(0, qexec(semanage))
+            return C.equal(0, qexec(semanage), "Unable to set '#{setype}' to permissive. semanage(8) returned non-zero value.")
         else
             return C.pass!
 -- selinux.port
