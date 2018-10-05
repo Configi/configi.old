@@ -36,9 +36,7 @@ write = (key) ->
             k = "/proc/sys/" .. gsub(key, "%.", "/")
             v = tostring value
             return C.fail "Sysctl key (#{k}) not found." unless file.stat(k)
-            if v == file.read_line k
-                return C.pass!
-            else
-                return C.is_true file.write_all(k, v)
+            return C.pass! if v == file.read_line k
+            return C.is_true(file.write_all(k, v), "Unable to write to key (#{key}).")
 S["write"] = write
 S
