@@ -35,7 +35,7 @@ write = (key) ->
             return C.fail "Required parameter key 'value' missing." unless p.value
             k = "/proc/sys/" .. gsub(key, "%.", "/")
             v = tostring value
-            return C.fail "Sysctl key not found" unless file.stat(k)
+            return C.fail "Sysctl key (#{k}) not found." unless file.stat(k)
             if v == file.read_line k
                 return C.pass!
             else
