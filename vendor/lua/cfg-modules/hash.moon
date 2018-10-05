@@ -1,8 +1,8 @@
-C = require"configi"
+C = require "configi"
 tostring = tostring
-{:file} = require"lib"
-bin = require"plc.bin"
-shasum = require"plc.sha2"
+{:file} = require "lib"
+bin = require "plc.bin"
+shasum = require "plc.sha2"
 H = {}
 export _ENV = nil
 -- Author: Eduardo Tongson <propolice@gmail.com>
