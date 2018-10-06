@@ -148,7 +148,7 @@ U["hash.sha2"] = function()
     os.execute("rm -f " .. f)
     r, t = T"hash.sha2"
     U.is_nil(r)
-    U.is_true(table.find(t.output, "Fail: file (tmp/____configi_test_hash_sha2) not found.", true))
+    U.is_true(table.find(t.output, "File (tmp/____configi_test_hash_sha2) not found.", true))
   end
 end
 os.execute "rmdir tmp"
