@@ -40,7 +40,7 @@ installed = (package) ->
 --     Fail     = Failed to perform distribution upgrade.
 --
 -- Examples:
---     zypper.du()
+--     zypper.dup()
 distupgrade = ->
     C["zypper.distupgrade"] = ->
         zypper.exe = exec.path "zypper"
@@ -51,5 +51,5 @@ Z["install"] = installed
 Z["in"] = installed
 Z["distupgrade"] = distupgrade
 Z["dist_upgrade"] = distupgrade
-Z["du"] = distupgrade
+Z["dup"] = distupgrade
 Z
