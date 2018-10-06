@@ -59,9 +59,11 @@ scan = (p) ->
 --     }
 open = (port) ->
     return (p) ->
+        return C.fail "Required `port` argument not set." unless port
         p.port = tostring port
 		p.protocol = tolower p.protocol
         C.parameter(p)
+        -- Default is TCP to localhost and expect boolean true from scan()
         p\set_if_not("protocol", "tcp")
         p\set_if_not("host", "127.0.0.1")
         p\set_if_not("expect", true)
