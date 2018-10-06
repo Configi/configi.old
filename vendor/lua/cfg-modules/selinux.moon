@@ -58,12 +58,12 @@ port = (type) ->
         protocol = p.protocol
         C["selinux.port :: #{type} + #{protocol}:#{nport}"] = ->
             _, t = cmd.semanage("port", "-l")
-            if nil == table.find(t.stdout, "#{type}%s+#{protocol}%s+[%d]*[%s,]nport")
+            unless nil == table.find(t.stdout, "#{type}%s+#{protocol}%s+[%d]*[%s,]nport")
+                return C.pass!
+            else
                 semanage = {"port", "-a", "-t", type, "-p", protocol, nport}
                 semanage.exe = "/usr/sbin/semanage"
                 return C.equal(0, qexec(semanage), "Execution failure. semanage(8) returned non-zero value.")
-            else
-                return C.pass!
 S["permissive"] = permissive
 S["port"] = port
 S
