@@ -117,6 +117,7 @@ end
 local api = { test_suite_name = "__root", disabled = false }
 
 api.parameter = function (p)
+  p = p or {}
   return setmetatable(p, { __index = {
     set_if_not = function(self, test, value)
       if not self[test] then
@@ -130,9 +131,9 @@ api.parameter = function (p)
     end}})
 end
 
-api.equal = function (l, r)
+api.equal = function (l, r, m)
   if l ~= r then
-    fail(tostring(l) .. " ~= " .. tostring(r))
+    fail(tostring(l) .. " ~= " .. tostring(r) .. "\n" .. m)
   end
   return true, "ok"
 end
@@ -177,9 +178,9 @@ api.is_false = function (maybe_false)
   return true, "ok"
 end
 
-api.is_true = function (maybe_true)
+api.is_true = function (maybe_true, m)
   if not maybe_true or type(maybe_true) ~= "boolean" then
-    fail("got " .. tostring(maybe_true) .. " instead of true")
+    fail("got " .. tostring(maybe_true) .. " instead of true" .. "\n" .. m)
   end
   return true, "ok"
 end
