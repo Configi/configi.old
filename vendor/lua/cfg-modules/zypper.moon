@@ -28,6 +28,19 @@ installed = (package) ->
             return C.equal(0, exec.qexec(zypper), "Unable to install package.")
         else
             return C.pass!
+-- Author: Eduardo Tongson <propolice@gmail.com>
+-- License: MIT <http://opensource.org/licenses/MIT>
+--
+-- zypper.distupgrade
+--
+-- Perform a distribution upgrade through zypper.
+--
+-- Results:
+--     Repaired = Successfully perform distribution upgrade.
+--     Fail     = Failed to perform distribution upgrade.
+--
+-- Examples:
+--     zypper.du()
 distupgrade = ->
     C["zypper.distupgrade"] = ->
         zypper.exe = exec.path "zypper"
