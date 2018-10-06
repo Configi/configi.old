@@ -61,7 +61,7 @@ templated = (f) ->
         for k, v in pairs m
             C["file.templated :: #{k}: #{v.path}"] = ->
                 payload = string.template(v.contents, p)
-                return C.pass! if payload === file.read v.path
+                return C.pass! if payload == file.read v.path
                 return C.equal(true, file.write(v.path, payload), "Failure writing contents to #{v.path}.")
 chmod = (f) ->
     return C.fail "chmod(1) executable not found" if nil == exec.path "chmod"
