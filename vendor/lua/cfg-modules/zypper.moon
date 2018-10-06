@@ -20,7 +20,6 @@ export _ENV = nil
 --
 -- Examples:
 --     zypper.installed("mtr")
-found = (package) ->
 installed = (package) ->
     C["zypper.installed :: #{package}"] = ->
         if nil == exec.cmd.rpm("-q", "-i", package)
