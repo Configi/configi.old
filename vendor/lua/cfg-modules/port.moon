@@ -5,29 +5,29 @@ tostring = tostring
 tolower = string.lower
 export _ENV = nil
 scan = (p) ->
-	client = lsocket.connect(p.protocol, p.host, p.port)
-	lsocket.select(nil, {client})
-	ok, err = client\status!
+	conn = lsocket.connect(p.protocol, p.host, p.port)
+	lsocket.select(nil, {conn})
+	ok, err = conn\status!
 	return nil, err unless ok
 	if p.payload
 		sent = 0
 		while sent != #p.payload
-			lsocket.select(nil, {client})
-			sent = sent + client\send(string.sub(p.payload, sent, -1))
+			lsocket.select(nil, {conn})
+			sent += conn\send(string.sub(p.payload, sent, -1))
 	if p.expect
 		reply = ""
 		str = ""
 		while nil != str
-			lsocket.select({client})
-			str, err = sock\recv!
+			lsocket.select({conn})
+			str, err = conn\recv!
 			reply ..= str if str
 			if err
-				client\close!
+				conn\close!
 				return nil, err
-		client\close!
+		conn\close!
 		return reply
 	else
-		client\close!
+		conn\close!
 		return true
 -- Module: port
 -- Function: open
