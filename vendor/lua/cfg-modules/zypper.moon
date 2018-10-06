@@ -8,7 +8,7 @@ export _ENV = nil
 --
 -- zypper.installed
 --
--- Ensure a Zypper managed package is present.
+-- Ensure a ZYpp managed package is present.
 --
 -- Argument:
 --     (string) = Package to install.
