@@ -33,7 +33,7 @@ sha2 = (path) ->
         digest = p.digest
         C["hash.sha2 :: #{path}: #{digest}"] = ->
             unless file.stat(path) == nil
-                hash256 = bin.stohex(shasum.hash256(file.read_to_string(path)))
+                hash256 = bin.stohex(shasum.hash256(file.read(path)))
                 if digest == hash256
                     C.pass!
                 else
