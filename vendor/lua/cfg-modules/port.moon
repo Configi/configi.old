@@ -1,13 +1,34 @@
 C = require "configi"
 P = {}
-S = require "qsocket"
+lsocket = require "lsocket"
 tostring = tostring
+tolower = string.lower
 export _ENV = nil
 scan = (p) ->
-    if not p.payload
-        return S[p.protocol]("-"..p.host, p.port)
-    else
-        return S[p.protocol](p.host, p.port, p.payload)
+	client = lsocket.connect(p.protocol, p.host, p.port)
+	lsocket.select(nil, {client})
+	ok, err = client\status!
+	return nil, err unless ok
+	if p.payload
+		sent = 0
+		while sent != #p.payload
+			lsocket.select(nil, {client})
+			sent = sent + client\send(string.sub(p.payload, sent, -1))
+	if p.expect
+		reply = ""
+		str = ""
+		while nil != str
+			lsocket.select({client})
+			str, err = sock\recv!
+			reply ..= str if str
+			if err
+				client\close!
+				return nil, err
+		client\close!
+		return reply
+	else
+		client\close!
+		return true
 -- Module: port
 -- Function: open
 -- Author: Eduardo Tongson <propolice@gmail.com>
@@ -38,15 +59,15 @@ scan = (p) ->
 --     }
 open = (port) ->
     return (p) ->
-        p.port = tostring(port)
+        p.port = tostring port
+		p.protocol = tolower p.protocol
         C.parameter(p)
         p\set_if_not("protocol", "tcp")
         p\set_if_not("host", "127.0.0.1")
         p\set_if_not("expect", true)
-        C["port.open :: #{p.host}:#{p.port}"] = ->
-            if p.expect == scan(p)
-                C.pass!
-            else
-                C.fail("Port is closed or expected response not received.")
+        C["port.open :: #{p.host}: #{p.protocol}:#{p.port}"] = ->
+			ret, err  = scan(p)
+            return C.pass! if p.expect == ret
+            return C.equal(p.expect, ret, "Port is closed or expected response not received. ERROR: #{err}.")
 P.open = open
 P
