@@ -45,11 +45,10 @@ update = (i) ->
     C["podman.update :: #{i}"] = ->
         return C.fail "podman(1) executable not found." unless exec.path "podman"
         r, t = exec.popen "podman pull #{i}"
-        return C.fail "Failed to update container image. podman(1) returned '#{t.code}'." unless r
-        if nil == table.find(t.output, "Copying blob", true)
+        if nil == table.find(t.output, "Copying blob", true) and 0 == r
             return C.pass!
         else
-            return C.equal(0, r)
+            return C.equal(0, r, "Failed to update container image. podman(1) retured '#{t.code}'.")
 P["image"] = image
 P["pull"] = image
 P["update"] = update
