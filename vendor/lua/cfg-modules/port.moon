@@ -106,5 +106,7 @@ close = (port) ->
             return C.pass! unless ret
             return C.fail "Port is open!" if ret == true
 P.open = open
+P.opened = open
 P.close = close
+P.closed = close
 P
