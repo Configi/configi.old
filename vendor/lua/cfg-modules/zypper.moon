@@ -35,6 +35,7 @@ distupgrade = ->
         return C.equal(0, exec.qexec(zypper), "Unable to perform a distribution upgrade.")
 Z["installed"] = installed
 Z["install"] = installed
+Z["in"] = installed
 Z["distupgrade"] = distupgrade
 Z["dist_upgrade"] = distupgrade
 Z["du"] = distupgrade
