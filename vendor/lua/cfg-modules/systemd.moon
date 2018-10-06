@@ -1,3 +1,4 @@
+tostring = tostring
 C = require "configi"
 S = {}
 {:exec} = require "lib"
