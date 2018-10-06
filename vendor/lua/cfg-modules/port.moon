@@ -70,7 +70,7 @@ open = (port) ->
         C["port.open :: #{p.host}: #{p.protocol}:#{p.port}"] = ->
 			ret, err  = scan(p)
             return C.pass! if p.expect == ret
-            return C.equal(p.expect, ret, "Port is closed or expected response not received. ERROR: #{err}.")
+            return C.equal(p.expect, ret, "Port is closed or expected response not received. lsocket ERROR: #{err}.")
 -- Author: Eduardo Tongson <propolice@gmail.com>
 -- License: MIT <http://opensource.org/licenses/MIT>
 --
