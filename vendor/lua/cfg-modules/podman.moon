@@ -26,7 +26,7 @@ image = (i) ->
         unless nil == exec.popen "podman history #{i}"
             return C.pass!
         else
-            return C.equal(0, exec.popen("podman pull #{i}"))
+            return C.equal(0, exec.popen("podman pull #{i}"), "Unable to pull container image (#{i}).")
 -- podman.update(string)
 --
 -- Ensure that a container image is up-to-date.
