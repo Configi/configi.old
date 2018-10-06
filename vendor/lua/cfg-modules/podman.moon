@@ -22,7 +22,7 @@ export _ENV = nil
 --     podman.image("docker.elastic.co/elasticsearch/elasticsearch:6.3.0")
 image = (i) ->
     C["podman.image :: #{i}"] = ->
-        if nil == exec.path "podman" return C.fail"podman(1) executable not found."
+        return C.fail "podman(1) executable not found." unless exec.path "podman"
         unless nil == exec.popen "podman history #{i}"
             return C.pass!
         else
