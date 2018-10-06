@@ -24,12 +24,12 @@ permissive = (setype) ->
     C["selinux.permissive :: #{setype}"] = ->
         return C.fail "semanage(8) executable not found." unless exec.path "semanage"
         _, t = cmd.semanage("permissive", "-l")
-        if nil == table.find(t.stdout, setype)
+        unless nil == table.find(t.stdout, setype)
+            return C.pass!
+        else
             semanage = {"permissive", "-a", setype}
             semanage.exe = "/usr/sbin/semanage"
             return C.equal(0, qexec(semanage), "Unable to set '#{setype}' to permissive. semanage(8) returned non-zero value.")
-        else
-            return C.pass!
 -- selinux.port
 --
 -- Add a port to the specified context.
