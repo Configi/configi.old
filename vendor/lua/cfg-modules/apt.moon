@@ -29,7 +29,7 @@ installed = (package) ->
             aptget = {"--no-install-recommends", "-qq", "install", package}
             aptget.exe = exec.path "apt-get"
             aptget.env = {"DEBIAN_FRONTEND=noninteractive"}
-            return C.equal(0, exec.qexec(aptget), "Failure installing deb package.")
+            return C.equal(0, exec.qexec(aptget), "Unable to install Deb package.")
         else
             return C.pass!
 A["installed"] = installed
