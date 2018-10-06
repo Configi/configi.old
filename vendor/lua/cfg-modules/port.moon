@@ -55,7 +55,7 @@ scan = (p) ->
 --
 -- Examples:
 --     port.open(22){
---        hostname = "test.internal.net"
+--        host = "test.internal.net"
 --     }
 open = (port) ->
     return (p) ->
@@ -84,7 +84,7 @@ open = (port) ->
 --
 -- Parameters:
 --     (table)
---         host     = IP or hostname (string)
+--         host = IP or hostname (string)
 --
 -- Results:
 --     Pass = Port is closed
@@ -92,7 +92,7 @@ open = (port) ->
 --
 -- Examples:
 --     port.close(22){
---        hostname = "test.internal.net"
+--        host = "test.internal.net"
 --     }
 close = (port) ->
     return (p) ->
