@@ -51,5 +51,6 @@ update = (i) ->
         else
             return C.equal(0, r)
 P["image"] = image
+P["pull"] = image
 P["update"] = update
 P
