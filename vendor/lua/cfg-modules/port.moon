@@ -71,5 +71,40 @@ open = (port) ->
 			ret, err  = scan(p)
             return C.pass! if p.expect == ret
             return C.equal(p.expect, ret, "Port is closed or expected response not received. ERROR: #{err}.")
+-- Author: Eduardo Tongson <propolice@gmail.com>
+-- License: MIT <http://opensource.org/licenses/MIT>
+--
+-- port.close(string, string/number)
+--
+-- Audit a port by determining if it is closed.
+-- IPv4-only.
+--
+-- Argument:
+--     (string/number) = port to check
+--
+-- Parameters:
+--     (table)
+--         host     = IP or hostname (string)
+--
+-- Results:
+--     Pass = Port is closed
+--     Fail = Port is open
+--
+-- Examples:
+--     port.close(22){
+--        hostname = "test.internal.net"
+--     }
+close = (port) ->
+    return (p) ->
+        return C.fail "Required `port` argument not set." unless port
+        C.parameter(p)
+        p\set_if_not("host", "127.0.0.1")
+        p.port = tostring port
+        C["port.close :: #{p.host}:#{p.port}"] = ->
+			ret, err  = scan(p)
+            return C.fail "lsocket ERROR: #{err}" if err
+            return C.pass! unless ret
+            return C.fail "Port is open!" if ret == true
 P.open = open
+P.close = close
 P
