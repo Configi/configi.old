@@ -1,6 +1,7 @@
 C = require "configi"
 P = {}
 lsocket = require "lsocket"
+base64 = require "plc.base64"
 tostring = tostring
 tolower = string.lower
 export _ENV = nil
@@ -44,10 +45,12 @@ scan = (p) ->
 --
 -- Parameters:
 --     (table)
---         host     = IP or hostname (string)
---         protocol = TCP or UDP (string)
---         payload  = Payload to send when connecting to the port (string)
---         expect   = Expect a string returned from the port connection (string)
+--         host           = IP or hostname (string)
+--         protocol       = TCP or UDP (string)
+--         payload        = Payload to send when connecting to the port (string)
+--         expect         = Expect a string returned from the port connection (string)
+--         base64_payload = Base64 encoded payload
+--         base64_expect  = Base64 encoded expected response
 --
 -- Results:
 --     Pass = Port is open and expected response received
@@ -61,6 +64,8 @@ open = (port) ->
     return (p) ->
         return C.fail "Required `port` argument not set." unless port
         C.parameter(p)
+        if p.base64_payload then p.payload = base64.decode p.base64_payload
+        if p.base64_expect then p.expect = base64.decode p.base64_return
         -- Default is TCP to localhost and expect boolean true from scan()
         p\set_if_not("protocol", "tcp")
         p\set_if_not("host", "127.0.0.1")
