@@ -64,7 +64,7 @@ scan = (p) ->
 --     }
 open = (port) ->
     return (p) ->
-        return C.fail "Required `port` argument not set." unless port
+        unless port return C.fail "Required `port` argument not set."
         C.parameter(p)
         if p.base64_payload then p.payload = base64.decode p.base64_payload
         if p.base64_response then p.response = base64.decode p.base64_response
