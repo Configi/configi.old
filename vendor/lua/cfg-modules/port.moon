@@ -11,7 +11,7 @@ scan = (p) ->
     unless conn return nil, err
 	lsocket.select(nil, {conn})
 	ok, err = conn\status!
-	return nil, err unless ok
+    unless ok return nil, err
 	if p.payload
 		sent = 0
 		while sent != #p.payload
