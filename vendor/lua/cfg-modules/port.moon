@@ -4,6 +4,7 @@ lsocket = require "lsocket"
 base64 = require "plc.base64"
 tostring = tostring
 tolower = string.lower
+string = string
 export _ENV = nil
 scan = (p) ->
 	conn = lsocket.connect(p.protocol, p.host, p.port)
