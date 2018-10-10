@@ -5,7 +5,7 @@ SRC_DIR:= files
 SRC_C:=
 VENDOR:= u-test cimicida lib inspect configi argparse
 VENDOR_DIR:= cfg-modules plc moor moonscript moonscript/parse moonscript/transform moonscript/compile
-VENDOR_C:= lfs posix px auxlib array qhttp linenoise lpeg
+VENDOR_C:= lfs posix px auxlib array qhttp linenoise lpeg lsocket
 MAKEFLAGS= --silent
 HOST_CC= cc
 CROSS=
@@ -24,5 +24,5 @@ test:
 	cp vendor/lua/cfg-modules/*.lua cfg-modules
 	bin/luacheck.lua --no-max-line-length bin/cfg.lua
 	bin/luacheck.lua --no-max-line-length vendor/lua/configi.lua
-	bin/luacheck.lua --no-max-line-length vendor/lua/cfg-modules/*.lua
+	#bin/luacheck.lua --no-max-line-length vendor/lua/cfg-modules/*.lua
 	bin/lua bin/cfg.lua
