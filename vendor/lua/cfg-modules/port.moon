@@ -49,8 +49,8 @@ scan = (p) ->
 --         protocol        = TCP or UDP (string)
 --         payload         = Payload to send when connecting to the port (string)
 --         response        = Expect a string returned from the port connection (string)
---         base64_payload  = Base64 encoded payload
---         base64_response = Base64 encoded expected response
+--         base64_payload  = Base64 encoded payload (string)
+--         base64_response = Base64 encoded expected response (string)
 --
 -- Results:
 --     Pass = Port is open and expected response received
