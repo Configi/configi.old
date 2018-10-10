@@ -15,7 +15,7 @@ scan = (p) ->
 		while sent != #p.payload
 			lsocket.select(nil, {conn})
 			sent += conn\send(string.sub(p.payload, sent, -1))
-	if p.expect
+	if p.response
 		reply = ""
 		str = ""
 		while nil != str
@@ -45,12 +45,12 @@ scan = (p) ->
 --
 -- Parameters:
 --     (table)
---         host           = IP or hostname (string)
---         protocol       = TCP or UDP (string)
---         payload        = Payload to send when connecting to the port (string)
---         expect         = Expect a string returned from the port connection (string)
---         base64_payload = Base64 encoded payload
---         base64_expect  = Base64 encoded expected response
+--         host            = IP or hostname (string)
+--         protocol        = TCP or UDP (string)
+--         payload         = Payload to send when connecting to the port (string)
+--         response        = Expect a string returned from the port connection (string)
+--         base64_payload  = Base64 encoded payload
+--         base64_response = Base64 encoded expected response
 --
 -- Results:
 --     Pass = Port is open and expected response received
@@ -65,17 +65,17 @@ open = (port) ->
         return C.fail "Required `port` argument not set." unless port
         C.parameter(p)
         if p.base64_payload then p.payload = base64.decode p.base64_payload
-        if p.base64_expect then p.expect = base64.decode p.base64_return
+        if p.base64_response then p.response = base64.decode p.base64_response
         -- Default is TCP to localhost and expect boolean true from scan()
         p\set_if_not("protocol", "tcp")
         p\set_if_not("host", "127.0.0.1")
-        p\set_if_not("expect", true)
+        p\set_if_not("response", true)
         p.port = tostring port
 		p.protocol = tolower p.protocol
         C["port.open :: #{p.host}: #{p.protocol}:#{p.port}"] = ->
 			ret, err  = scan(p)
-            return C.pass! if p.expect == ret
-            return C.equal(p.expect, ret, "Port is closed or expected response not received. lsocket ERROR: #{err}.")
+            return C.pass! if p.response == ret
+            return C.equal(p.response, ret, "Port is closed or expected response not received. lsocket ERROR: #{err}.")
 -- Author: Eduardo Tongson <propolice@gmail.com>
 -- License: MIT <http://opensource.org/licenses/MIT>
 --
