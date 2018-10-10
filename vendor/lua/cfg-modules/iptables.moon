@@ -65,6 +65,10 @@ default = (target) ->
 -- Arguments:
 --     #1 (string/number) = Port to open.
 --
+-- Parameters:
+--      (table)
+--          protocol = TCP or UDP (TCP by default)
+--
 -- Results:
 --     Pass     = Port is already opened.
 --     Repaired = Port opened.
@@ -73,66 +77,68 @@ default = (target) ->
 -- Examples:
 --     iptables.open(443)
 open = (port) ->
-    port = tostring port
-    ip4_rules = {
-        {
-            ""
-            "INPUT"
-            "-p"
-            "tcp"
-            "-s"
-            "0/0"
-            "-d"
-            "0/0"
-            "--sport"
-            "513:65535"
-            "--dport"
-            ""
-            "-m"
-            "state"
-            "--state"
-            "NEW,ESTABLISHED"
-            "-j"
-            "ACCEPT"
+    return (p) ->
+        p.protocol = string.lower p.protocol or "tcp"
+        port = tostring port
+        ip4_rules = {
+            {
+                ""
+                "INPUT"
+                "-p"
+                p.protocol
+                "-s"
+                "0/0"
+                "-d"
+                "0/0"
+                "--sport"
+                "513:65535"
+                "--dport"
+                ""
+                "-m"
+                "state"
+                "--state"
+                "NEW,ESTABLISHED"
+                "-j"
+                "ACCEPT"
+            }
+            {
+                ""
+                "OUTPUT"
+                "-p"
+                p.protocol
+                "-s"
+                "0/0"
+                "-d"
+                "0/0"
+                "--sport"
+                ""
+                "--dport"
+                "513:65535"
+                "-m"
+                "state"
+                "--state"
+                "ESTABLISHED"
+                "-j"
+                "ACCEPT"
+            }
         }
-        {
-            ""
-            "OUTPUT"
-            "-p"
-            "tcp"
-            "-s"
-            "0/0"
-            "-d"
-            "0/0"
-            "--sport"
-            ""
-            "--dport"
-            "513:65535"
-            "-m"
-            "state"
-            "--state"
-            "ESTABLISHED"
-            "-j"
-            "ACCEPT"
-        }
-    }
-    C["iptables.open :: #{port}"] = ->
-        ipt = exec.path "iptables"
-        if nil == ipt return C.fail "iptables(8) executable not found."
-        iptables = {}
-        for i in *ip4_rules
-            table.copy(iptables, i)
-            iptables.exe = ipt
-            iptables[1] = "-C"
-            if "INPUT" == iptables[2]
-                iptables[12] = port
-            if "OUTPUT" == iptables[2]
-                iptables[10] = port
-            if nil == exec.qexec iptables
-                iptables[1] = "-A"
-                return C.equal(0, exec.qexec(iptables), "Failure opening IPv4 port.")
-            else
-                return C.pass "IPv4 port already open."
+        C["iptables.open :: #{port}"] = ->
+            ipt = exec.path "iptables"
+            if nil == ipt return C.fail "iptables(8) executable not found."
+            iptables = {}
+            for i in *ip4_rules
+                table.copy(iptables, i)
+                iptables.exe = ipt
+                iptables[1] = "-C"
+                if "INPUT" == iptables[2]
+                    iptables[12] = port
+                if "OUTPUT" == iptables[2]
+                    iptables[10] = port
+                if nil == exec.qexec iptables
+                    iptables[1] = "-A"
+                    return C.equal(0, exec.qexec(iptables), "Failure opening IPv4 port.")
+                else
+                    return C.pass "IPv4 port already open."
 
 -- iptables.outgoing
 --
