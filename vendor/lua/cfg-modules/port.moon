@@ -7,7 +7,8 @@ tolower = string.lower
 string = string
 export _ENV = nil
 scan = (p) ->
-	conn = lsocket.connect(p.protocol, p.host, p.port)
+	conn, err = lsocket.connect(p.protocol, p.host, p.port)
+    unless conn return nil, err
 	lsocket.select(nil, {conn})
 	ok, err = conn\status!
 	return nil, err unless ok
