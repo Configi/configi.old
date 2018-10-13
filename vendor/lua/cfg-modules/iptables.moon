@@ -215,15 +215,13 @@ outgoing = (interface) ->
 add = (rule) ->
     C["iptables.add :: #{rule}"] = ->
         ipt = exec.path "iptables"
-        if nil == ipt return C.fail"iptables(8) executable not found."
+        return C.fail"iptables(8) executable not found." if nil == ipt
         iptables = string.to_table rule
         iptables[1] = "-C"
         iptables.exe = ipt
-        if nil == exec.qexec iptables
-            iptables[1] = "-A"
-            return C.equal(0, exec.qexec(iptables), "Failure adding iptables rule.")
-        else
-            return C.pass!
+        return C.pass! if exec.qexec iptables
+        iptables[1] = "-A"
+        C.equal(0, exec.qexec(iptables), "Failure adding iptables rule.")
 -- iptables.count
 --
 -- Compare the actual number of iptables rules in the given table with an expected number.
@@ -251,10 +249,8 @@ count = (tbl) ->
             return C.fail "iptables(8) executable not found." if nil == exec.path "iptables"
             r, t = exec.cmd.iptables("-S", "-t", tbl)
             return C.pass! if no == #t.stdout
-            if nil == r
-                return C.fail "iptables(8) command failure."
-            else
-                return C.equal(no, #t.stdout, "Unexpected number of rules.")
+            return C.fail "iptables(8) command failure." if nil == r
+            C.equal(no, #t.stdout, "Unexpected number of rules.")
 I["default"] = default
 I["add"] = add
 I["open"] = open
