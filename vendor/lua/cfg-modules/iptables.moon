@@ -122,7 +122,7 @@ open = (port) ->
                 "ACCEPT"
             }
         }
-        C["iptables.open :: #{port}"] = ->
+        C["iptables.open :: #{p.protocol}:#{port}"] = ->
             ipt = exec.path "iptables"
             if nil == ipt return C.fail "iptables(8) executable not found."
             iptables = {}
