@@ -51,12 +51,12 @@ default = (target) ->
         for i in *policy
             table.copy(iptables, i)
             iptables.exe = ipt
-            if nil == exec.qexec iptables return C.fail"Failure applying policy."
+            C.equal(0, exec.qexec(iptables), "Failure applying policy.")
         for i in *localhost
             table.copy(iptables, i)
             iptables.exe = ipt
             iptables[1] = "-A"
-            return C.equal(0, exec.qexec(iptables), "Failure applying localhost policy.")
+            C.equal(0, exec.qexec(iptables), "Failure applying localhost policy.")
 
 -- iptables.open(string/number)
 --
@@ -126,19 +126,19 @@ open = (port) ->
             ipt = exec.path "iptables"
             if nil == ipt return C.fail "iptables(8) executable not found."
             iptables = {}
-            for i in *ip4_rules
+            for  i in *ip4_rules
                 table.copy(iptables, i)
                 iptables.exe = ipt
-                iptables[1] = "-C"
                 if "INPUT" == iptables[2]
+                    iptables[1] = "-C"
                     iptables[12] = port
+                    return C.pass "IPv4 port already open." if 0 == exec.qexec iptables
+                    iptables[1] = "-A"
+                    C.equal(0, exec.qexec(iptables), "Failure opening IPv4 port. Unable to add INPUT rule.")
                 if "OUTPUT" == iptables[2]
                     iptables[10] = port
-                if nil == exec.qexec iptables
                     iptables[1] = "-A"
-                    return C.equal(0, exec.qexec(iptables), "Failure opening IPv4 port.")
-                else
-                    return C.pass "IPv4 port already open."
+                    C.equal(0, exec.qexec(iptables), "Failure opening IPv4 port. Unable to add OUTPUT rule.")
 
 -- iptables.outgoing
 --
@@ -191,16 +191,13 @@ outgoing = (interface) ->
         for i in *rules
             table.copy(iptables, i)
             iptables.exe = ipt
-            iptables[1] = "-C"
+            iptables[1] = "-A"
             if "OUTPUT" == iptables[2]
                 iptables[6] = interface
+                C.equal(0, exec.qexec(iptables), "Failure allowing outgoing interface. Unable to add OUTPUT rule.")
             if "INPUT" == iptables[2]
                 iptables[4] = interface
-            if nil == exec.qexec iptables
-                iptables[1] = "-A"
-                return C.equal(0, exec.qexec(iptables), "Failure allowing outgoing interface.")
-            else
-                return C.pass "Outgoing interface already allowed."
+                C.equal(0, exec.qexec(iptables), "Failure allowing outgoing interface. Unable to add INPUT rule.")
 -- iptables.add(string)
 --
 -- Add an iptables rule.
