@@ -25,13 +25,11 @@ found = (package) ->
     return table.find(r.output, "Status: install ok installed", true)
 installed = (package) ->
     C["apt.installed :: #{package}"] = ->
-        if nil == found package
-            aptget = {"--no-install-recommends", "-qq", "install", package}
-            aptget.exe = exec.path "apt-get"
-            aptget.env = {"DEBIAN_FRONTEND=noninteractive"}
-            return C.equal(0, exec.qexec(aptget), "Unable to install Deb package.")
-        else
-            return C.pass!
+        return C.pass! if found package
+        aptget = {"--no-install-recommends", "-qq", "install", package}
+        aptget.exe = exec.path "apt-get"
+        aptget.env = {"DEBIAN_FRONTEND=noninteractive"}
+        C.equal(0, exec.qexec(aptget), "Unable to install Deb package.")
 A["installed"] = installed
 A["install"] = installed
 A["get"] = installed
