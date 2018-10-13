@@ -35,12 +35,10 @@ spawn = (exe) ->
         path = p.expects
         args = p.args
         C["exec.spawn :: #{exe}"] = ->
-            if nil == path or nil == stat.stat(path)
-                command = string.to_table args
-                command.exe = exe
-                return C.equal(0, exec.qexec(command), "Failure executing command.")
-            else
-                return C.pass!
+            return C.pass! if path and stat.stat path
+            command = string.to_table args
+            command.exe = exe
+            C.equal(0, exec.qexec(command), "Failure executing command.")
 -- Author: Eduardo Tongson <propolice@gmail.com>
 -- License: MIT <http://opensource.org/licenses/MIT>
 --
