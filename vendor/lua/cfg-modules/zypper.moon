@@ -22,12 +22,10 @@ export _ENV = nil
 --     zypper.installed("mtr")
 installed = (package) ->
     C["zypper.installed :: #{package}"] = ->
-        if nil == exec.cmd.rpm("-q", "-i", package)
-            zypper = {"--non-interactive", "--quiet", "install", "--no-recommends", "--auto-agree-with-licenses", "--force-resolution", package}
-            zypper.exe = exec.path "zypper"
-            return C.equal(0, exec.qexec(zypper), "Unable to install package.")
-        else
-            return C.pass!
+       return C.pass! if exec.cmd.rpm("-q", "-i", package)
+       zypper = {"--non-interactive", "--quiet", "install", "--no-recommends", "--auto-agree-with-licenses", "--force-resolution", package}
+       zypper.exe = exec.path "zypper"
+       C.equal(0, exec.qexec(zypper), "Unable to install package.")
 -- Author: Eduardo Tongson <propolice@gmail.com>
 -- License: MIT <http://opensource.org/licenses/MIT>
 --
