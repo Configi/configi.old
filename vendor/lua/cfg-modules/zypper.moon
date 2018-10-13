@@ -23,8 +23,8 @@ export _ENV = nil
 installed = (package) ->
     C["zypper.installed :: #{package}"] = ->
         if nil == exec.cmd.rpm("-q", "-i", package)
-            zypper.exe = exec.path "zypper"
             zypper = {"--non-interactive", "--quiet", "install", "--no-recommends", "--auto-agree-with-licenses", "--force-resolution", package}
+            zypper.exe = exec.path "zypper"
             return C.equal(0, exec.qexec(zypper), "Unable to install package.")
         else
             return C.pass!
@@ -43,8 +43,8 @@ installed = (package) ->
 --     zypper.dup()
 distupgrade = ->
     C["zypper.distupgrade"] = ->
-        zypper.exe = exec.path "zypper"
         zypper = {"--non-interactive", "--quiet", "dist-upgrade", "--no-recommends", "--auto-agree-with-licenses"}
+        zypper.exe = exec.path "zypper"
         return C.equal(0, exec.qexec(zypper), "Unable to perform a distribution upgrade.")
 Z["installed"] = installed
 Z["install"] = installed
