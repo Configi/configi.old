@@ -53,7 +53,7 @@ managed = (f) ->
         C["file.managed :: #{k}: #{v.path}"] = ->
             contents = file.read v.path
             return C.pass! if contents == v.contents
-            C.equal(true, file.write(v.path, v.contents), "Failure writing contents to #{v.path}.")
+            C.is_true(file.write(v.path, v.contents), "Failure writing contents to #{v.path}.")
 templated = (f) ->
     m = require "files.#{f}"
     return C.fail "Source not found." if nil == m
@@ -62,7 +62,7 @@ templated = (f) ->
             C["file.templated :: #{k}: #{v.path}"] = ->
                 payload = string.template(v.contents, p)
                 return C.pass! if payload == file.read v.path
-                C.equal(true, file.write(v.path, payload), "Failure writing contents to #{v.path}.")
+                C.is_true(file.write(v.path, payload), "Failure writing contents to #{v.path}.")
 chmod = (f) ->
     return C.fail "chmod(1) executable not found" if nil == exec.path "chmod"
     return (p) ->
