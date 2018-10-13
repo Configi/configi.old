@@ -23,10 +23,8 @@ export _ENV = nil
 image = (i) ->
     C["podman.image :: #{i}"] = ->
         return C.fail "podman(1) executable not found." unless exec.path "podman"
-        unless nil == exec.popen "podman history #{i}"
-            return C.pass!
-        else
-            return C.equal(0, exec.popen("podman pull #{i}"), "Unable to pull container image (#{i}).")
+        return C.pass! if exec.popen "podman history #{i}"
+        C.equal(0, exec.popen("podman pull #{i}"), "Unable to pull container image (#{i}).")
 -- podman.update(string)
 --
 -- Ensure that a container image is up-to-date.
@@ -45,10 +43,8 @@ update = (i) ->
     C["podman.update :: #{i}"] = ->
         return C.fail "podman(1) executable not found." unless exec.path "podman"
         r, t = exec.popen "podman pull #{i}"
-        if nil == table.find(t.output, "Copying blob", true) and 0 == r
-            return C.pass!
-        else
-            return C.equal(0, r, "Failed to update container image. podman(1) retured '#{t.code}'.")
+        return C.pass! if not table.find(t.output, "Copying blob", true) and 0 == r
+        C.equal(0, r, "Failed to update container image. podman(1) retured '#{t.code}'.")
 P["image"] = image
 P["pull"] = image
 P["update"] = update
