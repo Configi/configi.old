@@ -22,7 +22,7 @@ export _ENV = nil
 -- Examples:
 --     iptables.default("DROP")
 default = (target = "DROP") ->
-    target = string.upper target)
+    target = string.upper target
     policy = {
         {"-F"}
         {"-X"}
