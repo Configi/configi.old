@@ -106,11 +106,11 @@ script = (str) ->
                     -- Always succeed
                     C.print("Script returned '#{code}'.")
                     C.print(table.concat(ret.output, "\n")) if true == output
-                    return C.equal(code, code)
+                    C.equal(code, code)
                 else
                     code, ret = popen(s)
                     C.print(table.concat(ret.output, "\n")) if true == output and 0 == code
-                    return C.equal(0, code, "Execution failure. Script returned '#{code}'.")
+                    C.equal(0, code, "Execution failure. Script returned '#{code}'.")
             else
                 return C.pass!
 E["spawn"] = spawn
