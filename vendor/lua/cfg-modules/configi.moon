@@ -54,6 +54,6 @@ systemd = (m) ->
         return C.fail "Unable to reload systemd daemon." unless systemctl "daemon-reload"
         return C.fail "Unable to enable Configi systemd timer." unless systemctl("enable", "configi")
         return C.fail "Unable to start Configi systemd timer." unless systemctl("start", "configi")
-        return C.equal(0, systemctl("is-active", "configi"), "systemctl(1) returned non-zero when checking if Configi is active.")
+        C.equal(0, systemctl("is-active", "configi"), "systemctl(1) returned non-zero when checking if Configi is active.")
 A["systemd"] = systemd
 A
