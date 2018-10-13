@@ -26,6 +26,6 @@ active = (unit) ->
         return C.pass! if 0 == systemctl("-q", "is-active", unit)
         return C.fail "Unable to reload systemd daemon." unless systemctl "daemon-reload"
         return C.fail "Attempt to enable systemd unit failed." unless systemctl("enable", unit)
-        return C.equal(0, systemctl("start", unit), "Unable to start systemd unit.")
+        C.equal(0, systemctl("start", unit), "Unable to start systemd unit.")
 S["active"] = active
 S
