@@ -24,12 +24,10 @@ permissive = (setype) ->
     C["selinux.permissive :: #{setype}"] = ->
         return C.fail "semanage(8) executable not found." unless exec.path "semanage"
         _, t = cmd.semanage("permissive", "-l")
-        unless nil == table.find(t.stdout, setype)
-            return C.pass!
-        else
-            semanage = {"permissive", "-a", setype}
-            semanage.exe = "/usr/sbin/semanage"
-            return C.equal(0, qexec(semanage), "Unable to set '#{setype}' to permissive. semanage(8) returned non-zero value.")
+        return C.pass! if table.find(t.stdout, setype)
+        semanage = {"permissive", "-a", setype}
+        semanage.exe = "/usr/sbin/semanage"
+        C.equal(0, qexec(semanage), "Unable to set '#{setype}' to permissive. semanage(8) returned non-zero value.")
 -- selinux.port
 --
 -- Add a port to the specified context.
@@ -58,12 +56,10 @@ port = (type) ->
         protocol = p.protocol
         C["selinux.port :: #{type} + #{protocol}:#{nport}"] = ->
             _, t = cmd.semanage("port", "-l")
-            unless nil == table.find(t.stdout, "#{type}%s+#{protocol}%s+[%d]*[%s,]nport")
-                return C.pass!
-            else
-                semanage = {"port", "-a", "-t", type, "-p", protocol, nport}
-                semanage.exe = "/usr/sbin/semanage"
-                return C.equal(0, qexec(semanage), "Execution failure. semanage(8) returned non-zero value.")
+            return C.pass! if table.find(t.stdout, "#{type}%s+#{protocol}%s+[%d]*[%s,]nport")
+            semanage = {"port", "-a", "-t", type, "-p", protocol, nport}
+            semanage.exe = "/usr/sbin/semanage"
+            C.equal(0, qexec(semanage), "Execution failure. semanage(8) returned non-zero value.")
 S["permissive"] = permissive
 S["port"] = port
 S
