@@ -18,13 +18,26 @@ scan = (p) ->
             lsocket.select(nil, {conn})
             sent += conn\send(string.sub(p.payload, sent, -1))
     if p.response
-        lsocket.select({conn})
-        reply, err = conn\recv 1024
-        if err
+        if p.protocol == "udp"
+            lsocket.select({conn})
+            reply, err = conn\recv 1024
+            if err
+                conn\close!
+                return nil, err
             conn\close!
-            return nil, err
-        conn\close!
-        return {response:reply, size:string.len(reply)}
+            return {response:reply, size:string.len(reply)}
+        if p.protocol == "tcp"
+			reply = ""
+			str = ""
+			while nil != str
+				lsocket.select({conn})
+				str, err = conn\recv!
+				reply ..= str if str
+				if err
+					conn\close!
+					return nil, err
+				conn\close!
+                return {response:reply, size:string.len(reply)}
     else
         conn\close!
         return {response:true, size:0}
