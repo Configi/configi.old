@@ -84,7 +84,7 @@ open = (port) ->
         p\set_if_not("size", 0)
         p.port = tostring port
         p.protocol = tolower p.protocol
-        C["port.open :: #{p.host}: #{p.protocol}:#{p.port}"] = ->
+        C["port.open :: #{p.host}:#{p.protocol}:#{p.port}"] = ->
             unless port return C.fail "Required `port` argument not set."
             ret, err  = scan(p)
             if ret == nil return C.fail err
