@@ -241,10 +241,10 @@ add = (rule) ->
 --      iptables.count("filter"){
 --        expect = 5
 --      }
-count = (tbl) ->
+count = (tbl = "filter") ->
     return (p) ->
         no = tonumber p.expect
-        tbl = string.lower(tbl) or "filter"
+        tbl = string.lower tbl
         C["iptables.count :: #{tbl} == #{no}"] = ->
             return C.fail "iptables(8) executable not found." if nil == exec.path "iptables"
             r, t = exec.cmd.iptables("-S", "-t", tbl)
