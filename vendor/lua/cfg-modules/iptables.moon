@@ -153,7 +153,7 @@ open = (port) ->
 --     Fail     = Failed to add rule.
 --
 -- Examples:
---     iptables.outgoing(eth0)
+--     iptables.outgoing "eth0"
 outgoing = (interface) ->
     rules = {
         {
