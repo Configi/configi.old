@@ -98,19 +98,17 @@ script = (str) ->
             return C.fail "Script '#{str}' not found." if nil == s
             local code, ret, expects, output, ignore
             {:expects, :output, :ignore} = p if type(p) == table
-            if nil == expects or nil == stat.stat(expects)
-                if true == ignore
-                    code, ret = popen(s, true)
-                    -- Always succeed
-                    C.print("Script returned '#{code}'.")
-                    C.print(table.concat(ret.output, "\n")) if true == output
-                    C.equal(code, code)
-                else
-                    code, ret = popen(s)
-                    C.print(table.concat(ret.output, "\n")) if true == output and 0 == code
-                    C.equal(0, code, "Execution failure. Script returned '#{code}'.")
+            return C.pass! if expects and stat.stat expects
+            if true == ignore
+                code, ret = popen(s, true)
+                -- Always succeed
+                C.print("Script returned '#{code}'.")
+                C.print(table.concat(ret.output, "\n")) if true == output
+                C.equal(code, code)
             else
-                return C.pass!
+                code, ret = popen(s)
+                C.print(table.concat(ret.output, "\n")) if true == output and 0 == code
+                C.equal(0, code, "Execution failure. Script returned '#{code}'.")
 E["spawn"] = spawn
 E["simple"] = spawn
 E["script"] = script
