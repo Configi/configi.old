@@ -7,31 +7,31 @@ tolower = string.lower
 string = string
 export _ENV = nil
 scan = (p) ->
-	conn, err = lsocket.connect(p.protocol, p.host, p.port)
+    conn, err = lsocket.connect(p.protocol, p.host, p.port)
     unless conn return nil, err
-	lsocket.select(nil, {conn})
-	ok, err = conn\status!
+    lsocket.select(nil, {conn})
+    ok, err = conn\status!
     unless ok return nil, err
-	if p.payload
-		sent = 0
-		while sent != #p.payload
-			lsocket.select(nil, {conn})
-			sent += conn\send(string.sub(p.payload, sent, -1))
-	if p.response
-		reply = ""
-		str = ""
-		while nil != str
-			lsocket.select({conn})
-			str, err = conn\recv!
-			reply ..= str if str
-			if err
-				conn\close!
-				return nil, err
-		conn\close!
-		return reply
-	else
-		conn\close!
-		return true
+    if p.payload
+        sent = 0
+        while sent != #p.payload
+            lsocket.select(nil, {conn})
+            sent += conn\send(string.sub(p.payload, sent, -1))
+    if p.response
+        reply = ""
+        str = ""
+        while nil != str
+            lsocket.select({conn})
+            str, err = conn\recv!
+            reply ..= str if str
+            if err
+                conn\close!
+                return nil, err
+            conn\close!
+            return reply
+    else
+        conn\close!
+        return true
 -- Module: port
 -- Function: open
 -- Author: Eduardo Tongson <propolice@gmail.com>
@@ -108,7 +108,7 @@ close = (port) ->
         p\set_if_not("host", "127.0.0.1")
         p.port = tostring port
         C["port.close :: #{p.host}:#{p.port}"] = ->
-			ret, err  = scan(p)
+            ret, err  = scan(p)
             return C.fail "lsocket ERROR: #{err}" if err
             return C.pass! unless ret
             return C.fail "Port is open!" if ret == true
