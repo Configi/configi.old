@@ -118,14 +118,15 @@ open = (port) ->
 close = (port) ->
     return (p) ->
         C.parameter(p)
-        p\set_if_not("host", "127.0.0.1")
         p.port = tostring port
-        C["port.close :: #{p.host}:#{p.port}"] = ->
+        p\set_if_not("host", "127.0.0.1")
+        p\set_if_not("protocol", "tcp")
+        C["port.close :: #{p.host}:#{p.protocol}:#{p.port}"] = ->
             return C.fail "Required `port` argument not set." unless port
             ret, err  = scan(p)
             return C.fail "lsocket ERROR: #{err}" if err
             return C.pass! unless ret
-            return C.fail "Port is open!" if ret == true
+            return C.fail "Port is open!" if ret.response == true
 P.open = open
 P.opened = open
 P.close = close
