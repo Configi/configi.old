@@ -64,7 +64,6 @@ scan = (p) ->
 --     }
 open = (port) ->
     return (p) ->
-        unless port return C.fail "Required `port` argument not set."
         C.parameter(p)
         if p.base64_payload then p.payload = base64.decode p.base64_payload
         if p.base64_response then p.response = base64.decode p.base64_response
@@ -75,6 +74,7 @@ open = (port) ->
         p.port = tostring port
 		p.protocol = tolower p.protocol
         C["port.open :: #{p.host}: #{p.protocol}:#{p.port}"] = ->
+            unless port return C.fail "Required `port` argument not set."
 			ret, err  = scan(p)
             return C.pass! if p.response == ret
             return C.equal(p.response, ret, "Port is closed or expected response not received. lsocket ERROR: #{err}.")
