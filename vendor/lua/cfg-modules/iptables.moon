@@ -241,13 +241,17 @@ add = (rule) ->
 --      iptables.count("filter"){
 --        expect = 5
 --      }
-count = (tbl = "filter") ->
+count = (tbl = "all") ->
     return (p) ->
         no = tonumber p.expect
         tbl = string.lower tbl
         C["iptables.count :: #{tbl} == #{no}"] = ->
             return C.fail "iptables(8) executable not found." if nil == exec.path "iptables"
-            r, t = exec.cmd.iptables("-S", "-t", tbl)
+            local r, t
+            if "all" == tbl
+                r, t = exec.cmd.iptables("-S")
+            else
+                r, t = exec.cmd.iptables("-S", "-t", tbl)
             return C.pass! if no == #t.stdout
             return C.fail "iptables(8) command failure." if nil == r
             C.equal(no, #t.stdout, "Unexpected number of rules.")
