@@ -32,13 +32,11 @@ sha2 = (path) ->
     return (p) ->
         digest = p.digest
         C["hash.sha2 :: #{path}: #{digest}"] = ->
-            unless file.stat(path) == nil
-                hash256 = bin.stohex(shasum.hash256(file.read(path)))
-                if digest == hash256
-                    C.pass!
-                else
-                    C.fail "Unexpected hash digest: #{hash256} for #{path}."
+            return C.fail "File (#{path}) not found." if not file.stat path
+            hash256 = bin.stohex(shasum.hash256(file.read(path)))
+            if digest == hash256
+                return C.pass!
             else
-                C.fail "File (#{path}) not found."
+                return C.fail "Unexpected hash digest: #{hash256} for #{path}."
 H["sha2"] = sha2
 H
