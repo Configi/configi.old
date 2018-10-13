@@ -43,7 +43,7 @@ distupgrade = ->
     C["zypper.distupgrade"] = ->
         zypper = {"--non-interactive", "--quiet", "dist-upgrade", "--no-recommends", "--auto-agree-with-licenses"}
         zypper.exe = exec.path "zypper"
-        return C.equal(0, exec.qexec(zypper), "Unable to perform a distribution upgrade.")
+        C.equal(0, exec.qexec(zypper), "Unable to perform a distribution upgrade.")
 Z["installed"] = installed
 Z["install"] = installed
 Z["in"] = installed
