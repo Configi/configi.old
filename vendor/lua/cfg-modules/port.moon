@@ -4,7 +4,7 @@ lsocket = require "lsocket"
 base64 = require "plc.base64"
 tostring = tostring
 tolower = string.lower
-string = string
+string = require "lib.string"
 export _ENV = nil
 scan = (p) ->
     conn, err = lsocket.connect(p.protocol, p.host, p.port)
@@ -77,7 +77,7 @@ open = (port) ->
             unless port return C.fail "Required `port` argument not set."
 			ret, err  = scan(p)
             return C.pass! if p.response == ret
-            return C.equal(p.response, ret, "Port is closed or expected response not received. lsocket ERROR: #{err}.")
+            return C.equal(string.hexdump(p.response), string.hexdump(ret), "Port is closed or expected response not received. lsocket ERROR: #{err}.")
 -- Author: Eduardo Tongson <propolice@gmail.com>
 -- License: MIT <http://opensource.org/licenses/MIT>
 --
