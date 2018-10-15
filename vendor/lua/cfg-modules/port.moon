@@ -91,6 +91,11 @@ open = (port) ->
             if p.response == ret.response or p.size == ret.size
                 return C.pass!
             else
+                if p.response != true
+                    x = string.hexdump p.response
+                    y = string.hexdump ret.response
+                    return C.fail "Expected:\n#{x}\nGot:\n#{y}\n"
+                if p.size != 0 return C.fail "Expected response size (#{p.size}), got (#{ret.size})."
                 return C.fail "Expected response or response size not found."
 -- Author: Eduardo Tongson <propolice@gmail.com>
 -- License: MIT <http://opensource.org/licenses/MIT>
