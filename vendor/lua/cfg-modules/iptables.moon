@@ -203,7 +203,11 @@ outgoing = (interface) ->
 -- Add an iptables rule.
 --
 -- Arguments:
---     #1 (string) = The rule to add.
+--     #1 (string) = Description of the rule
+--
+-- Parameters:
+--     (table)
+--         rule = The rule to add (string)
 --
 -- Results:
 --     Pass     = The rule is already loaded.
@@ -211,17 +215,21 @@ outgoing = (interface) ->
 --     Fail     = Failed adding the rule. Likely an invalid iptables rule.
 --
 -- Examples:
---     iptables.add("-A INPUT -p udp -m udp --dport 53 -j ACCEPT")
-add = (rule) ->
-    C["iptables.add :: #{rule}"] = ->
-        ipt = exec.path "iptables"
-        return C.fail"iptables(8) executable not found." if nil == ipt
-        iptables = string.to_table rule
-        iptables[1] = "-C"
-        iptables.exe = ipt
-        return C.pass! if exec.qexec iptables
-        iptables[1] = "-A"
-        C.equal(0, exec.qexec(iptables), "Failure adding iptables rule.")
+--     iptables.add("Allow DNS"){
+--       rule = "-A INPUT -p udp -m udp --dport 53 -j ACCEPT"
+--     }
+add = (desc = "") ->
+    return (p) ->
+        C["iptables.add :: #{desc}"] = ->
+            return C.fail "Missing iptables rule to add." if nil == p.rule
+            ipt = exec.path "iptables"
+            return C.fail "iptables(8) executable not found." if nil == ipt
+            iptables = string.to_table p.rule
+            iptables[1] = "-C"
+            iptables.exe = ipt
+            return C.pass! if exec.qexec iptables
+            iptables[1] = "-A"
+            C.equal(0, exec.qexec(iptables), "Failure adding iptables rule.")
 -- iptables.count
 --
 -- Compare the actual number of iptables rules in the given table with an expected number.
