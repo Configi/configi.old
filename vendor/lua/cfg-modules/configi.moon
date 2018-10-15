@@ -27,13 +27,13 @@ export _ENV = nil
 
 systemd = (exe = "/srv/configi/exe") ->
     return (p) ->
-        p.interval = tostring m or "5"
+        min = tostring p.interval or "5"
         timer = "
 [Unit]
     Description=Configi Timer
 
 [Timer]
-    OnCalendar=*:0/#{p.interval}
+    OnCalendar=*:0/#{min}
 
 [Install]
     WantedBy=timers.target
@@ -49,8 +49,7 @@ systemd = (exe = "/srv/configi/exe") ->
         timer_path = "/etc/systemd/system/configi.timer"
         service_path = "/etc/systemd/system/configi.service"
         systemctl = exec.ctx "systemctl"
-        install = exec.ctx "install"
-        C["configi.systemd :: Run #{dest} every #{min} minute(s)"] = ->
+        C["configi.systemd :: Run #{exe} every #{min} minute(s)"] = ->
             return C.pass! if file.read(timer_path) == timer and file.read(service_path) == service
             return C.fail "Unable to write the systemd timer (#{timer_path})." unless file.write(timer_path, timer)
             return C.fail "Unable to write the systemd service (#{service_path})." unless file.write(service_path, service)
