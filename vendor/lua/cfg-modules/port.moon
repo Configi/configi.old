@@ -37,7 +37,7 @@ scan = (p) ->
 					conn\close!
 					return nil, err
 				conn\close!
-                return {response:reply, size:string.len(reply)}
+            return {response:reply, size:string.len(reply)}
     else
         conn\close!
         return {response:true, size:0}
