@@ -54,8 +54,8 @@ systemd = (exe = "/srv/configi/exe") ->
             return C.fail "Unable to write the systemd timer (#{timer_path})." unless file.write(timer_path, timer)
             return C.fail "Unable to write the systemd service (#{service_path})." unless file.write(service_path, service)
             return C.fail "Unable to reload systemd daemon." unless systemctl "daemon-reload"
-            return C.fail "Unable to enable Configi systemd timer." unless systemctl("enable", "configi")
-            return C.fail "Unable to start Configi systemd timer." unless systemctl("start", "configi")
+            return C.fail "Unable to enable Configi systemd timer." unless systemctl("enable", "configi.timer")
+            return C.fail "Unable to start Configi systemd timer." unless systemctl("start", "configi.timer")
             C.equal(0, systemctl("is-active", "configi"), "systemctl(1) returned non-zero when checking if Configi is active.")
 A["systemd"] = systemd
 A
