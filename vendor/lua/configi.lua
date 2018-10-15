@@ -7,6 +7,7 @@ local quiet = false
 local grey = false
 local test_regex = false
 local remote = false
+local nocolor = false
 local UUID = false
 local seq = 0
 local argparse = require"argparse"
@@ -47,7 +48,14 @@ end
 
 local function log(msg, tag, name, tm)
   if not quiet then
-    fmt.print(msg.."\n")
+    if nocolor then
+      local tmsg, msg = pcall(string.gsub, msg, string.char(27).."[%d%p]+m", "")
+      if tmsg then
+        fmt.print(msg.."\n")
+      end
+    else
+      fmt.print(msg.."\n")
+    end
   end
   if remote then
     seq = seq + 1
@@ -278,6 +286,7 @@ api.INIT = function(a)
     end
   }
   local parser = argparse(a[0], "Options")
+  parser:flag("-C --nocolor", "Disable colors")
   parser:flag("-q --quiet", "Silent output")
   parser:option("-g --log", "Log to remote GELF TCP endpoint. Example: '127.0.0.1:12201'")
   local args = parser:parse()
@@ -287,6 +296,7 @@ api.INIT = function(a)
     uuid.seed()
     UUID = uuid.new()
   end
+  nocolor = args.nocolor
   quiet = args.quiet
   return setmetatable(env, {
       __index = function(_, m)
