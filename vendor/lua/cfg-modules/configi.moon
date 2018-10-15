@@ -48,8 +48,6 @@ systemd = (m) ->
     install = exec.ctx "install"
     C["configi.systemd :: Run #{dest} every #{min} minute(s)"] = ->
         return C.pass! if file.read(timer_path) == timer and file.read(service_path) == service
-        return C.fail "install(1) executable not found." unless exec.path "install"
-        return C.fail "Unable to copy the Configi executable to '#{dest}'." unless install("-m", "0755", "-o", "root", "-g", "root", "-D", "/proc/self/exe", dest)
         return C.fail "Unable to write the systemd timer (#{timer_path})." unless file.write(timer_path, timer)
         return C.fail "Unable to write the systemd service (#{service_path})." unless file.write(service_path, service)
         return C.fail "Unable to reload systemd daemon." unless systemctl "daemon-reload"
