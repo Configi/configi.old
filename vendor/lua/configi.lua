@@ -271,7 +271,7 @@ api.INIT = function(a)
       if nfailed == 0 then
         log(trepair_tag .. " " .. (ntests - npassed) .. " out of " .. ntests, "Summary")
         log(tpass_tag .. " " .. npassed .. " out of " .. ntests, "Summary")
-        log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " seconds", "Summary")
+        log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " second(s)", "Summary")
         os.exit(0)
       else
         log(trepair_tag .. " " .. ((ntests - nfailed) - npassed) .. " out of " .. ntests, "Summary")
