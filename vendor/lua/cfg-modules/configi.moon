@@ -29,23 +29,23 @@ systemd = (exe = "/srv/configi/exe") ->
     return (p) ->
         p.interval = tostring m or "5"
         timer = "
-            [Unit]
-            Description=Configi Timer
+[Unit]
+    Description=Configi Timer
 
-            [Timer]
-            OnCalendar=*:0/#{p.interval}
+[Timer]
+    OnCalendar=*:0/#{p.interval}
 
-            [Install]
-            WantedBy=timers.target
-        "
+[Install]
+    WantedBy=timers.target
+"
         service = "
-            [Unit]
-            Description=Configi Service
+[Unit]
+    Description=Configi Service
 
-            [Service]
-            Type=oneshot
-            ExecStart=#{exe} -C
-        "
+[Service]
+    Type=oneshot
+    ExecStart=#{exe} -C
+"
         timer_path = "/etc/systemd/system/configi.timer"
         service_path = "/etc/systemd/system/configi.service"
         systemctl = exec.ctx "systemctl"
