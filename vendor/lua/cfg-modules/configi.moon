@@ -39,7 +39,7 @@ systemd = (m) ->
 
         [Service]
         Type=oneshot
-        ExecStart=/srv/configi/exe
+        ExecStart=/srv/configi/exe -C
     "
     timer_path = "/etc/systemd/system/configi.timer"
     service_path = "/etc/systemd/system/configi.service"
