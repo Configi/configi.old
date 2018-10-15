@@ -49,9 +49,9 @@ end
 local function log(msg, tag, name, tm)
   if not quiet then
     if nocolor then
-      local tmsg, msg = pcall(string.gsub, msg, string.char(27).."[%d%p]+m", "")
+      local tmsg, m = pcall(string.gsub, msg, string.char(27).."[%d%p]+m", "")
       if tmsg then
-        fmt.print(msg.."\n")
+        fmt.print(m.."\n")
       end
     else
       fmt.print(msg.."\n")
