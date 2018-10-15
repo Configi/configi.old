@@ -1,4 +1,4 @@
-.DEFAULT_GOAL= development
+.DEFAULT_GOAL= release
 EXE:= cfg
 SRC:=
 SRC_DIR:= files
@@ -24,5 +24,5 @@ test:
 	cp vendor/lua/cfg-modules/*.lua cfg-modules
 	bin/luacheck.lua --no-max-line-length bin/cfg.lua
 	bin/luacheck.lua --no-max-line-length vendor/lua/configi.lua
-	#bin/luacheck.lua --no-max-line-length vendor/lua/cfg-modules/*.lua
+	bin/luacheck.lua --no-max-line-length vendor/lua/cfg-modules/*.lua
 	bin/lua bin/cfg.lua
