@@ -18,7 +18,7 @@ export _ENV = nil
 --
 -- Parameters:
 --     (table)
---         digest = The expected hash digest of the specified file.
+--         digest = The expected hash digest of the specified file (string)
 --
 -- Results:
 --     Pass = Hash digest matched.
