@@ -108,7 +108,7 @@ script = (str) ->
             else
                 code, ret = popen(s)
                 C.print(table.concat(ret.output, "\n")) if true == output and 0 == code
-                C.equal(0, code, "Execution failure. Script returned '#{code}'.")
+                C.equal(0, code, "Execution failure. Script returned non-zero code (#{code}).")
 E["spawn"] = spawn
 E["simple"] = spawn
 E["script"] = script
