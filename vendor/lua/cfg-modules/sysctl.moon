@@ -12,7 +12,7 @@ export _ENV = nil
 -- Kernel paramater modification through sysctl as implemented in procfs.d
 -- Write value to a sysctl key.
 --
--- Arguments:
+-- Argument:
 --     (string) = The key to write to
 --
 -- Parameters:
