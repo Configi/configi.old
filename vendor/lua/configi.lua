@@ -121,7 +121,6 @@ local function test_pretty_name(suite_name, test_name)
   end
 end
 
--- PUBLIC API -----------------------------------------------------------------
 local api = { test_suite_name = "__root", disabled = false }
 
 api.parameter = function (p)
