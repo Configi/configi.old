@@ -13,6 +13,7 @@ local seq = 0
 local argparse = require"argparse"
 local lib = require"lib"
 local fmt = lib.fmt
+local package = package
 
 local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m" end
 local function blue(str)   return grey and str or "\27[1;34m" .. str .. "\27[0m" end
@@ -284,6 +285,7 @@ api.INIT = function(a)
       end
     end
   }
+  package.loaded["configi.env"] = env
   local parser = argparse(a[0], "Options")
   parser:flag("-C --nocolor", "Disable colors")
   parser:flag("-q --quiet", "Silent output")
