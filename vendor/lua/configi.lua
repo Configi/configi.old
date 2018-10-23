@@ -13,7 +13,7 @@ local seq = 0
 local argparse = require"argparse"
 local lib = require"lib"
 local fmt = lib.fmt
-local package = package
+local env
 
 local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m" end
 local function blue(str)   return grey and str or "\27[1;34m" .. str .. "\27[0m" end
@@ -157,6 +157,9 @@ api.pass = function (...)
   if ok then pass() end
 end
 
+api.register = function (r, v)
+  if r and type(r) == "string" then env[r] = v end
+
 api.fail = function(s)
   fail(tostring(s))
 end
@@ -264,7 +267,7 @@ end
 
 api.INIT = function(a)
   local start = os.time()
-  local env = {
+  env = {
     SUMMARY = function ()
       log(done_tag, "Done")
       local nfailed = #failed_list
@@ -285,7 +288,6 @@ api.INIT = function(a)
       end
     end
   }
-  package.loaded["configi.env"] = env
   local parser = argparse(a[0], "Options")
   parser:flag("-C --nocolor", "Disable colors")
   parser:flag("-q --quiet", "Silent output")
