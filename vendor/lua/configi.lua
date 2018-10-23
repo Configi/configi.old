@@ -159,6 +159,7 @@ end
 
 api.register = function (r, v)
   if r and type(r) == "string" then env[r] = v end
+end
 
 api.fail = function(s)
   fail(tostring(s))
