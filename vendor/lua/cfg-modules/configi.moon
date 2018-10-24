@@ -25,7 +25,7 @@ export _ENV = nil
 -- Examples:
 --     configi.systemd(5)
 
-systemd = (exe = "/srv/configi/exe") ->
+systemd = (exe = "/srv/cfg") ->
     return (p) ->
         min = tostring p.interval or "5"
         timer = "
