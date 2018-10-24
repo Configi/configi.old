@@ -305,7 +305,7 @@ api.INIT = function(a)
         if not rb then
           rb, rm = pcall(require, "cfg-modules." .. m)
           if not rb then
-            return log(string.format("%s: `%s`", " WARNING    : Value not set or no such Configi module", m))
+            return log(string.format("%s: `%s`", "    WARNING : Value not set or no such Configi module", m))
           end
         end
         return rm
