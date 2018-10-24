@@ -98,7 +98,7 @@ script = (str) ->
             s = require"scripts.#{str}"
             return C.fail "Script '#{str}' not found." if nil == s
             local code, ret, expects, output, ignore
-            {:expects, :output, :ignore} = p if type(p) == table
+            {:register, :expects, :output, :ignore} = p if type(p) == table
             return C.pass! if expects and stat.stat expects
             if true == ignore
                 code, ret = popen(s, true)
@@ -106,12 +106,12 @@ script = (str) ->
                 C.print("Script returned '#{code}'.")
                 C.print(table.concat(ret.output, "\n")) if true == output
                 C.equal(code, code)
-                C.register(p.register, ret.output)
+                C.register(register, ret.output)
             else
                 code, ret = popen(s)
                 C.print(table.concat(ret.output, "\n")) if true == output and 0 == code
                 C.equal(0, code, "Execution failure. Script returned non-zero code (#{code}).")
-                C.register(p.register, ret.output)
+                C.register(register, ret.output)
 E["spawn"] = spawn
 E["simple"] = spawn
 E["script"] = script
