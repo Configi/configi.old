@@ -23,7 +23,6 @@ local function magenta(str) return grey and str or "\27[1;35m" .. str .. "\27[0m
 
 local configi_tag  = blue   " ---- Configi"
 local done_tag     = blue   " ------- Done"
-local start_tag    = blue   " START      :"
 local repair_tag   = green  "     REPAIR :"
 local pass_tag     = yellow "       PASS :"
 local fail_tag     = red    "       FAIL :"
@@ -240,8 +239,6 @@ local function run_test(test_suite, test_name, test_function, ...)
   ntests = ntests + 1
   failed = false
   passed = false
-
-  log(start_tag .. " " .. full_test_name, start_tag, full_test_name)
 
   local start = os.time()
 
