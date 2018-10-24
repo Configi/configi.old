@@ -256,7 +256,7 @@ local function run_test(test_suite, test_name, test_function, ...)
   local difftime = os.difftime(stop, start)
   local is_test_failed = not status or failed
   local tag = (is_test_failed and fail_tag) or (passed and pass_tag) or repair_tag
-  log(string.format("%s %s = %d sec", tag, full_test_name, difftime), tag, full_test_name, difftime)
+  log(string.format("%s %s = %ds", tag, full_test_name, difftime), tag, full_test_name, difftime)
 
   if is_test_failed then
     table.insert(failed_list, full_test_name)
