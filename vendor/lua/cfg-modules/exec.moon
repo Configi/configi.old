@@ -66,6 +66,7 @@ spawn = (exe) ->
 --         expects = A precondition. Path MUST NOT exist before running the executable.
 --          ignore = if set to `true`, always run the script, the shell script's return result is ignored.
 --          output = if set to `true`, show the popen(3) output.
+--        register = Set this variable name to the output of the script.
 --
 -- Results:
 --     Repaired = Successfully executed.
@@ -105,10 +106,12 @@ script = (str) ->
                 C.print("Script returned '#{code}'.")
                 C.print(table.concat(ret.output, "\n")) if true == output
                 C.equal(code, code)
+                C.register(p.register, ret.output)
             else
                 code, ret = popen(s)
                 C.print(table.concat(ret.output, "\n")) if true == output and 0 == code
                 C.equal(0, code, "Execution failure. Script returned non-zero code (#{code}).")
+                C.register(p.register, ret.output)
 E["spawn"] = spawn
 E["simple"] = spawn
 E["script"] = script
