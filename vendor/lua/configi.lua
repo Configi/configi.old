@@ -38,7 +38,7 @@ local function trace(msg, start_frame)
     local info = debug.getinfo(frame, "Sl")
     if not info then break end
     local d = frame - start_frame
-    if ((d >= 3) and (d <= 4)) then
+    if ((d >= 4) and (d <= 5)) then
       o[#o + 1] = "  --> " .. (string.gsub(info.source, "%.", "/")) ..  ".lua:" .. info.currentline
     end
     frame = frame + 1
