@@ -63,10 +63,10 @@ spawn = (exe) ->
 --
 -- Parameters:
 --     (table)
---         expects = A precondition. Path MUST NOT exist before running the executable.
---          ignore = if set to `true`, always run the script, the shell script's return result is ignored.
---          output = if set to `true`, show the popen(3) output.
---        register = Set this variable name to the output of the script.
+--         expects = A precondition. Path MUST NOT exist before running the executable (string)
+--          ignore = if set to `true`, always run the script, the shell script's return result is ignored (boolean)
+--          output = if set to `true`, show the popen(3) output (boolean)
+--        register = Set this variable name to the output of the script (string)
 --
 -- Results:
 --     Repaired = Successfully executed.
