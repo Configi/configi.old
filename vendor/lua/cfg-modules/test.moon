@@ -4,7 +4,7 @@ S = {}
 export _ENV = nil
 test_fail = (t) ->
     return (p) ->
-        C["test.test :: #{t}"] = ->
+        C["test.test_fail :: #{t}"] = ->
             C.equal(0, 1, "Did not match")
             C.print "prints someting"
             return C.pass if p
