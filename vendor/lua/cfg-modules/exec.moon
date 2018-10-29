@@ -1,7 +1,7 @@
 C = require"configi"
 E = {}
 {:exec, :string} = require"lib"
-table, require, type, io, tostring = table, require, type, io, tostring
+table, require, type, io, tostring, pcall = table, require, type, io, tostring, pcall
 stat = require"posix.sys.stat"
 export _ENV = nil
 -- Author: Eduardo Tongson <propolice@gmail.com>
@@ -95,8 +95,8 @@ script = (str) ->
             return nil, r
     return (p) ->
         C["exec.script :: #{str}"] = ->
-            s = require"scripts.#{str}"
-            return C.fail "Script '#{str}' not found." if nil == s
+            r, s = pcall(require, "scripts.#{str}")
+            return C.fail "Script '#{str}' not found." if false == r
             local code, ret, expects, output, ignore
             {:register, :expects, :output, :ignore} = p if type(p) == table
             return C.pass! if expects and stat.stat expects
