@@ -281,7 +281,7 @@ api.INIT = function(a)
         for _, test_name in ipairs(failed_list) do
           log(failed_tag .. "\t" .. test_name, "Summary")
         end
-        log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " seconds", "Summary")
+        log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " second(s)", "Summary")
         os.exit(1)
       end
     end
