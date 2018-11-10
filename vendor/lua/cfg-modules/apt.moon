@@ -1,9 +1,9 @@
+-- Author: Eduardo Tongson <propolice@gmail.com>
+-- License: MIT <http://opensource.org/licenses/MIT>
 C = require "configi"
 {:exec, :table} = require "lib"
 A = {}
 export _ENV = nil
--- Author: Eduardo Tongson <propolice@gmail.com>
--- License: MIT <http://opensource.org/licenses/MIT>
 ----
 --  `apt.installed`
 --
