@@ -1,3 +1,5 @@
+-- Author: Eduardo Tongson <propolice@gmail.com>
+-- License: MIT <http://opensource.org/licenses/MIT>
 require, pairs, tostring = require, pairs, tostring
 C = require "configi"
 F = {}
