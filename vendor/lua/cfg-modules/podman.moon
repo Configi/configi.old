@@ -1,5 +1,6 @@
 -- Author: Eduardo Tongson <propolice@gmail.com>
 -- License: MIT <http://opensource.org/licenses/MIT>
+tostring = tostring
 C = require "configi"
 P = {}
 {:exec, :table} = require "lib"
