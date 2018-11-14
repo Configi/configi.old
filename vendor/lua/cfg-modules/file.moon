@@ -8,6 +8,31 @@ stat = require "posix.sys.stat"
 Ppwd = require "posix.pwd"
 Pgrp = require "posix.grp"
 export _ENV = nil
+----
+--  ### file.owner
+--
+--  Ensure the owner attribute of a path is the specified user or uid.
+--  Wraps the chown(1) command or program.
+--
+--  #### Arguments:
+--      (string) = Complete path of file.
+--
+--  #### Parameters:
+--      (table)
+--          user = owner or uid (string/number)
+--
+--  #### Results:
+--      Repaired = Successfully changed owner attribute to the correct user.
+--      Fail     = Error encountered when running chown(1) against the path.
+--      Pass     = The owner attribute of the path is already the expected user.
+--
+--  #### Examples:
+--  ```
+--  file.owner("/etc/passwd"){
+--    user = "root"
+--  }
+--  ```
+----
 owner = (path) ->
     return (p) ->
         user = tostring p.user
@@ -23,6 +48,31 @@ owner = (path) ->
             return C.fail "chown(1) executable not found." if nil == exec.path "chown"
             return C.pass! if user == pw_name or user == tostring pw_uid
             C.equal(0, exec.ctx("chown")(user, path), "Failure running chown(1).")
+----
+--  ### file.group
+--
+--  Ensure the group attribute of a path is the specified group or gid.
+--  Wraps the chgrp(1) command or program.
+--
+--  #### Arguments:
+--      (string) = Complete path of file.
+--
+--  #### Parameters:
+--      (table)
+--          group = group or gid (string/number)
+--
+--  #### Results:
+--      Repaired = Successfully changed group attribute to the correct group.
+--      Fail     = Error encountered when running chgrp(1) against the path.
+--      Pass     = The group attribute of the path is already the expected group.
+--
+--  #### Examples:
+--  ```
+--  file.group("/etc/passwd"){
+--    group = "root"
+--  }
+--  ```
+----
 group = (path) ->
     return (p) ->
         grp = tostring p.group
@@ -38,16 +88,72 @@ group = (path) ->
             return C.fail "chgrp(1) executable not found." if nil == exec.path "chgrp"
             return C.pass! if grp == gr_name or grp == tostring gr_gid
             C.equal(0, exec.ctx("chgrp")(grp, path), "Failure running chgrp(1).")
+----
+--  ### file.directory
+--
+--  Ensure the specified directory is present.
+--  Wraps the mkdir(1) command or program.
+--
+--  #### Arguments:
+--      (string) = Complete path of directory.
+--
+--  #### Results:
+--      Repaired = Successfully created directory.
+--      Fail     = Error encountered when running mkdir(1).
+--      Pass     = Directory already present.
+--
+--  #### Examples:
+--  ```
+--  file.directory("/srv/configi")
+--  ```
+----
 directory = (d) ->
     C["file.directory :: #{d}"] = ->
         return C.fail "mkdir(1) executable not found." if nil == exec.path "mkdir"
         return C.pass! if os.is_dir d
         C.equal(0, exec.ctx("mkdir")("-p", d), "Failure creating directory #{d}.")
+----
+--  ### file.absent
+--
+--  Ensure the specified path is absent.
+--  Wraps the rm(1) command or program.
+--
+--  #### Arguments:
+--      (string) = Path to remove.
+--
+--  #### Results:
+--      Repaired = Successfully removed path.
+--      Fail     = Error encountered when running rm(1).
+--      Pass     = Path already absent.
+--
+--  #### Examples:
+--  ```
+--  file.absent("/srv/configi")
+--  ```
+----
 absent = (f) ->
     C["file.absent :: #{f}"] = ->
         return C.fail "rm(1) executable not found." if nil == exec.path "rm"
         return C.pass! if nil == stat.stat f
         C.equal(0, exec.ctx("rm")("-r", "-f", f), "Failure deleting #{f}.")
+----
+--  ### file.managed
+--
+--  Manage a specified file's contents.
+--
+--  #### Arguments:
+--      (string) = Name of key to load from the files module hierarchy.
+--
+--  #### Results:
+--      Repaired = Successfully written file.
+--      Fail     = Error encountered when writing file.
+--      Pass     = File already has expected contents.
+--
+--  #### Examples:
+--  ```
+--  file.managed("testing")
+--  ```
+----
 managed = (f) ->
     m = require "files.#{f}"
     for k, v in pairs m
@@ -56,6 +162,30 @@ managed = (f) ->
             contents = file.read v.path
             return C.pass! if contents == v.contents
             C.is_true(file.write(v.path, v.contents), "Failure writing contents to #{v.path}.")
+----
+--  ### file.templated
+--
+--  Manage a specified file's contents through a template.
+--
+--  #### Arguments:
+--      (string) = Name of key to load from the files module hierarchy.
+--
+--  #### Parameters:
+--      (table) = Key-value pairs to interpolate from the file.
+--
+--  #### Results:
+--      Repaired = Successfully written file.
+--      Fail     = Error encountered when writing file.
+--      Pass     = File already has expected contents.
+--
+--  #### Examples:
+--  ```
+--  file.templated("testing"){
+--    user = "tongson",
+--    uid = "11111"
+--  }
+--  ```
+----
 templated = (f) ->
     m = require "files.#{f}"
     return (p) ->
@@ -65,6 +195,30 @@ templated = (f) ->
                 payload = string.template(v.contents, p)
                 return C.pass! if payload == file.read v.path
                 C.is_true(file.write(v.path, payload), "Failure writing contents to #{v.path}.")
+----
+--  ### file.chmod
+--
+--  Wraps the chmod(1) command or program.
+--
+--  #### Arguments:
+--      (string) = Complete path of file.
+--
+--  #### Parameters:
+--      (table)
+--          mode = mode
+--
+--  #### Results:
+--      Repaired = Successfully changed owner attribute to the correct user.
+--      Fail     = Error encountered when running chown(1) against the path.
+--      Pass     = The owner attribute of the path is already the expected user.
+--
+--  #### Examples:
+--  ```
+--  file.chmod("/etc/passwd"){
+--    mode = "0660"
+--  }
+--  ```
+----
 chmod = (f) ->
     return (p) ->
         mode_arg = tostring p.mode
@@ -75,6 +229,33 @@ chmod = (f) ->
             return C.fail "chmod(1) executable not found" if nil == exec.path "chmod"
             return C.pass! if current_mode == string.sub(mode_arg, len, -1)
             C.equal(0, exec.ctx("chmod")(mode_arg, f), "Failure running chmod(1) on #{f}.")
+----
+--  ### file.copy
+--
+--  Copy a file to the specified destination
+--  Wraps the cp(1) command or program.
+--
+--  #### Arguments:
+--      (string) = Complete path of file.
+--
+--  #### Parameters:
+--      (table)
+--          target = path to copy file into
+--          force  = overwrite destination
+--
+--  #### Results:
+--      Repaired = Successfully copied source file into destination.
+--      Fail     = Error encountered when running cp(1).
+--      Pass     = Destination path already present.
+--
+--  #### Examples:
+--  ```
+--  file.copy("/etc/passwd"){
+--    target = "/root/backup"
+--    force = true
+--  }
+--  ```
+----
 copy = (f) ->
     return (p) ->
         destination = p.target
