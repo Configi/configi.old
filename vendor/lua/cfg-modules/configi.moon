@@ -1,29 +1,32 @@
+-- Author: Eduardo Tongson <propolice@gmail.com>
+-- License: MIT <http://opensource.org/licenses/MIT>
 C = require "configi"
 tostring = tostring
 {:exec, :file}  = require "lib"
 A = {}
 export _ENV = nil
--- Author: Eduardo Tongson <propolice@gmail.com>
--- License: MIT <http://opensource.org/licenses/MIT>
+----
+--  ### configi.systemd
 --
--- configi.systemd
+--  Ensure that Configi is installed as a timer unit on a systemd-based host.
 --
--- Ensure that Configi is installed as a time on a systemd-based host.
+--  #### Argument:
+--      (string) = Path of Configi executable binary
 --
--- Argument:
---     (string) = Path of Configi executable binary
+--  #### Parameters:
+--      (table)
+--          interval = Interval in minutes to run Configi (string/number)
 --
--- Parameters:
---     (table)
---         interval = Interval in minutes to run Configi (string/number)
+--  #### Results:
+--      Pass     = systemd timer and service already in place.
+--      Repaired = Installed systemd timer and service.
+--      Fail     = Failed to install systemd timer and service.
 --
--- Results:
---     Pass     = systemd timer and service already in place.
---     Repaired = Installed systemd timer and service.
---     Fail     = Failed to install systemd timer and service.
---
--- Examples:
---     configi.systemd(5)
+--  #### Examples:
+--  ```
+--  configi.systemd(5)
+--  ```
+----
 
 systemd = (exe = "/srv/cfg") ->
     return (p) ->
