@@ -1,26 +1,29 @@
+-- Author: Eduardo Tongson <propolice@gmail.com>
+-- License: MIT <http://opensource.org/licenses/MIT>
 C = require "configi"
 I = {}
 tonumber, tostring = tonumber, tostring
 {:exec, :string, :table} = require "lib"
 export _ENV = nil
--- Author: Eduardo Tongson <propolice@gmail.com>
--- License: MIT <http://opensource.org/licenses/MIT>
+----
+--  ### iptables.default
 --
--- iptables.default
+--  Add baseline iptables rules.
+--  Sets the default policy.
 --
--- Add baseline iptables rules.
--- Sets the default policy.
+--  #### Arguments:
+--      #1 (string) = Iptables TARGET. Valid values are ACCEPT, DROP, REJECT. Default is DROP.
 --
--- Arguments:
---     #1 (string) = Iptables TARGET. Valid values are ACCEPT, DROP, REJECT. Default is DROP.
+--  #### Results:
+--      Pass     = Policy already in place.
+--      Repaired = The policy was implemented.
+--      Fail     = Failed implementing policy.
 --
--- Results:
---     Pass     = Policy already in place.
---     Repaired = The policy was implemented.
---     Fail     = Failed implementing policy.
---
--- Examples:
---     iptables.default("DROP")
+--  #### Examples:
+--  ```
+--  iptables.default("DROP")
+--  ```
+----
 default = (target = "DROP") ->
     target = string.upper target
     policy = {
@@ -57,25 +60,28 @@ default = (target = "DROP") ->
             iptables.exe = ipt
             iptables[1] = "-A"
             C.equal(0, exec.qexec(iptables), "Failure applying localhost policy.")
-
--- iptables.open(string/number)
+----
+--  ### iptables.open
 --
--- Open stateful port.
+--  Open stateful port.
 --
--- Arguments:
---     #1 (string/number) = Port to open.
+--  #### Arguments:
+--         #1 (string/number) = Port to open.
 --
--- Parameters:
---      (table)
---          protocol = TCP or UDP (TCP by default)
+--  #### Parameters:
+--         (table)
+--             protocol = TCP or UDP (TCP by default)
 --
--- Results:
---     Pass     = Port is already opened.
---     Repaired = Port opened.
---     Fail     = Failed to open port.
+--  #### Results:
+--         Pass     = Port is already opened.
+--         Repaired = Port opened.
+--         Fail     = Failed to open port.
 --
--- Examples:
---     iptables.open(443)
+--  #### Examples:
+--  ```
+--  iptables.open(443)
+--  ```
+----
 open = (port) ->
     return (p) ->
         p.protocol = string.lower p.protocol or "tcp"
@@ -139,21 +145,24 @@ open = (port) ->
                     iptables[10] = port
                     iptables[1] = "-A"
                     C.equal(0, exec.qexec(iptables), "Failure opening IPv4 port. Unable to add OUTPUT rule.")
-
--- iptables.outgoing
+----
+--  ### iptables.outgoing
 --
--- Allow outgoing connections from the specified interface.
+--  Allow outgoing connections from the specified interface.
 --
--- Arguments:
---     #1 (string) = Interface to allow.
+--  #### Arguments:
+--         #1 (string) = Interface to allow.
 --
--- Results:
---     Pass     = Interface already allowed.
---     Repaired = Rule for interface added.
---     Fail     = Failed to add rule.
+--  #### Results:
+--         Pass     = Interface already allowed.
+--         Repaired = Rule for interface added.
+--         Fail     = Failed to add rule.
 --
--- Examples:
---     iptables.outgoing "eth0"
+--  #### Examples:
+--  ```
+--  iptables.outgoing "eth0"
+--  ```
+----
 outgoing = (interface) ->
     rules = {
         {
@@ -198,26 +207,30 @@ outgoing = (interface) ->
             if "INPUT" == iptables[2]
                 iptables[4] = interface
                 C.equal(0, exec.qexec(iptables), "Failure allowing outgoing interface. Unable to add INPUT rule.")
--- iptables.add(string)
+----
+--  ### iptables.add
 --
--- Add an iptables rule.
+--  Add an iptables rule.
 --
--- Arguments:
---     #1 (string) = Description of the rule
+--  #### Arguments:
+--         #1 (string) = Description of the rule
 --
--- Parameters:
---     (table)
---         rule = The rule to add (string)
+--  #### Parameters:
+--         (table)
+--             rule = The rule to add (string)
 --
--- Results:
---     Pass     = The rule is already loaded.
---     Repaired = The rule was successfully added.
---     Fail     = Failed adding the rule. Likely an invalid iptables rule.
+--  #### Results:
+--         Pass     = The rule is already loaded.
+--         Repaired = The rule was successfully added.
+--         Fail     = Failed adding the rule. Likely an invalid iptables rule.
 --
--- Examples:
---     iptables.add("Allow DNS"){
---       rule = "-A INPUT -p udp -m udp --dport 53 -j ACCEPT"
---     }
+--  #### Examples:
+--  ```
+--  iptables.add("Allow DNS"){
+--    rule = "-A INPUT -p udp -m udp --dport 53 -j ACCEPT"
+--  }
+--  ```
+----
 add = (desc = "") ->
     return (p) ->
         C["iptables.add :: #{desc}"] = ->
@@ -230,25 +243,29 @@ add = (desc = "") ->
             return C.pass! if exec.qexec iptables
             iptables[1] = "-A"
             C.equal(0, exec.qexec(iptables), "Failure adding iptables rule.")
--- iptables.count
+----
+--  ### iptables.count
 --
--- Compare the actual number of iptables rules in the given table with an expected number.
+--  Compare the actual number of iptables rules in the given table with an expected number.
 --
--- Argument:
---      (string) = The table (e.g. "nat", "filter") to count rules on.
+--  #### Argument:
+--         (string) = The table (e.g. "nat", "filter") to count rules on.
 --
--- Parameters:
---      (table)
---          expect = The expected number of rules in the table (number)
+--  #### Parameters:
+--         (table)
+--             expect = The expected number of rules in the table (number)
 --
--- Results:
---      Pass = The actual and expected number of rules match.
---      Fail = The actual and expected number of rules are different.
+--  #### Results:
+--         Pass = The actual and expected number of rules match.
+--         Fail = The actual and expected number of rules are different.
 --
--- Examples:
---      iptables.count("filter"){
---        expect = 5
---      }
+--  #### Examples:
+--  ```
+--  iptables.count("filter"){
+--    expect = 5
+--  }
+--  ```
+----
 count = (tbl = "all") ->
     return (p) ->
         no = tonumber p.expect
