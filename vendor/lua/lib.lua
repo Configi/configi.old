@@ -482,7 +482,7 @@ function os.real_name()
   return pwd.getpwuid(unistd.getuid()).pw_name
 end
 
-function exec.context(exe)
+function exec.context(exe, expect)
   local args
   if strlen(path.split(exe)) == 0 then
     args = {exe = exec.path(exe)}
@@ -502,7 +502,11 @@ function exec.context(exe)
         a[#a+1] = k
       end
     end
-    return exec.qexec(a)
+    if expect == nil then
+      return exec.qexec(a)
+    elseif exec.qexec(a) == expect then
+      return true
+    end
   end})
 end
 
