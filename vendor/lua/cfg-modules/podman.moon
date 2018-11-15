@@ -12,12 +12,12 @@ export _ENV = nil
 --  Does not update the existing local image.
 --
 --  #### Arguments:
---         #1 (string) = The url of the image.
+--      #1 (string) = The url of the image.
 --
 --  #### Results:
---         Pass     = Image already pulled.
---         Repaired = Successfully pulled image.
---         Fail     = Failed to pull the image.
+--      Pass     = Image already pulled.
+--      Repaired = Successfully pulled image.
+--      Fail     = Failed to pull the image.
 --
 --  #### Examples:
 --  ```
@@ -35,12 +35,12 @@ image = (i) ->
 --  Ensure that a container image is up-to-date.
 --
 --  #### Arguments:
---         #1 (string) = The url of the image.
+--      #1 (string) = The url of the image.
 --
 --  #### Results:
---         Pass     = Image up-to-date.
---         Repaired = Successfully updated image.
---         Fail     = Failed to update the image.
+--      Pass     = Image up-to-date.
+--      Repaired = Successfully updated image.
+--      Fail     = Failed to update the image.
 --
 --  #### Examples:
 --  ```
