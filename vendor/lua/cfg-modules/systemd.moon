@@ -49,12 +49,12 @@ unit = (f) ->
 --  systemd.active("unbound")
 --  ```
 ----
-active = (unit) ->
-    C["systemd.active :: #{unit}"] = ->
-        return C.pass! if systemctl("-q", "is-active", unit)
+active = (u) ->
+    C["systemd.active :: #{u}"] = ->
+        return C.pass! if systemctl("-q", "is-active", u)
         return C.fail "Unable to reload systemd daemon." unless systemctl "daemon-reload"
-        return C.fail "Attempt to enable systemd unit failed." unless systemctl("enable", unit)
-        C.equal(0, systemctl("start", unit), "Unable to start systemd unit.")
+        return C.fail "Attempt to enable systemd unit failed." unless systemctl("enable", u)
+        C.equal(0, systemctl("start", u), "Unable to start systemd unit.")
 S["unit"] = unit
 S["active"] = active
 S
