@@ -1,26 +1,29 @@
+-- Author: Eduardo Tongson <propolice@gmail.com>
+-- License: MIT <http://opensource.org/licenses/MIT>
 tostring = tostring
 C = require "configi"
 S = {}
 {:exec} = require "lib"
 systemctl = exec.ctx "systemctl"
 export _ENV = nil
--- Author: Eduardo Tongson <propolice@gmail.com>
--- License: MIT <http://opensource.org/licenses/MIT>
+----
+--  ### systemd.active
 --
--- systemd.active
+--  Ensure a systemd service is active.
 --
--- Ensure a systemd service is active.
+--  #### Arguments:
+--      #1 (string) = The systemd unit.
 --
--- Arguments:
---     #1 (string) = The systemd unit.
+--  #### Results:
+--      Pass     = The service is active.
+--      Repaired = Successfully started service.
+--      Fail     = Failed to start service.
 --
--- Results:
---     Pass     = The service is active.
---     Repaired = Successfully started service.
---     Fail     = Failed to start service.
---
--- Examples:
---     systemd.active("unbound")
+--  #### Examples:
+--  ```
+--  systemd.active("unbound")
+--  ```
+----
 active = (unit) ->
     C["systemd.active :: #{unit}"] = ->
         return C.pass! if 0 == systemctl("-q", "is-active", unit)
