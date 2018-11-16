@@ -21,12 +21,12 @@ local function green(str)  return grey and str or "\27[1;32m" .. str .. "\27[0m"
 local function yellow(str) return grey and str or "\27[1;33m" .. str .. "\27[0m" end
 local function magenta(str) return grey and str or "\27[1;35m" .. str .. "\27[0m" end
 
-local configi_tag  = blue   " ---- Configi"
-local done_tag     = blue   " ------- Done"
-local repair_tag   = green  "     REPAIR :"
-local pass_tag     = yellow "       PASS :"
-local fail_tag     = red    "       FAIL :"
-local disabled_tag = magenta"   DISABLED :"
+local configi_tag  = blue   "INFO: ---- Configi"
+local done_tag     = blue   "INFO: ------- Done"
+local repair_tag   = green  "RUN :"
+local pass_tag     = yellow "PASS:"
+local fail_tag     = red    "FAIL:"
+local disabled_tag = magenta"DISABLED:"
 local tpass_tag    = green  "  Compliant :"
 local trepair_tag  = green  "   Repaired :"
 local failed_tag   = red    "     Failed :"
@@ -305,7 +305,7 @@ api.INIT = function(a)
         if not rb then
           rb, rm = pcall(require, "cfg-modules." .. m)
           if not rb then
-            return log(string.format("%s: `%s`", "    WARNING : Value not set or no such Configi module", m))
+            return log(string.format("%s: `%s`", "WARN: Value not set or no such Configi module", m))
           end
         end
         return rm
