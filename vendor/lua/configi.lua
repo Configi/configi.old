@@ -23,7 +23,7 @@ local function magenta(str) return grey and str or "\27[1;35m" .. str .. "\27[0m
 
 local configi_tag  = blue   "INFO: ---- Configi"
 local done_tag     = blue   "INFO: ------- Done"
-local repair_tag   = green  "RUN :"
+local repair_tag   = green  "MEND:"
 local pass_tag     = yellow "PASS:"
 local fail_tag     = red    "FAIL:"
 local disabled_tag = magenta"DISABLED:"
