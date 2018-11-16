@@ -3,7 +3,7 @@
 tostring = tostring
 C = require "configi"
 S = {}
-{:exec} = require "lib"
+{:exec, :file} = require "lib"
 systemctl = exec.ctx "systemctl"
 export _ENV = nil
 ----
