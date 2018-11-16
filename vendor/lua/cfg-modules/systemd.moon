@@ -25,12 +25,13 @@ export _ENV = nil
 --  ```
 ----
 unit = (f) ->
-    m = require "systemd.#{f}"
-    C["systemd.unit :: #{f}: #{m.path}"] = ->
+    path = "/etc/systemd/system/#{f}.service"
+    C["systemd.unit :: #{path}"] = ->
+        m = require "systemd.#{f}"
         return C.fail "Source not found." if nil == m
-        contents = file.read m.path
-        return C.pass! if contents == m.contents
-        C.is_true(file.write(m.path, m.contents), "Failure writing contents to #{m.path}.")
+        contents = file.read path
+        return C.pass! if contents == m
+        C.is_true(file.write(path, m), "Failure writing contents to #{path}.")
 ----
 --  ### systemd.active
 --
