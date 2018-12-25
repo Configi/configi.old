@@ -1,1 +1,0 @@
-void closefrom(int lowfd);

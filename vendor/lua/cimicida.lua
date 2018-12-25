@@ -94,7 +94,7 @@ local t_find = function(tbl, str, plain)
 end
 
 local f_find = function(file, str, plain, fmt)
-  fmt = fmt or "L"
+  fmt = fmt or "*L"
   for s in io.lines(file, fmt) do
     if string.find(s, str, 1, plain) then
       return true
@@ -104,7 +104,7 @@ end
 
 local f_match = function(file, str, fmt)
   local m
-  fmt = fmt or "L"
+  fmt = fmt or "*L"
   for s in io.lines(file, fmt) do
     m = string.match(s, str)
     if m then break end
@@ -188,7 +188,7 @@ local t_filter = function(tbl, patt, plain)
 end
 
 local f_to_seq = function(file, fmt)
-  fmt = fmt or "L"
+  fmt = fmt or "*L"
   local _, fd = pcall(io.open, file, 're')
   if fd then
     io.flush(fd)
@@ -256,7 +256,7 @@ local f_read = function(file)
 end
 
 local f_write = function(path, str, mode)
-  mode = mode or "we+"
+  mode = mode or "w+"
   local fd = io.open(path, mode)
   if fd then
     fd:setvbuf("no")
@@ -281,15 +281,6 @@ end
 
 local template = function(s, v)
   return string.gsub(s, "%${[%s]-([^}%G]+)[%s]-}", v)
-end
-
-local exit_string = function(proc, status, code)
-  if status == "exit" or status == "exited" then
-    return string.format("%s: Exited with code %s", proc, code)
-  end
-  if status == "signal" or status == "killed" then
-    return string.format("%s: Caught signal %s", proc, code)
-  end
 end
 
 local truthy = function(s)
@@ -326,8 +317,7 @@ local popen = function(str, cwd, ignore)
   for ln in pipe:lines() do
     R.output[#R.output + 1] = ln
   end
-  local _, code
-  _, R.status, code = io.close(pipe)
+  local code = io.close(pipe)
   R.exe = "io.popen"
   R.code = code
   if code == 0 or ignore then
@@ -350,9 +340,8 @@ local pwrite = function(str, data, cwd, ignore)
   local pipe = io.popen(str, "w")
   io.flush(pipe)
   pipe:write(data)
-  local _, code
   local R = {}
-  _, R.status, code = io.close(pipe)
+  local code = io.close(pipe)
   R.exe = "io.popen"
   if code == 0 or ignore then
     return code, R
@@ -374,9 +363,8 @@ local system = function(str, cwd, ignore)
   else
     str = string.format("%sexec %s %s", set, str, redir)
   end
-  local _, code
   local R = {}
-  _, R.status, code = os.execute(str)
+  local code = os.execute(str)
   R.exe = "os.execute"
   R.code = code
   if code == 0 or ignore then
@@ -394,8 +382,7 @@ local script = function(str, ignore)
   for ln in pipe:lines() do
     R.output[#R.output + 1] = ln
   end
-  local _, code
-  _, R.status, code = io.close(pipe)
+  local code = io.close(pipe)
   R.exe = "io.popen"
   R.code = code
   if code == 0 or ignore then
@@ -435,7 +422,7 @@ local escape_quotes = function(str)
 end
 
 local l_file = function(file, ident, msg)
-  local fd = io.open(file, "ae+")
+  local fd = io.open(file, "a+")
   if fd then
     fd:setvbuf("line")
     local _, err = fprintf(fd, "%s %s: %s\n", os.date("%a %b %d %T"), ident, msg)
@@ -659,7 +646,6 @@ return {
     split = split
   },
   exec = {
-    exit_string = exit_string,
     popen = popen,
     pwrite = pwrite,
     system = system,

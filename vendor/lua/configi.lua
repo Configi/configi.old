@@ -12,6 +12,31 @@ local lib = require"lib"
 local fmt = lib.fmt
 local env
 
+local rerun = function(dir, mod, cmd, a, params)
+  local header = [[
+  export LC_ALL=C
+  export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin
+  ]]
+  local str = string.format("%s rerun -M %s %s:%s --arg %s", header, dir, mod, cmd, a)
+  if params and next(params) then
+    for o, p in pairs(params) do
+      str = string.format("%s --%s %s", str, o, p)
+    end
+  end
+  local pipe = io.popen(str, "r")
+  io.flush(pipe)
+  local output = {}
+  for ln in pipe:lines() do
+    output[#output + 1] = ln
+  end
+  local code = io.close(pipe)
+  if code == 0 then
+    return code, output
+  else
+    return nil, output
+  end
+end
+
 local function red(str)    return grey and str or "\27[1;31m" .. str .. "\27[0m" end
 local function blue(str)   return grey and str or "\27[1;34m" .. str .. "\27[0m" end
 local function green(str)  return grey and str or "\27[1;32m" .. str .. "\27[0m" end

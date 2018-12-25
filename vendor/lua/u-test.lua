@@ -93,6 +93,13 @@ end
 
 -- PUBLIC API -----------------------------------------------------------------
 local api = { test_suite_name = "__root", skip = false }
+
+api.assert = function (cond)
+    if not cond then
+        fail("assertion " .. tostring(cond) .. " failed")
+    end
+end
+
 api.equal = function (l, r)
     if l ~= r then
         fail(tostring(l) .. " ~= " .. tostring(r))
@@ -126,6 +133,20 @@ end
 api.is_not_nil = function (maybe_not_nil)
     if type(maybe_not_nil) == "nil" then
         fail("got nil")
+    end
+end
+
+api.error_raised = function (f, error_message, ...)
+    local status, err = pcall(f, ...)
+    if status == true then
+        fail("error not raised")
+    else
+        if error_message ~= nil then
+            -- we set "plain" to true to avoid pattern matching in string.find
+            if err:find(error_message, 1, true) == nil then
+                fail("'" .. error_message .. "' not found in error '" .. tostring(err) .. "'")
+            end
+        end
     end
 end
 
