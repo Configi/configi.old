@@ -9,6 +9,7 @@ HOST_CC= cc
 CROSS=
 CROSS_CC=
 CCOPT= -Os -mtune=generic -mmmx -msse -msse2 -fomit-frame-pointer -pipe
+CFLAGS= -DLUAJIT_ENABLE_LUA52COMPAT
 LDFLAGS= -Wl,--strip-all
 TARGET_CCOPT= $(CCOPT)
 TARGET_CFLAGS= $(CFLAGS)
