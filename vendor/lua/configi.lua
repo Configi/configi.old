@@ -6,11 +6,8 @@ local failed_list = {}
 local quiet = false
 local grey = false
 local test_regex = false
-local remote = false
 local nocolor = false
-local UUID = false
 local seq = 0
-local argparse = require"argparse"
 local lib = require"lib"
 local fmt = lib.fmt
 local env
@@ -56,35 +53,6 @@ local function log(msg, tag, name, tm)
     else
       fmt.print(msg.."\n")
     end
-  end
-  if remote then
-    seq = seq + 1
-    local tmsg, ttag
-    tmsg, msg = pcall(string.gsub, msg, string.char(27).."[%d%p]+m", "")
-    if not tmsg then msg = nil end
-    if tag and string.find(tag, "^"..string.char(27)) then
-      ttag, tag = pcall(string.match, tag, string.char(27).."[%d%p]+m[%s]+([%w]+)[%s]+:"..string.char(27))
-      if not ttag then tag = nil end
-    end
-    local json = require"dkjson"
-    local px = require"px"
-    local payload = json.encode({ version = "1.1",
-                                     host = px.hostname(),
-                            short_message = "configi: " .. (tag or ""),
-                             full_message = (name or msg),
-                                    _uuid = UUID,
-                                _sequence = seq,
-                                 _elapsed = (tm or nil)})
-    local ip, port = string.match(remote, "([%d]+%.[%d]+%.[%d]+%.[%d]*)[%:]?([%d]*)")
-    if port == "" then port = 12201 end
-    local socket = require"lsocket"
-    local client = socket.connect(ip, port)
-    socket.select(nil, {client})
-    local ok , err = client:status()
-    if not ok then fmt.warn("Error connecting to remote GELF endpoint. ("..err..")\n") end
-    ok, err = client:send(payload)
-    if not ok then fmt.warn("Error connecting to remote GELF endpoint. ("..err..")\n") end
-    client:close()
   end
 end
 
@@ -261,55 +229,6 @@ local function run_test(test_suite, test_name, test_function, ...)
   if is_test_failed then
     table.insert(failed_list, full_test_name)
   end
-end
-
-api.INIT = function(a)
-  local start = os.time()
-  env = {
-    SUMMARY = function ()
-      log(done_tag, "Done")
-      local nfailed = #failed_list
-      if nfailed == 0 then
-        log(trepair_tag .. " " .. (ntests - npassed) .. " out of " .. ntests, "Summary")
-        log(tpass_tag .. " " .. npassed .. " out of " .. ntests, "Summary")
-        log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " second(s)", "Summary")
-        os.exit(0)
-      else
-        log(trepair_tag .. " " .. ((ntests - nfailed) - npassed) .. " out of " .. ntests, "Summary")
-        log(tpass_tag .. " " .. npassed .. " out of " .. ntests, "Summary")
-        log(failed_tag .. " " .. nfailed .. " out of " .. ntests .. ":", "Summary")
-        for _, test_name in ipairs(failed_list) do
-          log(failed_tag .. "\t" .. test_name, "Summary")
-        end
-        log(" Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " second(s)", "Summary")
-        os.exit(1)
-      end
-    end
-  }
-  local parser = argparse(a[0], "Options")
-  parser:flag("-C --nocolor", "Disable colors")
-  parser:flag("-q --quiet", "Silent output")
-  parser:option("-g --log", "Log to remote GELF TCP endpoint. Example: '127.0.0.1:12201'")
-  local args = parser:parse()
-  remote = args.log
-  if remote then
-    local uuid = require"uuid"
-    uuid.seed()
-    UUID = uuid.new()
-  end
-  nocolor = args.nocolor
-  quiet = args.quiet
-  return setmetatable(env, {
-      __index = function(_, m)
-        local rb, rm = pcall(require, "modules." .. m)
-        if not rb then
-          rb, rm = pcall(require, "cfg-modules." .. m)
-          if not rb then
-            return log(string.format("%s: `%s`", "WARN: Value not set or no such Configi module", m))
-          end
-        end
-        return rm
-      end})
 end
 
 api.result = function ()
