@@ -1,11 +1,18 @@
 local script = arg[1]
 local lib = require "cimicida"
+local string, fmt, file, path = lib.string, lib.fmt, lib.file, lib.path
+local dir = path.split(script)
+package.path = dir
+local cfg = require "configi"
 local ENV = lib
-setmetatable(ENV, {__index })
+setmetatable(ENV, {__index = function(_, m)
+  local mod = file.test(dir .. "/modules/" .. m)
+  if not mod then
+    return fmt.panic("%s: `%s`", "WARN: Value not set or no such Configi module", m)
+  end
+end })
 ENV.os = os
 ENV.io = io
-local string, fmt, file, path = lib.string, lib.fmt, lib.file, lib.path
-package.path = path.split(script)
 local source = file.read_all(script)
 if not source then
   return fmt.panic("error: problem reading script '%s'.\n", script )
