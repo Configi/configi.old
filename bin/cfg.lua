@@ -11,10 +11,11 @@ if args.verbose then
 end
 local dir = path.split(args.script)
 package.path = dir
+local rpath = "/usr/local/bin/rerun"
 local rerun = function(dir, mod, cmd, a, params)
-  if not file.test("/usr/local/bin/rerun") then
-    file.write_all("/usr/local/bin/rerun", require("rerun"))
-    os.execute("chmod +x /usr/local/bin/rerun")
+  if not file.test(rpath) then
+    file.write_all(rpath, require("rerun"))
+    os.execute("chmod +x " .. rpath)
   end
   local header = [[
   export LC_ALL=C
