@@ -3,7 +3,7 @@ local argparse = require "argparse"
 local parser = argparse("cfg", "Configi. A wrapper to rerun, for lightweight configuration management.")
 parser:argument("script", "Script to load.")
 parser:flag("-v --verbose", "Verbose output.")
-parser:flag("-t --cut", "Truncate verbose output to 80 columns.")
+parser:flag("-t --cut", "Truncate verbose or error output to 80 columns.")
 local args = parser:parse()
 local lib = require "cimicida"
 local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
