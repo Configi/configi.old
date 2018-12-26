@@ -4,12 +4,11 @@ local parser = argparse("cfg", "Configi. A wrapper to rerun, for lightweight con
 parser:argument("script", "Script to load.")
 parser:flag("-v --verbose", "Verbose output.")
 local args = parser:parse()
-if args.verbose then
-  io.stdout:write("Start Configi run...\n")
-  io.stdout:flush()
-end
 local lib = require "cimicida"
-local string, fmt, file, path = lib.string, lib.fmt, lib.file, lib.path
+local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
+if args.verbose then
+  util.echo "Start Configi run...\n"
+end
 local dir = path.split(args.script)
 package.path = dir
 local rerun = function(dir, mod, cmd, a, params)
@@ -63,8 +62,7 @@ setmetatable(ENV, {__index = function(_, mod)
             for _, l in ipairs(o) do
               ln = string.format("%s | %s \n", ln, l)
             end
-            io.stdout:write(ln)
-            io.stdout:flush()
+            util.echo(ln)
           end
         else
           local err = ""
@@ -87,8 +85,7 @@ do
     setfenv(chunk, ENV)
     chunk()
     if args.verbose then
-      io.stdout:write("Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " second(s)\n")
-      io.stdout:flush()
+      util.echo("Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " second(s)\n")
     end
     return os.exit(0)
   else
