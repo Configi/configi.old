@@ -2,7 +2,7 @@
 EXE:= cfg
 SRC:=
 SRC_DIR:=
-VENDOR:= cimicida configi
+VENDOR:= cimicida rerun argparse
 VENDOR_DIR:=
 MAKEFLAGS= --silent
 HOST_CC= cc

@@ -1,33 +1,104 @@
-local script = arg[1]
+local start = os.time()
+local argparse = require "argparse"
+local parser = argparse("cfg", "Configi. A wrapper to rerun, for lightweight configuration management.")
+parser:argument("script", "Script to load.")
+parser:flag("-v --verbose", "Verbose output.")
+local args = parser:parse()
+if args.verbose then
+  io.stdout:write("Start Configi run...\n")
+  io.stdout:flush()
+end
 local lib = require "cimicida"
 local string, fmt, file, path = lib.string, lib.fmt, lib.file, lib.path
-local dir = path.split(script)
+local dir = path.split(args.script)
 package.path = dir
-local cfg = require "configi"
-local ENV = lib
-setmetatable(ENV, {__index = function(_, m)
-  local mod = file.test(dir .. "/modules/" .. m)
-  if not mod then
-    return fmt.panic("%s: `%s`", "WARN: Value not set or no such Configi module", m)
+local rerun = function(dir, mod, cmd, a, params)
+  if not file.test("/usr/local/bin/rerun") then
+    file.write_all("/usr/local/bin/rerun", require("rerun"))
+    os.execute("chmod +x /usr/local/bin/rerun")
   end
-end })
-ENV.os = os
-ENV.io = io
-local source = file.read_all(script)
-if not source then
-  return fmt.panic("error: problem reading script '%s'.\n", script )
+  local header = [[
+  export LC_ALL=C
+  export PATH=/bin:/usr/bin:/usr/local/bin
+  exec 0>&- 2>&1
+  ]]
+  local str = string.format("%s cd %s && rerun -M modules %s:%s --arg %s", header, dir, mod, cmd, a)
+  if params and next(params) then
+    for o, p in pairs(params) do
+      str = string.format("%s --%s %s", str, o, p)
+    end
+  end
+  local pipe = io.popen(str, "r")
+  io.flush(pipe)
+  local output = {}
+  for ln in pipe:lines() do
+    output[#output + 1] = ln
+  end
+  local _, _, code = io.close(pipe)
+  if code == 0 then
+    return true, output
+  else
+    return nil, output
+  end
 end
-local chunk, err = loadstring(source)
-if chunk then
-  setfenv(chunk, ENV)
-  return chunk()
-else
-  local tbl = {}
-  for ln in string.gmatch(source, "([^\n]*)\n*") do
-    tbl[#tbl + 1] = ln
+local ENV = {}
+setmetatable(ENV, {__index = function(_, mod)
+  if not file.test(dir .. "/modules/" .. mod .. "/metadata") then
+    if lib[mod] then
+      return lib[mod]
+    else
+      return _G[mod]
+    end
   end
-  local ln = string.match(err, "^.+:([%d]):.*")
-  local sp = string.rep(" ", string.len(ln))
-  err = string.match(err, "^.+:[%d]:(.*)")
-  return fmt.panic("error: %s\n%s |\n%s | %s\n%s |\n", err, sp, ln, tbl[tonumber(ln)], sp)
+  return setmetatable({}, {__index = function(_, cmd)
+    if not file.test(dir .. "/modules/" .. mod .. "/commands/" .. cmd .. "/script") then
+      return fmt.warn("%s: `%s`", "warning: no such valid command in module.\n", cmd)
+    end
+    return function (a)
+      return function (p)
+        local c, o = rerun(dir, mod, cmd, a, p)
+        if c then
+          if args.verbose or (p and next(p) and p.verbose == true) then
+            local ln = ""
+            for _, l in ipairs(o) do
+              ln = string.format("%s | %s \n", ln, l)
+            end
+            io.stdout:write(ln)
+            io.stdout:flush()
+          end
+        else
+          local err = ""
+          for _, l in ipairs(o) do
+            err = string.format("%s | %s \n", err, l)
+          end
+          return fmt.panic("error: %s.%s \"%s\"...\n%s", mod, cmd, a, err)
+        end
+      end
+    end
+  end})
+end})
+do
+  local source = file.read_all(args.script)
+  if not source then
+    return fmt.panic("error: problem reading script '%s'.\n", args.script )
+  end
+  local chunk, err = loadstring(source)
+  if chunk then
+    setfenv(chunk, ENV)
+    chunk()
+    if args.verbose then
+      io.stdout:write("Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " second(s)\n")
+      io.stdout:flush()
+    end
+    return os.exit(0)
+  else
+    local tbl = {}
+    for ln in string.gmatch(source, "([^\n]*)\n*") do
+      tbl[#tbl + 1] = ln
+    end
+    local ln = string.match(err, "^.+:([%d]):%s.*")
+    local sp = string.rep(" ", string.len(ln))
+    local err = string.match(err, "^.+:[%d]:%s(.*)")
+    return fmt.panic("error: %s\n%s |\n%s | %s\n%s |\n", err, sp, ln, tbl[tonumber(ln)], sp)
+  end
 end
