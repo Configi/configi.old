@@ -40,6 +40,11 @@ local printf = function(str, ...)
   return io.write(string.format(str, ...))
 end
 
+local echo = function(str)
+  io.stdout:write(str)
+  return io.stdout:flush()
+end
+
 local fprintf = function(file, str, ...)
   local o = io.output()
   io.output(file)
@@ -661,5 +666,6 @@ return {
     return_if = return_if,
     return_if_not = return_if_not,
     octal = octal,
+    echo = echo,
   }
 }
