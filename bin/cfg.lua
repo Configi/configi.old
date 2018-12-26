@@ -69,7 +69,7 @@ setmetatable(ENV, {__index = function(_, mod)
           for _, l in ipairs(o) do
             err = string.format("%s | %s \n", err, l)
           end
-          return fmt.panic("abort: error near %s.%s \"%s\"...\n%s", mod, cmd, a, err)
+          return fmt.panic("abort: error at %s.%s \"%s\"...\n%s", mod, cmd, a, err)
         end
       end
     end
