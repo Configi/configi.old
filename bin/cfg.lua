@@ -3,6 +3,7 @@ local argparse = require "argparse"
 local parser = argparse("cfg", "Configi. A wrapper to rerun, for lightweight configuration management.")
 parser:argument("script", "Script to load.")
 parser:flag("-v --verbose", "Verbose output.")
+parser:flag("-t --cut", "Truncate verbose output to 80 columns.")
 local args = parser:parse()
 local lib = require "cimicida"
 local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
@@ -61,6 +62,7 @@ setmetatable(ENV, {__index = function(_, mod)
           if args.verbose or (p and next(p) and p.verbose == true) then
             local ln = ""
             for _, l in ipairs(o) do
+              if args.cut then l = l:sub(1, 80) end
               ln = string.format("%s | %s \n", ln, l)
             end
             util.echo(ln)
@@ -68,6 +70,7 @@ setmetatable(ENV, {__index = function(_, mod)
         else
           local err = ""
           for _, l in ipairs(o) do
+            if args.cut then l = l:sub(1, 80) end
             err = string.format("%s | %s \n", err, l)
           end
           return fmt.panic("abort: error at %s.%s \"%s\"...\n%s", mod, cmd, a, err)
