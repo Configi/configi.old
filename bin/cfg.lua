@@ -7,9 +7,7 @@ parser:flag("-t --cut", "Truncate verbose or error output to 80 columns.")
 local args = parser:parse()
 local lib = require "cimicida"
 local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
-if args.verbose then
-  util.echo "Start Configi run...\n"
-end
+if args.verbose then util.echo "Start Configi run...\n" end
 local dir = path.split(args.script)
 package.path = dir
 local rerun = function(dir, mod, cmd, a, params)
@@ -83,9 +81,7 @@ setmetatable(ENV, {__index = function(_, mod)
 end})
 do
   local source = file.read_all(args.script)
-  if not source then
-    return fmt.panic("error: problem reading script '%s'.\n", args.script )
-  end
+  if not source then return fmt.panic("error: problem reading script '%s'.\n", args.script) end
   local chunk, err = loadstring(source)
   if chunk then
     setfenv(chunk, ENV)
