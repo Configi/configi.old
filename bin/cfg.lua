@@ -13,10 +13,12 @@ end
 local dir = path.split(args.script)
 package.path = dir
 local rerun = function(dir, mod, cmd, a, params)
-  local rpath = "/usr/local/bin/rerun"
-  if not file.test(rpath) then
-    file.write_all(rpath, require("rerun"))
-    os.execute("chmod +x " .. rpath)
+  do
+    local rpath = "/usr/local/bin/rerun"
+    if not file.test(rpath) then
+      file.write_all(rpath, require("rerun"))
+      os.execute("chmod +x " .. rpath)
+    end
   end
   local header = [[
   export LC_ALL=C
