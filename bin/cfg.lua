@@ -89,7 +89,9 @@ do
     setfenv(chunk, ENV)
     chunk()
     if args.verbose then
-      util.echo("Finished run in " .. string.format("%d", os.difftime(os.time(), start)) .. " second(s)\n")
+      local sec = os.difftime(os.time(), start)
+      if sec == 0 then sec = 1 end
+      util.echo("Finished run in " .. string.format("%d", sec) .. " second(s)\n")
     end
     return os.exit(0)
   else
