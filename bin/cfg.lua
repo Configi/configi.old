@@ -96,12 +96,13 @@ do
     return os.exit(0)
   else
     local tbl = {}
-    for ln in string.gmatch(source, "([^\n]*)\n*") do
+    local src = io.open(args.script)
+    for ln in src:lines() do
       tbl[#tbl + 1] = ln
     end
-    local ln = string.match(err, "^.+:([%d]):%s.*")
+    local ln = string.match(err, "^.+:([%d]+):%s.*")
     local sp = string.rep(" ", string.len(ln))
-    local err = string.match(err, "^.+:[%d]:%s(.*)")
+    local err = string.match(err, "^.+:[%d]+:%s(.*)")
     return fmt.panic("error: %s\n%s |\n%s | %s\n%s |\n", err, sp, ln, tbl[tonumber(ln)], sp)
   end
 end
