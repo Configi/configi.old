@@ -12,8 +12,8 @@ if args.verbose then
 end
 local dir = path.split(args.script)
 package.path = dir
-local rpath = "/usr/local/bin/rerun"
 local rerun = function(dir, mod, cmd, a, params)
+  local rpath = "/usr/local/bin/rerun"
   if not file.test(rpath) then
     file.write_all(rpath, require("rerun"))
     os.execute("chmod +x " .. rpath)
