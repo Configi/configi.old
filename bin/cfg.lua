@@ -96,7 +96,6 @@ do
     return os.exit(0)
   else
     local tbl = {}
-    local ln = ""
     for ln in string.gmatch(source, "([^\n]*)\n*") do
       tbl[#tbl + 1] = ln
     end
