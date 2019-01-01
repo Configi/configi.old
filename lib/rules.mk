@@ -1,6 +1,6 @@
 $(LIBLUAJIT_A):
 	$(MAKE) -C lib/luajit/src \
-                TARGET_CFLAGS="$(TARGET_CFLAGS)" \
+                TARGET_CFLAGS="$(TARGET_CFLAGS) -DLUAJIT_ENABLE_LUA52COMPAT" \
                 TARGET_LD="$(TARGET_LD)" \
                 TARGET_LDFLAGS="$(TARGET_LDFLAGS)" \
                 TARGET_STCC="$(TARGET_STCC)" \
