@@ -5,7 +5,7 @@ parser:argument("script", "Script to load.")
 parser:flag("-v --verbose", "Verbose output.")
 parser:flag("-t --cut", "Truncate verbose or error output to 80 columns.")
 local args = parser:parse()
-local lib = require "cimicida"
+local lib = require "lib"
 local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
 if args.verbose then util.echo "Start Configi run...\n" end
 local dir = path.split(args.script)
