@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC1090
+
+set -o errexit -o nounset -o pipefail
+
+#/ command: stubbs:add-command: "add command to module"
+#/ usage: rerun stubbs:add-command  --command|-c <>  --description <>  --module|-m <> [ --overwrite <false>] [ --generate-help <true>] 
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: COMMAND DESCRIPTION MODULE OVERWRITE GENERATE_HELP
+
+. "${RERUN_MODULE_DIR}/lib/functions.sh" 'add-command' || { 
+  echo >&2 "Failed loading function library." ; exit 1 ; 
+}
+
+
+rerun_options_parse "$@"
+
+# Initialize defaults.
+# ----------------------
+: "${DESCRIPTION:-}"
+: "${VARIABLES:-}"
+: "${OVERWRITE:=false}"
+: "${STUB:=${RERUN_MODULE_DIR}/lib/stub/bash}"
+
+
+
+#
+# Create command structure
+# ----------------------
+RERUN_MODULE_HOME_DIR=$(rerun_module_exists "${MODULE:-}")
+mkdir -p "${RERUN_MODULE_HOME_DIR}/commands/${COMMAND}" || rerun_die "Failed creating command directory."
+
+if ! generate_command_metadata "$COMMAND" "$DESCRIPTION" \
+  "${GENERATE_HELP:-true}" "$OVERWRITE" "$RERUN_MODULE_HOME_DIR/commands/$COMMAND/metadata"
+then
+  rerun_die "Failed generating command metadata."
+fi
+
+#
+# Generate command script
+# ----------------------
+
+SCRIPT_TEMPLATE=$(rerun_property_get "${STUB}" TEMPLATE_COMMAND_SCRIPT)
+declare -r SCRIPT_TEMPLATE
+[[ ! -f "$STUB/$SCRIPT_TEMPLATE" ]] && {
+    rerun_syntax_error "command script template not found: \"$STUB/$SCRIPT_TEMPLATE\""
+}
+
+
+OUT_SCRIPT="${RERUN_MODULE_HOME_DIR}/commands/${COMMAND}/$(basename "$SCRIPT_TEMPLATE")"
+declare -r OUT_SCRIPT
+
+VARIABLES=$(stubbs_option_variables "${RERUN_MODULE_HOME_DIR}" "${COMMAND}")
+declare -r VARIABLES
+
+if ! generate_command_script "$COMMAND" "$MODULE" \
+  "$DESCRIPTION" "$VARIABLES" "$OVERWRITE" "$OUT_SCRIPT" < "$STUB/$SCRIPT_TEMPLATE"
+then rerun_die "Failed generating stub comand script."
+fi
+
+
+# Generate option parser
+# ----------------------
+
+# This will be an initial blank option parser script that just includes _CMD_LINE
+
+PARSER_SCRIPT=$(rerun_property_get "${STUB}" OPTIONS_SCRIPT)
+declare -r PARSER_SCRIPT
+
+if ! generate_options_parser "$COMMAND" "$MODULE" "$OVERWRITE" "$STUB" \
+  "${RERUN_MODULE_HOME_DIR}/commands/${COMMAND}/${PARSER_SCRIPT}"
+then rerun_die "Failed generating options parser script."
+fi
+
+
+# Generate a unit test 
+# ---------------------
+
+if ! generate_command_test "$COMMAND" "$MODULE" "$OVERWRITE" \
+  "${RERUN_MODULE_HOME_DIR}/tests" \
+  "$COMMAND-1-test.sh" \
+  "$RERUN_MODULE_DIR/templates/test.functions.sh" \
+  < "$RERUN_MODULE_DIR/templates/test.roundup"
+then rerun_die "Failed generating unit test script."
+fi
+
+# - - -
+
+# Done. Exit with last command exit status.
+exit 0

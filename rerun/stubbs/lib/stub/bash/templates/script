@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+#/ command: @MODULE@:@COMMAND@: "@DESCRIPTION@"
+#/ usage: rerun @MODULE@:@COMMAND@ [options]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: @VARIABLES@
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "@COMMAND@" || { 
+  echo >&2 "Failed loading function library." ; exit 1 ; 
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+
+# Done. Exit with last command exit status.
+exit $?
+

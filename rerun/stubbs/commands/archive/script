@@ -1,0 +1,435 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC1090
+
+# command: stubbs:archive: "Build a self extracting archive"
+#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <sh>]  --modules <'*'> [ --release <1>] [ --version <>] [ --template <>]
+
+
+# Load common functions
+# ---------------------
+
+# Load the function library for this module.
+# This loads rerun functions and those defined for stubbs.
+. "$RERUN_MODULE_DIR/lib/functions.sh" archive || {
+    echo >&2 "failed laoding function library" ; exit 1 ;
+}
+
+# Parse the command options
+[ -r "$RERUN_MODULE_DIR/commands/archive/options.sh" ] && {
+  . "$RERUN_MODULE_DIR/commands/archive/options.sh"
+}
+
+
+# Error handling
+# ---------------
+
+# This script is designed to _fail-fast_.
+
+# Trap errors and exit. The call to `rerun_die` will print the
+# the error message and exit with the error command exit status.
+
+trap 'rerun_die $? "*** command failed: stubbs:archive. ***"' ERR
+
+# Run [set] `nounset` to treat unset variables as errors. Set [pipefail]
+# so a pipeline return status is the value of the last
+# (rightmost) command to exit with non-zero status.
+#
+# [set]: http://ss64.com/bash/set.html
+# [pipefail]: http://www.gnu.org/software/bash/manual/html_node/Pipelines.html
+
+set -o nounset -o pipefail
+
+
+# Command variables
+# -----------------
+
+# This command script can access the following variables
+# declared by `rerun` or by the option parser function.
+
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: FILE FORMAT MODULES RELEASE VERSION TEMPLATE
+
+# The `rerun_options_parse` function processes the command line
+# arguments. Each accepted command line flag results in setting
+# one the corresponding option variables.
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# Weird matryoshka doll problem with the setting of LOGNAME/USER on travis.
+# When making the debian package, the deb utility reruns tests but
+# this time the USER/LOGNAME vars are not defined
+[[ -z "${LOGNAME:-}" ]] && [[ -z "${USER:-}" ]] && export LOGNAME="travis"
+
+# Default the templates directory if unset.
+: "${TEMPLATE:=$RERUN_MODULE_DIR/templates}"
+
+# Possibly default VERSION. 
+mods=( $MODULES )
+if [[ -z "${VERSION:-}" ]]
+then  
+  # if there is just one module specified, default it from that module metadata.
+  if [[ ${#mods[*]} -eq 1 ]]
+  then VERSION=$(rerun_property_get "$RERUN_MODULE_DIR" VERSION)
+  fi
+fi  
+[[ -z "${VERSION:-}" ]] && rerun_die 2 "version must be specified"
+
+decoder() {
+    if command -v openssl >/dev/null
+    then echo "openssl enc -base64 -d"
+    else echo "uudecode -p"
+    fi
+}
+
+# Encode the tar gz output so it's save across systems.
+encode() {
+    outfile=$1
+
+    if command -v openssl >/dev/null
+    then
+        openssl enc -base64 > "$outfile"
+        retval=$?
+    else
+        uuencode -m -o "$outfile" "$outfile"
+        chmod 444 "$outfile"
+        retval=$?
+    fi
+    return $retval
+}
+
+build_sh_archive() {
+  CWD=$(pwd); #remember current working directory.
+
+  # Check if file option was specified and if not set it to rerun.sh.
+  [[ -z "${FILE:-}"  ]] && FILE=rerun.sh
+
+  # Prepend current working directory if relative file path.
+  [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
+
+  [[ ! -d $(dirname "$FILE") ]] && { echo >&2 "directory not found: $(dirname "$FILE")"; exit 2; }
+
+  # create a work directory the archive content
+  PAYLOAD=$(mktemp -d /tmp/rerun.stubbs.archive.XXXXXX) || rerun_die "Failed creating temporary work directory for payload."
+  export PAYLOAD
+  if [[ "$(uname -s)" = "Darwin" ]]; then
+    # Github issue-166
+    TAREXCL="--exclude=\.git --exclude=\.svn --exclude=\.gitignore --exclude=\.hg --exclude=\.hgignore"
+  else
+    TAREXCL="--exclude-vcs"
+  fi
+
+  #
+  # Start preparing the payload content.
+  #
+
+  # Iterate through the the specified modules and add them to payload
+  mkdir -p "$PAYLOAD/rerun/modules"
+  for module in $MODULES
+  do
+      rerun_module_home_dir=$(rerun_module_exists "$module")
+      # Check for a commands subdir to be sure it looks like a module
+      if [[ -d "$rerun_module_home_dir/commands" ]]
+      then
+        pushd "$rerun_module_home_dir/.." > /dev/null
+        tar -c ${TAREXCL} -f - "$module" | ( cd "$PAYLOAD/rerun/modules"; tar xpf - )
+        popd >/dev/null
+      fi
+  done
+
+  # Copy rerun itself to the payload
+  cp "$RERUN" "$PAYLOAD/rerun"
+
+  # Copy in the extract and launcher scripts used during execution
+  for script in $TEMPLATE/{extract,launcher}
+  do
+      # replace the template substitution tokens ...
+      sed -e "s/@GENERATOR@/stubbs:archive/" \
+          -e "s/@FILE@/$(basename "$FILE")/" \
+          -e "s/@DATE@/$(date)/" \
+          -e "s/@USER@/${USER:-$LOGNAME}/" \
+          -e "s/@VERSION@/$VERSION/" \
+          -e "s/@RELEASE@/$RELEASE/" \
+          -e "s/@DECODER@/$(decoder)/" \
+          "$script" > "$PAYLOAD/$(basename "$script")"
+      # ... and save it to the payload --^
+  done
+
+  #
+  # Archive the content
+  #
+  cd "$PAYLOAD" || rerun_die "Failed to cd to payload directory."
+
+  # make the payload.tar file
+  tar cf payload.tar launcher extract rerun
+
+  # compress and base64 encode the tar file
+  if [[ -e "payload.tar" ]]
+  then
+      gzip -c payload.tar | encode payload.tgz.base64 || rerun_die
+      if [ -e "payload.tgz.base64" ]; then
+          #
+          # Prepend the extract script to the payload.
+          #    and thus turn the thing into a shell script!
+          #
+          cat extract payload.tgz.base64 > "$FILE" || rerun_die
+      else
+          rerun_die "$PAYLOAD/payload.tgz.base64 does not exist"
+      fi
+  else
+      rerun_die "payload.tar does not exist"
+  fi
+
+  #
+  # Make the archive executable
+  #
+  chmod +x "$FILE"
+  #
+  # Clean up the temp directory
+  #
+  cd "$CWD" || rerun_die
+  chmod 755 "$PAYLOAD"
+  find "$PAYLOAD" -type d -exec chmod 755 {} \;
+  find "$PAYLOAD" -type f -exec chmod 644 {} \;
+  rm -rf "$PAYLOAD"
+
+
+  rerun_log info "Wrote self extracting archive script: ${FILE}"
+}
+
+build_deb_archive() {
+
+  [[ -e /etc/debian_version ]] || rerun_die "need to build on a Debian machine"
+
+  for MODULE in ${MODULES}
+  do
+    MODULE_DIR=$(rerun_module_exists "$MODULE")
+    [[ -r ${MODULE_DIR}/metadata ]] || rerun_die "Can not find module ${MODULE}"
+
+    # Setup a temporary directory to build the deb:
+    DEBTOPDIR=$(mktemp -d /tmp/rerun.stubbs.deb.XXXXXX)
+
+    VER="${VERSION}"
+    # Source the module metadata:
+    unset NAME DESCRIPTION VERSION REQUIRES EXTERNALS
+    . "${MODULE_DIR}/metadata"
+
+    [[ -n ${NAME} ]] || rerun_die "no module name in \"${MODULE_DIR}/metadata\""
+    [[ "${NAME}" != "debian" ]] || rerun_die "Illegal module name, debian is a reserved name"
+    [[ -n ${DESCRIPTION} ]] || rerun_die "no description in \"${MODULE_DIR}/metadata\""
+
+    [[ -z ${VER} ]] || VERSION="${VER}"
+    [[ -n ${VERSION} ]] || rerun_die "no version in \"${MODULE_DIR}/metadata\""
+
+    # copy the source to the source tarball directory
+    mkdir -p "${DEBTOPDIR}/deb" "${DEBTOPDIR}/stb/rerun-${NAME}-${VERSION}/${NAME}"
+    pushd "${MODULE_DIR}" > /dev/null
+    find . | cpio --quiet -pdm "${DEBTOPDIR}/stb/rerun-${NAME}-${VERSION}/${NAME}"
+    popd > /dev/null
+
+    # build the release tarball filtering out any version control tracking files
+    pushd "${DEBTOPDIR}/stb" > /dev/null
+    tar -c -z --exclude-vcs \
+      -f "${DEBTOPDIR}/deb/rerun-${NAME}_${VERSION}.orig.tar.gz" \
+      "rerun-${NAME}-${VERSION}"
+    popd > /dev/null
+
+    # unpack the source in the build directory
+    pushd ${DEBTOPDIR}/deb > /dev/null
+    tar -xzf ${DEBTOPDIR}/deb/rerun-${NAME}_${VERSION}.orig.tar.gz
+    popd > /dev/null
+
+    # Use dh_make to generate a basic debian package configuration
+    pushd ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION} > /dev/null
+    DEBFULLNAME="rerun-discuss@googlegroups.com"; \
+    dh_make --yes --indep --copyright apache --email rerun-discuss@googlegroups.com
+
+    # Hack up the config files generated by dh_make
+    sed -i  -e 's/ unknown$/ shells/' \
+      -e 's/ root / stagrlee /g' \
+      -e "s@^Homepage:.*\$@Homepage: http://github.com/rerun-modules/${NAME}@" \
+      -e "s/^Description:.*\$/Description: ${DESCRIPTION}/" \
+      -e 's/^Depends:.*$/Depends: rerun/' \
+      -e '$d' \
+      ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION}/debian/control
+    echo -e " *** Unofficial package from ${DEBFULLNAME} ***\n" \
+      ".\n" \
+      "${NAME} is a Rerun Module extension.\n" \
+      "${DESCRIPTION}\c" \
+      >> ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION}/debian/control
+    MYDATE=$(date -R)
+    [[ -n ${RELEASE} ]] || RELEASE=1
+    echo -e "rerun-${NAME} (${VERSION}-${RELEASE}) unstable; urgency=low\n\n" \
+      " * Developer produced pkg, changes tracked on github\n\n" \
+      "-- stagrlee <${DEBFULLNAME}>  ${MYDATE}\c" \
+      > ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION}/debian/changelog
+    sed -i        -e 's@^Source:.*$@Source: https://github.com/rerun/rerun@' \
+      -e "s/^Copyright:.*\$/Copyright: 2011-2013, Rerun Community ${DEBFULLNAME}/" \
+      -e '/likewise for another/d' \
+      -e '/^# /d' \
+      ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION}/debian/copyright
+    # Need something to do the equivalent of "make install"
+    cat > ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION}/debian/rules <<EOF
+#!/usr/bin/make -f
+export DH_VERBOSE=1
+
+# using the dh_install callback here kept picking up files
+# in the debian/tmp/docs directory and failing
+override_dh_install:
+	mkdir -p debian/rerun-${NAME}/usr/lib/rerun/modules
+	cp -a ${NAME} debian/rerun-${NAME}/usr/lib/rerun/modules/
+
+%:
+	dh \$@
+EOF
+    rm -f ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION}/debian/*\.ex
+    rm -f ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION}/debian/*\.EX
+    debuild -us -uc || rerun_die "debuild utility failed to create the Debian package"
+    popd > /dev/null
+
+    # Grab the goodies left under the tree
+    mv ${DEBTOPDIR}/deb/rerun-${NAME}_* ./
+
+    # Clean up the cookie crumbs on the floor
+    /bin/rm -rf ${DEBTOPDIR}
+  done
+}
+
+build_rpm_archive() {
+
+  for MODULE in ${MODULES}
+  do
+    MODULE_DIR=$(rerun_module_exists $MODULE)
+    if [[ -r ${MODULE_DIR}/metadata ]]
+    then
+      # Setup a temporary directory to build the RPM:
+      RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs.rpm.XXXXXX)
+      mkdir $RPMTOPDIR/SOURCES
+      mkdir $RPMTOPDIR/BUILD
+      mkdir $RPMTOPDIR/RPMS
+
+      # Source the module metadata:
+      unset NAME DESCRIPTION VERSION REQUIRES EXTERNALS
+      . $MODULE_DIR/metadata
+
+      [[ -n $NAME ]] || rerun_die "no module name in \"$MODULE_DIR/metadata\""
+      [[ -n $DESCRIPTION ]] || rerun_die "no description in \"$MODULE_DIR/metadata\""
+
+      if [[ -z $VERSION ]]
+      then rerun_die "no version in \"$MODULE_DIR/metadata\""
+      fi
+
+      # Extract the module's major version number:
+      MAJOR_VERSION="$(echo $VERSION | cut -d. -f1)"
+      MINOR_VERSION="$(echo $VERSION | cut -d. -f2)"
+      REVISION_VERSION="$(echo $VERSION | cut -d. -f3)"
+
+      [[ -z $MAJOR_VERSION || -z $MINOR_VERSION || -z $REVISION_VERSION ]] && rerun_die "module version (\"$VERSION\") should be of the form \"major.minor.revision\""
+
+      # Extract Rerun's major version number:
+      RERUN_MAJOR_VERSION="$(echo $RERUN_VERSION | cut -d. -f1)"
+
+      # Backwards compatibility is guaranteed to the minor version:
+      if [[ ${MAJOR_VERSION} -ne ${RERUN_MAJOR_VERSION} ]]
+      then
+        rerun_die "the module's major version number (\"${MAJOR_VERSION}\") must match the major number (\"${RERUN_MAJOR_VERSION}\") of the version of Rerun being used to build the archive"
+      fi
+
+      if [[ -z $REQUIRES ]]
+      then
+        REQUIRES="rerun = $RERUN_MAJOR_VERSION"
+      else
+        # Enforces specified module dependencies at the major version number:
+        REQUIRES="rerun = $RERUN_MAJOR_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e "s/\([^,]*\)/rerun-\1 = ${MAJOR_VERSION}/g")"
+      fi
+
+      if [[ -n $EXTERNALS ]]
+      then REQUIRES="$REQUIRES,$EXTERNALS"
+      fi
+
+      # get the Distribution
+      if [[ "$(uname -s)" = "Darwin" ]]; then
+        RPMDIST=".osx"
+        # Github issue-155
+        TAREXCL="--exclude=\.git --exclude=\.svn --exclude=\.gitignore --exclude=\.hg --exclude=\.hgignore"
+      else
+        RPMDIST=$(rpm --eval %{?dist})
+        TAREXCL="--exclude-vcs"
+      fi
+
+      # Remove any existing builds:
+      rm -f $MODULE_DIR/rerun-${NAME}*.noarch.rpm
+
+      # Prepare the source archive hierarchy:
+      mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
+      mkdir $RPMTOPDIR/tmp
+      pushd $MODULE_DIR > /dev/null
+      find . | cpio --quiet -pdm $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
+      popd > /dev/null
+
+      # Build the source archive:
+      pushd $RPMTOPDIR/SOURCES > /dev/null
+
+      if [[ ! -w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION} ]]; then
+        # this happens in autoconf "make distcheck", so this is a workaround
+        chmod -R u+w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
+      fi
+
+      tar -czf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz \
+        ${TAREXCL} rerun-${NAME}-${VERSION}
+
+      popd > /dev/null
+
+      local junkdir=${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
+      find ${junkdir} -type d -exec chmod 755 {} \;
+      find ${junkdir} -type f -exec chmod 644 {} \;
+      /bin/rm -rf ${junkdir}/SOURCES/rerun-${NAME}-${VERSION}
+
+      # Build the RPM:
+      rpmbuild -bb \
+        --target noarch \
+        --define "dist ${RPMDIST:=.linux}" \
+        --define "_topdir ${RPMTOPDIR}" \
+        --define "module ${NAME}" \
+        --define "desc ${DESCRIPTION}" \
+        --define "version ${VERSION}" \
+        --define "release ${RELEASE}" \
+        --define "requires ${REQUIRES}" \
+        --define "major ${MAJOR_VERSION}" \
+        --define "minor ${MINOR_VERSION}" \
+        --define "revision ${REVISION_VERSION}" \
+        ${RERUN_MODULE_DIR}/templates/rerun-module.spec \
+      || rerun_die "failed to build rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
+
+      # Move the RPM:
+      /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm .
+      rerun_log info "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
+
+      # Clean up the temporary directory:
+      find ${RPMTOPDIR} -type d -exec chmod 755 {} \;
+      find ${RPMTOPDIR} -type f -exec chmod 644 {} \;
+      /bin/rm -rf ${RPMTOPDIR}
+    fi
+  done
+}
+
+
+case $FORMAT in
+  bin|sh)
+    build_sh_archive
+    ;;
+  deb)
+    build_deb_archive
+    ;;
+  rpm)
+    build_rpm_archive
+    ;;
+  *)
+    rerun_die "invalid archive format \"$FORMAT\""
+    ;;
+esac
+
+exit $?
+# Done.

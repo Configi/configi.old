@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# launcher - Launch rerun from an self extracting archive script
+#
+# generator: @GENERATOR@
+# date: @DATE@
+# user: @USER@
+# archive-version: @VERSION@
+# archive-release: @RELEASE@
+
+# Function to print error message and exit
+die() { echo >&2 "ERROR: $* " ; exit 1 ; }
+
+# Check for required environment variables 
+[[ -z "${CWD}" ]]     && die "CWD environment variable not set." ; # user's current working directory
+[[ -z "${PAYLOAD}" ]] && die "PAYLOAD directory not specified."  ; # archive artifacts 
+
+# Verify the extracted artifact contents exist.
+[[ -d ${PAYLOAD}/rerun ]]         || die "rerun base directory not found. CWD=${CWD}, PAYLOAD=$PAYLOAD"
+[[ -d ${PAYLOAD}/rerun/modules ]] || die "missing modules subdirectory"
+[[ -f ${PAYLOAD}/rerun/rerun ]]   || die "missing rerun script"
+[[ -x ${PAYLOAD}/rerun/rerun ]]   || { chmod +x ./rerun || die "couldn't set rerun executable" ; }
+
+# set the module directory base
+export RERUN_MODULES=$PAYLOAD/rerun/modules
+
+# add archived rerun script to path
+PATH=$PATH:$PAYLOAD/rerun
+
+# launch it!
+exec $PAYLOAD/rerun/rerun "$@"
+
+# Done

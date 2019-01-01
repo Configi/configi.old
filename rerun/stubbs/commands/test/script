@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+#
+#/ command: stubbs:test: "run module test scripts"
+#/ usage: stubbs:test --module|-m <> [--plan|-p <*>] [--answers|-a]
+
+
+# Load common functions
+# ---------------------
+
+# Load the function library for this module.
+# This loads rerun functions and those defined for stubbs.
+. $RERUN_MODULE_DIR/lib/functions.sh test || { 
+    echo >&2 "failed loading function library" ; exit 1 ; 
+}
+
+
+# Error handling
+# ---------------
+
+# This script is designed to _fail-fast_.
+
+# Trap errors and exit. The call to `rerun_die` will print the
+# the error message and exit with the error command exit status. 
+
+trap 'rerun_die $? "*** command failed: stubbs:test. ***"' ERR
+
+# Run [set] `nounset` to treat unset variables as errors. Set [pipefail]
+# so a pipeline return status is the value of the last 
+# (rightmost) command to exit with non-zero status.
+#
+# [set]: http://ss64.com/bash/set.html
+# [pipefail]: http://www.gnu.org/software/bash/manual/html_node/Pipelines.html
+
+set -o nounset -o pipefail
+
+
+# Command implementation
+# ----------------------
+
+
+# Get the options
+while [ "$#" -gt 0 ]; do
+    OPT="$1"
+    case "$OPT" in
+        # options without arguments
+	# options with arguments
+	    -m|--module)
+	        rerun_option_check "$#" "$1"
+	        MODULE="$2"
+	        shift
+	        ;;
+	    -p|--plan)
+	        rerun_option_check "$#" "$1"
+	        PLAN="${2}"
+	        shift
+	        ;;
+	    -a|--answers)
+	        rerun_option_check "$#" "$1"
+	        ANSWERS="${2}"
+	        shift
+	        ;;
+
+    # unknown option
+	    -?)
+	        rerun_option_usage
+            exit 2
+	        ;;
+	  # end of options, just arguments left
+	    *)
+	        break
+    esac
+    shift
+done
+
+[ -z "${MODULE:-}" ] &&  { rerun_syntax_error "missing required option: --module"; }
+[ -z "${PLAN:-}" ] && PLAN="*"
+
+export RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+if [ ! -d "$RERUN_MODULE_HOME_DIR/tests" ]
+then
+    # there should always be at least one test!
+    rerun_die "No tests" 
+fi
+
+echo $(rerun_color blue "=========================================================")
+echo $(rerun_color blue " TESTING MODULE: $MODULE ")
+echo $(rerun_color blue "=========================================================")
+(
+    # Resolve relative path to rerun
+    export RERUN=$(rerun_path_absolute $RERUN)
+    export ROUNDUP=$(rerun_path_absolute $RERUN_MODULE_DIR/bin/roundup)
+
+    # Set modules path
+    export RERUN_MODULES=$RERUN_MODULES
+
+    # Export the answers file
+    export ANSWERS=${ANSWERS:-}
+
+    # Roundup likes to run relative
+    cd $RERUN_MODULE_HOME_DIR/tests
+
+    # Run the tests
+    #
+    $ROUNDUP --color $PLAN-[0-9]*-test.sh
+) 
+
+# Done
+

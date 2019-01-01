@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+#/ command: configi:add-option: "Add option to Configi command"
+#/ usage: rerun configi:add-option  --parameter <>  --desc <>  --module <>  --command <>
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: PARAMETER DESC MODULE COMMAND
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "add-option" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+RERUN_MODULES=./modules rerun stubbs:add-option --option "$PARAMETER" --description "$DESC" --module "$MODULE" --command "$COMMAND" --required false --export false
+# Done. Exit with last command exit status.
+exit $?
+

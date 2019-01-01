@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+#/ command: file:directory: "Ensure a directory is present"
+#/ usage: rerun file:directory  --arg <> [ --comment <>] [ --verbose <>] [ --owner <>] [ --mode <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE OWNER MODE
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "directory" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+owner=${OWNER:-root}
+mode=${MODE:-755}
+if [ -d "$ARG" ]; then
+    PASS "file.directory" "$ARG"
+    exit 0
+fi
+mkdir -p "$ARG"
+chown "$owner" "$ARG"
+chmod "$mode" "$ARG"
+if [ -d "$ARG" ]; then
+    REPAIR "file.directory" "$ARG"
+    exit 0
+else
+    FAIL "file.directory" "$ARG"
+    exit 1
+fi
+# Done. Exit with last command exit status.
+exit $?
+

@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC1090
+
+#/ command: stubbs:add-module: "add a new module"
+#/ usage: rerun stubbs:add-module  --description <>  --module|-m <> [ --template <>] 
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: DESCRIPTION MODULE TEMPLATE
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" 'add-module' || { 
+  echo >&2 "Failed loading function library." ; exit 1 ; 
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+if [[ "${TEMPLATE:-}" == "pedantic" ]]
+then 
+    STUB=$RERUN_MODULE_DIR/lib/stub/bash-pedantic
+else
+    STUB=$RERUN_MODULE_DIR/lib/stub/bash
+fi
+
+[[ ! -d "$STUB" ]] && rerun_die "module stub not found: $STUB"
+
+TEMPLATE_FUNCTION_LIB=$(rerun_property_get "$STUB" TEMPLATE_FUNCTION_LIB)
+COMMAND_SHELL=$(rerun_property_get "$STUB" COMMAND_SHELL)
+
+[[ ! -f  $STUB/$TEMPLATE_FUNCTION_LIB ]] && {
+    rerun_die "function library not found:  $STUB/$TEMPLATE_FUNCTION_LIB"
+}
+
+
+RERUN_MODULE_HOME_DIR=$(echo "$RERUN_MODULES" | cut -d: -f1)/"$MODULE"
+
+if ! generate_module_structure "$RERUN_MODULE_HOME_DIR"
+then
+    rerun_die "Failed creating module structure."
+fi
+
+if !  generate_module_metadata "$RERUN_MODULE_HOME_DIR" "$MODULE" "${DESCRIPTION:-}" "$COMMAND_SHELL"
+then
+    rerun_die "Failed generating module metadata."
+fi
+
+if ! generate_module_library "$RERUN_MODULE_HOME_DIR" "$MODULE" "$DESCRIPTION" "$STUB/$TEMPLATE_FUNCTION_LIB" 
+then
+    rerun_die "Failed creating initial module library."
+fi
+
+
+
+# If --template was specified, resolve its directory path
+# and clone its contents into the new module.
+if [[ -n "${TEMPLATE:-}" ]]
+then
+    if [[ "$TEMPLATE" =~ [/]+ ]]
+    then TEMPLATE_DIR=$(rerun_path_absolute "$TEMPLATE")
+    else TEMPLATE_DIR=$(rerun_module_exists "$TEMPLATE")
+    fi
+    rerun_log info "Copying files from template: $TEMPLATE..."
+    stubbs_module_clone "$RERUN_MODULE_HOME_DIR" "$TEMPLATE_DIR"
+fi
+
+rerun_log info "Created module structure: $RERUN_MODULE_HOME_DIR."
+
+# - - -
+
+# Done. Exit with last command exit status.
+exit $?
