@@ -16,7 +16,7 @@ int setenv(const char*, const char*, int);
 int execvp(const char *file, char *const argv[]);
 int chdir(const char *);
 ]])
-local ffi_error = function(s)
+local strerror = function(s)
   s = s or "error"
   return string.format("%s: %s\n", s, ffi.string(C.strerror(ffi.errno())))
 end
@@ -54,7 +54,7 @@ local redirect = function(io_or_filename, dest_fd)
   else
     local fd = C.open(io_or_filename, bit.bor(O_WRONLY, O_CREAT), bit.bor(S_IRUSR, S_IWUSR))
     if fd < 0 then
-      return nil, ffi_error(string.format("failure opening file '%s'", fname))
+      return nil, strerror(string.format("failure opening file '%s'", fname))
     end
     C.dup2(fd, dest_fd)
     C.close(fd)
@@ -66,7 +66,7 @@ exec.spawn = function (exe, args, env, cwd, stdout_redirect, stderr_redirect)
 
   local pid = C.fork()
   if pid < 0 then
-    return nil, ffi_error("fork(2) failed")
+    return nil, strerror("fork(2) failed")
   elseif pid == 0 then -- child process
     redirect(stdout_redirect, STDOUT)
     redirect(stderr_redirect, STDERR)
@@ -82,7 +82,7 @@ exec.spawn = function (exe, args, env, cwd, stdout_redirect, stderr_redirect)
       local function setenv(name, value)
         local overwrite_flag = 1
         if C.setenv(name, value, overwrite_flag) == -1 then
-          return nil, ffi_error("setenv(3) failed")
+          return nil, strerror("setenv(3) failed")
         else
           return value
         end
@@ -93,16 +93,16 @@ exec.spawn = function (exe, args, env, cwd, stdout_redirect, stderr_redirect)
       end
     end
     if cwd then
-      if C.chdir(tostring(cwd)) == -1 then return nil, ffi_error("chdir(2) failed") end
+      if C.chdir(tostring(cwd)) == -1 then return nil, strerror("chdir(2) failed") end
     end
     argv[0] = exe
     argv[#args + 1] = nil
     if C.execvp(exe, ffi.cast("char *const*", argv)) == -1 then
-      return nil, ffi_error("execvp(3) failed")
+      return nil, strerror("execvp(3) failed")
     end
     assert(nil, "assertion failed: exec.spawn (should be unreachable!)")
   else
-    if ERETRY(C.waitpid)(pid, nil, 0) == -1 then return nil, ffi_error("waitpid(2) failed") end
+    if ERETRY(C.waitpid)(pid, nil, 0) == -1 then return nil, strerror("waitpid(2) failed") end
   end
 end
 
