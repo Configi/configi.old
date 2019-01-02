@@ -1,0 +1,30 @@
+#!../../bin/lua
+local lib = require "lib"
+local file = lib.file
+local util = lib.util
+local random = util.random_string
+local T = require "u-test"
+local exec = require"exec"
+T["exec.context"] = function()
+  local s = random(12)
+  local touch = exec.ctx"touch"
+  touch(s)
+  T.equal(true, file.test(s))
+  os.execute("rm " .. s)
+end
+T["exec.context cwd"] = function()
+  local s = random(12)
+  local touch = exec.ctx"touch"
+  touch.cwd = "/tmp"
+  touch(s)
+  T.equal(true, file.test("/tmp/"..s))
+  os.execute("rm /tmp/" .. s)
+end
+T["exec.cmd"] = function()
+  local s = random(12)
+  local cmd = exec.cmd
+  cmd.touch(s)
+  T.equal(true, file.test(s))
+  os.execute("rm " .. s)
+end
+T.summary()
