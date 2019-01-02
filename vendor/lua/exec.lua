@@ -39,71 +39,71 @@ end
 
 -- dest should be either 0 or 1 (STDOUT or STDERR)
 local redirect = function(io_or_filename, dest_fd)
-    if io_or_filename == nil then return true end
-    local O_WRONLY = octal('0001')
-    local O_CREAT  = octal('0100')
-    local S_IRUSR  = octal('00400') -- user has read permission
-    local S_IWUSR  = octal('00200') -- user has write permission
-    -- first check for regular
-    if (io_or_filename == io.stdout or io_or_filename == STDOUT) and dest_fd ~= STDOUT then
-        C.dup2(STDERR, STDOUT)
-    elseif (io_or_filename == io.stderr or io_or_filename == STDERR) and dest_fd ~= STDERR then
-        C.dup2(STDOUT, STDERR)
+  if io_or_filename == nil then return true end
+  local O_WRONLY = octal('0001')
+  local O_CREAT  = octal('0100')
+  local S_IRUSR  = octal('00400') -- user has read permission
+  local S_IWUSR  = octal('00200') -- user has write permission
+  -- first check for regular
+  if (io_or_filename == io.stdout or io_or_filename == STDOUT) and dest_fd ~= STDOUT then
+    C.dup2(STDERR, STDOUT)
+  elseif (io_or_filename == io.stderr or io_or_filename == STDERR) and dest_fd ~= STDERR then
+    C.dup2(STDOUT, STDERR)
 
     -- otherwise handle file-based redirection
-    else
-        local fd = C.open(io_or_filename, bit.bor(O_WRONLY, O_CREAT), bit.bor(S_IRUSR, S_IWUSR))
-        if fd < 0 then
-          return nil, ffi_error(string.format("failure opening file '%s'", fname))
-        end
-        C.dup2(fd, dest_fd)
-        C.close(fd)
+  else
+    local fd = C.open(io_or_filename, bit.bor(O_WRONLY, O_CREAT), bit.bor(S_IRUSR, S_IWUSR))
+    if fd < 0 then
+      return nil, ffi_error(string.format("failure opening file '%s'", fname))
     end
+    C.dup2(fd, dest_fd)
+    C.close(fd)
+  end
 end
 
 exec.spawn = function (exe, args, env, cwd, stdout_redirect, stderr_redirect)
-    args = args or {}
+  args = args or {}
 
-    local pid = C.fork()
-    if pid < 0 then
-        return nil, ffi_error("fork(2) failed")
-    elseif pid == 0 then -- child process
-        redirect(stdout_redirect, STDOUT)
-        redirect(stderr_redirect, STDERR)
-        local string_array_t = ffi.typeof('const char *[?]')
-        -- local char_p_k_p_t   = ffi.typeof('char *const*')
-        -- args is 1-based Lua table, argv is 0-based C array
-        -- automatically NULL terminated
-        local argv = string_array_t(#args + 1 + 1)
-        for i = 1, #args do
-            argv[i] = tostring(args[i])
-        end
-        do
-          local function setenv(name, value)
-            local overwrite_flag = 1
-            if C.setenv(name, value, overwrite_flag) == -1 then
-              return nil, ffi_error("setenv(3) failed")
-            else
-              return value
-            end
-          end
-          for name, value in pairs(env or {}) do
-            local x, e = setenv(name, tostring(value))
-            if x == nil then return nil, e end
-          end
-        end
-        if cwd then
-          if C.chdir(tostring(cwd)) == -1 then return nil, ffi_error("chdir(2) failed") end
-        end
-        argv[0] = exe
-        argv[#args + 1] = nil
-        if C.execvp(exe, ffi.cast("char *const*", argv)) == -1 then
-          return nil, ffi_error("execvp(3) failed")
-        end
-        assert(nil, "assertion failed: exec.spawn (should be unreachable!)")
-      else
-        if ERETRY(C.waitpid)(pid, nil, 0) == -1 then return nil, ffi_error("waitpid(2) failed") end
+  local pid = C.fork()
+  if pid < 0 then
+    return nil, ffi_error("fork(2) failed")
+  elseif pid == 0 then -- child process
+    redirect(stdout_redirect, STDOUT)
+    redirect(stderr_redirect, STDERR)
+    local string_array_t = ffi.typeof('const char *[?]')
+    -- local char_p_k_p_t   = ffi.typeof('char *const*')
+    -- args is 1-based Lua table, argv is 0-based C array
+    -- automatically NULL terminated
+    local argv = string_array_t(#args + 1 + 1)
+    for i = 1, #args do
+      argv[i] = tostring(args[i])
     end
+    do
+      local function setenv(name, value)
+        local overwrite_flag = 1
+        if C.setenv(name, value, overwrite_flag) == -1 then
+          return nil, ffi_error("setenv(3) failed")
+        else
+          return value
+        end
+      end
+      for name, value in pairs(env or {}) do
+        local x, e = setenv(name, tostring(value))
+        if x == nil then return nil, e end
+      end
+    end
+    if cwd then
+      if C.chdir(tostring(cwd)) == -1 then return nil, ffi_error("chdir(2) failed") end
+    end
+    argv[0] = exe
+    argv[#args + 1] = nil
+    if C.execvp(exe, ffi.cast("char *const*", argv)) == -1 then
+      return nil, ffi_error("execvp(3) failed")
+    end
+    assert(nil, "assertion failed: exec.spawn (should be unreachable!)")
+  else
+    if ERETRY(C.waitpid)(pid, nil, 0) == -1 then return nil, ffi_error("waitpid(2) failed") end
+  end
 end
 
 exec.context = function(exe)
@@ -124,20 +124,21 @@ exec.context = function(exe)
 end
 exec.ctx = exec.context
 
-exec.cmd = setmetatable({}, {__index =
-  function (_, exe)
-    return function(...)
-      local args
-      if not (...) then
-        args = {}
-      elseif type(...) == "table" then
-        args = ...
-      else
-        args = {...}
+exec.cmd = setmetatable({},
+  {__index =
+    function (_, exe)
+      return function(...)
+        local args
+        if not (...) then
+          args = {}
+        elseif type(...) == "table" then
+          args = ...
+        else
+          args = {...}
+        end
+        return exec.spawn(exe, args, args.env, args.cwd, args.stdout, args.stderr)
       end
-      return exec.spawn(exe, args, args.env, args.cwd, args.stdout, args.stderr)
     end
-  end
-})
+  })
 
 return exec
