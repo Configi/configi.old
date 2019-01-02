@@ -557,7 +557,7 @@ local read_line = function(file)
   return str
 end
 
-local octal = function(num)
+local base = function(num)
   local s = string.format("%o", num)
   local n = tonumber(s)
   return n, s
@@ -678,7 +678,7 @@ return {
     falsy = falsy,
     return_if = return_if,
     return_if_not = return_if_not,
-    octal = octal,
+    base = base,
     echo = echo,
     random_string = random_string,
   }
