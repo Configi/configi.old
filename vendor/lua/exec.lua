@@ -3,14 +3,18 @@ local C = ffi.C
 local exec = {}
 
 ffi.cdef([[
+static const int EINTR = 4; /* Interrupted system call */
+static const int EAGAIN = 11; /* Try again */
 typedef int32_t pid_t;
 pid_t fork(void);
+pid_t waitpid(pid_t pid, int *status, int options);
 char *strerror(int errnum);
 int open(const char *pathname, int flags, int mode);
 int close(int fd);
 int dup2(int oldfd, int newfd);
 int setenv(const char*, const char*, int);
 int execvp(const char *file, char *const argv[]);
+int chdir(const char *);
 ]])
 local ffi_error = function(s)
   s = s or "error"
@@ -19,6 +23,19 @@ end
 local octal = function(n) return tonumber(n, 8) end
 local STDOUT = 1
 local STDERR = 2
+local ERETRY = function(fn)
+  return function(...)
+    local r, e
+    repeat
+      r = fn(...)
+      e = ffi.errno()
+      if r ~= -1 then
+        break
+      end
+    until((e ~= C.EINTR) and (e ~= C.EAGAIN))
+    return r, e
+  end
+end
 
 -- dest should be either 0 or 1 (STDOUT or STDERR)
 local redirect = function(io_or_filename, dest_fd)
@@ -44,7 +61,7 @@ local redirect = function(io_or_filename, dest_fd)
     end
 end
 
-exec.spawn = function (exe, args, cwd, env, stdout_redirect, stderr_redirect)
+exec.spawn = function (exe, args, env, cwd, stdout_redirect, stderr_redirect)
     args = args or {}
 
     local pid = C.fork()
@@ -54,7 +71,7 @@ exec.spawn = function (exe, args, cwd, env, stdout_redirect, stderr_redirect)
         redirect(stdout_redirect, STDOUT)
         redirect(stderr_redirect, STDERR)
         local string_array_t = ffi.typeof('const char *[?]')
-        --local char_p_k_p_t   = ffi.typeof('char *const*')
+        -- local char_p_k_p_t   = ffi.typeof('char *const*')
         -- args is 1-based Lua table, argv is 0-based C array
         -- automatically NULL terminated
         local argv = string_array_t(#args + 1 + 1)
@@ -75,14 +92,52 @@ exec.spawn = function (exe, args, cwd, env, stdout_redirect, stderr_redirect)
             if x == nil then return nil, e end
           end
         end
-        --if cwd then C.chdir(tostring(cwd)) end
+        if cwd then
+          if C.chdir(tostring(cwd)) == -1 then return nil, ffi_error("chdir(2) failed") end
+        end
         argv[0] = exe
         argv[#args + 1] = nil
         if C.execvp(exe, ffi.cast("char *const*", argv)) == -1 then
           return nil, ffi_error("execvp(3) failed")
         end
         assert(nil, "assertion failed: exec.spawn (should be unreachable!)")
+      else
+        if ERETRY(C.waitpid)(pid, nil, 0) == -1 then return nil, ffi_error("waitpid(2) failed") end
     end
 end
+
+exec.context = function(exe)
+  local args = {}
+  return setmetatable(args, {__call = function(_, ...)
+    local n = select("#", ...)
+    if n == 1 then
+      for k in string.gmatch(..., "%S+") do
+        args[#args+1] = k
+      end
+    elseif n > 1 then
+      for _, k in ipairs({...}) do
+        args[#args+1] = k
+      end
+    end
+    return exec.spawn(exe, args, args.env, args.cwd, args.stdout, args.stderr)
+  end})
+end
+exec.ctx = exec.context
+
+exec.cmd = setmetatable({}, {__index =
+  function (_, exe)
+    return function(...)
+      local args
+      if not (...) then
+        args = {}
+      elseif type(...) == "table" then
+        args = ...
+      else
+        args = {...}
+      end
+      return exec.spawn(exe, args, args.env, args.cwd, args.stdout, args.stderr)
+    end
+  end
+})
 
 return exec
