@@ -5,6 +5,27 @@ local util = lib.util
 local random = util.random_string
 local T = require "u-test"
 local exec = require"exec"
+T["exec.spawn stdout"] = function()
+  local echo = exec.ctx"echo"
+  local cmd = exec.cmd
+  local a, b, _
+  _, a = cmd.echo("-n", "-e", [[aaa\nbbb]])
+  _, b = echo("-n", "-e", [[aaa\nbbb]])
+  T.equal(a[1], "aaa")
+  T.equal(a[2], "bbb")
+  T.equal(b[1], "aaa")
+  T.equal(b[2], "bbb")
+end
+T["exec.spawn stderr"] = function()
+  local ls = exec.ctx"ls"
+  local cmd = exec.cmd
+  local a, b, _
+  _, _, a = ls("sdfsdf")
+  _, _, b = cmd.ls("sdfsdf")
+  T.equal(a[1], "ls: sdfsdf: No such file or directory")
+  T.equal(b[1], "ls: sdfsdf: No such file or directory")
+end
+
 T["exec.context"] = function()
   local s = random(12)
   local touch = exec.ctx"touch"
