@@ -54,4 +54,12 @@ T["exec.spawn stdin"] = function()
   _, a = sed("s:abc:123:g")
   T.equal(a[1], "xxx123yyy")
 end
+T["exec.spawn stdout redirect"] = function()
+  local s = random(12)
+  local ls = exec.ctx"ls"
+  ls.stdout = s
+  local a, _
+  ls"/etc/passwd"
+  T.equal("/etc/passwd\n", file.read_all(s))
+end
 T.summary()
