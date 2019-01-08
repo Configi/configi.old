@@ -62,4 +62,13 @@ T["exec.spawn stdout redirect"] = function()
   ls"/etc/passwd"
   T.equal("/etc/passwd\n", file.read_all(s))
 end
+T["exec.spawn stderr redirect"] = function()
+  local s = random(12)
+  local ls = exec.ctx"ls"
+  ls.stderr = s
+  local a, _
+  ls"non-existent"
+  T.equal("ls: non-existent: No such file or directory\n", file.read_all(s))
+end
+
 T.summary()
