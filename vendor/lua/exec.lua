@@ -49,6 +49,7 @@ end
 
 exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stderr_redirect)
   args = args or {}
+  local ret
   local stdout_tbl = {}
   local stderr_tbl = {}
   local stdin = ffi.new("int[2]")
@@ -121,7 +122,11 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     else
       C.close(stdin[1])
     end
-    if ffiext.retry(C.waitpid)(pid, nil, 0) == -1 then return nil, ffiext.strerror("waitpid(2) failed") end
+    do
+      local status = ffi.new("int[?]", 1)
+      if ffiext.retry(C.waitpid)(pid, status, 0) == -1 then return nil, ffiext.strerror("waitpid(2) failed") end
+      ret = bit.rshift(bit.band(status[0], 0xff00), 8)
+    end
     local output = function(i, o)
       local F_GETFL = 0x03
       local F_SETFL = 0x04
@@ -165,7 +170,11 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     C.close(stderr[0])
     C.close(stderr[1])
   end
+  if ret == 0 then
     return pid, stdout_tbl, stderr_tbl
+  else
+    return nil, stdout_tbl, stderr_tbl
+  end
 end
 
 exec.context = function(exe)
