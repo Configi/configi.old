@@ -42,8 +42,10 @@ T["exec.spawn stderr"] = function()
   local ls = exec.ctx"ls"
   local cmd = exec.cmd
   local a, b, _
-  _, _, a = ls("sdfsdf")
-  _, _, b = cmd.ls("sdfsdf")
+  x, _, a = ls("sdfsdf")
+  y, _, b = cmd.ls("sdfsdf")
+  T.is_nil(x)
+  T.is_nil(y)
   T.equal(a[1], "ls: sdfsdf: No such file or directory")
   T.equal(b[1], "ls: sdfsdf: No such file or directory")
 end
@@ -67,8 +69,10 @@ T["exec.spawn stderr redirect"] = function()
   local s = random(12)
   local ls = exec.ctx"ls"
   ls.stderr = s
-  local a, _
-  ls"non-existent"
+  local a, b, _
+  a, _, b = ls"non-existent"
+  T.is_nil(a)
+  T.is_nil(b[1])
   T.equal("ls: non-existent: No such file or directory\n", file.read_all(s))
   os.execute("rm " .. s)
 end
