@@ -20,7 +20,6 @@ ssize_t read(int, void *, size_t);
 ssize_t write(int, const void *, size_t);
 int fcntl(int, int, ...);
 ]])
-local octal = function(n) return tonumber(n, 8) end
 local STDIN = 0
 local STDOUT = 1
 local STDERR = 2
@@ -30,6 +29,7 @@ local O_NONBLOCK = 0x800
 
 -- dest should be either 0 or 1 (STDOUT or STDERR)
 local redirect = function(io_or_filename, dest_fd)
+  local octal = function(n) return tonumber(n, 8) end
   if io_or_filename == nil then return true end
   local O_WRONLY = octal('0001')
   local O_CREAT  = octal('0100')
