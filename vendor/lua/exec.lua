@@ -1,14 +1,12 @@
 local ffi = require "ffi"
+local ffiext = require "ffiext"
 local C = ffi.C
 local exec = {}
 
 ffi.cdef([[
-static const int EINTR = 4; /* Interrupted system call */
-static const int EAGAIN = 11; /* Try again */
 typedef int32_t pid_t;
 pid_t fork(void);
 pid_t waitpid(pid_t pid, int *status, int options);
-char *strerror(int errnum);
 int open(const char *pathname, int flags, int mode);
 int close(int fd);
 int dup2(int oldfd, int newfd);
@@ -22,10 +20,6 @@ ssize_t read(int, void *, size_t);
 ssize_t write(int, const void *, size_t);
 int fcntl(int, int, ...);
 ]])
-local strerror = function(s)
-  s = s or "error"
-  return string.format("%s: %s\n", s, ffi.string(C.strerror(ffi.errno())))
-end
 local octal = function(n) return tonumber(n, 8) end
 local STDIN = 0
 local STDOUT = 1
@@ -33,19 +27,6 @@ local STDERR = 2
 local F_GETFL = 0x03
 local F_SETFL = 0x04
 local O_NONBLOCK = 0x800
-local ERETRY = function(fn)
-  return function(...)
-    local r, e
-    repeat
-      r = fn(...)
-      e = ffi.errno()
-      if r ~= -1 then
-        break
-      end
-    until((e ~= C.EINTR) and (e ~= C.EAGAIN))
-    return r, e
-  end
-end
 
 -- dest should be either 0 or 1 (STDOUT or STDERR)
 local redirect = function(io_or_filename, dest_fd)
@@ -63,7 +44,7 @@ local redirect = function(io_or_filename, dest_fd)
   else
     local fd = C.open(io_or_filename, bit.bor(O_WRONLY, O_CREAT), bit.bor(S_IRUSR, S_IWUSR))
     if fd < 0 then
-      return nil, strerror(string.format("failure opening file '%s'", fname))
+      return nil, ffiext.strerror(string.format("failure opening file '%s'", fname))
     end
     C.dup2(fd, dest_fd)
     C.close(fd)
@@ -77,12 +58,12 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
   local stdin = ffi.new("int[2]")
   local stdout = ffi.new("int[2]")
   local stderr = ffi.new("int[2]")
-  if C.pipe(stdin) == -1 then return nil, strerror("pipe(2) for STDIN failed") end
-  if C.pipe(stdout) == -1 then return nil, strerror("pipe(2) for STDOUT failed") end
-  if C.pipe(stderr) == -1 then return nil, strerror("pipe(2) for STDERR failed") end
+  if C.pipe(stdin) == -1 then return nil, ffiext.strerror("pipe(2) for STDIN failed") end
+  if C.pipe(stdout) == -1 then return nil, ffiext.strerror("pipe(2) for STDOUT failed") end
+  if C.pipe(stderr) == -1 then return nil, ffiext.strerror("pipe(2) for STDERR failed") end
   local pid = C.fork()
   if pid < 0 then
-    return nil, strerror("fork(2) failed")
+    return nil, ffiext.strerror("fork(2) failed")
   elseif pid == 0 then -- child process
     C.close(stdin[1])
     C.close(stdout[0])
@@ -115,7 +96,7 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
       local function setenv(name, value)
         local overwrite_flag = 1
         if C.setenv(name, value, overwrite_flag) == -1 then
-          return nil, strerror("setenv(3) failed")
+          return nil, ffiext.strerror("setenv(3) failed")
         else
           return value
         end
@@ -126,12 +107,12 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
       end
     end
     if cwd then
-      if C.chdir(tostring(cwd)) == -1 then return nil, strerror("chdir(2) failed") end
+      if C.chdir(tostring(cwd)) == -1 then return nil, ffiext.strerror("chdir(2) failed") end
     end
     argv[0] = exe
     argv[#args + 1] = nil
     if C.execvp(exe, ffi.cast("char *const*", argv)) == -1 then
-      return nil, strerror("execvp(2) failed")
+      return nil, ffiext.strerror("execvp(2) failed")
     end
     assert(nil, "assertion failed: exec.spawn (should be unreachable!)")
   else
@@ -144,13 +125,13 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     else
       C.close(stdin[1])
     end
-    if ERETRY(C.waitpid)(pid, nil, 0) == -1 then return nil, strerror("waitpid(2) failed") end
+    if ffiext.retry(C.waitpid)(pid, nil, 0) == -1 then return nil, ffiext.strerror("waitpid(2) failed") end
     local output = function(i, o)
       local buf = ffi.new("char[?]", 1)
       local flags = C.fcntl(i, F_GETFL, 0)
       flags = bit.bor(flags, O_NONBLOCK)
       if C.fcntl(i, F_SETFL, ffi.new("int", flags)) == -1 then
-        return nil, strerror("fcntl(2) failed")
+        return nil, ffiext.strerror("fcntl(2) failed")
       end
       local n, s, c
       while true do
@@ -172,7 +153,7 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
           o[#o+1] = s
           break
         else
-          return nil, strerror("read(2) failed")
+          return nil, ffiext.strerror("read(2) failed")
         end
       end
     end
