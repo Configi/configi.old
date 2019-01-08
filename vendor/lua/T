@@ -47,4 +47,11 @@ T["exec.spawn stderr"] = function()
   T.equal(a[1], "ls: sdfsdf: No such file or directory")
   T.equal(b[1], "ls: sdfsdf: No such file or directory")
 end
+T["exec.spawn stdin"] = function()
+  local sed = exec.ctx"sed"
+  sed.stdin = "xxxabcyyy"
+  local _, a
+  _, a = sed("s:abc:123:g")
+  T.equal(a[1], "xxx123yyy")
+end
 T.summary()
