@@ -23,6 +23,7 @@ int fcntl(int, int, ...);
 local STDIN = 0
 local STDOUT = 1
 local STDERR = 2
+local dup2 = ffiext.retry(C.dup2)
 -- dest should be either 0 or 1 (STDOUT or STDERR)
 local redirect = function(io_or_filename, dest_fd)
   local octal = function(n) return tonumber(n, 8) end
@@ -33,16 +34,16 @@ local redirect = function(io_or_filename, dest_fd)
   local S_IWUSR  = octal('00200') -- user has write permission
   -- first check for regular
   if (io_or_filename == io.stdout or io_or_filename == STDOUT) and dest_fd ~= STDOUT then
-    C.dup2(STDERR, STDOUT)
+    dup2(STDERR, STDOUT)
   elseif (io_or_filename == io.stderr or io_or_filename == STDERR) and dest_fd ~= STDERR then
-    C.dup2(STDOUT, STDERR)
+    dup2(STDOUT, STDERR)
     -- otherwise handle file-based redirection
   else
     local fd = C.open(io_or_filename, bit.bor(O_WRONLY, O_CREAT), bit.bor(S_IRUSR, S_IWUSR))
     if fd < 0 then
       return nil, ffiext.strerror(string.format("failure opening file '%s'", fname))
     end
-    C.dup2(fd, dest_fd)
+    dup2(fd, dest_fd)
     C.close(fd)
   end
 end
@@ -66,17 +67,17 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     C.close(stdout[0])
     C.close(stderr[0])
     if stdin_string then
-      C.dup2(stdin[0], STDIN)
+      dup2(stdin[0], STDIN)
     end
     if stdout_redirect then
       redirect(stdout_redirect, STDOUT)
     else
-      C.dup2(stdout[1], STDOUT)
+      dup2(stdout[1], STDOUT)
     end
     if stderr_redirect then
       redirect(stderr_redirect, STDERR)
     else
-      C.dup2(stderr[1], STDERR)
+      dup2(stderr[1], STDERR)
     end
     C.close(stdin[0])
     C.close(stdout[1])
