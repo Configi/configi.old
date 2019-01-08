@@ -76,5 +76,19 @@ T["exec.spawn stderr redirect"] = function()
   T.equal("ls: non-existent: No such file or directory\n", file.read_all(s))
   os.execute("rm " .. s)
 end
-
+T["exec.spawn cwd"] = function()
+  local ls = exec.ctx"ls"
+  local a, b, c
+  ls.cwd = "/etc"
+  a, b, c =ls"passwd"
+  T.equal(type(a), "number")
+  T.equal(b[1], "passwd")
+end
+T["exec.spawn env"] = function()
+  local env = exec.ctx"/usr/bin/env"
+  local a, b, c
+  env.env = { TXT = "yo" }
+  a, b, c = env""
+  T.equal(b[#b], "TXT=yo")
+end
 T.summary()
