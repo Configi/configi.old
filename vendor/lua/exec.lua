@@ -23,10 +23,6 @@ int fcntl(int, int, ...);
 local STDIN = 0
 local STDOUT = 1
 local STDERR = 2
-local F_GETFL = 0x03
-local F_SETFL = 0x04
-local O_NONBLOCK = 0x800
-
 -- dest should be either 0 or 1 (STDOUT or STDERR)
 local redirect = function(io_or_filename, dest_fd)
   local octal = function(n) return tonumber(n, 8) end
@@ -127,6 +123,9 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     end
     if ffiext.retry(C.waitpid)(pid, nil, 0) == -1 then return nil, ffiext.strerror("waitpid(2) failed") end
     local output = function(i, o)
+      local F_GETFL = 0x03
+      local F_SETFL = 0x04
+      local O_NONBLOCK = 0x800
       local buf = ffi.new("char[?]", 1)
       local flags = C.fcntl(i, F_GETFL, 0)
       flags = bit.bor(flags, O_NONBLOCK)
