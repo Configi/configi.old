@@ -10,6 +10,7 @@ local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, l
 if args.verbose then util.echo "Start Configi run...\n" end
 local dir = path.split(args.script)
 package.path = dir
+if dir == "" then dir = "." end
 local rerun = function(dir, mod, cmd, a, params)
   do
     local rpath = "/usr/local/bin/rerun"
@@ -23,7 +24,7 @@ local rerun = function(dir, mod, cmd, a, params)
   export PATH=/bin:/usr/bin:/usr/local/bin
   exec 0>&- 2>&1
   ]]
-  local str = string.format("%s cd %s && rerun -M modules %s:%s --arg %s", header, dir, mod, cmd, a)
+  local str = string.format("%s cd %s && rerun -M %s/modules %s:%s --arg %s", header, dir, dir, mod, cmd, a)
   if params and next(params) then
     for o, p in pairs(params) do
       str = string.format("%s --%s %s", str, o, p)
