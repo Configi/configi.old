@@ -1,10 +1,9 @@
 local ffi = require "ffi"
 local C = ffi.C
 local ffiext = {}
-
 ffi.cdef[[
-static const int EINTR = 4; /* Interrupted system call */
-static const int EAGAIN = 11; /* Try again */
+static const int EINTR = 4; /* Linux: Interrupted system call */
+static const int EAGAIN = 11; /* Linux: Try again */
 char *strerror(int);
 int dprintf(int, const char *, ...);
 ]]
@@ -32,5 +31,4 @@ ffiext.retry = function(fn)
     return r, e
   end
 end
-
 return ffiext
