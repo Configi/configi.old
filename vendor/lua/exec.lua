@@ -24,6 +24,7 @@ local STDIN = 0
 local STDOUT = 1
 local STDERR = 2
 local dup2 = ffiext.retry(C.dup2)
+local strerror = ffiext.strerror
 -- dest should be either 0 or 1 (STDOUT or STDERR)
 local redirect = function(io_or_filename, dest_fd)
   local octal = function(n) return tonumber(n, 8) end
@@ -34,16 +35,19 @@ local redirect = function(io_or_filename, dest_fd)
   local S_IWUSR  = octal('00200') -- user has write permission
   -- first check for regular
   if (io_or_filename == io.stdout or io_or_filename == STDOUT) and dest_fd ~= STDOUT then
-    dup2(STDERR, STDOUT)
+    local r, e = dup2(STDERR, STDOUT)
+    if r == -1 then return r, e end
   elseif (io_or_filename == io.stderr or io_or_filename == STDERR) and dest_fd ~= STDERR then
-    dup2(STDOUT, STDERR)
+    local r, e = dup2(STDOUT, STDERR)
+    if r == -1 then return r, e end
     -- otherwise handle file-based redirection
   else
     local fd = C.open(io_or_filename, bit.bor(O_WRONLY, O_CREAT), bit.bor(S_IRUSR, S_IWUSR))
     if fd < 0 then
       return nil, ffiext.strerror(string.format("failure opening file '%s'", fname))
     end
-    dup2(fd, dest_fd)
+    local r, e = dup2(fd, dest_fd)
+    if r == -1 then return r, e end
     C.close(fd)
   end
 end
@@ -67,17 +71,21 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     C.close(stdout[0])
     C.close(stderr[0])
     if stdin_string then
-      dup2(stdin[0], STDIN)
+      local r, e = dup2(stdin[0], STDIN)
+      if r == -1 then return nil, nil, nil, strerror(e, "dup2(2) failed") end
     end
     if stdout_redirect then
       redirect(stdout_redirect, STDOUT)
     else
-      dup2(stdout[1], STDOUT)
+      local r, e = dup2(stdout[1], STDOUT)
+      if r == -1 then return nil, nil, nil, strerror(e, "dup2(2) failed") end
     end
     if stderr_redirect then
-      redirect(stderr_redirect, STDERR)
+      local r, e = redirect(stderr_redirect, STDERR)
+      if r == -1 then return nil, nil, nil, strerror(e, "dup2(2) failed") end
     else
-      dup2(stderr[1], STDERR)
+      local r, e = dup2(stderr[1], STDERR)
+      if r == -1 then return nil, nil, nil, strerror(e, "dup2(2) failed") end
     end
     C.close(stdin[0])
     C.close(stdout[1])
