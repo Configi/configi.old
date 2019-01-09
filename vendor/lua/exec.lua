@@ -70,16 +70,19 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
       if r == -1 then return nil, nil, nil, strerror(e, "dup2(2) failed") end
     end
     if stdout_redirect then
-      redirect(stdout_redirect, STDOUT)
+      local r, e
+      r, e = redirect(stdout_redirect, STDOUT)
+      if r == -1 then return nil, nil, nil, sterror(e, "open(2) failed") end
     else
-      local r, e = dup2(stdout[1], STDOUT)
+      r, e = dup2(stdout[1], STDOUT)
       if r == -1 then return nil, nil, nil, strerror(e, "dup2(2) failed") end
     end
     if stderr_redirect then
-      local r, e = redirect(stderr_redirect, STDERR)
+      local r, e
+      r, e = redirect(stderr_redirect, STDERR)
       if r == -1 then return nil, nil, nil, strerror(e, "dup2(2) failed") end
     else
-      local r, e = dup2(stderr[1], STDERR)
+      r, e = dup2(stderr[1], STDERR)
       if r == -1 then return nil, nil, nil, strerror(e, "dup2(2) failed") end
     end
     C.close(stdin[0])
