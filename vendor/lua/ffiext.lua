@@ -6,7 +6,15 @@ ffi.cdef[[
 static const int EINTR = 4; /* Interrupted system call */
 static const int EAGAIN = 11; /* Try again */
 char *strerror(int);
+int dprintf(int, const char *, ...);
 ]]
+ffiext.dprintf = function(fd, s, ...)
+  s = string.format(s, ...)
+  local len = string.len(s)
+  local str = ffi.new("char[?]", len + 1)
+  ffi.copy(str, s, len)
+  C.dprintf(fd, str)
+end
 ffiext.strerror = function(e, s)
   s = s or "error"
   return string.format("%s: %s\n", s, ffi.string(C.strerror(e)))
