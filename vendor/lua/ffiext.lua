@@ -31,4 +31,17 @@ ffiext.retry = function(fn)
     return r, e
   end
 end
+ffiext.open = function(filename)
+	local octal = function(n) return tonumber(n, 8) end
+  local O_WRONLY = octal('0001')
+  local O_CREAT  = octal('0100')
+  local S_IRUSR  = octal('00400') -- user has read permission
+  local S_IWUSR  = octal('00200') -- user has write permission
+  local r, e = ffiext.retry(C.open)(filename, bit.bor(O_WRONLY, O_CREAT), bit.bor(S_IRUSR, S_IWUSR))
+  if r > 0 then
+		return r
+  else
+		return -1, e
+	end
+end
 return ffiext
