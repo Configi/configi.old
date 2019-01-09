@@ -7,9 +7,9 @@ static const int EINTR = 4; /* Interrupted system call */
 static const int EAGAIN = 11; /* Try again */
 char *strerror(int);
 ]]
-ffiext.strerror = function(s)
+ffiext.strerror = function(e, s)
   s = s or "error"
-  return string.format("%s: %s\n", s, ffi.string(C.strerror(ffi.errno())))
+  return string.format("%s: %s\n", s, ffi.string(C.strerrore(e)))
 end
 ffiext.retry = function(fn)
   return function(...)
@@ -17,7 +17,7 @@ ffiext.retry = function(fn)
     repeat
       r = fn(...)
       e = ffi.errno()
-      if r ~= -1 then
+      if (r ~= -1) or ((r == -1) and (e ~= C.EINTR) and (e ~= C.EAGAIN)) then
         break
       end
     until((e ~= C.EINTR) and (e ~= C.EAGAIN))
