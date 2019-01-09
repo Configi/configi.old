@@ -28,12 +28,7 @@ local strerror = ffiext.strerror
 local errno = ffi.errno
 -- dest should be either 0 or 1 (STDOUT or STDERR)
 local redirect = function(io_or_filename, dest_fd)
-  local octal = function(n) return tonumber(n, 8) end
   if io_or_filename == nil then return true end
-  local O_WRONLY = octal('0001')
-  local O_CREAT  = octal('0100')
-  local S_IRUSR  = octal('00400') -- user has read permission
-  local S_IWUSR  = octal('00200') -- user has write permission
   -- first check for regular
   if (io_or_filename == io.stdout or io_or_filename == STDOUT) and dest_fd ~= STDOUT then
     local r, e = dup2(STDERR, STDOUT)
@@ -43,12 +38,11 @@ local redirect = function(io_or_filename, dest_fd)
     if r == -1 then return r, e end
     -- otherwise handle file-based redirection
   else
-    local fd = C.open(io_or_filename, bit.bor(O_WRONLY, O_CREAT), bit.bor(S_IRUSR, S_IWUSR))
-    if fd < 0 then
-      return nil, strerror(errno(), string.format("failure opening file '%s'", fname))
-    end
-    local r, e = dup2(fd, dest_fd)
-    if r == -1 then return r, e end
+    local fd, r, e
+    fd, e = ffiext.open(io_or_filename)
+    if fd == -1 then return -1, e end
+    r, e = dup2(fd, dest_fd)
+    if r == -1 then return -1, e end
     C.close(fd)
   end
 end
