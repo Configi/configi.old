@@ -32,10 +32,10 @@ local redirect = function(io_or_filename, dest_fd)
   -- first check for regular
   if (io_or_filename == io.stdout or io_or_filename == STDOUT) and dest_fd ~= STDOUT then
     local r, e = dup2(STDERR, STDOUT)
-    if r == -1 then return r, e end
+    if r == -1 then return -1, e end
   elseif (io_or_filename == io.stderr or io_or_filename == STDERR) and dest_fd ~= STDERR then
     local r, e = dup2(STDOUT, STDERR)
-    if r == -1 then return r, e end
+    if r == -1 then return -1, e end
     -- otherwise handle file-based redirection
   else
     local fd, r, e
@@ -111,12 +111,12 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
       end
     end
     if cwd then
-      if C.chdir(tostring(cwd)) == -1 then return nil, strerror(errno(), "chdir(2) failed") end
+      if C.chdir(tostring(cwd)) == -1 then return nil, nil, nil, strerror(errno(), "chdir(2) failed") end
     end
     argv[0] = exe
     argv[#args + 1] = nil
     if C.execvp(exe, ffi.cast("char *const*", argv)) == -1 then
-      return nil, strerror(errno(), "execvp(2) failed")
+      return nil, nil, nil, strerror(errno(), "execvp(2) failed")
     end
     assert(nil, "assertion failed: exec.spawn (should be unreachable!)")
   else
@@ -131,7 +131,8 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     end
     do
       local status = ffi.new("int[?]", 1)
-      if ffiext.retry(C.waitpid)(pid, status, 0) == -1 then return nil, strerror(errno(), "waitpid(2) failed") end
+      local r, e = ffiext.retry(C.waitpid)(pid, status, 0)
+      if r == -1 then return nil, nil, nil, strerror(e, "waitpid(2) failed") end
       ret = bit.rshift(bit.band(status[0], 0xff00), 8)
     end
     local output = function(i, o)
