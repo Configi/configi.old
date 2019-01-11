@@ -159,7 +159,11 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
       local len = string.len(stdin_string)
       local str = ffi.new("char[?]", len + 1)
       ffi.copy(str, stdin_string, len)
-      C.write(stdin[1], str, len)
+      local r, e = ffiext.retry(C.write)(stdin[1], str, len)
+      if r == -1 then
+        R.error = strerror(e, "write(2) failed")
+        return nil, R
+      end
       C.close(stdin[1])
     else
       C.close(stdin[1])
