@@ -1,4 +1,5 @@
-#!../../bin/lua
+#!bin/lua
+package.path="vendor/lua/?.lua"
 local lib = require "lib"
 local file = lib.file
 local util = lib.util
