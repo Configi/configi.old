@@ -51,6 +51,13 @@ local redirect = function(io_or_filename, dest_fd)
 end
 
 exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stderr_redirect, ignore)
+  --[[
+    { stdout = "STDOUT (string)",
+      stderr = "STDERR (string)",
+      code = "return code (number)",
+      error = "error (string)"
+    }
+  ]]
   args = args or {}
   local R = {
     stdout = {},
