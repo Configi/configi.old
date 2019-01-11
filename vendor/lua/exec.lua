@@ -52,6 +52,17 @@ end
 
 exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stderr_redirect, ignore)
   --[[
+    INPUT
+      exe: program or executable (string)
+      args: arguments to program (table)
+      env: environment variables when running program (table)
+      cwd: current working directory before running program (string)
+      stdin_string: STDIN input to program (string)
+      stdout_redirect: file to redirect STDOUT stream to (string)
+      stderr_redirect: file to redirect STDERR stream to (string)
+      ignore: when not nil or false, ignores the return value of the program (string)
+
+    OUTPUT
     { stdout = "STDOUT (string)",
       stderr = "STDERR (string)",
       code = "return code (number)",
