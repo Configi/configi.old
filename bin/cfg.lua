@@ -6,42 +6,42 @@ parser:flag("-v --verbose", "Verbose output.")
 parser:flag("-t --cut", "Truncate verbose or error output to 80 columns.")
 local args = parser:parse()
 local lib = require "lib"
+local exec = require "exec"
 local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
 if args.verbose then util.echo "Start Configi run...\n" end
 local dir = path.split(args.script)
 package.path = dir
 if dir == "" then dir = "." end
 local rerun = function(dir, mod, cmd, a, params)
-  do
-    local rpath = "/usr/local/bin/rerun"
-    if not file.test(rpath) then
-      file.write_all(rpath, require("rerun"))
-      os.execute("chmod +x " .. rpath)
-    end
+  local rpath = "/usr/local/bin/rerun"
+  if not file.test(rpath) then
+    file.write_all(rpath, require("rerun"))
+    os.execute("chmod +x " .. rpath)
   end
-  local header = [[
-  export LC_ALL=C
-  export PATH=/bin:/usr/bin:/usr/local/bin
-  exec 0>&- 2>&1
-  ]]
-  local str = string.format("%s cd %s && rerun -M %s/modules %s:%s --arg %s", header, dir, dir, mod, cmd, a)
+  local t = {"-M", "./modules", mod..":"..cmd, "--arg", a}
   if params and next(params) then
     for o, p in pairs(params) do
-      str = string.format("%s --%s %s", str, o, p)
+      t[#t+1] = "--" .. o
+      t[#t+1] = p
     end
   end
-  local pipe = io.popen(str, "r")
-  io.flush(pipe)
-  local output = {}
-  for ln in pipe:lines() do
-    output[#output + 1] = ln
+  return exec.spawn(rpath, t, {LC_ALL="C"}, dir)
+end
+local printer = function(o)
+  util.echo"STDOUT\n"
+  local ln = ""
+  for _, l in ipairs(o.stdout) do
+    if args.cut then l = l:sub(1, 80) end
+    ln = string.format("%s | %s \n", ln, l)
   end
-  local _, _, code = io.close(pipe)
-  if code == 0 then
-    return true, output
-  else
-    return nil, output
-  end
+  util.echo(ln)
+  util.echo"STDERR\n"
+  ln = ""
+  for _, l in ipairs(o.stderr) do
+    if args.cut then l = l:sub(1, 80) end
+      ln = string.format("%s | %s \n", ln, l)
+    end
+  util.echo(ln)
 end
 local ENV = {}
 setmetatable(ENV, {__index = function(_, mod)
@@ -61,20 +61,12 @@ setmetatable(ENV, {__index = function(_, mod)
         local c, o = rerun(dir, mod, cmd, a, p)
         if c then
           if args.verbose or (p and next(p) and p.verbose == true) then
-            local ln = ""
-            for _, l in ipairs(o) do
-              if args.cut then l = l:sub(1, 80) end
-              ln = string.format("%s | %s \n", ln, l)
-            end
-            util.echo(ln)
+            printer(o)
           end
         else
-          local err = ""
-          for _, l in ipairs(o) do
-            if args.cut then l = l:sub(1, 80) end
-            err = string.format("%s | %s \n", err, l)
-          end
-          return fmt.panic("abort: error at %s.%s \"%s\"...\n%s", mod, cmd, a, err)
+          printer(o)
+          local err = o.err or ""
+          return fmt.panic("abort: failure at %s.%s \"%s\"...\ncode: %s\nerror: %s\n", mod, cmd, a, o.code, err)
         end
       end
     end
