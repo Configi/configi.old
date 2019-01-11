@@ -33,28 +33,28 @@ T["exec.spawn stdout"] = function()
   local a, b, _
   _, a = cmd.echo("-n", "-e", [[aaa\nbbb]])
   _, b = echo("-n", "-e", [[aaa\nbbb]])
-  T.equal(a[1], "aaa")
-  T.equal(a[2], "bbb")
-  T.equal(b[1], "aaa")
-  T.equal(b[2], "bbb")
+  T.equal(a["stdout"][1], "aaa")
+  T.equal(a["stdout"][2], "bbb")
+  T.equal(b["stdout"][1], "aaa")
+  T.equal(b["stdout"][2], "bbb")
 end
 T["exec.spawn stderr"] = function()
   local ls = exec.ctx"ls"
   local cmd = exec.cmd
-  local a, b, _
-  x, _, a = ls("sdfsdf")
-  y, _, b = cmd.ls("sdfsdf")
+  local a, b
+  x, a = ls("sdfsdf")
+  y, b = cmd.ls("sdfsdf")
   T.is_nil(x)
   T.is_nil(y)
-  T.equal(a[1], "ls: sdfsdf: No such file or directory")
-  T.equal(b[1], "ls: sdfsdf: No such file or directory")
+  T.equal(a["stderr"][1], "ls: sdfsdf: No such file or directory")
+  T.equal(b["stderr"][1], "ls: sdfsdf: No such file or directory")
 end
 T["exec.spawn stdin"] = function()
   local sed = exec.ctx"sed"
   sed.stdin = "xxxabcyyy"
   local _, a
   _, a = sed("s:abc:123:g")
-  T.equal(a[1], "xxx123yyy")
+  T.equal(a["stdout"][1], "xxx123yyy")
 end
 T["exec.spawn stdout redirect"] = function()
   local s = random(12)
@@ -69,26 +69,27 @@ T["exec.spawn stderr redirect"] = function()
   local s = random(12)
   local ls = exec.ctx"ls"
   ls.stderr = s
-  local a, b, _
-  a, _, b = ls"non-existent"
+  local a, b
+  a, b = ls"non-existent"
   T.is_nil(a)
-  T.is_nil(b[1])
+  T.is_nil(b["stderr"][1])
   T.equal("ls: non-existent: No such file or directory\n", file.read_all(s))
   os.execute("rm " .. s)
 end
 T["exec.spawn cwd"] = function()
   local ls = exec.ctx"ls"
-  local a, b, c
+  local a, b
   ls.cwd = "/etc"
-  a, b, c =ls"passwd"
+  a, b = ls"passwd"
   T.equal(type(a), "number")
-  T.equal(b[1], "passwd")
+  T.equal(b["stdout"][1], "passwd")
 end
 T["exec.spawn env"] = function()
   local env = exec.ctx"/usr/bin/env"
-  local a, b, c
+  local a, b
   env.env = { TXT = "yo" }
-  a, b, c = env""
-  T.equal(b[#b], "TXT=yo")
+  a, b = env""
+  local stdout = b.stdout
+  T.equal(stdout[#stdout], "TXT=yo")
 end
 T.summary()
