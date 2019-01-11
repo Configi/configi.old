@@ -32,17 +32,17 @@ local redirect = function(io_or_filename, dest_fd)
   -- first check for regular
   if (io_or_filename == io.stdout or io_or_filename == STDOUT) and dest_fd ~= STDOUT then
     local r, e = dup2(STDERR, STDOUT)
-    if r == -1 then return -1, e end
+    if r == -1 then return nil, strerror(e, "dup2(2) failed")
   elseif (io_or_filename == io.stderr or io_or_filename == STDERR) and dest_fd ~= STDERR then
     local r, e = dup2(STDOUT, STDERR)
-    if r == -1 then return -1, e end
+    if r == -1 then return nil, strerror(e, "dup2(2) failed")
     -- otherwise handle file-based redirection
   else
     local fd, r, e
     fd, e = ffiext.open(io_or_filename)
-    if fd == -1 then return -1, e end
+    if fd == -1 then return nil, strerror(e, "open(2) failed")
     r, e = dup2(fd, dest_fd)
-    if r == -1 then return -1, e end
+    if r == -1 then return nil, strerror(e, "dup2(2) failed")
     C.close(fd)
   end
 end
