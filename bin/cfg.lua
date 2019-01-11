@@ -28,20 +28,22 @@ local rerun = function(dir, mod, cmd, a, params)
   return exec.spawn(rpath, t, {LC_ALL="C"}, dir)
 end
 local printer = function(o)
-  util.echo"STDOUT\n"
+  util.echo"stdout\n"
   local ln = ""
   for _, l in ipairs(o.stdout) do
     if args.cut then l = l:sub(1, 80) end
     ln = string.format("%s | %s \n", ln, l)
   end
   util.echo(ln)
-  util.echo"STDERR\n"
-  ln = ""
-  for _, l in ipairs(o.stderr) do
-    if args.cut then l = l:sub(1, 80) end
-      ln = string.format("%s | %s \n", ln, l)
-    end
-  util.echo(ln)
+  if o.stderr[1] then
+    util.echo"stderr\n"
+    ln = ""
+    for _, l in ipairs(o.stderr) do
+      if args.cut then l = l:sub(1, 80) end
+        ln = string.format("%s | %s \n", ln, l)
+      end
+    util.echo(ln)
+  end
 end
 local ENV = {}
 setmetatable(ENV, {__index = function(_, mod)
