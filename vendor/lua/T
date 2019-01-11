@@ -76,6 +76,13 @@ T["exec.spawn stderr redirect"] = function()
   T.equal("ls: non-existent: No such file or directory\n", file.read_all(s))
   os.execute("rm " .. s)
 end
+T["exec.spawn ignore"] = function()
+  local ls = exec.ctx"ls"
+  ls.ignore = true
+  local a, b = ls"non-existent"
+  T.equal(type(a), "number")
+  T.equal(b["stderr"][1], "ls: non-existent: No such file or directory")
+end
 T["exec.spawn cwd"] = function()
   local ls = exec.ctx"ls"
   local a, b
