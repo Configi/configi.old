@@ -9,6 +9,9 @@ local lib = require "lib"
 local exec = require "exec"
 local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
 if args.verbose then util.echo "Start Configi run...\n" end
+if file.test(args.script) == nil then
+  return fmt.panic("abort: \"%s\" not found.\n", args.script)
+end
 local dir = path.split(args.script)
 package.path = dir
 if dir == "" then dir = "." end
@@ -69,6 +72,14 @@ setmetatable(ENV, {__index = function(_, mod)
           printer(o)
           local err = o.err or ""
           return fmt.panic("abort: failure at %s.%s \"%s\"...\ncode: %s\nerror: %s\n", mod, cmd, a, o.code, err)
+        end
+        if p.register then
+          if ENV[p.register] then
+            return fmt.panic("abort: failure at %s.%s \"%s\"...\nerror: attempted to overwrite existing registered variable: \"%s\"\n",
+              mod, cmd, a, p.register)
+          else
+            ENV[p.register] = o.stdout[1]
+          end
         end
       end
     end
