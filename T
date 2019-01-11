@@ -81,6 +81,7 @@ T["exec.spawn ignore"] = function()
   local ls = exec.ctx"ls"
   ls.ignore = true
   local a, b = ls"non-existent"
+  T.not_equal(0, b.code)
   T.equal(type(a), "number")
   T.equal(b["stderr"][1], "ls: non-existent: No such file or directory")
 end

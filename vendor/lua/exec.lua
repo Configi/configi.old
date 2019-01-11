@@ -176,6 +176,7 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
         return nil, R
       end
       ret = bit.rshift(bit.band(status[0], 0xff00), 8)
+      R.code = ret
     end
     local output = function(i, o)
       local F_GETFL = 0x03
