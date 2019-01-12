@@ -19,11 +19,6 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-
-. "$RERUN_MODULES/lib/configi.sh" "file.directory" || {
-  echo >&2 "Failed loading Configi library." ; exit 1 ;
-}
-
 owner=${OWNER:-root}
 mode=${MODE:-755}
 if [ -d "$ARG" ]; then
@@ -35,7 +30,6 @@ chmod "$mode" "$ARG"
 if [ -d "$ARG" ]; then
     exit 113
 else
-    FAIL "$ARG"
     exit 1
 fi
 # Done. Exit with last command exit status.
