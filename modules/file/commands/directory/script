@@ -27,15 +27,13 @@ rerun_options_parse "$@"
 owner=${OWNER:-root}
 mode=${MODE:-755}
 if [ -d "$ARG" ]; then
-    PASS "$ARG"
     exit 0
 fi
 mkdir -p "$ARG"
 chown "$owner" "$ARG"
 chmod "$mode" "$ARG"
 if [ -d "$ARG" ]; then
-    REPAIR "$ARG"
-    exit 0
+    exit 113
 else
     FAIL "$ARG"
     exit 1
