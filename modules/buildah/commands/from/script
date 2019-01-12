@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+#/ command: buildah:from: "create container from specified image"
+#/ usage: rerun buildah:from  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --image <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER IMAGE
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "from" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+[ -x "$(command -v buildah)" ] || { echo >&2 "Buildah executable not found."; exit 1; }
+buildah inspect "$IMAGE" && exit 0
+buildah from --name "$ARG" "$IMAGE" && exit 113
+# Done. Exit with last command exit status.
+exit $?
+
