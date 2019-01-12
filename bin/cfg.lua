@@ -28,9 +28,12 @@ local rerun = function(dir, mod, cmd, a, params)
       t[#t+1] = p
     end
   end
-  return exec.spawn(rpath, t, {LC_ALL="C"}, dir)
+  return exec.spawn(rpath, t, {LC_ALL="C"}, dir, nil, nil, nil, true)
 end
-local printer = function(o)
+local printer = function(o, mod, cmd, a)
+  if o.code == 0 then fmt.print("[PASS] %s.%s \"%s\"\n", mod, cmd, a) end
+  if o.code == 113 then fmt.print("[REPAIRED] %s.%s \"%s\"\n", mod, cmd, a) end
+  if o.code == 1 then fmt.print("[FAIL] %s.%s \"%s\"\n", mod, cmd, a) end
   util.echo"stdout\n"
   local ln = ""
   for _, l in ipairs(o.stdout) do
@@ -66,10 +69,10 @@ setmetatable(ENV, {__index = function(_, mod)
         local c, o = rerun(dir, mod, cmd, a, p)
         if c then
           if args.verbose or (p and next(p) and p.verbose == true) then
-            printer(o)
+            printer(o, mod, cmd, a)
           end
         else
-          printer(o)
+          printer(o, mod, cmd, a)
           local err = o.err or ""
           return fmt.panic("abort: failure at %s.%s \"%s\"...\ncode: %s\nerror: %s\n", mod, cmd, a, o.code, err)
         end
