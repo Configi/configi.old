@@ -34,13 +34,15 @@ local printer = function(o, mod, cmd, a)
   if o.code == 0 then fmt.print("[PASS] %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 113 then fmt.print("[REPAIRED] %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 1 then fmt.print("[FAIL] %s.%s \"%s\"\n", mod, cmd, a) end
-  util.echo"stdout\n"
-  local ln = ""
-  for _, l in ipairs(o.stdout) do
-    if args.cut then l = l:sub(1, 80) end
-    ln = string.format("%s | %s \n", ln, l)
+  if o.stdout[1] then
+    util.echo"stdout\n"
+    local ln = ""
+    for _, l in ipairs(o.stdout) do
+      if args.cut then l = l:sub(1, 80) end
+      ln = string.format("%s | %s \n", ln, l)
+    end
+    util.echo(ln)
   end
-  util.echo(ln)
   if o.stderr[1] then
     util.echo"stderr\n"
     ln = ""
