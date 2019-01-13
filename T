@@ -4,7 +4,7 @@ local T = require "u-test"
 local exec = require "exec"
 local cmd = exec.cmd
 local tests = {
-  "exec",
+  "module-exec",
   "configi-basic",
 }
 T["Configi Tests"] = function()
@@ -16,4 +16,3 @@ T["Configi Tests"] = function()
     end
   end
 end
-T.summary()
