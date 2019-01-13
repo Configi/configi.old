@@ -1,125 +1,19 @@
 #!bin/lua
 package.path="vendor/lua/?.lua"
-local lib = require "lib"
-local file = lib.file
-local util = lib.util
-local random = util.random_string
 local T = require "u-test"
-local exec = require"exec"
-T["exec.context"] = function()
-  local s = random(12)
-  local touch = exec.ctx"touch"
-  touch(s)
-  T.equal(true, file.test(s))
-  os.execute("rm " .. s)
-end
-T["exec.context cwd"] = function()
-  local s = random(12)
-  local touch = exec.ctx"touch"
-  touch.cwd = "/tmp"
-  touch(s)
-  T.equal(true, file.test("/tmp/"..s))
-  os.execute("rm /tmp/" .. s)
-end
-T["exec.cmd"] = function()
-  local s = random(12)
-  local cmd = exec.cmd
-  cmd.touch(s)
-  T.equal(true, file.test(s))
-  os.execute("rm " .. s)
-end
-T["exec.spawn stdout"] = function()
-  local echo = exec.ctx"echo"
-  local cmd = exec.cmd
-  local a, b, _
-  _, a = cmd.echo("-n", "-e", [[aaa\nbbb]])
-  _, b = echo("-n", "-e", [[aaa\nbbb]])
-  T.equal(a["stdout"][1], "aaa")
-  T.equal(a["stdout"][2], "bbb")
-  T.equal(b["stdout"][1], "aaa")
-  T.equal(b["stdout"][2], "bbb")
-end
-T["exec.spawn stderr"] = function()
-  local ls = exec.ctx"ls"
-  local cmd = exec.cmd
-  local a, b
-  x, a = ls("sdfsdf")
-  y, b = cmd.ls("sdfsdf")
-  T.is_nil(x)
-  T.is_nil(y)
-  T.equal(a["stderr"][1], "ls: sdfsdf: No such file or directory")
-  T.equal(b["stderr"][1], "ls: sdfsdf: No such file or directory")
-end
-T["exec.spawn stdin"] = function()
-  local sed = exec.ctx"sed"
-  sed.stdin = "xxxabcyyy"
-  local _, a
-  _, a = sed("s:abc:123:g")
-  T.equal(a["stdout"][1], "xxx123yyy")
-end
-T["exec.spawn stdout redirect"] = function()
-  local s = random(12)
-  local ls = exec.ctx"ls"
-  ls.stdout = s
-  local a, _
-  ls"/etc/passwd"
-  T.equal("/etc/passwd\n", file.read_all(s))
-  os.execute("rm " .. s)
-end
-T["exec.spawn stderr redirect"] = function()
-  local s = random(12)
-  local ls = exec.ctx"ls"
-  ls.stderr = s
-  local a, b
-  a, b = ls"non-existent"
-  T.is_nil(a)
-  T.is_nil(b["stderr"][1])
-  T.equal("ls: non-existent: No such file or directory\n", file.read_all(s))
-  os.execute("rm " .. s)
-end
-T["exec.spawn ignore"] = function()
-  local ls = exec.ctx"ls"
-  ls.ignore = true
-  local a, b = ls"non-existent"
-  T.not_equal(0, b.code)
-  T.equal(type(a), "number")
-  T.equal(b["stderr"][1], "ls: non-existent: No such file or directory")
-end
-T["exec.spawn cwd"] = function()
-  local ls = exec.ctx"ls"
-  local a, b
-  ls.cwd = "/etc"
-  a, b = ls"passwd"
-  T.equal(type(a), "number")
-  T.equal(b["stdout"][1], "passwd")
-end
-T["exec.spawn env"] = function()
-  local env = exec.ctx"/usr/bin/env"
-  local a, b
-  env.env = { TXT = "yo" }
-  a, b = env""
-  local stdout = b.stdout
-  T.equal(stdout[#stdout], "TXT=yo")
-end
-do
-  local cfg = exec.ctx"bin/cfg"
-  local a, b = cfg"test.lua"
-  T["Configi: Test if PID (number) is returned"] = function()
-    T.is_number(a)
+local exec = require "exec"
+local cmd = exec.cmd
+local tests = {
+  "exec",
+  "configi-basic",
+}
+T["Configi Tests"] = function()
+  for _, t in ipairs(tests) do
+    T[t] = function()
+      local a, b = cmd["bin/lua"]("tests/"..t..".lua")
+      T.is_number(a)
+      T.equal(b.code, 0)
+    end
   end
-  T["Configi: Test for expected STDOUT output"] = function()
-    T.is_number(string.find(b.stdout[1], "[REPAIRED] file.directory \"/tmp/xxx\"", 1, true))
-  end
-  os.execute("rmdir /tmp/xxx")
-end
-do
-  local cfg = exec.ctx"bin/cfg"
-  local a, b = cfg("-v", "test.lua")
-  T["Configi: Test for expected STDOUT output (flag -v)"] = function()
-    T.is_not_nil(string.find(b.stdout[1], "Start Configi run...", 1, true))
-    T.is_not_nil(string.find(b.stdout[2], "[REPAIRED] file.directory \"/tmp/xxx\"", 1, true))
-    T.is_not_nil(string.find(b.stdout[3], "Finished run", 1, true))
-  end
-  os.execute("rmdir /tmp/xxx")
 end
 T.summary()
