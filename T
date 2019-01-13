@@ -101,19 +101,25 @@ T["exec.spawn env"] = function()
   local stdout = b.stdout
   T.equal(stdout[#stdout], "TXT=yo")
 end
-T["configi.module"] = function()
+do
   local cfg = exec.ctx"bin/cfg"
   local a, b = cfg"test.lua"
-  T.is_number(a)
-  string.find(b.stdout[1], "[PASS] file.directory \"/tmp/xxx\"", 1, true)
+  T["Configi: Test if PID (number) is returned"] = function()
+    T.is_number(a)
+  end
+  T["Configi: Test for expected STDOUT output"] = function()
+    T.is_number(string.find(b.stdout[1], "[REPAIRED] file.directory \"/tmp/xxx\"", 1, true))
+  end
   os.execute("rmdir /tmp/xxx")
 end
-T["configi.module.verbose"] = function()
+do
   local cfg = exec.ctx"bin/cfg"
   local a, b = cfg("-v", "test.lua")
-  string.find(b.stdout[1], "Start Configi run...", 1, true)
-  string.find(b.stdout[2], "[PASS] file.directory \"/tmp/xxx\"", 1, true)
-  string.find(b.stdout[3], "Finished run", 1, true)
+  T["Configi: Test for expected STDOUT output (flag -v)"] = function()
+    T.is_not_nil(string.find(b.stdout[1], "Start Configi run...", 1, true))
+    T.is_not_nil(string.find(b.stdout[2], "[REPAIRED] file.directory \"/tmp/xxx\"", 1, true))
+    T.is_not_nil(string.find(b.stdout[3], "Finished run", 1, true))
+  end
   os.execute("rmdir /tmp/xxx")
 end
 T.summary()
