@@ -101,4 +101,19 @@ T["exec.spawn env"] = function()
   local stdout = b.stdout
   T.equal(stdout[#stdout], "TXT=yo")
 end
+T["configi.module"] = function()
+  local cfg = exec.ctx"bin/cfg"
+  local a, b = cfg"test.lua"
+  T.is_number(a)
+  string.find(b.stdout[1], "[PASS] file.directory \"/tmp/xxx\"", 1, true)
+  os.execute("rmdir /tmp/xxx")
+end
+T["configi.module.verbose"] = function()
+  local cfg = exec.ctx"bin/cfg"
+  local a, b = cfg("-v", "test.lua")
+  string.find(b.stdout[1], "Start Configi run...", 1, true)
+  string.find(b.stdout[2], "[PASS] file.directory \"/tmp/xxx\"", 1, true)
+  string.find(b.stdout[3], "Finished run", 1, true)
+  os.execute("rmdir /tmp/xxx")
+end
 T.summary()
