@@ -25,3 +25,4 @@ fi
 # - - -
 [ -x "$(command -v buildah)" ] || { echo >&2 "Buildah executable not found."; exit 1; }
 
+

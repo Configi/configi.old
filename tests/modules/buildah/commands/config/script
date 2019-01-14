@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: buildah:config: "Update image configuration settings"
-#/ usage: rerun buildah:config  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --options <>]
+#/ usage: rerun buildah:config  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --options <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER OPTIONS
 

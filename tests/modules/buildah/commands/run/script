@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: buildah:run: "Run a command inside of the container"
-#/ usage: rerun buildah:run  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --options <>] [ --command <>]
+#/ usage: rerun buildah:run  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --options <>]  --command <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER OPTIONS COMMAND
 

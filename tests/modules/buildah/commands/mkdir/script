@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: buildah:mkdir: "Create a directory inside the container"
-#/ usage: rerun buildah:mkdir  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --directory <>]
+#/ usage: rerun buildah:mkdir  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --directory <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER DIRECTORY
 

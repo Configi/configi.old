@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-#/ command: buildah:local: "commit container to local containers-storage"
-#/ usage: rerun buildah:local  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --name <>]
+#/ command: buildah:local: "Commit container to local containers-storage"
+#/ usage: rerun buildah:local  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --name <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER NAME
 
