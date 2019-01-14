@@ -4,8 +4,10 @@ local T = require "u-test"
 local exec = require "exec"
 local cmd = exec.cmd
 local tests = {
-  "module-exec",
-  "configi-basic",
+  "Lua",
+  "lua-module-exec",
+  "lua-module-lib",
+  "configi-basic-functionality",
 }
 T["Configi Tests"] = function()
   for _, t in ipairs(tests) do
