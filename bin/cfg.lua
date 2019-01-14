@@ -8,7 +8,7 @@ local args = parser:parse()
 local lib = require "lib"
 local exec = require "exec"
 local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
-if args.verbose then util.echo "Start Configi run...\n" end
+if args.verbose then util.echo "Start Configi run..." end
 if file.test(args.script) == nil then
   return fmt.panic("abort: \"%s\" not found.\n", args.script)
 end
@@ -36,22 +36,22 @@ local printer = function(o, mod, cmd, a)
   if o.code == 112 then fmt.print("[OK] %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 1 then fmt.print("[FAIL] %s.%s \"%s\"\n", mod, cmd, a) end
   if o.stdout[1] then
-    util.echo"stdout\n"
+    util.echo"stdout"
     local ln = ""
     for _, l in ipairs(o.stdout) do
       if args.cut then l = l:sub(1, 80) end
       ln = string.format("%s | %s \n", ln, l)
     end
-    util.echo(ln)
+    fmt.print(ln)
   end
   if o.stderr[1] then
-    util.echo"stderr\n"
+    util.echo"stderr"
     ln = ""
     for _, l in ipairs(o.stderr) do
       if args.cut then l = l:sub(1, 80) end
         ln = string.format("%s | %s \n", ln, l)
       end
-    util.echo(ln)
+    fmt.print(ln)
   end
 end
 local ENV = {}
@@ -101,7 +101,7 @@ do
     if args.verbose then
       local sec = os.difftime(os.time(), start)
       if sec == 0 then sec = 1 end
-      util.echo("Finished run in " .. string.format("%d", sec) .. " second(s)\n")
+      util.echo("Finished run in " .. string.format("%d", sec) .. " second(s)")
     end
     return os.exit(0)
   else

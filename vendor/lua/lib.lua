@@ -41,7 +41,7 @@ local printf = function(str, ...)
 end
 
 local echo = function(str)
-  io.stdout:write(str)
+  io.stdout:write(string.format("%s\n", str))
   return io.stdout:flush()
 end
 
