@@ -552,7 +552,7 @@ local read_all = function(file)
   return str
 end
 
-local read_line = function(file)
+local head = function(file)
   local o = io.input()
   local fd = io.open(file)
   io.input(fd)
@@ -663,7 +663,7 @@ return {
     line = line,
     truncate = truncate,
     read_all = read_all,
-    read_line = read_line
+    head = head,
   },
   path = {
     split = split
