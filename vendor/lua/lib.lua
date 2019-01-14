@@ -323,9 +323,10 @@ local popen = function(str, cwd, ignore)
   for ln in pipe:lines() do
     R.output[#R.output + 1] = ln
   end
-  local code = io.close(pipe)
+  local _, status, code = io.close(pipe)
   R.exe = "io.popen"
   R.code = code
+  R.status = status
   if code == 0 or ignore then
     return code, R
   else
@@ -347,8 +348,9 @@ local pwrite = function(str, data, cwd, ignore)
   io.flush(pipe)
   pipe:write(data)
   local R = {}
-  local code = io.close(pipe)
+  local _, status, code = io.close(pipe)
   R.exe = "io.popen"
+  R.status = status
   if code == 0 or ignore then
     return code, R
   else
@@ -370,9 +372,10 @@ local system = function(str, cwd, ignore)
     str = string.format("%sexec %s %s", set, str, redir)
   end
   local R = {}
-  local code = os.execute(str)
+  local _, status, code = os.execute(str)
   R.exe = "os.execute"
   R.code = code
+  R.status = status
   if code == 0 or ignore then
     return code, R
   else
@@ -388,9 +391,10 @@ local script = function(str, ignore)
   for ln in pipe:lines() do
     R.output[#R.output + 1] = ln
   end
-  local code = io.close(pipe)
+  local _, status, code = io.close(pipe)
   R.exe = "io.popen"
   R.code = code
+  R.status = status
   if code == 0 or ignore then
     return code, R
   else
