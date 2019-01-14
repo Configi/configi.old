@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-#/ command: buildah:from: "create container from specified image"
-#/ usage: rerun buildah:from  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --image <>]
+#/ command: buildah:mkdir: "Create a directory inside the container"
+#/ usage: rerun buildah:mkdir  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --directory <>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER IMAGE
+#/ option-variables: ARG COMMENT VERBOSE REGISTER DIRECTORY
 
-. "$RERUN_MODULE_DIR/lib/functions.sh" "from" || {
+. "$RERUN_MODULE_DIR/lib/functions.sh" "mkdir" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
 }
 
@@ -19,8 +19,7 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-buildah inspect "$IMAGE" && exit 0
-buildah from --name "$ARG" "$IMAGE" && exit 113
+buildah run "$ARG" -- mkdir -p "$DIRECTORY" && exit 112
 # Done. Exit with last command exit status.
 exit $?
 

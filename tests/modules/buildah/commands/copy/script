@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+#/ command: buildah:copy: "Copies the contents of a file, URL, or directory into a container's working directory"
+#/ usage: rerun buildah:copy  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --src <>] [ --dest <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER SRC DEST
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "copy" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+buildah copy "$ARG" "$SRC" "$DEST" && exit 112
+# Done. Exit with last command exit status.
+exit $?
+
