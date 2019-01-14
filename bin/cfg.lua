@@ -33,6 +33,7 @@ end
 local printer = function(o, mod, cmd, a)
   if o.code == 0 then fmt.print("[PASS] %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 113 then fmt.print("[REPAIRED] %s.%s \"%s\"\n", mod, cmd, a) end
+  if o.code == 112 then fmt.print("[OK] %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 1 then fmt.print("[FAIL] %s.%s \"%s\"\n", mod, cmd, a) end
   if o.stdout[1] then
     util.echo"stdout\n"
