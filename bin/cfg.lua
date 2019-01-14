@@ -1,4 +1,5 @@
 local start = os.time()
+local cstart = os.clock()
 local argparse = require "argparse"
 local parser = argparse("cfg", "Configi. A wrapper to rerun, for lightweight configuration management.")
 parser:argument("script", "Script to load.")
@@ -108,7 +109,7 @@ do
     if args.verbose then
       local sec = os.difftime(os.time(), start)
       if sec == 0 then sec = 1 end
-      util.echo("Finished run in " .. string.format("%d", sec) .. " second(s)")
+      util.echo("Finished run in " .. string.format("%d", sec) .. " second(s) ".. string.format("[%.2f]", (os.clock()) - cstart))
     end
     return os.exit(0)
   else
