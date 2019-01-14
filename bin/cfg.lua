@@ -31,16 +31,22 @@ local rerun = function(dir, mod, cmd, a, params)
   return exec.spawn(rpath, t, {LC_ALL="C"}, dir, nil, nil, nil, true)
 end
 local printer = function(o, mod, cmd, a, p)
-  if (p and next(p)) and p.comment then util.echo(p.comment) end
-  if o.code == 0 then fmt.print("[PASS] %s.%s \"%s\"\n", mod, cmd, a) end
+  if (p and next(p)) and p.comment then
+    if not args.cut or string.len(p.comment) < 77 then
+      util.echo("-- " .. p.comment)
+    else
+      util.echo("-- " .. p.comment:sub(1, 77).."...")
+    end
+  end
+  if o.code == 0   then fmt.print("[PASS]     %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 113 then fmt.print("[REPAIRED] %s.%s \"%s\"\n", mod, cmd, a) end
-  if o.code == 112 then fmt.print("[OK] %s.%s \"%s\"\n", mod, cmd, a) end
-  if o.code == 1 then fmt.print("[FAIL] %s.%s \"%s\"\n", mod, cmd, a) end
+  if o.code == 112 then fmt.print("[OK]       %s.%s \"%s\"\n", mod, cmd, a) end
+  if o.code == 1   then fmt.print("[FAIL]     %s.%s \"%s\"\n", mod, cmd, a) end
   if o.stdout[1] then
     util.echo"stdout"
     local ln = ""
     for _, l in ipairs(o.stdout) do
-      if args.cut then l = l:sub(1, 80) end
+      if args.cut then l = l:sub(1, 77) end
       ln = string.format("%s | %s \n", ln, l)
     end
     fmt.print(ln)
@@ -49,7 +55,7 @@ local printer = function(o, mod, cmd, a, p)
     util.echo"stderr"
     ln = ""
     for _, l in ipairs(o.stderr) do
-      if args.cut then l = l:sub(1, 80) end
+      if args.cut then l = l:sub(1, 77) end
         ln = string.format("%s | %s \n", ln, l)
       end
     fmt.print(ln)
