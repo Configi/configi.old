@@ -37,7 +37,8 @@ local catch_f = function(fn)
 end
 
 local printf = function(str, ...)
-  return io.write(string.format(str, ...))
+  io.stdout:write(string.format(str, ...))
+  return io.stdout:flush()
 end
 
 local echo = function(str)
