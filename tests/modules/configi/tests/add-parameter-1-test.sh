@@ -1,6 +1,6 @@
 #!/usr/bin/env roundup
 #
-#/ usage:  rerun stubbs:test -m configi -p add-option [--answers <>]
+#/ usage:  rerun stubbs:test -m configi -p add-parameter [--answers <>]
 #
 
 # Helpers
@@ -9,7 +9,7 @@
 
 # The Plan
 # --------
-describe "add-option"
+describe "add-parameter"
 
 # ------------------------------
 # Replace this test. 
