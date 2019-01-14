@@ -1,4 +1,4 @@
 file.directory("/tmp/xxx"){
-  comment = "sdsdf",
+  comment = "Testing basic functionality...",
   verbose = true,
 }
