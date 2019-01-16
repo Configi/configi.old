@@ -2,6 +2,7 @@
 package.path="vendor/lua/?.lua"
 local T = require "u-test"
 local exec = require "exec"
+local luacheck = exec.ctx"bin/luacheck.lua"
 local cmd = exec.cmd
 local tests = {
   "Lua",
@@ -10,6 +11,10 @@ local tests = {
   "configi-basic-functionality",
 }
 T["Configi Tests"] = function()
+  T["$ luacheck bin/cfg.lua"] = function()
+    local a, b = luacheck("--max-code-line-length", "160", "bin/cfg.lua")
+    T.equal(b.code, 0)
+  end
   for _, t in ipairs(tests) do
     T[t] = function()
       local a, b = cmd["bin/lua"]("tests/"..t..".lua")
