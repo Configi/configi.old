@@ -1,6 +1,7 @@
 local ffi = require "ffi"
 local ffiext = require "ffiext"
 local C = ffi.C
+local lfs = require "lfs"
 local exec = {}
 ffi.cdef([[
 typedef int32_t pid_t;
@@ -74,6 +75,10 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     stdout = {},
     stderr = {}
   }
+  if not lfs.attributes(exe) then
+    R.error = "argument #1 (exe) not found"
+    return nil, R
+  end
   local ret
   local stdin = ffi.new("int[2]")
   local stdout = ffi.new("int[2]")
@@ -167,10 +172,7 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     end
     argv[0] = exe
     argv[#args + 1] = nil
-    if C.execvp(exe, ffi.cast("char *const*", argv)) == -1 then
-        R.error = strerror(errno(), "execvp(2) failed")
-        return nil, R
-    end
+    C.execvp(exe, ffi.cast("char *const*", argv))
     assert(nil, "assertion failed: exec.spawn (should be unreachable!)")
   else
     if stdin_string then
@@ -194,6 +196,7 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
         return nil, R
       end
       ret = bit.rshift(bit.band(status[0], 0xff00), 8)
+      if ret == 1 then R.error = "execvp(2) failed" end
       R.code = ret
     end
     local output = function(i, o)
