@@ -16,7 +16,7 @@ end
 local dir = path.split(args.script)
 package.path = dir
 if dir == "" then dir = "." end
-local rerun = function(dir, mod, cmd, a, params)
+local rerun = function(d, mod, cmd, a, params)
   local rpath = "/usr/local/bin/rerun"
   if not file.test(rpath) then
     file.write_all(rpath, require("rerun"))
@@ -29,7 +29,7 @@ local rerun = function(dir, mod, cmd, a, params)
       t[#t+1] = p
     end
   end
-  return exec.spawn(rpath, t, {LC_ALL="C"}, dir, nil, nil, nil, true)
+  return exec.spawn(rpath, t, {LC_ALL="C"}, d, nil, nil, nil, true)
 end
 local printer = function(o, mod, cmd, a, p)
   if (p and next(p)) and p.comment then
@@ -54,7 +54,7 @@ local printer = function(o, mod, cmd, a, p)
   end
   if o.stderr[1] then
     util.echo"stderr"
-    ln = ""
+    local ln = ""
     for _, l in ipairs(o.stderr) do
       if args.cut then l = l:sub(1, 77) end
         ln = string.format("%s | %s \n", ln, l)
@@ -89,8 +89,7 @@ setmetatable(ENV, {__index = function(_, mod)
         end
         if p.register then
           if ENV[p.register] then
-            return fmt.panic("abort: failure at %s.%s \"%s\"...\nerror: attempted to overwrite existing registered variable: \"%s\"\n",
-              mod, cmd, a, p.register)
+            return fmt.panic("abort: failure at %s.%s \"%s\"...\nerror: attempted to overwrite registered variable: \"%s\"\n", mod, cmd, a, p.register)
           else
             ENV[p.register] = o.stdout[#o.stdout]
           end
@@ -120,7 +119,7 @@ do
     end
     local ln = string.match(err, "^.+:([%d]+):%s.*")
     local sp = string.rep(" ", string.len(ln))
-    local err = string.match(err, "^.+:[%d]+:%s(.*)")
-    return fmt.panic("error: %s\n%s |\n%s | %s\n%s |\n", err, sp, ln, tbl[tonumber(ln)], sp)
+    local lerr = string.match(err, "^.+:[%d]+:%s(.*)")
+    return fmt.panic("error: %s\n%s |\n%s | %s\n%s |\n", lerr, sp, ln, tbl[tonumber(ln)], sp)
   end
 end
