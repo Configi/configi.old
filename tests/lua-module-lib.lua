@@ -1,4 +1,4 @@
-package.path="vendor/lua/?.lua"
+package.path="vendor/lua/?.lua;lib/?.lua;lib/?/init.lua"
 local C = require "lib"
 local T = require "u-test"
 
