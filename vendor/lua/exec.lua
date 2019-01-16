@@ -1,7 +1,6 @@
 local ffi = require "ffi"
 local ffiext = require "ffiext"
 local C = ffi.C
-local lfs = require "lfs"
 local exec = {}
 ffi.cdef([[
 typedef int32_t pid_t;
@@ -75,10 +74,6 @@ exec.spawn = function (exe, args, env, cwd, stdin_string, stdout_redirect, stder
     stdout = {},
     stderr = {}
   }
-  if not lfs.attributes(exe) then
-    R.error = "argument #1 (exe) not found"
-    return nil, R
-  end
   local ret
   local stdin = ffi.new("int[2]")
   local stdout = ffi.new("int[2]")
