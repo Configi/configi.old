@@ -1,8 +1,7 @@
 local fs = {}
 
+local lfs = require "lfs"
 local utils = require "luacheck.utils"
-
-fs.has_lfs, fs.lfs = pcall(require, "lfs")
 
 local function ensure_dir_sep(path)
    if path:sub(-1) ~= utils.dir_sep then
@@ -12,17 +11,15 @@ local function ensure_dir_sep(path)
    return path
 end
 
-if utils.is_windows then
-   function fs.split_base(path)
+function fs.split_base(path)
+   if utils.is_windows then
       if path:match("^%a:\\") then
          return path:sub(1, 3), path:sub(4)
       else
-         -- Disregard UNC stuff for now.
+         -- Disregard UNC paths and relative paths with drive letter.
          return "", path
       end
-   end
-else
-   function fs.split_base(path)
+   else
       if path:match("^/") then
          if path:match("^//") then
             return "//", path:sub(3)
@@ -35,11 +32,14 @@ else
    end
 end
 
-local function is_absolute(path)
+function fs.is_absolute(path)
    return fs.split_base(path) ~= ""
 end
 
 function fs.normalize(path)
+   if utils.is_windows then
+      path = path:lower()
+   end
    local base, rest = fs.split_base(path)
    rest = rest:gsub("[/\\]", utils.dir_sep)
 
@@ -62,12 +62,22 @@ function fs.normalize(path)
    end
 end
 
-function fs.join(base, path)
-   if base == "" or is_absolute(path) then
+local function join_two_paths(base, path)
+   if base == "" or fs.is_absolute(path) then
       return path
    else
-      return ensure_dir_sep(base)..path
+      return ensure_dir_sep(base) .. path
    end
+end
+
+function fs.join(base, ...)
+   local res = base
+
+   for i = 1, select("#", ...) do
+      res = join_two_paths(res, select(i, ...))
+   end
+
+   return res
 end
 
 function fs.is_subpath(path, subpath)
@@ -85,12 +95,20 @@ function fs.is_subpath(path, subpath)
    return rest1 == rest2 or rest2:sub(#rest1 + 1, #rest1 + 1) == utils.dir_sep
 end
 
+function fs.is_dir(path)
+   return lfs.attributes(path, "mode") == "directory"
+end
+
+function fs.is_file(path)
+   return lfs.attributes(path, "mode") == "file"
+end
+
 -- Searches for file starting from path, going up until the file
 -- is found or root directory is reached.
 -- Path must be absolute.
 -- Returns absolute and relative paths to directory containing file or nil.
 function fs.find_file(path, file)
-   if is_absolute(file) then
+   if fs.is_absolute(file) then
       return fs.is_file(file) and path, ""
    end
 
@@ -102,7 +120,7 @@ function fs.find_file(path, file)
       if fs.is_file(fs.join(base..rest, file)) then
          return base..rest, rel_path
       elseif rest == "" then
-         break
+         return
       end
 
       rest = rest:match("^(.*)"..utils.dir_sep..".*$") or ""
@@ -110,64 +128,32 @@ function fs.find_file(path, file)
    end
 end
 
-if not fs.has_lfs then
-   function fs.is_dir(_)
-      return false
+-- Returns iterator over directory items or nil, error message.
+function fs.dir_iter(dir_path)
+   local ok, iter, state, var = pcall(lfs.dir, dir_path)
+
+   if not ok then
+      local err = utils.unprefix(iter, "cannot open " .. dir_path .. ": ")
+      return nil, "couldn't list directory: " .. err
    end
 
-   function fs.is_file(path)
-      local fh = io.open(path)
-
-      if fh then
-         fh:close()
-         return true
-      else
-         return false
-      end
-   end
-
-   function fs.extract_files(_, _)
-      return {}
-   end
-
-   function fs.mtime(_)
-      return 0
-   end
-
-   local pwd_command = utils.is_windows and "cd" or "pwd"
-
-   function fs.current_dir()
-      local fh = io.popen(pwd_command)
-      local current_dir = fh:read("*a")
-      fh:close()
-      -- Remove extra newline at the end.
-      return ensure_dir_sep(current_dir:sub(1, -2))
-   end
-
-   return fs
-end
-
--- Returns whether path points to a directory.
-function fs.is_dir(path)
-   return fs.lfs.attributes(path, "mode") == "directory"
-end
-
--- Returns whether path points to a file.
-function fs.is_file(path)
-   return fs.lfs.attributes(path, "mode") == "file"
+   return iter, state, var
 end
 
 -- Returns list of all files in directory matching pattern.
--- Returns nil, error message on error.
+-- Additionally returns a mapping from directory paths that couldn't be expanded
+-- to error messages.
 function fs.extract_files(dir_path, pattern)
    local res = {}
+   local err_map = {}
 
    local function scan(dir)
-      local ok, iter, state, var = pcall(fs.lfs.dir, dir)
+      local iter, state, var = fs.dir_iter(dir)
 
-      if not ok then
-         local err = utils.unprefix(iter, "cannot open " .. dir .. ": ")
-         return "couldn't recursively check " .. dir .. ": " .. err
+      if not iter then
+         err_map[dir] = state
+         table.insert(res, dir)
+         return
       end
 
       for path in iter, state, var do
@@ -175,11 +161,7 @@ function fs.extract_files(dir_path, pattern)
             local full_path = fs.join(dir, path)
 
             if fs.is_dir(full_path) then
-               local err = scan(full_path)
-
-               if err then
-                  return err
-               end
+               scan(full_path)
             elseif path:match(pattern) and fs.is_file(full_path) then
                table.insert(res, full_path)
             end
@@ -187,24 +169,51 @@ function fs.extract_files(dir_path, pattern)
       end
    end
 
-   local err = scan(dir_path)
+   scan(dir_path)
+   table.sort(res)
+   return res, err_map
+end
 
-   if err then
-      return nil, err
+local function make_absolute_dirs(dir_path)
+   if fs.is_dir(dir_path) then
+      return true
    end
 
-   table.sort(res)
-   return res
+   local upper_dir = fs.normalize(fs.join(dir_path, ".."))
+
+   if upper_dir == dir_path then
+      return nil, ("Filesystem root %s is not a directory"):format(upper_dir)
+   end
+
+   local upper_ok, upper_err = make_absolute_dirs(upper_dir)
+
+   if not upper_ok then
+      return nil, upper_err
+   end
+
+   local make_ok, make_error = lfs.mkdir(dir_path)
+
+   if not make_ok then
+      return nil, ("Couldn't make directory %s: %s"):format(dir_path, make_error)
+   end
+
+   return true
+end
+
+-- Ensures that a given path is a directory, creating intermediate directories if necessary.
+-- Returns true on success, nil and an error message on failure.
+function fs.make_dirs(dir_path)
+   return make_absolute_dirs(fs.normalize(fs.join(fs.get_current_dir(), dir_path)))
 end
 
 -- Returns modification time for a file.
-function fs.mtime(path)
-   return fs.lfs.attributes(path, "modification")
+function fs.get_mtime(path)
+   return lfs.attributes(path, "modification")
 end
 
--- Returns absolute path to current working directory.
-function fs.current_dir()
-   return ensure_dir_sep(assert(fs.lfs.currentdir()))
+-- Returns absolute path to current working directory, with trailing directory separator.
+function fs.get_current_dir()
+   return ensure_dir_sep(assert(lfs.currentdir()))
 end
 
 return fs
