@@ -29,7 +29,7 @@ return {
 
   --- Delete stats file after reporting? Default: false.
   deletestats = false,
-  
+
   --- Process Lua code loaded from raw strings?
   -- That is, when the 'source' field in the debug info
   -- does not start with '@'. Default: false.
@@ -39,6 +39,11 @@ return {
   -- All will be included if nothing is listed.
   -- Do not include the '.lua' extension. Path separator is always '/'.
   -- Overruled by `exclude`.
+  -- @usage
+  -- include = {
+  --    "mymodule$",      -- the main module
+  --    "mymodule%/.+$",  -- and everything namespaced underneath it
+  -- }
   include = {},
 
   --- Lua patterns for files to exclude when reporting.
