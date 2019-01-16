@@ -16,7 +16,7 @@ T["Configi Tests"] = function()
     T.equal(b.code, 0)
   end
   for _, t in ipairs(tests) do
-    T[t] = function()
+    T["$ bin/lua tests/"..t..".lua"] = function()
       local a, b = cmd["bin/lua"]("tests/"..t..".lua")
       T.is_number(a)
       T.equal(b.code, 0)
