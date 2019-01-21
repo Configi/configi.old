@@ -46,6 +46,11 @@ local echo = function(str)
   return io.stdout:flush()
 end
 
+local uprint = function(str)
+  io.stdout:write(str)
+  return io.stdout:flush()
+end
+
 local fprintf = function(file, str, ...)
   local o = io.output()
   io.output(file)
@@ -679,6 +684,7 @@ return {
     return_if = return_if,
     return_if_not = return_if_not,
     echo = echo,
+    print = uprint,
     random_string = random_string,
   }
 }
