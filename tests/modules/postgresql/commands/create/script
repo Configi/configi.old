@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: postgresql:create: "Create PostgreSQL container"
-#/ usage: rerun postgresql:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --debian <>
+#/ usage: rerun postgresql:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --debian <> [ --encoding <UTF8>] [ --locale <en_US.UTF-8>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL DEBIAN
+#/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL DEBIAN ENCODING LOCALE
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -49,7 +49,7 @@ CLEAR /tmp
 CLEAR /var/tmp
 CLEAR /var/lib/apt/lists
 RUN chown postgres:postgres /data
-RUN runuser postgres -c "/usr/lib/postgresql/${POSTGRESQL}/bin/initdb --locale en_US.UTF-8 -E UTF8 -D '/data'"
+RUN runuser postgres -c "/usr/lib/postgresql/${POSTGRESQL}/bin/initdb --locale=$LOCALE -E $ENCODING -D '/data'"
 echo "listen_addresses = '*'" >> "${POSTGRESQL_CONF}/postgresql.conf"
 COPY "$RERUN_MODULE_DIR/commands/create/entrypoint.sh" /entrypoint.sh
 COPY "$RERUN_MODULE_DIR/commands/create/shutdown.sh" /shutdown.sh
