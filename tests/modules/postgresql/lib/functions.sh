@@ -13,7 +13,7 @@
 
 # Source the option parser script.
 #
-if [[ -r "$RERUN_MODULE_DIR/commands/$1/options.sh" ]]
+if [[ -r "$RERUN_MODULE_DIR/commands/$1/options.sh" ]] 
 then
     . "$RERUN_MODULE_DIR/commands/$1/options.sh" || {
         rerun_die "Failed loading options parser."
@@ -23,3 +23,6 @@ fi
 # - - -
 # Your functions declared here.
 # - - -
+
+
+

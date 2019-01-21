@@ -1,6 +1,6 @@
 #!/usr/bin/env roundup
 #
-#/ usage:  rerun stubbs:test -m postgresql -p local [--answers <>]
+#/ usage:  rerun stubbs:test -m postgresql -p create [--answers <>]
 #
 
 # Helpers
@@ -9,7 +9,7 @@
 
 # The Plan
 # --------
-describe "local"
+describe "create"
 
 # ------------------------------
 # Replace this test. 
