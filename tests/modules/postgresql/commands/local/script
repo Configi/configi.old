@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+#/ command: postgresql:local: "Create PostgreSQL container and commit to local containers-storage."
+#/ usage: rerun postgresql:local  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --debian <>
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL DEBIAN
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "local" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+. "$RERUN_MODULES/lib/print.sh"
+NAME="postgresql-build"
+FROM="debian:${DEBIAN}-slim"
+PRINT "+H" "Pulling source image ($FROM)..."
+POSTGRESQL_DATA="/srv/postgresql-${POSTGRESQL}/data"
+POSTGRESQL_CONF="/srv/postgresql-${POSTGRESQL}/conf"
+PRINT "+H" "Recreating $POSTGRESQL_DATA..."
+/usr/bin/rm -rf $POSTGRESQL_DATA
+/usr/bin/mkdir -p $POSTGRESQL_DATA
+PRINT "+H" "Recreating $POSTGRESQL_CONF..."
+/usr/bin/rm -rf $POSTGRESQL_CONF
+/usr/bin/mkdir -p $POSTGRESQL_CONF
+OPTS="-v ${POSTGRESQL_DATA}:/data -v ${POSTGRESQL_CONF}:/etc/postgresql/${POSTGRESQL}/main"
+. "$RERUN_MODULES/lib/buildah.sh"
+APT_GET="/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -qq"
+MKDIR /usr/share/man/man1
+MKDIR /usr/share/man/man7
+RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
+RUN $APT_GET update
+RUN $APT_GET dist-upgrade
+RUN $APT_GET --no-install-recommends install postgresql locales
+RUN $APT_GET clean
+RUN $APT_GET autoremove
+SH "echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen"
+SH "echo 'en_PH.UTF-8 UTF-8' >> /etc/locale.gen"
+RUN /usr/sbin/locale-gen
+CLEAR /tmp
+CLEAR /var/tmp
+CLEAR /var/lib/apt/lists
+RUN chown postgres:postgres /data
+RUN runuser postgres -c "/usr/lib/postgresql/${POSTGRESQL}/bin/initdb --locale en_US.UTF-8 -E UTF8 -D '/data'"
+echo "listen_addresses = '*'" >> "${POSTGRESQL_CONF}/postgresql.conf"
+COPY "$RERUN_MODULE_DIR/commands/local/entrypoint.sh" /entrypoint.sh
+COPY "$RERUN_MODULE_DIR/commands/local/shutdown.sh" /shutdown.sh
+COPY "$RERUN_MODULE_DIR/commands/local/reload.sh" /reload.sh
+RUN sed -i "s:__POSTGRESQL__:${POSTGRESQL}:g" /entrypoint.sh
+RUN sed -i "s:__POSTGRESQL__:${POSTGRESQL}:g" /shutdown.sh
+RUN sed -i "s:__POSTGRESQL__:${POSTGRESQL}:g" /reload.sh
+CONFIG --entrypoint '["/entrypoint.sh"]'
+CONFIG --cmd ''
+CONFIG --stop-signal TERM
+PRINT "+H" "Committing to containers-storage..."
+buildah commit ${NAME} containers-storage:postgresql-$POSTGRESQL
+# Done. Exit with last command exit status.
+exit $?
