@@ -60,7 +60,7 @@ RUN sed -i "s:__POSTGRESQL__:${POSTGRESQL}:g" /reload.sh
 CONFIG --entrypoint '["/entrypoint.sh"]'
 CONFIG --cmd ''
 CONFIG --stop-signal TERM
-if [ "$ARG" -eq "local" ]
+if [ "$ARG" = "local" ]
 then
     PRINT "+H" "Committing to containers-storage..."
     buildah commit ${NAME} containers-storage:postgresql-$POSTGRESQL
