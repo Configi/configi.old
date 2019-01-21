@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+#/ command: postgresql:service: "Ensure podman-postgresql is a systemd managed service"
+#/ usage: rerun postgresql:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+function cleanup() {
+    PRINT "+" "Deleting incomplete systemd unit..."
+    rm -f "$SERVICE"
+    systemctl daemon-reload
+}
+trap cleanup ERR
+PRINT "+" "Getting image ID of PostgreSQL ${POSTGRESQL} container..."
+IMAGE=$(podman images | grep -F "postgresql-${POSTGRESQL}" | awk '{print $3}')
+SERVICE="/etc/systemd/system/podman-postgresql-${POSTGRESQL}.service"
+PRINT "+" "Generating systemd unit..."
+cp "$RERUN_MODULE_DIR/commands/service/podman-postgresql.service" $SERVICE
+sed -i "s:__IMAGE__:$IMAGE:g" $SERVICE
+sed -i "s:__POSTGRESQL__:$POSTGRESQL:g" $SERVICE
+PRINT "+" "Enabling and starting PostgreSQL container service..."
+systemctl daemon-reload
+systemctl enable "podman-postgresql-$POSTGRESQL"
+systemctl start "podman-postgresql-$POSTGRESQL"
+PRINT "+" "Checking if PostgreSQL container service is up..."
+systemctl is-active "podman-postgresql-$POSTGRESQL"
+PRINT "!" "DONE."
+exit 113
+# Done. Exit with last command exit status.
+exit $?

@@ -1,0 +1,25 @@
+[Unit]
+Description=PostgreSQL Container
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+KillSignal=SIGINT
+SendSIGKILL=false
+Restart=on-failure
+RestartSec=5s
+ExecStartPre=-/usr/bin/podman stop postgresql-__POSTGRESQL__
+ExecStartPre=-/usr/bin/podman rm postgresql-__POSTGRESQL__
+ExecStart=/usr/bin/podman run --name postgresql-__POSTGRESQL__ --network host --rm --ulimit nofile=4192:16384 -v /srv/postgresql-__POSTGRESQL__/data:/data -v /srv/postgresql-__POSTGRESQL__/conf:/etc/postgresql/__POSTGRESQL__/main __IMAGE__
+ExecStop=/usr/bin/podman exec postgresql-__POSTGRESQL__ /shutdown.sh
+ExecReload=/usr/bin/podman exec postgresql-__POSTGRESQL__ /reload.sh
+OOMScoreAdjust=-200
+BlockIOWeight=1000
+LimitNOFILE=16384
+Nice=-5
