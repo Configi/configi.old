@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: postgresql:create: "Create PostgreSQL container"
-#/ usage: rerun postgresql:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --debian <> [ --encoding <UTF8>] [ --locale <en_US.UTF-8>] 
+#/ usage: rerun postgresql:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --debian <> [ --encoding <UTF8>] [ --locale <en_US.UTF-8>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL DEBIAN ENCODING LOCALE
 
@@ -19,6 +19,12 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
+function cleanup {
+    PRINT "+H" "Cleaning up..."
+    buildah rm $NAME
+    PRINT "+X" "Done!"
+}
+trap cleanup ERR
 . "$RERUN_MODULES/lib/print.sh"
 NAME="postgresql-build"
 FROM="debian:${DEBIAN}-slim"
@@ -63,7 +69,10 @@ CONFIG --stop-signal TERM
 if [ "$ARG" = "local" ]
 then
     PRINT "+H" "Committing to containers-storage..."
-    buildah commit --squash ${NAME} containers-storage:postgresql-$POSTGRESQL
+    buildah commit --rm --squash "${NAME}" "containers-storage:postgresql-$POSTGRESQL"
+else
+    PRINT "+H" "Committing to directory $ARG..."
+    buildah commit --format docker --rm --squash "${NAME}" "dir:$ARG"
 fi
 # Done. Exit with last command exit status.
 exit $?
