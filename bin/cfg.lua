@@ -50,7 +50,7 @@ local printer = function(o, mod, cmd, a, p)
       if args.cut then l = l:sub(1, 77) end
       ln = string.format("%s | %s \n", ln, l)
     end
-    fmt.print(ln)
+    util.print(ln)
   end
   if o.stderr[1] then
     util.echo"stderr"
@@ -59,7 +59,7 @@ local printer = function(o, mod, cmd, a, p)
       if args.cut then l = l:sub(1, 77) end
         ln = string.format("%s | %s \n", ln, l)
       end
-    fmt.print(ln)
+    util.print(ln)
   end
 end
 local ENV = {}
