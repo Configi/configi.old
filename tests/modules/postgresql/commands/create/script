@@ -63,7 +63,7 @@ CONFIG --stop-signal TERM
 if [ "$ARG" = "local" ]
 then
     PRINT "+H" "Committing to containers-storage..."
-    buildah commit ${NAME} containers-storage:postgresql-$POSTGRESQL
+    buildah commit --squash ${NAME} containers-storage:postgresql-$POSTGRESQL
 fi
 # Done. Exit with last command exit status.
 exit $?
