@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: configi:add-parameter: "Add parameter to Configi command"
-#/ usage: rerun configi:add-parameter  --parameter <>  --desc <>  --module <>  --command <>  --required <>
+#/ usage: rerun configi:add-parameter  --parameter <>  --desc <>  --module <>  --command <>  --required <> [ --default <>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: PARAMETER DESC MODULE COMMAND REQUIRED
+#/ option-variables: PARAMETER DESC MODULE COMMAND REQUIRED DEFAULT
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "add-parameter" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -19,7 +19,7 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-RERUN_MODULES=./modules rerun stubbs:add-option --option "$PARAMETER" --description "$DESC" --module "$MODULE" --command "$COMMAND" --required "$REQUIRED" --export false
+RERUN_MODULES=./modules rerun stubbs:add-option --option "$PARAMETER" --description "$DESC" --module "$MODULE" --command "$COMMAND" --required "$REQUIRED" --export false --default "$DEFAULT"
 # Done. Exit with last command exit status.
 exit $?
 
