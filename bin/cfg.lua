@@ -39,6 +39,10 @@ local printer = function(o, mod, cmd, a, p)
       util.echo("-- " .. p.comment:sub(1, 77).."...")
     end
   end
+  if o == nil then
+    fmt.print("[SKIP]     %s.%s \"%s\"\n", mod, cmd, a)
+    return
+  end
   if o.code == 0   then fmt.print("[PASS]     %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 113 then fmt.print("[REPAIRED] %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 112 then fmt.print("[OK]       %s.%s \"%s\"\n", mod, cmd, a) end
@@ -77,6 +81,14 @@ setmetatable(ENV, {__index = function(_, mod)
     end
     return function (a)
       return function (p)
+        if p and next(p) and p.requires then
+          if ENV[p.requires] == nil then
+            if args.verbose or (p and next(p) and p.verbose == true) then
+              printer(nil, mod, cmd, a, p)
+            end
+            return
+          end
+        end
         local c, o = rerun(dir, mod, cmd, a, p)
         if c then
           if args.verbose or (p and next(p) and p.verbose == true) then
