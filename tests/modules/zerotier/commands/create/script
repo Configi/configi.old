@@ -27,7 +27,7 @@ function cleanup {
 trap cleanup ERR
 NAME="zerotier-build"
 FROM="debian:stretch-slim"
-OPTS="/srv/zerotier:/var/lib/zerotier-one"
+OPTS="-v /srv/zerotier:/var/lib/zerotier-one"
 mkdir -p /srv/zerotier
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+H" "Pulling source image ($FROM)..."
