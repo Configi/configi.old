@@ -46,14 +46,20 @@ RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
 RUN $APT_GET update
 RUN $APT_GET dist-upgrade
 RUN $APT_GET --no-install-recommends install postgresql locales
-RUN $APT_GET clean
+RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs
 RUN $APT_GET autoremove
+RUN $APT_GET clean
 SH "echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen"
 SH "echo 'en_PH.UTF-8 UTF-8' >> /etc/locale.gen"
 RUN /usr/sbin/locale-gen
 CLEAR /tmp
 CLEAR /var/tmp
+CLEAR /var/cache
+CLEAR /var/log
 CLEAR /var/lib/apt/lists
+CLEAR /usr/share/man
+CLEAR /usr/share/common-licenses
+CLEAR /usr/share/doc
 RUN chown postgres:postgres /data
 RUN runuser postgres -c "/usr/lib/postgresql/${POSTGRESQL}/bin/initdb --locale=$LOCALE -E $ENCODING -D '/data'"
 echo "listen_addresses = '*'" >> "${POSTGRESQL_CONF}/postgresql.conf"
