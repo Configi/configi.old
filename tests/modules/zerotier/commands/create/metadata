@@ -3,5 +3,5 @@
 # Mon Jan 21 14:23:43 UTC 2019
 NAME=create
 DESCRIPTION="Create ZeroTier container"
-OPTIONS="arg comment verbose register"
+OPTIONS="arg comment verbose register network"
 GENERATE_HELP="true"
