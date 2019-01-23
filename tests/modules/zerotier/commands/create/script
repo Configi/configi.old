@@ -41,7 +41,6 @@ RUN $APT_GET update
 RUN $APT_GET dist-upgrade
 RUN $APT_GET --no-install-recommends install curl gnupg dirmngr ca-certificates
 SH "curl -Lo - https://www.zerotier.com/misc/contact@zerotier.com.gpg | apt-key add -"
-#RUN apt-key adv --keyserver ipv4.pool.sks-keyservers.net --recv-keys 0x1657198823e52a61
 SH "echo 'deb http://download.zerotier.com/debian/stretch stretch main' > /etc/apt/sources.list.d/zerotier.list"
 RUN $APT_GET update
 RUN $APT_GET install zerotier-one=1.2.12
