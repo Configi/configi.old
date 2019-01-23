@@ -1,3 +1,6 @@
+[ -x "$(command -v buildah)" ] || { echo >&2 "Buildah executable not found."; exit 1; }
+[ -x "$(command -v podman)" ] || { echo >&2 "Podman executable not found."; exit 1; }
+
 __CONTAINER=$(/usr/bin/buildah from --name "${NAME}" "${FROM}")
 CONFIG()
 {
