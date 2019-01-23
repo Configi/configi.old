@@ -28,6 +28,8 @@ trap cleanup ERR
 . "$RERUN_MODULES/lib/print.sh"
 NAME="postgresql-build"
 FROM="debian:${DEBIAN}-slim"
+# For Debian + PostgreSQL valid combinations visit:
+# https://packages.debian.org/search?keywords=postgresql
 PRINT "+H" "Pulling source image ($FROM)..."
 POSTGRESQL_DATA="/srv/postgresql-${POSTGRESQL}/data"
 POSTGRESQL_CONF="/srv/postgresql-${POSTGRESQL}/conf"
