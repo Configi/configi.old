@@ -25,6 +25,7 @@ function cleanup() {
     systemctl daemon-reload
 }
 trap cleanup ERR
+. "$RERUN_MODULES/lib/print.sh"
 PRINT "+" "Getting image ID of PostgreSQL ${POSTGRESQL} container..."
 IMAGE=$(podman images | grep -F "postgresql-${POSTGRESQL}" | awk '{print $3}')
 SERVICE="/etc/systemd/system/podman-postgresql-${POSTGRESQL}.service"
