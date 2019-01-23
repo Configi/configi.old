@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+#/ command: zerotier:service: "Ensure podman-zerotier is a systemd managed service"
+#/ usage: rerun zerotier:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+function cleanup() {
+    PRINT "+" "Deleting incomplete systemd unit..."
+    rm -f "$SERVICE"
+    systemctl daemon-reload
+}
+trap cleanup ERR
+PRINT "+" "Getting image ID of ZeroTier ${POSTGRESQL} container..."
+IMAGE=$(podman images | grep -F "zerotier" | awk '{print $3}')
+SERVICE="/etc/systemd/system/podman-zerotier.service"
+PRINT "+" "Generating systemd unit..."
+cp "$RERUN_MODULE_DIR/commands/service/podman-zerotier.service" $SERVICE
+sed -i "s:__IMAGE__:$IMAGE:g" $SERVICE
+PRINT "+" "Enabling and starting ZeroTier podman container service..."
+systemctl daemon-reload
+systemctl enable "podman-zerotier"
+systemctl start "podman-zerotier"
+PRINT "+" "Checking if ZeroTier podman container service is up..."
+systemctl is-active "podman-zerotier"
+PRINT "!" "DONE."
+exit 113
+# Done. Exit with last command exit status.
+exit $?
+

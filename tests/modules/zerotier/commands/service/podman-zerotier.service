@@ -1,0 +1,19 @@
+[Unit]
+Description=ZeroTier container
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=false
+KillSignal=SIGTERM
+SendSIGKILL=false
+Restart=on-failure
+RestartSec=5s
+ExecStartPre=-/usr/bin/podman stop zerotier
+ExecStartPre=-/usr/bin/podman rm zerotier
+ExecStart=/usr/bin/podman run --rm --device /dev/net/tun --security-opt apparmor=unconfined --net host --cap-add NET_ADMIN --cap-add SYS_ADMIN --name zerotier -v /srv/zerotier:/var/lib/zerotier-one __IMAGE__
