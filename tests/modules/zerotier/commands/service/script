@@ -25,7 +25,7 @@ function cleanup() {
     systemctl daemon-reload
 }
 trap cleanup ERR
-PRINT "+" "Getting image ID of ZeroTier ${POSTGRESQL} container..."
+PRINT "+" "Getting image ID of ZeroTier container..."
 IMAGE=$(podman images | grep -F "zerotier" | awk '{print $3}')
 SERVICE="/etc/systemd/system/podman-zerotier.service"
 PRINT "+" "Generating systemd unit..."
