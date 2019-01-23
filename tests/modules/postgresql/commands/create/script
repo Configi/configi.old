@@ -80,6 +80,6 @@ else
     PRINT "+H" "Committing to directory $ARG..."
     buildah commit --format docker --rm --squash "${NAME}" "dir:$ARG"
 fi
+exit 113
 # Done. Exit with last command exit status.
 exit $?
-
