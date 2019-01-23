@@ -3,5 +3,5 @@
 # Mon Jan 21 08:17:24 UTC 2019
 NAME=useradd
 DESCRIPTION="Add PostgreSQL user"
-OPTIONS="arg comment verbose register postgresql user address database password"
+OPTIONS="arg comment verbose register postgresql address database password"
 GENERATE_HELP="true"
