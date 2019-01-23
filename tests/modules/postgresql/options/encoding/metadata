@@ -7,6 +7,6 @@ ARGUMENTS=true
 REQUIRED=false
 SHORT=
 LONG=encoding
-DEFAULT=UTF8
+DEFAULT="UTF8"
 EXPORT=false
 

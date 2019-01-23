@@ -7,6 +7,6 @@ ARGUMENTS=true
 REQUIRED=false
 SHORT=
 LONG=locale
-DEFAULT=en_US.UTF-8
+DEFAULT="en_US.UTF-8"
 EXPORT=false
 
