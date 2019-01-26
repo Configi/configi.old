@@ -17,3 +17,5 @@ RestartSec=5s
 ExecStartPre=-/usr/bin/podman stop zerotier
 ExecStartPre=-/usr/bin/podman rm zerotier
 ExecStart=/usr/bin/podman run --rm --device /dev/net/tun --security-opt apparmor=unconfined --net host --cap-add NET_ADMIN --cap-add SYS_ADMIN --name zerotier -v /srv/zerotier:/var/lib/zerotier-one __IMAGE__
+ExecStopPost=-/usr/bin/podman stop zerotier
+ExecStopPost=-/usr/bin/podman rm zerotier
