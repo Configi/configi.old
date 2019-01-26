@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: zerotier:create: "Create ZeroTier container"
-#/ usage: rerun zerotier:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --network <>] [ --planet <>] [ --moons <>] [ --requires <>]
+#/ usage: rerun zerotier:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --network <>] [ --planet <>] [ --moons <>] [ --requires <>] [ --public <>] [ --secret <>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER NETWORK PLANET MOONS REQUIRES
+#/ option-variables: ARG COMMENT VERBOSE REGISTER NETWORK PLANET MOONS REQUIRES PUBLIC SECRET
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -53,11 +53,20 @@ MKDIR /var/lib/zerotier-one/networks.d
 RUN touch "/var/lib/zerotier-one/networks.d/$ARG.conf"
 if [ -f "$PLANET" ]
 then
-	cp "$PLANET" "$BIND/planet"
+    cp "$PLANET" "$BIND/planet"
 fi
 if [ -d "$MOONS" ]
 then
-	cp -R "$MOONS" "$BIND"
+    cp -R "$MOONS" "$BIND"
+fi
+if [ -f "$PUBLIC" ]
+then
+    cp "$PUBLIC" "$BIND/identity.public"
+fi
+if [ -f "$SECRET" ]
+then
+    cp "$SECRET" "$BIND/identity.secret"
+    chmod 0600 "$BIND/identity.secret"
 fi
 RUN chown -R zerotier-one:zerotier-one /var/lib/zerotier-one
 CLEAR /tmp
