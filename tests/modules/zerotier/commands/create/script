@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: zerotier:create: "Create ZeroTier container"
-#/ usage: rerun zerotier:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --network <>] [ --planet <>] [ --moons <>]
+#/ usage: rerun zerotier:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --network <>] [ --planet <>] [ --moons <>] [ --requires <>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER NETWORK PLANET MOONS
+#/ option-variables: ARG COMMENT VERBOSE REGISTER NETWORK PLANET MOONS REQUIRES
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
   echo >&2 "Failed loading function library." ; exit 1 ;

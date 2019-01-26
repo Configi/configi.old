@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: postgresql:useradd: "Add PostgreSQL user"
-#/ usage: rerun postgresql:useradd  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --address <>  --database <>  --password <>
+#/ usage: rerun postgresql:useradd  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --address <>  --database <>  --password <> [ --requires <>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL ADDRESS DATABASE PASSWORD
+#/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL ADDRESS DATABASE PASSWORD REQUIRES
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "useradd" || {
   echo >&2 "Failed loading function library." ; exit 1 ;

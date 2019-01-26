@@ -3,5 +3,5 @@
 # Mon Dec 31 08:53:26 UTC 2018
 NAME=directory
 DESCRIPTION="Ensure a directory is present"
-OPTIONS="arg comment verbose owner mode"
+OPTIONS="arg comment verbose owner mode requires"
 GENERATE_HELP="true"

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: postgresql:service: "Ensure podman-postgresql is a systemd managed service"
-#/ usage: rerun postgresql:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>
+#/ usage: rerun postgresql:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <> [ --requires <>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL
+#/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL REQUIRES
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
   echo >&2 "Failed loading function library." ; exit 1 ;

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: zerotier:service: "Ensure podman-zerotier is a systemd managed service"
-#/ usage: rerun zerotier:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]
+#/ usage: rerun zerotier:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
   echo >&2 "Failed loading function library." ; exit 1 ;

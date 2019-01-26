@@ -24,6 +24,7 @@ RERUN_MODULES=./modules rerun stubbs:add-option --option arg --description "Conf
 RERUN_MODULES=./modules rerun stubbs:add-option --option comment --description "Configi: comments" --module "$MODULE" --command "$COMMAND" --required false --export false
 RERUN_MODULES=./modules rerun stubbs:add-option --option verbose --description "Configi: verbosity" --module "$MODULE" --command "$COMMAND" --required false --export false
 RERUN_MODULES=./modules rerun stubbs:add-option --option register --description "Configi: register variable" --module "$MODULE" --command "$COMMAND" --required false --export false
+RERUN_MODULES=./modules rerun stubbs:add-option --option requires --description "Configi: requires variable" --module "$MODULE" --command "$COMMAND" --required false --export false
 # Done. Exit with last command exit status.
 exit $?
 
