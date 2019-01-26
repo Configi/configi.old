@@ -27,7 +27,8 @@ function cleanup {
 trap cleanup ERR
 NAME="zerotier-build"
 FROM="debian:stretch-slim"
-OPTS="-v /srv/zerotier:/var/lib/zerotier-one"
+BIND="/srv/zerotier"
+OPTS="-v $BIND:/var/lib/zerotier-one"
 mkdir -p /srv/zerotier
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+H" "Pulling source image ($FROM)..."
@@ -48,15 +49,15 @@ RUN $APT_GET remove curl gnupg dirmngr ca-certificates
 RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs tzdata
 RUN $APT_GET autoremove
 RUN $APT_GET clean
-RUN mkdir /var/lib/zerotier-one/networks.d
+MKDIR /var/lib/zerotier-one/networks.d
 RUN touch "/var/lib/zerotier-one/networks.d/$ARG.conf"
 if [ -f "$PLANET" ]
 then
-    RUN cp "$PLANET" /var/lib/zerotier-one/planet
+	cp "$PLANET" "$BIND/planet"
 fi
 if [ -d "$MOONS" ]
 then
-    RUN cp -R "$MOONS" /var/lib/zerotier-one
+	cp -R "$MOONS" "$BIND"
 fi
 RUN chown -R zerotier-one:zerotier-one /var/lib/zerotier-one
 CLEAR /tmp
