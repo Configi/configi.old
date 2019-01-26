@@ -48,11 +48,8 @@ RUN $APT_GET remove curl gnupg dirmngr ca-certificates
 RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs tzdata
 RUN $APT_GET autoremove
 RUN $APT_GET clean
-if [ ! -z "$NETWORK" ]
-then
-    RUN mkdir /var/lib/zerotier-one/networks.d
-    RUN touch "/var/lib/zerotier-one/networks.d/$NETWORK.conf"
-fi
+RUN mkdir /var/lib/zerotier-one/networks.d
+RUN touch "/var/lib/zerotier-one/networks.d/$ARG.conf"
 if [ -f "$PLANET" ]
 then
     RUN cp "$PLANET" /var/lib/zerotier-one/planet
