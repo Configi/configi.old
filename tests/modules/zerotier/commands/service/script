@@ -20,9 +20,10 @@ rerun_options_parse "$@"
 # Put the command implementation here.
 # - - -
 function cleanup() {
-    PRINT "+" "Deleting incomplete systemd unit..."
+    PRINT "!" "Abort. Deleting incomplete systemd unit..."
     rm -f "$SERVICE"
     systemctl daemon-reload
+    PRINT "!" "Error encountered."
 }
 trap cleanup ERR
 . "$RERUN_MODULES/lib/print.sh"
