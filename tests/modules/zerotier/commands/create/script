@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: zerotier:create: "Create ZeroTier container"
-#/ usage: rerun zerotier:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --network <>] 
+#/ usage: rerun zerotier:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --network <>] [ --planet <>] [ --moons <>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER NETWORK
+#/ option-variables: ARG COMMENT VERBOSE REGISTER NETWORK PLANET MOONS
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -52,8 +52,16 @@ if [ ! -z "$NETWORK" ]
 then
     RUN mkdir /var/lib/zerotier-one/networks.d
     RUN touch "/var/lib/zerotier-one/networks.d/$NETWORK.conf"
-    RUN chown -R zerotier-one:zerotier-one /var/lib/zerotier-one
 fi
+if [ -f "$PLANET" ]
+then
+    RUN cp "$PLANET" /var/lib/zerotier-one/planet
+fi
+if [ -d "$MOONS" ]
+then
+    RUN cp -R "$MOONS" /var/lib/zerotier-one
+fi
+RUN chown -R zerotier-one:zerotier-one /var/lib/zerotier-one
 CLEAR /tmp
 CLEAR /var/tmp
 CLEAR /var/cache
