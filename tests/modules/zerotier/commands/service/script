@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: zerotier:service: "Ensure podman-zerotier is a systemd managed service"
-#/ usage: rerun zerotier:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>] 
+#/ usage: rerun zerotier:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES
 
@@ -26,9 +26,9 @@ function cleanup() {
 }
 trap cleanup ERR
 . "$RERUN_MODULES/lib/print.sh"
+SERVICE="/etc/systemd/system/podman-zerotier.service"
 PRINT "+" "Getting image ID of ZeroTier container..."
 IMAGE=$(podman images | grep -F "zerotier" | awk '{print $3}')
-SERVICE="/etc/systemd/system/podman-zerotier.service"
 PRINT "+" "Generating systemd unit..."
 cp "$RERUN_MODULE_DIR/commands/service/podman-zerotier.service" $SERVICE
 sed -i "s:__IMAGE__:$IMAGE:g" $SERVICE
