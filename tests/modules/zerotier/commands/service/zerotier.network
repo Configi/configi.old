@@ -2,4 +2,4 @@
 Name=zt*
 
 [Network]
-DHCP=ipv4
+__NETWORK__
