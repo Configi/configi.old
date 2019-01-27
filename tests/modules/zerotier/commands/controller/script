@@ -17,11 +17,13 @@ rerun_options_parse "$@"
 # ----------------------
 function cleanup {
     PRINT "+H" "Abort. Cleaning up..."
-    buildah rm $NAME
+    buildah rm "$NAME"
+    rm "$SERVICE"
     PRINT "+X" "Error encountered!"
 }
 trap cleanup ERR
 NAME="zerotier-controller-build"
+SERVICE="/etc/systemd/system/podman:zerotier-controller.service"
 FROM="debian:stretch-slim"
 BIND="/srv/zerotier-controller"
 OPTS="-v $BIND:/var/lib/zerotier-one"
@@ -75,6 +77,19 @@ CONFIG --entrypoint '["/usr/sbin/zerotier-one"]'
 CONFIG --cmd "-p$PORT"
 CONFIG --stop-signal TERM
 buildah commit --rm --squash "$NAME" containers-storage:zerotier-controller
+PRINT "+" "Getting image ID of ZeroTier container..."
+IMAGE=$(podman images | grep -F "zerotier-controller " | awk '{print $3}')
+PRINT "+" "Generating systemd unit..."
+cp "$RERUN_MODULE_DIR/commands/controller/zerotier.service" "$SERVICE"
+sed -i "s:__IMAGE__:$IMAGE:g" "$SERVICE"
+PRINT "+" "Enabling and starting ZeroTier podman container service..."
+systemctl daemon-reload
+systemctl enable "podman:zerotier-controller"
+systemctl start "podman:zerotier-controller"
+PRINT "+" "Checking if ZeroTier podman container service is up..."
+systemctl is-active "podman:zerotier-controller"
+PRINT "!" "DONE."
+
 exit 113
 # Done. Exit with last command exit status.
 exit $?
