@@ -74,7 +74,7 @@ CLEAR /usr/share/doc
 CONFIG --entrypoint '["/usr/sbin/zerotier-one"]'
 CONFIG --cmd "-p$PORT"
 CONFIG --stop-signal TERM
-buildah commit --rm --squash "$NAME" containers-storage:zerotier
+buildah commit --rm --squash "$NAME" containers-storage:zerotier-controller
 exit 113
 # Done. Exit with last command exit status.
 exit $?
