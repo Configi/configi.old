@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: zerotier:create: "Create ZeroTier container"
-#/ usage: rerun zerotier:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --network <>] [ --planet <>] [ --moons <>] [ --requires <>] [ --public <>] [ --secret <>] 
+#/ usage: rerun zerotier:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --network <>] [ --planet <>] [ --moons <>] [ --requires <>] [ --public <>] [ --secret <>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER NETWORK PLANET MOONS REQUIRES PUBLIC SECRET
 
@@ -51,6 +51,7 @@ RUN $APT_GET autoremove
 RUN $APT_GET clean
 MKDIR /var/lib/zerotier-one/networks.d
 RUN touch "/var/lib/zerotier-one/networks.d/$ARG.conf"
+printf "{\n\t\"settings\":\n\t{\n\t\t\"allowTcpFallbackRelay\": false\n\t}\n}\n" > "$BIND/local.conf"
 if [ -f "$PLANET" ]
 then
     cp "$PLANET" "$BIND/planet"
