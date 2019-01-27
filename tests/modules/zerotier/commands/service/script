@@ -43,12 +43,12 @@ else
 fi
 PRINT "+" "Enabling and starting ZeroTier podman container service..."
 systemctl daemon-reload
-systemctl enable "podman-zerotier"
+systemctl enable "podman:zerotier"
 systemctl enable systemd-networkd
-systemctl start "podman-zerotier"
+systemctl start "podman:zerotier"
 systemctl restart systemd-networkd
 PRINT "+" "Checking if ZeroTier podman container service is up..."
-systemctl is-active "podman-zerotier"
+systemctl is-active "podman:zerotier"
 PRINT "!" "DONE."
 exit 113
 # Done. Exit with last command exit status.
