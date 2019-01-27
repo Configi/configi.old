@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: zerotier:service: "Ensure podman-zerotier is a systemd managed service"
-#/ usage: rerun zerotier:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]
+#/ usage: rerun zerotier:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>] [ --ip <>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES IP
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -27,16 +27,26 @@ function cleanup() {
 }
 trap cleanup ERR
 . "$RERUN_MODULES/lib/print.sh"
-SERVICE="/etc/systemd/system/podman-zerotier.service"
+SERVICE="/etc/systemd/system/podman:zerotier.service"
+NETWORK="/etc/systemd/network/55-podman:zerotier.network"
 PRINT "+" "Getting image ID of ZeroTier container..."
 IMAGE=$(podman images | grep -F "zerotier " | awk '{print $3}')
 PRINT "+" "Generating systemd unit..."
-cp "$RERUN_MODULE_DIR/commands/service/podman-zerotier.service" $SERVICE
-sed -i "s:__IMAGE__:$IMAGE:g" $SERVICE
+cp "$RERUN_MODULE_DIR/commands/service/zerotier.service" "$SERVICE"
+cp "$RERUN_MODULE_DIR/commands/service/zerotier.network" "$NETWORK"
+sed -i "s:__IMAGE__:$IMAGE:g" "$SERVICE"
+if [ "$IP" = "dhcp" ]
+then
+    sed -i "s:__NETWORK__:DHCP=ipv4:" "$NETWORK"
+else
+    sed -i "s:__NETWORK__:Address=$IP:" "$NETWORK"
+fi
 PRINT "+" "Enabling and starting ZeroTier podman container service..."
 systemctl daemon-reload
 systemctl enable "podman-zerotier"
+systemctl enable systemd-networkd
 systemctl start "podman-zerotier"
+systemctl restart systemd-networkd
 PRINT "+" "Checking if ZeroTier podman container service is up..."
 systemctl is-active "podman-zerotier"
 PRINT "!" "DONE."

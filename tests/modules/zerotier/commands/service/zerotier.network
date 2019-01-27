@@ -1,0 +1,5 @@
+[Match]
+Name=zt*
+
+[Network]
+DHCP=ipv4

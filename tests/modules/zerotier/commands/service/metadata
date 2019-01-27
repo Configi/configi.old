@@ -3,5 +3,5 @@
 # Wed Jan 23 03:44:39 UTC 2019
 NAME=service
 DESCRIPTION="Ensure podman-zerotier is a systemd managed service"
-OPTIONS="arg comment verbose register requires"
+OPTIONS="arg comment verbose register requires ip"
 GENERATE_HELP="true"
