@@ -40,7 +40,7 @@ RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
 RUN cp --remove-destination /usr/share/zoneinfo/UTC /etc/localtime
 RUN $APT_GET update
 RUN $APT_GET dist-upgrade
-RUN $APT_GET --no-install-recommends install curl gnupg dirmngr ca-certificates libcap2-bin
+RUN $APT_GET --no-install-recommends install curl gnupg dirmngr ca-certificates
 SH "curl -Lo - https://www.zerotier.com/misc/contact@zerotier.com.gpg | apt-key add -"
 SH "echo 'deb http://download.zerotier.com/debian/stretch stretch main' > /etc/apt/sources.list.d/zerotier.list"
 RUN $APT_GET update
