@@ -17,6 +17,6 @@ RestartSec=5s
 TimeoutStopSpec=10s
 ExecStartPre=-/usr/bin/podman stop zerotier-controller
 ExecStartPre=-/usr/bin/podman rm zerotier-controller
-ExecStart=/usr/bin/podman run --rm --security-opt apparmor=unconfined --name zerotier-controller -v /srv/zerotier-controller:/var/lib/zerotier-one __IMAGE__
+ExecStart=/usr/bin/podman run --rm --security-opt apparmor=unconfined --net host --name zerotier-controller -v /srv/zerotier-controller:/var/lib/zerotier-one __IMAGE__
 ExecStopPost=-/usr/bin/podman stop zerotier-controller
 ExecStopPost=-/usr/bin/podman rm zerotier-controller
