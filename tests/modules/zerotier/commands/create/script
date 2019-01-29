@@ -50,7 +50,7 @@ RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs t
 RUN $APT_GET autoremove
 RUN $APT_GET clean
 MKDIR /var/lib/zerotier-one/networks.d
-RUN touch "/var/lib/zerotier-one/networks.d/$ARG.conf"
+RUN touch "/var/lib/zerotier-one/networks.d/$NETWORK.conf"
 printf "{\n\t\"settings\":\n\t{\n\t\t\"allowTcpFallbackRelay\": false\n\t}\n}\n" > "$BIND/local.conf"
 if [ -f "$PLANET" ]
 then
@@ -81,7 +81,14 @@ CLEAR /usr/share/doc
 CONFIG --entrypoint '["/usr/sbin/zerotier-one"]'
 CONFIG --cmd ''
 CONFIG --stop-signal TERM
-buildah commit --rm --squash "$NAME" containers-storage:zerotier
+if [ "$ARG" = "local" ]
+then
+    PRINT "+H" "Committing to containers-storage..."
+    buildah commit --rm --squash "${NAME}" "containers-storage:zerotier"
+else
+    PRINT "+H" "Committing to containers-storage as $ARG..."
+    buildah commit --rm --squash "${NAME}" "containers-storage:$ARG"
+fi
 exit 113
 # Done. Exit with last command exit status.
 exit $?
