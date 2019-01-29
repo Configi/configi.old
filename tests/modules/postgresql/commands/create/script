@@ -21,7 +21,7 @@ rerun_options_parse "$@"
 # - - -
 function cleanup {
     PRINT "+H" "Cleaning up..."
-    buildah rm $NAME
+    buildah rm "$NAME" 2>/dev/null 1>/dev/null
     PRINT "+X" "Done!"
 }
 trap cleanup ERR
