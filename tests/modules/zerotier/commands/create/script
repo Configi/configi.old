@@ -27,8 +27,7 @@ function cleanup {
 trap cleanup ERR
 NAME="zerotier-build"
 FROM="debian:stretch-slim"
-BIND="/srv/zerotier"
-OPTS="-v $BIND:/var/lib/zerotier-one"
+OPTS=""
 mkdir -p /srv/zerotier
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+H" "Pulling source image ($FROM)..."
@@ -51,23 +50,23 @@ RUN $APT_GET autoremove
 RUN $APT_GET clean
 MKDIR /var/lib/zerotier-one/networks.d
 RUN touch "/var/lib/zerotier-one/networks.d/$NETWORK.conf"
-printf "{\n\t\"settings\":\n\t{\n\t\t\"allowTcpFallbackRelay\": false\n\t}\n}\n" > "$BIND/local.conf"
+COPY "$RERUN_MODULE_DIR/commands/create/local.conf" "/var/lib/zerotier-one/local.conf"
 if [ -f "$PLANET" ]
 then
-    cp "$PLANET" "$BIND/planet"
+   COPY "$PLANET" "/var/lib/zerotier-one/planet"
 fi
 if [ -d "$MOONS" ]
 then
-    cp -R "$MOONS" "$BIND"
+    COPY "$MOONS" "/var/lib/zerotier-one"
 fi
 if [ -f "$PUBLIC" ]
 then
-    cp "$PUBLIC" "$BIND/identity.public"
+    COPY "$PUBLIC" "/var/lib/zerotier-one/identity.public"
 fi
 if [ -f "$SECRET" ]
 then
-    cp "$SECRET" "$BIND/identity.secret"
-    chmod 0600 "$BIND/identity.secret"
+    COPY "$SECRET" "/var/lib/zerotier-one/identity.secret"
+    RUN chmod 0600 "/var/lib/zerotier-one/identity.secret"
 fi
 RUN chown -R zerotier-one:zerotier-one /var/lib/zerotier-one
 CLEAR /tmp
