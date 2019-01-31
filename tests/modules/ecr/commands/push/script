@@ -26,7 +26,7 @@ DOCKERTEMP=$(mktemp -p .)
 awless authenticate registry accounts=$(awless whoami --account-only --color never) no-docker-login=true -f --color never 2>"$DOCKERTEMP"
 DOCKERPASS=$(sed -n '2{p;q}' "$DOCKERTEMP" | awk '{print $6}')
 rm -f "$DOCKERTEMP"
-PRINT "+H" "Sending image to ECR..."
+PRINT "+H" "Pushing image to ECR..."
 skopeo copy --dest-creds=AWS:"$DOCKERPASS" "containers-storage:$ARG" "$URL"
 # Done. Exit with last command exit status.
 exit $?
