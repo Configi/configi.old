@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 #/ command: cfg:fedora: "Create Fedora Linux container"
-#/ usage: rerun cfg:fedora  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --version <>  --manifest <>  --modules <> 
+#/ usage: rerun cfg:fedora  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --version <>  --manifest <>  --modules <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES VERSION MANIFEST MODULES
 
-. "$RERUN_MODULE_DIR/lib/functions.sh" "fedora" || { 
-  echo >&2 "Failed loading function library." ; exit 1 ; 
+. "$RERUN_MODULE_DIR/lib/functions.sh" "fedora" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
 }
 
-set -o errexit -o nounset -o pipefail
+set -o errexit -o nounset -o pipefail -o errtrace
 
 rerun_options_parse "$@"
 
@@ -19,7 +19,43 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-
+[ -d "$MODULES" ] || { echo >&2 "Not a valid modules directory."; exit 1; }
+[ -f "$MANIFEST" ] || { echo >&2 "Not a valid manifest file."; exit 1; }
+function cleanup {
+    PRINT "+H" "Abort. Cleaning up..."
+    buildah rm "$NAME" 2>/dev/null 1>/dev/null
+    buildah rm "$SCRATCH" 2>/dev/null 1>/dev/null
+    PRINT "+X" "Error encountered!"
+}
+trap cleanup ERR
+NAME="configi-fedora-build"
+FROM="registry.fedoraproject.org/fedora-minimal:$VERSION"
+OPTS=""
+. "$RERUN_MODULES/lib/print.sh"
+PRINT "+H" "Pulling source image ($FROM)..."
+. "$RERUN_MODULES/lib/buildah.sh"
+SCRATCH=$(buildah from scratch)
+RUN dnf --setopt=install_weak_deps=False -4 --nodocs --best --security -y -q --refresh update
+RUN dnf --setopt=install_weak_deps=False -4 --nodocs --best -y -q groupinstall "C Development Tools and Libraries"
+RUN dnf --setopt=install_weak_deps=False -4 --nodocs --best -y -q install git
+RUN dnf -y -q autoremove
+RUN dnf -q clean all
+RUN git clone https://github.com/Configi/configi /configi
+SH "cd /configi && make"
+build=$(buildah mount "$NAME")
+dummy=$(buildah mount "$SCRATCH")
+buildah copy "$build/configi/bin/cfg" "$dummy/cfg"
+buildah rm "$NAME"
+buildah copy "$MODULES" "$dummy/"
+buildah copy "$MANIFEST" "$dummy/"
+if [ "$ARG" = "local" ]
+then
+    PRINT "+H" "Committing to containers-storage..."
+    buildah commit --rm --squash "$SCRATCH" "containers-storage:configi"
+else
+    PRINT "+H" "Committing to containers-storage as $ARG..."
+    buildah commit --rm --squash "$SCRATCH" "containers-storage:$ARG"
+fi
+exit 113
 # Done. Exit with last command exit status.
 exit $?
-
