@@ -148,4 +148,7 @@ function M.seed()
   return M.randomseed(seed)
 end
 
-return setmetatable( M, { __call = function(self) return self.new() end} )
+return setmetatable( M, { __call = function(self)
+  self.seed()
+  return self.new()
+end})
