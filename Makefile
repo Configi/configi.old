@@ -2,7 +2,7 @@
 EXE:= cfg
 SRC:=
 SRC_DIR:=
-VENDOR:= lib rerun argparse exec ffiext
+VENDOR:= lib rerun argparse exec ffiext uuid
 VENDOR_DIR:=
 MAKEFLAGS= --silent
 HOST_CC= cc
