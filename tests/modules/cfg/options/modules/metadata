@@ -4,7 +4,7 @@
 NAME=modules
 DESCRIPTION="Directory of Configi/rerun modules to bundle"
 ARGUMENTS=true
-REQUIRED=true
+REQUIRED=false
 SHORT=
 LONG=modules
 DEFAULT=

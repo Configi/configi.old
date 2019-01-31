@@ -19,7 +19,6 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-[ -d "$MODULES" ] || { echo >&2 "Not a valid modules directory."; exit 1; }
 [ -f "$MANIFEST" ] || { echo >&2 "Not a valid manifest file."; exit 1; }
 function cleanup {
     PRINT "+H" "Abort. Cleaning up..."
@@ -46,9 +45,14 @@ SH "cd /configi && make"
 PRINT "+H" "Copying artifacts to dummy container image..."
 build=$(buildah mount "$NAME")
 dummy=$(buildah mount "$SCRATCH")
-buildah copy "$build/configi/bin/cfg" "$dummy/cfg"
-buildah copy "$MODULES" "$dummy/"
-buildah copy "$MANIFEST" "$dummy/"
+cp "$build/configi/bin/cfg" "$MANIFEST" "$dummy"
+mkdir "$dummy/modules"
+if [ -d "$MODULES" ]
+then
+    cp -R "$MODULES"/. "$dummy/modules"
+else
+    cp -R $(dirname "$MANIFEST")/modules/. "$dummy/modules"
+fi
 PRINT "+H" "Removing build container..."
 buildah rm "$NAME"
 if [ "$ARG" = "local" ]
