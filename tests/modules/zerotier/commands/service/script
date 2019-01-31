@@ -30,7 +30,12 @@ trap cleanup ERR
 SERVICE="/etc/systemd/system/podman:zerotier.service"
 NETWORK="/etc/systemd/network/55-podman:zerotier.network"
 PRINT "+" "Getting image ID of ZeroTier container..."
-IMAGE=$(podman images | grep -F "zerotier " | awk '{print $3}')
+if [ "$ARG" = "" ]
+then
+    IMAGE=$(podman images | grep -F "zerotier " | awk '{print $3}')
+else
+    IMAGE=$(podman images | grep -F "$ARG" | awk '{print $3}')
+fi
 PRINT "+" "Generating systemd unit..."
 cp "$RERUN_MODULE_DIR/commands/service/zerotier.service" "$SERVICE"
 cp "$RERUN_MODULE_DIR/commands/service/zerotier.network" "$NETWORK"
