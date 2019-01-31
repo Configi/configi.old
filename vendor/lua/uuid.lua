@@ -130,7 +130,7 @@ function M.randomseed(seed)
     -- integer overflow, so reduce to prevent a bad seed
     seed = seed - math_floor(seed / 2^bitsize) * (2^bitsize)
   end
-  math.randomseed(seed)
+  math.randomseed(seed - 2^(bitsize-1))
   return seed
 end
 
