@@ -57,7 +57,8 @@ then
 fi
 if [ -d "$MOONS" ]
 then
-    COPY "$MOONS" "/var/lib/zerotier-one"
+    MKDIR /var/lib/zerotier-one/moons.d
+    COPY "$MOONS"/. "/var/lib/zerotier-one/moons.d"
 fi
 if [ -f "$PUBLIC" ]
 then
