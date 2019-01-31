@@ -28,5 +28,6 @@ DOCKERPASS=$(sed -n '2{p;q}' "$DOCKERTEMP" | awk '{print $6}')
 rm -f "$DOCKERTEMP"
 PRINT "+H" "Pushing image to ECR..."
 skopeo copy --dest-creds=AWS:"$DOCKERPASS" "containers-storage:$ARG" "$URL"
+exit 113
 # Done. Exit with last command exit status.
 exit $?
