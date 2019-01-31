@@ -34,6 +34,7 @@ OPTS=""
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+H" "Pulling source image ($FROM)..."
 . "$RERUN_MODULES/lib/buildah.sh"
+PRINT "+H" "Creating dummy container..."
 SCRATCH=$(buildah from scratch)
 RUN dnf --setopt=install_weak_deps=False -4 --nodocs --best --security -y -q --refresh update
 RUN dnf --setopt=install_weak_deps=False -4 --nodocs --best -y -q groupinstall "C Development Tools and Libraries"
@@ -42,12 +43,14 @@ RUN dnf -y -q autoremove
 RUN dnf -q clean all
 RUN git clone https://github.com/Configi/configi /configi
 SH "cd /configi && make"
+PRINT "+H" "Copying artifacts to dummy container image..."
 build=$(buildah mount "$NAME")
 dummy=$(buildah mount "$SCRATCH")
 buildah copy "$build/configi/bin/cfg" "$dummy/cfg"
-buildah rm "$NAME"
 buildah copy "$MODULES" "$dummy/"
 buildah copy "$MANIFEST" "$dummy/"
+PRINT "+H" "Removing build container..."
+buildah rm "$NAME"
 if [ "$ARG" = "local" ]
 then
     PRINT "+H" "Committing to containers-storage..."
