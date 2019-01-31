@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 #/ command: ecr:push: "Push local containers-storage image to AWS ECR"
-#/ usage: rerun ecr:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --url <> 
+#/ usage: rerun ecr:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --url <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES URL
 
-. "$RERUN_MODULE_DIR/lib/functions.sh" "push" || { 
-  echo >&2 "Failed loading function library." ; exit 1 ; 
+. "$RERUN_MODULE_DIR/lib/functions.sh" "push" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
 }
 
 set -o errexit -o nounset -o pipefail
@@ -19,7 +19,14 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-
+[ -x "$(command -v skopeo)" ] || { echo >&2 "skopeo executable not found."; exit 1; }
+[ -x "$(command -v awless)" ] || { echo >&2 "awless executable not found."; exit 1; }
+PRINT "+H" "Getting ECR password..."
+DOCKERTEMP=$(mktemp -p .)
+awless authenticate registry accounts=$(awless whoami --account-only --color never) no-docker-login=true -f --color never 2>"$DOCKERTEMP"
+DOCKERPASS=$(sed -n '2{p;q}' "$DOCKERTEMP" | awk '{print $6}')
+rm -f "$DOCKERTEMP"
+PRINT "+H" "Sending image to ECR..."
+skopeo copy --dest-creds=AWS:"$DOCKERPASS" "containers-storage:$ARG" "$URL"
 # Done. Exit with last command exit status.
 exit $?
-
