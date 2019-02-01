@@ -82,6 +82,9 @@ setmetatable(ENV, {__index = function(_, mod)
     end
     return function (a)
       return function (p)
+        setmetatable(p, {__newindex = function(_, k, v)
+          p[k] = tostring(v)
+        end})
         if p and next(p) and p.requires then
           if ENV[p.requires] == nil then
             if args.verbose or (p and next(p) and p.verbose == true) then
