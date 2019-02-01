@@ -8,6 +8,7 @@ local tests = {
   "Lua",
   "lua-module-exec",
   "lua-module-lib",
+  "lua-module-uuid",
   "configi-basic-functionality",
 }
 T["Configi Tests"] = function()
