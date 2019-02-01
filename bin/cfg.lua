@@ -8,6 +8,7 @@ parser:flag("-t --cut", "Truncate verbose or error output to 80 columns.")
 local args = parser:parse()
 local lib = require "lib"
 local exec = require "exec"
+local uuid = require "uuid"
 local string, fmt, file, path, util = lib.string, lib.fmt, lib.file, lib.path, lib.util
 if args.verbose then util.echo "Start Configi run..." end
 if file.test(args.script) == nil then
@@ -66,7 +67,7 @@ local printer = function(o, mod, cmd, a, p)
     util.print(ln)
   end
 end
-local ENV = {}
+local ENV = { uuid = uuid }
 setmetatable(ENV, {__index = function(_, mod)
   if not file.test(dir .. "/modules/" .. mod .. "/metadata") then
     if lib[mod] then
