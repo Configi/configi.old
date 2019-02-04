@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+#/ command: ecr:pull: "Pull from AWS ECR"
+#/ usage: rerun ecr:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --url <> 
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES URL
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "pull" || { 
+  echo >&2 "Failed loading function library." ; exit 1 ; 
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+
+# Done. Exit with last command exit status.
+exit $?
+
