@@ -40,7 +40,7 @@ PRINT "+" "Generating systemd unit..."
 cp "$RERUN_MODULE_DIR/commands/service/zerotier.service" "$SERVICE"
 cp "$RERUN_MODULE_DIR/commands/service/zerotier.network" "$NETWORK"
 sed -i "s:__IMAGE__:$IMAGE:g" "$SERVICE"
-if [ "$IP" = "dhcp" ]
+if [ "$IP" = "dhcp" ] || [ "$IP" = "" ]
 then
     sed -i "s:__NETWORK__:DHCP=ipv4:" "$NETWORK"
 else
