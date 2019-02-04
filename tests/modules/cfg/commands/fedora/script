@@ -28,7 +28,7 @@ function cleanup {
 }
 trap cleanup ERR
 NAME="configi-fedora-build"
-FROM="registry.fedoraproject.org/fedora-minimal:$VERSION"
+FROM="registry.fedoraproject.org/fedora:$VERSION"
 OPTS=""
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+H" "Pulling source image ($FROM)..."
