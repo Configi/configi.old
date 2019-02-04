@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 #/ command: ecr:pull: "Pull from AWS ECR"
-#/ usage: rerun ecr:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --url <> 
+#/ usage: rerun ecr:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --url <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES URL
 
-. "$RERUN_MODULE_DIR/lib/functions.sh" "pull" || { 
-  echo >&2 "Failed loading function library." ; exit 1 ; 
+. "$RERUN_MODULE_DIR/lib/functions.sh" "pull" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
 }
 
 set -o errexit -o nounset -o pipefail
@@ -16,9 +16,12 @@ rerun_options_parse "$@"
 # Command implementation
 # ----------------------
 
-# - - -
 # Put the command implementation here.
 # - - -
+[ -x "$(command -v podman)" ] || { echo >&2 "podman executable not found."; exit 1; }
+PRINT "+H" "Pulling image from ECR..."
+podman pull "$URL"
+exit 113
 
 # Done. Exit with last command exit status.
 exit $?
