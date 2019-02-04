@@ -3,5 +3,5 @@
 # Mon Feb  4 07:56:22 UTC 2019
 NAME=pull
 DESCRIPTION="Pull from AWS ECR"
-OPTIONS="arg comment verbose register requires url"
+OPTIONS="arg comment verbose register requires"
 GENERATE_HELP="true"
