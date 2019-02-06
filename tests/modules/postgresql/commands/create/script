@@ -34,10 +34,9 @@ PRINT "+H" "Pulling source image ($FROM)..."
 POSTGRESQL_DATA="/srv/postgresql-${POSTGRESQL}/data"
 POSTGRESQL_CONF="/srv/postgresql-${POSTGRESQL}/conf"
 PRINT "+H" "Recreating $POSTGRESQL_DATA..."
-/usr/bin/rm -rf $POSTGRESQL_DATA
+[ -d "/srv/postgresql-${POSTGRESQL}" ] && exit 0
 /usr/bin/mkdir -p $POSTGRESQL_DATA
 PRINT "+H" "Recreating $POSTGRESQL_CONF..."
-/usr/bin/rm -rf $POSTGRESQL_CONF
 /usr/bin/mkdir -p $POSTGRESQL_CONF
 OPTS="-v ${POSTGRESQL_DATA}:/data -v ${POSTGRESQL_CONF}:/etc/postgresql/${POSTGRESQL}/main"
 . "$RERUN_MODULES/lib/buildah.sh"
