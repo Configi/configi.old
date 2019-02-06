@@ -32,8 +32,6 @@ printf "SELECT 1 FROM pg_roles WHERE rolname=\'%s\';" $ARG > "$PGTEMP"
 FOUND=$(podman exec -it "postgresql-$POSTGRESQL" runuser postgres -c "psql postgres -1tAf /data/.__pg_temp")
 rm -f "$PGTEMP"
 [ "$FOUND" = "1" ] && exit 0
-PRINT "+H" "Checking if PostgreSQL container service is active..."
-systemctl is-active "podman:postgresql-$POSTGRESQL"
 PRINT "+C" "Creating PostgreSQL user $ARG..."
 podman exec -it "postgresql-$POSTGRESQL" runuser postgres -c "createuser -d -S $ARG"
 printf "ALTER USER %s WITH ENCRYPTED PASSWORD \'%s\';" $ARG $PASSWORD > "$PGTEMP"
