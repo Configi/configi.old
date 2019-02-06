@@ -22,7 +22,7 @@ rerun_options_parse "$@"
 PGTEMP="/srv/postgresql-$POSTGRESQL/data/.__pg_temp"
 . "$RERUN_MODULES/lib/print.sh"
 printf "SELECT 1 FROM pg_roles WHERE rolname=\'%s\';" $ARG > "$PGTEMP"
-FOUND=$(podman exec -it "postgresql-$POSTGRESQL" runuser postgres -c "psql -1tAcf /data/.__pg_temp")
+FOUND=$(podman exec -it "postgresql-$POSTGRESQL" runuser postgres -c "psql postgres -1tAcf /data/.__pg_temp")
 rm -f "$PGTEMP"
 [ "$FOUND" = "1" ] && exit 1
 PRINT "+H" "Checking if PostgreSQL container service is active..."
