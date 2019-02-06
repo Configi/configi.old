@@ -22,7 +22,7 @@ rerun_options_parse "$@"
 PGTEMP="/srv/postgresql-$POSTGRESQL/data/.__pg_temp"
 . "$RERUN_MODULES/lib/print.sh"
 RETRIES=5
-until podman exec -it "postgresql-$POSTGRESQL" runuser postgres -c "psql postgres -1 -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]
+until podman exec -it "postgresql-$POSTGRESQL" runuser postgres -c "psql postgres -1 -c 'select 1'" > /dev/null 2>&1 || [ "$RETRIES" -eq 0 ]
 do
     PRINT "+C" "Waiting for PostgreSQL $POSTGRESQL to come up..."
     RETRIES=$((RETRIES-=1))
