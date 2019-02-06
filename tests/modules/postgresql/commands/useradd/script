@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: postgresql:useradd: "Add PostgreSQL user"
-#/ usage: rerun postgresql:useradd  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --address <>  --database <>  --password <> [ --requires <>] 
+#/ usage: rerun postgresql:useradd  --arg <> [ --comment <>] [ --verbose <>] [ --register <>]  --postgresql <>  --address <>  --database <>  --password <> [ --requires <>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER POSTGRESQL ADDRESS DATABASE PASSWORD REQUIRES
 
@@ -21,7 +21,7 @@ rerun_options_parse "$@"
 # - - -
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+H" "Checking if PostgreSQL container service is active..."
-systemctl is-active "podman-postgresql-$POSTGRESQL"
+systemctl is-active "podman:postgresql-$POSTGRESQL"
 PRINT "+C" "Creating PostgreSQL user $ARG..."
 podman exec -it "postgresql-$POSTGRESQL" runuser postgres -c "createuser -d -S $ARG"
 printf "ALTER USER %s WITH ENCRYPTED PASSWORD \'%s\';" $ARG $PASSWORD > "/srv/postgresql-$POSTGRESQL/data/__pg_temp"
