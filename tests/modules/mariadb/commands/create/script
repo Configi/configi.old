@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 #/ command: mariadb:create: "Create MariaDB container"
-#/ usage: rerun mariadb:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --debian <>  --mariadb <> [ --bind <127.0.0.1>] 
+#/ usage: rerun mariadb:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --debian <>  --mariadb <> [ --bind <127.0.0.1>] [ --hostname <mariadb>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES DEBIAN MARIADB BIND
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES DEBIAN MARIADB BIND HOSTNAME
 
+unset HOSTNAME
 . "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
 }

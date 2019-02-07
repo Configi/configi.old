@@ -3,5 +3,5 @@
 # Thu Feb  7 01:19:20 UTC 2019
 NAME=create
 DESCRIPTION="Create MariaDB container"
-OPTIONS="arg comment verbose register requires debian mariadb bind"
+OPTIONS="arg comment verbose register requires debian mariadb bind hostname"
 GENERATE_HELP="true"
