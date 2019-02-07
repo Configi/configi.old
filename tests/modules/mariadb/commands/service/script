@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: mariadb:service: "Ensure podman-mariadb is a systemd managed service"
-#/ usage: rerun mariadb:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --mariadb <> 
+#/ usage: rerun mariadb:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --mariadb <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES MARIADB
 
@@ -29,7 +29,7 @@ systemctl is-active "podman:mariadb-$MARIADB" && exit 0
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+" "Getting image ID of MariaDB $MARIADB container..."
 IMAGE=$(podman images | grep -F "mariadb-$MARIADB" | awk '{print $3}')
-SERVICE="/etc/systemd/system/podman:mariadb-$MARIADB.service
+SERVICE="/etc/systemd/system/podman:mariadb-$MARIADB.service"
 PRINT "+" "Generating systemd unit..."
 cp "$RERUN_MODULE_DIR/commands/service/podman:mariadb.service" $SERVICE
 sed -i "s:__IMAGE__:$IMAGE:g" $SERVICE
