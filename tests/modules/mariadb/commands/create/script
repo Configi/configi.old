@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+#/ command: mariadb:create: "Create MariaDB container"
+#/ usage: rerun mariadb:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --debian <>  --mariadb <> [ --bind <127.0.0.1>] 
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES DEBIAN MARIADB BIND
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+function cleanup {
+    PRINT "+H" "Cleaning up..."
+    buildah rm "$NAME" 2>/dev/null 1>/dev/null
+    PRINT "+X" "Done!"
+}
+trap cleanup ERR
+. "$RERUN_MODULES/lib/print.sh"
+NAME="mariadb-build"
+FROM="docker.io/library/debian:${DEBIAN}-slim"
+# For Debian + MariaDB valid combinations visit:
+# https://packages.debian.org/search?keywords=mariadb-server
+PRINT "+H" "Pulling source image ($FROM)..."
+DATA="/srv/mariadb-$MARIADB/data"
+[ -d "/srv/mariadb-$MARIADB" ] && exit 0
+/usr/bin/mkdir -p "$DATA"
+OPTS="-v $DATA:/data"
+. "$RERUN_MODULES/lib/buildah.sh"
+APT_GET="/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -qq"
+MKDIR /usr/share/man/man1
+MKDIR /usr/share/man/man7
+RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
+RUN $APT_GET update
+RUN $APT_GET dist-upgrade
+RUN $APT_GET --no-install-recommends install mariadb-server locales
+RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs
+RUN $APT_GET autoremove
+RUN $APT_GET clean
+SH "echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen"
+SH "echo 'en_PH.UTF-8 UTF-8' >> /etc/locale.gen"
+RUN /usr/sbin/locale-gen
+CLEAR /tmp
+CLEAR /var/tmp
+CLEAR /var/cache
+CLEAR /var/log
+CLEAR /var/lib/apt/lists
+CLEAR /usr/share/man
+CLEAR /usr/share/common-licenses
+CLEAR /usr/share/doc
+RUN /usr/bin/chown mysql:mysql /data
+RUN /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/data
+RUN /usr/bin/install -m 755 -o mysql -g root -d /var/run/mysqld
+CFG --entrypoint '["/usr/sbin/mysqld", "--no-defaults", "--user=mysql", "--basedir=/usr", "--datadir=/data"]'
+CFG --cmd "--bind-address=$BIND"
+CFG --stop-signal TERM
+if [ "$ARG" = "local" ]
+then
+    PRINT "+H" "Committing to containers-storage..."
+    buildah commit --rm --squash "${NAME}" "containers-storage:mariadb-$MARIADB"
+else
+    PRINT "+H" "Committing to containers-storage as $ARG..."
+    buildah commit --rm --squash "${NAME}" "containers-storage:$ARG"
+fi
+exit 113
+# Done. Exit with last command exit status.
+exit $?
+

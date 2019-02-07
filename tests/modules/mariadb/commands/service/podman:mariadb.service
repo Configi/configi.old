@@ -1,0 +1,23 @@
+[Unit]
+Description=MariaDB Container
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+KillSignal=SIGTERM
+SendSIGKILL=false
+Restart=on-abort
+RestartSec=5s
+ExecStartPre=-/usr/bin/podman stop mariadb-__MARIADB__
+ExecStartPre=-/usr/bin/podman rm mariadb-__MARIADB__
+ExecStart=/usr/bin/podman run --name mariadb-__MARIADB__ --network host --rm --ulimit nofile=4192:16384 -v /srv/mariadb-__MARIADB__/data:/data __IMAGE__
+OOMScoreAdjust=-200
+BlockIOWeight=1000
+LimitNOFILE=16384
+Nice=-5
