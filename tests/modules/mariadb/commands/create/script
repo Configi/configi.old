@@ -26,6 +26,7 @@ function cleanup {
     PRINT "+X" "Done!"
 }
 trap cleanup ERR
+[ -d "/srv/mariadb-$MARIADB" ] && exit 0
 . "$RERUN_MODULES/lib/print.sh"
 NAME="mariadb-build"
 FROM="docker.io/library/debian:${DEBIAN}-slim"
@@ -33,11 +34,10 @@ FROM="docker.io/library/debian:${DEBIAN}-slim"
 # https://packages.debian.org/search?keywords=mariadb-server
 PRINT "+H" "Pulling source image ($FROM)..."
 DATA="/srv/mariadb-$MARIADB/data"
-[ -d "/srv/mariadb-$MARIADB" ] && exit 0
 /usr/bin/mkdir -p "$DATA"
-OPTS="-v $DATA:/data"
+OPTS="--hostname $HOSTNAME -v $DATA:/data"
 . "$RERUN_MODULES/lib/buildah.sh"
-APT_GET="/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -qq"
+APT_GET="/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -qq -o=Dpkg::Use-Pty=0"
 MKDIR /usr/share/man/man1
 MKDIR /usr/share/man/man7
 RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
@@ -60,10 +60,11 @@ CLEAR /usr/share/common-licenses
 CLEAR /usr/share/doc
 RUN /usr/bin/chown mysql:mysql /data
 RUN /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/data
+MKDIR /var/run/mysqld
 RUN /usr/bin/install -m 755 -o mysql -g root -d /var/run/mysqld
-CFG --entrypoint '["/usr/sbin/mysqld", "--no-defaults", "--user=mysql", "--basedir=/usr", "--datadir=/data"]'
-CFG --cmd "--bind-address=$BIND"
-CFG --stop-signal TERM
+CONFIG --entrypoint '["/usr/sbin/mysqld", "--no-defaults", "--user=mysql", "--basedir=/usr", "--datadir=/data"]'
+CONFIG --cmd "--bind-address=$BIND"
+CONFIG --stop-signal TERM
 if [ "$ARG" = "local" ]
 then
     PRINT "+H" "Committing to containers-storage..."
