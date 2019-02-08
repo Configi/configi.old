@@ -32,7 +32,7 @@ echo "$PASSWORD" > /srv/wordpress/password
 chmod 0600 /srv/wordpress/password
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+" "Getting image ID of wordpress:$TAG..."
-IMAGE=$(podman images | grep -F -- "$TAG" | awk '{print $3}')
+IMAGE=$(podman images | grep -F -- "$TAG " | awk '{print $3}')
 SERVICE="/etc/systemd/system/podman:wordpress-$TAG.service"
 PRINT "+" "Generating systemd unit..."
 cp "$RERUN_MODULE_DIR/commands/service/podman:wordpress.service" $SERVICE
