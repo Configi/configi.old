@@ -46,8 +46,8 @@ T["exec.spawn stderr"] = function()
   y, b = cmd.ls("sdfsdf")
   T.is_nil(x)
   T.is_nil(y)
-  T.equal(a["stderr"][1], "ls: sdfsdf: No such file or directory")
-  T.equal(b["stderr"][1], "ls: sdfsdf: No such file or directory")
+  T.equal(a["stderr"][1], "ls: cannot access 'sdfsdf': No such file or directory")
+  T.equal(b["stderr"][1], "ls: cannot access 'sdfsdf': No such file or directory")
 end
 T["exec.spawn stdin"] = function()
   local sed = exec.ctx"sed"
@@ -73,7 +73,7 @@ T["exec.spawn stderr redirect"] = function()
   a, b = ls"non-existent"
   T.is_nil(a)
   T.is_nil(b["stderr"][1])
-  T.equal("ls: non-existent: No such file or directory\n", file.read_all(s))
+  T.equal("ls: cannot access 'non-existent': No such file or directory\n", file.read_all(s))
   os.execute("rm " .. s)
 end
 T["exec.spawn ignore"] = function()
@@ -82,7 +82,7 @@ T["exec.spawn ignore"] = function()
   local a, b = ls"non-existent"
   T.not_equal(0, b.code)
   T.equal(type(a), "number")
-  T.equal(b["stderr"][1], "ls: non-existent: No such file or directory")
+  T.equal(b["stderr"][1], "ls: cannot access 'non-existent': No such file or directory")
 end
 T["exec.spawn cwd"] = function()
   local ls = exec.ctx"ls"
