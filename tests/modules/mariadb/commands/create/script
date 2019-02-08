@@ -37,7 +37,7 @@ DATA="/srv/mariadb-$MARIADB/data"
 /usr/bin/mkdir -p "$DATA"
 OPTS="--hostname $HOSTNAME -v $DATA:/data"
 . "$RERUN_MODULES/lib/buildah.sh"
-APT_GET="/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -qq -o=Dpkg::Use-Pty=0"
+APT_GET="/usr/bin/env LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get -qq -o=Dpkg::Use-Pty=0"
 MKDIR /usr/share/man/man1
 MKDIR /usr/share/man/man7
 RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
