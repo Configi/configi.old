@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+#/ command: wordpress:service: "Ensure Wordpress container is managed by systemd"
+#/ usage: rerun wordpress:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>] [ --user <root>] [ --host <localhost>]  --password <>  --tag <>
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES USER HOST PASSWORD TAG
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+function cleanup() {
+    PRINT "+" "Deleting incomplete systemd unit..."
+    rm -f "$SERVICE"
+    systemctl daemon-reload
+}
+trap cleanup ERR
+systemctl is-active "podman:wordpress-$TAG" && exit 0
+podman pull "docker.io/wordpress:$TAG"
+mkdir -p /srv/wordpress
+echo "$PASSWORD" > /srv/wordpress/password
+. "$RERUN_MODULES/lib/print.sh"
+PRINT "+" "Getting image ID of wordpress:$TAG..."
+IMAGE=$(podman images | grep -F "$TAG" | awk '{print $3}')
+SERVICE="/etc/systemd/system/podman:wordpress-$TAG.service"
+PRINT "+" "Generating systemd unit..."
+cp "$RERUN_MODULE_DIR/commands/service/podman:wordpress.service" $SERVICE
+sed -i "s:__IMAGE__:$IMAGE:g" $SERVICE
+sed -i "s:__TAG__:$TAG:g" $SERVICE
+sed -i "s:__USER__:$USER:g" $SERVICE
+sed -i "s:__HOST__:$HOST:g" $SERVICE
+PRINT "+" "Enabling and starting Wordpress container service..."
+systemctl daemon-reload
+systemctl enable "podman:wordpress-$TAG"
+systemctl start "podman:wordpress-$TAG"
+PRINT "+" "Checking if Wordpress container service is up..."
+systemctl is-active "podman:wordpress-$TAG"
+PRINT "!" "DONE."
+exit 113
+# Done. Exit with last command exit status.
+exit $?
