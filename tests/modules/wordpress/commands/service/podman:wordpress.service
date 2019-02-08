@@ -17,6 +17,6 @@ RestartSec=5s
 LimitNOFILE=16384
 ExecStartPre=-/usr/bin/podman stop wordpress-__TAG__
 ExecStartPre=-/usr/bin/podman rm wordpress-__TAG__
-ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name wordpress-__TAG__ -v /srv/wordpress:/run/secrets --network host --rm
+ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name wordpress-__TAG__ -v /srv/wordpress:/run/secrets --network host --rm \
 --ulimit nofile=4192:16384 \
 -e WORDPRESS_DB_PASSWORD_FILE=/run/secrets/password -e WORDPRESS_DB_HOST=__HOST__ -e WORDPRESS_DB_USER=__USER__ __IMAGE__
