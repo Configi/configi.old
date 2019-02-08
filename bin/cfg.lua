@@ -107,7 +107,7 @@ setmetatable(ENV, {__index = function(_, mod)
           if ENV[p.register] then
             return fmt.panic("abort: failure at %s.%s \"%s\"...\nerror: attempted to overwrite registered variable: \"%s\"\n", mod, cmd, a, p.register)
           else
-            ENV[p.register] = o.stdout[#o.stdout]
+            ENV[p.register] = o.stdout[#o.stdout] or true
           end
         end
       end
