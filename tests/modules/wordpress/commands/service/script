@@ -29,6 +29,7 @@ systemctl is-active "podman:wordpress-$TAG" && exit 0
 podman pull "docker.io/wordpress:$TAG"
 mkdir -p /srv/wordpress
 echo "$PASSWORD" > /srv/wordpress/password
+chmod 0600 /srv/wordpress/password
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+" "Getting image ID of wordpress:$TAG..."
 IMAGE=$(podman images | grep -F "$TAG" | awk '{print $3}')
