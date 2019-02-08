@@ -9,7 +9,7 @@
   echo >&2 "Failed loading function library." ; exit 1 ;
 }
 
-set -o errexit -o nounset -o pipefail
+set -o errexit -o nounset
 
 rerun_options_parse "$@"
 
@@ -19,14 +19,17 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
+podman exec -t "mariadb-$MARIADB" mysql -u root -e 'select 1' 2>/dev/null | grep -q 1045 && exit 0
+set -o pipefail
 FTEMP="/srv/mariadb-$MARIADB/data/.__temp"
 . "$RERUN_MODULES/lib/print.sh"
 RETRIES=5
-until podman exec -it "mariadb-$MARIADB" runuser root -c "mysql -u root -e 'select 1'" > /dev/null 2>&1 || [ "$RETRIES" -eq 0 ]
+until podman exec -t "mariadb-$MARIADB" mysql -u root -e 'select 1' >/dev/null 2>&1
 do
     PRINT "+C" "Waiting for MariaDB $MARIADB to come up..."
     RETRIES=$((RETRIES-=1))
     sleep 1
+    [ "$RETRIES" -eq 0 ] && exit 1
 done
 cat > "$FTEMP" << QUERY
 UPDATE mysql.user SET Password=PASSWORD('__PASSWORD__') WHERE User='root';
@@ -38,7 +41,7 @@ FLUSH PRIVILEGES;
 QUERY
 sed -i "s:__PASSWORD__:$PASSWORD:g" "$FTEMP"
 PRINT "+C" "Running queries..."
-podman exec -it "mariadb-$MARIADB" runuser root -c "mysql -sfu root < /data/.___temp"
+podman exec -t "mariadb-$MARIADB" sh -c "mysql -sfu root < /data/.__temp"
 rm -f "$FTEMP"
 exit 113
 # Done. Exit with last command exit status.
