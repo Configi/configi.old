@@ -316,7 +316,7 @@ T["All tests"] = function()
       T.equal(r.status, "exit")
       t, r = exec.popen("xxx", ".", true)
       T.equal(t, 127)
-      T.equal(r.output[1], "sh: xxx: not found")
+      T.equal(r.output[1], "sh: line 6: xxx: command not found")
       os.execute[[
         rm tmp/one
         rm tmp/two
@@ -342,7 +342,7 @@ T["All tests"] = function()
       t, r = exec.system("ls XXX")
       T.is_nil(t)
       t, r = exec.system("ls XXX", ".", true)
-      T.equal(t, 1)
+      T.equal(t, 2)
     end
     T.exec.script = function()
       local t, r = exec.script("tests/lua-module-lib-exec.script1.sh")
