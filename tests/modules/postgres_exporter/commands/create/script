@@ -30,7 +30,7 @@ NAME="postgres_exporter-build"
 FROM="scratch"
 . "$RERUN_MODULES/lib/buildah.sh"
 PRINT "+H" "Downloading postgres_exporter version $VERSION..."
-TMPDIR=$(mkdir -d -p .)
+TMPDIR=$(mktemp -d -p .)
 pushd "$TMPDIR"
     wget "https://github.com/wrouesnel/postgres_exporter/releases/download/v${VERSION}/postgres_exporter_v${VERSION}_linux-amd64.tar.gz"
     tar xf "postgres_exporter_v${VERSION}_linux-amd64.tar.gz"
