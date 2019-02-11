@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+#/ command: postgres_exporter:create: "Create postgres_exporter container"
+#/ usage: rerun postgres_exporter:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --version <>
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES VERSION
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+function cleanup {
+    PRINT "+H" "Cleaning up..."
+    buildah rm "$NAME" 2>/dev/null 1>/dev/null
+    PRINT "+X" "Done!"
+}
+trap cleanup ERR
+. "$RERUN_MODULES/lib/print.sh"
+NAME="postgres_exporter-build"
+FROM="scratch"
+. "$RERUN_MODULES/lib/buildah.sh"
+PRINT "+H" "Downloading postgres_exporter version $VERSION..."
+TMPDIR=$(mkdir -d -p .)
+pushd "$TMPDIR"
+    wget "https://github.com/wrouesnel/postgres_exporter/releases/download/v${VERSION}/postgres_exporter_v${VERSION}_linux-amd64.tar.gz"
+    tar xf "postgres_exporter_v${VERSION}_linux-amd64.tar.gz"
+    COPY "postgres_exporter_v${VERSION}_linux-amd64/postgres_exporter" /postgres_exporter
+popd
+rm -rf "$TMPDIR"
+CONFIG --entrypoint '["/postgres_exporter"]'
+CONFIG --cmd ''
+CONFIG --stop-signal TERM
+if [ "$ARG" = "local" ]
+then
+    PRINT "+H" "Committing to containers-storage..."
+    buildah commit --rm --squash "${NAME}" "containers-storage:postgres_exporter"
+else
+    PRINT "+H" "Committing to containers-storage as $ARG..."
+    buildah commit --rm --squash "${NAME}" "containers-storage:$ARG"
+fi
+exit 113
+# Done. Exit with last command exit status.
+exit $?
