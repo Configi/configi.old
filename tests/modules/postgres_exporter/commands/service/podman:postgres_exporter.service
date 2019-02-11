@@ -19,5 +19,5 @@ ExecStartPre=-/usr/bin/podman stop postgres_exporter
 ExecStartPre=-/usr/bin/podman rm postgres_exporter
 ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name postgres_exporter -v /srv/postgres_exporter:/etc --network host --rm \
 --ulimit nofile=4192:16384 \
--e DATA_SOURCE_URI="postgresql://__HOST__:__PORT__/postgres" -e DATA_SOURCE_USER="__USER__" -e DATA_SOURCE_PASS_FILE="/etc/postgres_exporter.asc" \
+-e DATA_SOURCE_URI="__HOST__:__PORT__/postgres" -e DATA_SOURCE_USER="__USER__" -e DATA_SOURCE_PASS_FILE="/etc/postgres_exporter.asc" \
 __IMAGE__
