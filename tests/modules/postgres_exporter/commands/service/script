@@ -32,7 +32,12 @@ IMAGE=$(podman images | grep -F "postgres_exporter" | awk '{print $3}')
 SERVICE="/etc/systemd/system/podman:postgres_exporter.service"
 PRINT "+" "Generating systemd unit..."
 cp "$RERUN_MODULE_DIR/commands/service/podman:postgres_exporter.service" "$SERVICE"
-sed -i "s:__IMAGE__:$IMAGE:g" $SERVICE
+sed -i "s:__IMAGE__:$IMAGE:g" "$SERVICE"
+sed -i "s:__USER__:$USER:g" "$SERVICE"
+sed -i "s:__HOST__:$HOST:g" "$SERVICE"
+sed -i "s:__PORT__:$PORT:g" "$SERVICE"
+mkdir -p /srv/postgres_exporter
+echo "$PASSWORD" > /srv/postgres_exporter/postgres_exporter.asc
 PRINT "+" "Enabling and starting postgres_exporter service..."
 systemctl daemon-reload
 systemctl enable "podman:postgres_exporter"
