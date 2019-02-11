@@ -9,6 +9,8 @@
   echo >&2 "Failed loading function library." ; exit 1 ;
 }
 
+unset USER
+unset HOST
 set -o errexit -o nounset -o pipefail -o errtrace
 
 rerun_options_parse "$@"
