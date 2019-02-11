@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+#/ command: postgres_exporter:service: "Ensure postgres_exporter container is managed by systemd"
+#/ usage: rerun postgres_exporter:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>] [ --user <postgres_exporter>] [ --port <5432>] [ --host <localhost>]  --password <>
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES USER PORT HOST PASSWORD
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+function cleanup() {
+    PRINT "+" "Deleting incomplete systemd unit..."
+    rm -f "$SERVICE"
+    systemctl daemon-reload
+}
+trap cleanup ERR
+systemctl is-active "podman:postgres_exporter" && exit 0
+. "$RERUN_MODULES/lib/print.sh"
+PRINT "+" "Getting image ID of postgres_exporter container..."
+IMAGE=$(podman images | grep -F "postgres_exporter" | awk '{print $3}')
+SERVICE="/etc/systemd/system/podman:postgres_exporter.service"
+PRINT "+" "Generating systemd unit..."
+cp "$RERUN_MODULE_DIR/commands/service/podman:postgres_exporter.service" "$SERVICE"
+sed -i "s:__IMAGE__:$IMAGE:g" $SERVICE
+PRINT "+" "Enabling and starting postgres_exporter service..."
+systemctl daemon-reload
+systemctl enable "podman:postgres_exporter"
+systemctl start "podman:postgres_exporter"
+PRINT "+" "Checking if postgres_exporter container service is up..."
+systemctl is-active "podman:postgres_exporter"
+PRINT "!" "DONE."
+exit 113
+# Done. Exit with last command exit status.
+exit $?
