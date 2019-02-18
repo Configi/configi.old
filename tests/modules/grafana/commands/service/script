@@ -34,6 +34,7 @@ mkdir -p /srv/grafana/logs
 mkdir -p /srv/grafana/plugins
 mkdir -p /srv/grafana/provisioning
 pushd /srv/grafana/plugins
+    rm -rf grafana-piechart-panel-cf03cdf
     curl -Lo piechart.zip "https://grafana.com/api/dashboards/8919/revisions/7/download"
     unzip piechart.zip
     rm -f piechart.zip
