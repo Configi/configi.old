@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+#/ command: blackbox_exporter:setup: "Install and let systemd manage blackbox_exporter"
+#/ usage: rerun blackbox_exporter:setup  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "setup" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+. "$RERUN_MODULES/lib/print.sh"
+PRINT "+" "Checking if blackbox_exporter is already running..."
+systemctl is-active "prometheus-blackbox_exporter" && exit 0
+if [ ! -x $(command -v blackbox_exporter) ]
+then
+    PRINT "+" "Downloading and installing blackbox_exporter..."
+    TMPDIR=$(mktemp -d -p .)
+    pushd "$TMPDIR"
+        wget "https://github.com/prometheus/blackbox_exporter/releases/download/v0.13.0/blackbox_exporter-0.13.0.linux-amd64.tar.gz"
+	tar xf "blackbox_exporter-0.13.0.linux-amd64.tar.gz"
+        cp "blackbox_exporter-0.13.0.linux-amd64/blackbox_exporter" /usr/local/sbin/blackbox_exporter
+    popd
+    rm -rf "$TMPDIR"
+fi
+PRINT "+" "Starting blackbox_exporter..."
+systemctl enable prometheus-blackbox_exporter.service
+systemctl start prometheus-black_exporter.service
+exit 113
+# Done. Exit with last command exit status.
+exit $?
+
