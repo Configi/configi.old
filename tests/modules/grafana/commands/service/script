@@ -30,7 +30,6 @@ systemctl is-active "podman:grafana-$VERSION" && exit 0
 PRINT "+" "Pulling Grafana image..."
 podman pull "docker.io/grafana/grafana:$VERSION"
 mkdir -p /srv/grafana/data
-mkdir -p /srv/grafana/home
 mkdir -p /srv/grafana/logs
 mkdir -p /srv/grafana/plugins
 mkdir -p /srv/grafana/provisioning
