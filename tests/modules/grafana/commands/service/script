@@ -29,11 +29,11 @@ trap cleanup ERR
 systemctl is-active "podman:grafana-$VERSION" && exit 0
 PRINT "+" "Pulling Grafana image..."
 podman pull "docker.io/grafana/grafana:$VERSION"
-mkdir -p /srv/grafana/config
 mkdir -p /srv/grafana/data
 mkdir -p /srv/grafana/home
 mkdir -p /srv/grafana/logs
 mkdir -p /srv/grafana/plugins
+mkdir -p /srv/grafana/provisioning
 chown -R 472 /srv/grafana
 PRINT "+" "Getting image ID of grafana:$VERSION..."
 IMAGE=$(podman images | grep -F -- "grafana" | grep -F -- "$VERSION " | awk '{print $3}')
