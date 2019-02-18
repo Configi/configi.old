@@ -1,0 +1,27 @@
+[Unit]
+Description=Grafana Container
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+KillSignal=SIGTERM
+Restart=on-failure
+RestartSec=5s
+LimitNOFILE=16384
+ExecStartPre=-/usr/bin/podman stop grafana-__VERSION__
+ExecStartPre=-/usr/bin/podman rm grafana-__VERSION__
+ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name grafana-__VERSION__
+-v /srv/grafana/config:/etc/grafana \
+-v /srv/grafana/data:/var/lib/grafana \
+-v /srv/grafana/home:/usr/share/grafana \
+-v /srv/grafana/logs:/var/log/grafana \
+-v /srv/grafana/plugins:/var/lib/grafana/plugins \
+--network host --rm \
+--ulimit nofile=4192:16384 \
+-e "GF_SECURITY_ADMIN_PASSWORD=__PASSWORD__" __IMAGE__

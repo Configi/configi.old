@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+#/ command: grafana:service: "Ensure Grafana container is managed by systemd"
+#/ usage: rerun grafana:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --version <>  --password <>
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES VERSION PASSWORD
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+function cleanup() {
+    PRINT "+" "Deleting incomplete systemd unit..."
+    rm -f "$SERVICE"
+    systemctl daemon-reload
+}
+trap cleanup ERR
+. "$RERUN_MODULES/lib/print.sh"
+systemctl is-active "podman:grafana-$VERSION" && exit 0
+PRINT "+" "Pulling Grafana image..."
+podman pull "docker.io/grafana/grafana:$VERSION"
+mkdir -p /srv/grafana/config
+mkdir -p /srv/grafana/data
+mkdir -p /srv/grafana/home
+mkdir -p /srv/grafana/logs
+mkdir -p /srv/grafana/plugins
+PRINT "+" "Getting image ID of grafana:$VERSION..."
+IMAGE=$(podman images | grep -F -- "grafana:$VERSION " | awk '{print $3}')
+SERVICE="/etc/systemd/system/podman:grafana-$VERSION.service"
+PRINT "+" "Generating systemd unit..."
+cp "$RERUN_MODULE_DIR/commands/service/podman:grafana.service" $SERVICE
+sed -i "s|__IMAGE__|$IMAGE|" $SERVICE
+sed -i "s|__VERSION__|$VERSION|g" $SERVICE
+sed -i "s|__PASSWORD__|$PASSWORD|" $SERVICE
+PRINT "+" "Enabling and starting Grafana container service..."
+systemctl daemon-reload
+systemctl enable "podman:grafana-$VERSION"
+systemctl start "podman:grafana-$VERSION"
+PRINT "+" "Checking if Grafana container service is up..."
+systemctl is-active "podman:grafana-$VERSION"
+PRINT "!" "DONE."
+exit 113
+# Done. Exit with last command exit status.
+exit $?
+
