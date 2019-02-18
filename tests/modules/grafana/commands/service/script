@@ -34,6 +34,7 @@ mkdir -p /srv/grafana/data
 mkdir -p /srv/grafana/home
 mkdir -p /srv/grafana/logs
 mkdir -p /srv/grafana/plugins
+chown -R 472 /srv/grafana
 PRINT "+" "Getting image ID of grafana:$VERSION..."
 IMAGE=$(podman images | grep -F -- "grafana" | grep -F -- "$VERSION " | awk '{print $3}')
 SERVICE="/etc/systemd/system/podman:grafana-$VERSION.service"
