@@ -33,7 +33,12 @@ mkdir -p /srv/grafana/data
 mkdir -p /srv/grafana/logs
 mkdir -p /srv/grafana/plugins
 mkdir -p /srv/grafana/provisioning
-chown -R 472 /srv/grafana
+pushd /srv/grafana/plugins
+    curl -Lo piechart.zip "https://grafana.com/api/dashboards/8919/revisions/7/download"
+    unzip piechart.zip
+    rm -f piechart.zip
+popd
+chown -R 472:472 /srv/grafana
 PRINT "+" "Getting image ID of grafana:$VERSION..."
 IMAGE=$(podman images | grep -F -- "grafana" | grep -F -- "$VERSION " | awk '{print $3}')
 SERVICE="/etc/systemd/system/podman:grafana-$VERSION.service"
