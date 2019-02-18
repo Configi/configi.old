@@ -1,6 +1,12 @@
 [ -x "$(command -v buildah)" ] || { echo >&2 "Buildah executable not found."; exit 1; }
 [ -x "$(command -v podman)" ] || { echo >&2 "Podman executable not found."; exit 1; }
+function CLEANUP {
+    printf '[\e[1;33m%s\e[m] \e[1;35m%s\e[m\n' "!!" "Error encountered. Cleaning up..."
+    /usr/bin/buildah rm "${NAME}" 2>/dev/null 1>/dev/null
+}
+trap CLEANUP ERR
 
+printf '[\e[1;33m%s\e[m] \e[1;35m%s\e[m\n' "+H" "Creating ${NAME} container..."
 __CONTAINER=$(/usr/bin/buildah from --name "${NAME}" "${FROM}")
 CONFIG()
 {
