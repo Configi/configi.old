@@ -16,7 +16,7 @@ RestartSec=5s
 LimitNOFILE=16384
 ExecStartPre=-/usr/bin/podman stop grafana-__VERSION__
 ExecStartPre=-/usr/bin/podman rm grafana-__VERSION__
-ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name grafana-__VERSION__
+ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name grafana-__VERSION__ \
 -v /srv/grafana/config:/etc/grafana \
 -v /srv/grafana/data:/var/lib/grafana \
 -v /srv/grafana/home:/usr/share/grafana \
