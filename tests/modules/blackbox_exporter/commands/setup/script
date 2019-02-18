@@ -33,6 +33,7 @@ then
     popd
     rm -rf "$TMPDIR"
 fi
+cp "$RERUN_MODULE_DIR/commands/setup/prometheus-blackbox_exporter.service" /etc/systemd/system/
 PRINT "+" "Starting blackbox_exporter..."
 systemctl enable prometheus-blackbox_exporter.service
 systemctl start prometheus-black_exporter.service

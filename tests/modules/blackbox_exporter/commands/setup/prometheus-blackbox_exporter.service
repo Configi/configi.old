@@ -1,0 +1,21 @@
+[Unit]
+Description=Prometheus blackbox_exporter
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+NotifyAccess=main
+NoNewPrivileges=true
+DevicePolicy=closed
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/sbin/blackbox_exporter
+
