@@ -22,7 +22,7 @@ rerun_options_parse "$@"
 . "$RERUN_MODULES/lib/print.sh"
 PRINT "+" "Checking if blackbox_exporter is already running..."
 systemctl is-active "prometheus-blackbox_exporter" && exit 0
-if [ ! -x $(command -v blackbox_exporter) ]
+if [ ! -x "/usr/local/sbin/blackbox_exporter" ]
 then
     PRINT "+" "Downloading and installing blackbox_exporter..."
     TMPDIR=$(mktemp -d -p .)
