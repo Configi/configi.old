@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+#/ command: syslog-ng:create: "Create container image"
+#/ usage: rerun syslog-ng:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+THIS="$RERUN_MODULE_DIR/commands/create"
+export NAME="samba-build"
+export FROM="docker://docker.io/library/alpine:edge"
+export OPTS=""
+. "$RERUN_MODULES/lib/buildah.sh"
+. "$RERUN_MODULES/lib/print.sh"
+RUN /sbin/apk upgrade --no-cache --available --no-progress
+RUN /sbin/apk add --no-cache --no-progress syslog-ng
+CP "$THIS/syslog-ng.conf" /etc/syslog-ng/syslog-ng.conf
+CLEAR /tmp
+CONFIG --entrypoint '["/usr/sbin/syslog-ng", "-e", "-F"]'
+CONFIG --cmd ''
+CONFIG --stop-signal TERM
+PRINT "+H" "Committing to local containers storage..."
+buildah commit --rm --squash "${NAME}" "containers-storage:$ARG"
+exit 112

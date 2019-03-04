@@ -1,0 +1,21 @@
+[Unit]
+Description=syslog-ng Container
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+KillSignal=SIGTERM
+Restart=always
+RestartSec=5s
+LimitNOFILE=16384
+ExecStartPre=-/usr/bin/mkdir -p /srv/syslog-ng
+ExecStartPre=-/usr/bin/podman stop syslog-ng
+ExecStartPre=-/usr/bin/podman rm syslog-ng
+ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name syslog-ng -v /srv/syslog-ng:/host --network host --rm \
+--ulimit nofile=4192:8192 __IMAGE__
