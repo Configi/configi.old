@@ -9,7 +9,7 @@
   echo >&2 "Failed loading function library." ; exit 1 ;
 }
 
-set -o errexit -o nounset -o pipefail
+set -o errexit -o nounset -o pipefail -o errtrace
 
 rerun_options_parse "$@"
 
