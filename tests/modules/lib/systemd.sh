@@ -27,7 +27,7 @@ unit_image()
 {
     iid=$(/usr/bin/podman images | grep -F -- "${1} " | awk '{print $3}')
     echo "$iid"
-    sed -i "s|__IMAGE__|$iid|" "/etc/systemd/systemd/${2}"
+    sed -i "s|__IMAGE__|$iid|" "/etc/systemd/system/${2}"
 }
 
 unit_stop()
