@@ -14,7 +14,8 @@ KillSignal=SIGTERM
 Restart=always
 RestartSec=5s
 LimitNOFILE=16384
-ExecStartPre=-/usr/bin/mkdir -p /srv/syslog-ng
+ExecStartPre=-/usr/bin/mkdir -p /srv/syslog-ng/buffer
+ExecStartPre=-/usr/bin/chown -R 13514 /srv/syslog-ng
 ExecStartPre=-/usr/bin/podman stop syslog-ng
 ExecStartPre=-/usr/bin/podman rm syslog-ng
-ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name syslog-ng -v /srv/syslog-ng:/chroot --network host --rm --ulimit nofile=4192:8192 __IMAGE__
+ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --cap-add NET_BIND_SERVICE --name syslog-ng -v /srv/syslog-ng:/chroot --network host --rm --ulimit nofile=4192:8192 __IMAGE__
