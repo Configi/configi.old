@@ -1,0 +1,21 @@
+[Unit]
+Description=rsyncd Container
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+KillSignal=SIGTERM
+Restart=always
+RestartSec=5s
+LimitNOFILE=16384
+ExecStartPre=-/usr/bin/mkdir -p /srv/rsyncd
+ExecStartPre=-/usr/bin/chown -R 13873:13873 /srv/rsyncd
+ExecStartPre=-/usr/bin/podman stop rsyncd
+ExecStartPre=-/usr/bin/podman rm rsyncd
+ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --cap-add NET_BIND_SERVICE --name rsyncd -v /srv/rsyncd:/host --network host --rm --ulimit nofile=4192:8192 __IMAGE__

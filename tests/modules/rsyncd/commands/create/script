@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+#/ command: rsyncd:create: "Create container image"
+#/ usage: rerun rsyncd:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+THIS="$RERUN_MODULE_DIR/commands/create"
+export NAME="rsyncd-build"
+export FROM="docker://docker.io/library/alpine:edge"
+export OPTS=""
+. "$RERUN_MODULES/lib/buildah.sh"
+. "$RERUN_MODULES/lib/print.sh"
+RUN /sbin/apk upgrade --no-cache --available --no-progress
+RUN /sbin/apk add --no-cache --no-progress rsync
+RUN addgroup -g 13873 rsyncd
+RUN adduser -G rsyncd -H -D -u 13873 -s /sbin/nologin rsyncd
+CLEAR /tmp
+CONFIG --entrypoint '["/usr/bin/rsync", "--daemon", "--no-detach", "--config=/host/rsyncd.conf"]'
+CONFIG --cmd ''
+CONFIG --stop-signal TERM
+PRINT "+H" "Committing to local containers storage..."
+buildah commit --rm --squash "${NAME}" "containers-storage:$ARG"
+exit 112
