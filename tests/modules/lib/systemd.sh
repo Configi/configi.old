@@ -28,3 +28,8 @@ unit_image()
     iid=$(/usr/bin/podman images | grep -F -- "${1} " | awk '{print $3}')
     sed -i "s|__IMAGE__|$iid|" "$2"
 }
+
+unit_stop()
+{
+    /usr/bin/systemctl stop "$1" 2>&1 >/dev/null || return 0
+}
