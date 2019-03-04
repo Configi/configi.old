@@ -23,4 +23,7 @@ unit_active()
     return 1
 }
 
-
+unit_image()
+{
+    /usr/bin/podman images | grep -F -- "${1} " | awk '{print $3}'
+}
