@@ -28,9 +28,9 @@ export OPTS=""
 RUN /sbin/apk upgrade --no-cache --available --no-progress
 RUN /sbin/apk add --no-cache --no-progress syslog-ng
 RUN adduser -D -u 13514 -s /sbin/nologin syslog
-COPY "$THIS/syslog-ng.conf" /chroot/syslog-ng.conf
+COPY "$THIS/syslog-ng.conf" /etc/syslog-ng/syslog-ng.conf
 CLEAR /tmp
-CONFIG --entrypoint '["/usr/sbin/syslog-ng", "-f", "/syslog-ng.conf", "-e", "-F", "-C", "/chroot"]'
+CONFIG --entrypoint '["/usr/sbin/syslog-ng", "-e", "-F"]'
 CONFIG --cmd ''
 CONFIG --stop-signal TERM
 PRINT "+H" "Committing to local containers storage..."
