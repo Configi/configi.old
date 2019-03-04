@@ -26,7 +26,7 @@ export OPTS=""
 . "$RERUN_MODULES/lib/buildah.sh"
 . "$RERUN_MODULES/lib/print.sh"
 RUN /sbin/apk upgrade --no-cache --available --no-progress
-RUN /sbin/apk add --no-cache --no-progress syslog-ng
+RUN /sbin/apk add --no-cache --no-progress syslog-ng syslog-ng-json
 RUN adduser -D -u 13514 -s /sbin/nologin syslog
 COPY "$THIS/syslog-ng.conf" /etc/syslog-ng/syslog-ng.conf
 CLEAR /tmp
