@@ -28,7 +28,7 @@ export OPTS=""
 RUN /sbin/apk upgrade --no-cache --available --no-progress
 RUN /sbin/apk add --no-cache --no-progress syslog-ng
 RUN adduser -D -u 13514 -s /sbin/nologin syslog
-CP "$THIS/syslog-ng.conf" /etc/syslog-ng/syslog-ng.conf
+COPY "$THIS/syslog-ng.conf" /etc/syslog-ng/syslog-ng.conf
 CLEAR /tmp
 CONFIG --entrypoint '["/usr/sbin/syslog-ng", "-e", "-F", "-C", "/chroot"]'
 CONFIG --cmd ''
