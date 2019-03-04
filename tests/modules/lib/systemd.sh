@@ -25,5 +25,6 @@ unit_active()
 
 unit_image()
 {
-    /usr/bin/podman images | grep -F -- "${1} " | awk '{print $3}'
+    iid=$(/usr/bin/podman images | grep -F -- "${1} " | awk '{print $3}')
+    sed -i "s|__IMAGE__|$iid|" "$2"
 }
