@@ -1,3 +1,10 @@
+function unit_cleanup() {
+    PRINT "+" "Deleting incomplete systemd unit..."
+    rm -f "/etc/systemd/system/$SERVICE"
+    systemctl daemon-reload
+}
+trap unit_cleanup ERR
+
 unit_start()
 {
     /usr/bin/systemctl daemon-reload
