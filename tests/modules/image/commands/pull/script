@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #/ command: image:pull: "Pull container image from remote rsync registry"
-#/ usage: rerun image:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --creds <> 
+#/ usage: rerun image:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --creds <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST CREDS
 
@@ -26,19 +26,20 @@ then
     print "Missing credentials file."
 fi
 TMPDIR=$(mktemp -d -p .)
-pushd "$TMPDIR"
+cp "$CREDS" "$TMPDIR/CREDS"
+1>/dev/null pushd "$TMPDIR"
     NAME=$(cut -f1 -d:<<<"$ARG")
     TAG=$(cut -f2 -d:<<<"$ARG")
-    LOGIN=$(cut -f1 -d: < "$CREDS")
-    PASS=$(cut -f2 -d: < "$CREDS")
+    LOGIN=$(cut -f1 -d: < ./CREDS)
+    PASS=$(cut -f2 -d: < ./CREDS)
     printf '%s' "${PASS}" > ./PASS
     chmod 0600 ./PASS
     /usr/bin/rsync --password-file ./PASS --progress -h 3 -z -W "${LOGIN}@${HOST}::${NAME}/${TAG}" ./IMAGE.tar.xz
     /usr/bin/tar -xJf IMAGE.tar.xz
     /usr/bin/sha256sum -c < "${NAME}/${TAG}.sha256"
     /usr/bin/skopeo copy "oci-archive:${NAME}/${TAG}" "containers-storage:${NAME}:${TAG}"
-popd
+1>/dev/null popd
 rm -rf "${TMPDIR}/${NAME}"
-rm -f "${TMPDIR}/{IMAGE.tar.xz,PASS}"
+rm -f "${TMPDIR}/{IMAGE.tar.xz,PASS,CREDS}"
 rmdir "${TMPDIR}"
 exit 112
