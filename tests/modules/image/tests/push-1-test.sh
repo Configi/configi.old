@@ -1,6 +1,6 @@
 #!/usr/bin/env roundup
 #
-#/ usage:  rerun stubbs:test -m syslog_ng -p push [--answers <>]
+#/ usage:  rerun stubbs:test -m image -p push [--answers <>]
 #
 
 # Helpers

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-#/ command: syslog_ng:push: "Push container image to remote rsync registry via SSH"
-#/ usage: rerun syslog_ng:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --src <>  --dest <> [ --tag <latest>]
+#/ command: image:push: "Push container image to remote rsync registry via SSH"
+#/ usage: rerun image:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --src <> [ --tag <latest>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST SRC DEST TAG
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST SRC TAG
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "push" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
