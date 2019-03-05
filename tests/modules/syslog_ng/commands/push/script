@@ -20,15 +20,19 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
+# Requires skopeo, tar, xz, openssh(scp), coreutils(sha256sum)
+#
 . "$RERUN_MODULES/lib/functions.sh"
 TMPDIR=$(mktemp -d -p .)
 pushd "${TMPDIR}"
+    /usr/bin/mkdir "${DEST}"
     print "Converting local image to oci-archive..."
-    /usr/bin/skopeo copy "containers-storage:${SRC}" "oci-archive:IMAGE"
+    /usr/bin/skopeo copy "containers-storage:${SRC}" "oci-archive:${DEST}/${TAG}"
     print "Compressing image before pushing..."
-    /usr/bin/xz -T0 IMAGE
+    /usr/bin/sha256sum "${DEST}/${TAG}" > "${DEST}/${TAG}.sha256"
+    XZ_OPT=-T0 /usr/bin/tar -cJf IMAGE.tar.xz "${DEST}"
     print "Pushing to rsync registry..."
-    /usr/bin/scp IMAGE.xz "root@${HOST}:/srv/rsyncd/registry/${DEST}/${TAG}"
+    /usr/bin/scp IMAGE.tar.xz "root@${HOST}:/srv/rsyncd/registry/${DEST}/${TAG}"
 popd
 rm -f "${TMPDIR}/${DEST}"
 rmdir "${TMPDIR}"
