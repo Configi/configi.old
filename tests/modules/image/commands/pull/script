@@ -34,7 +34,7 @@ cp "$CREDS" "$TMPDIR/CREDS"
     PASS=$(cut -f2 -d: < ./CREDS)
     printf '%s' "${PASS}" > ./PASS
     chmod 0600 ./PASS
-    /usr/bin/rsync --password-file ./PASS --progress -h 3 -z -W "${LOGIN}@${HOST}::${NAME}/${TAG}" ./IMAGE.tar.xz
+    /usr/bin/rsync --password-file ./PASS --progress -h 3 -W "rsync://${LOGIN}@${HOST}/${NAME}/${TAG}" ./IMAGE.tar.xz
     /usr/bin/tar -xJf IMAGE.tar.xz
     /usr/bin/sha256sum -c < "${NAME}/${TAG}.sha256"
     /usr/bin/skopeo copy "oci-archive:${NAME}/${TAG}" "containers-storage:${NAME}:${TAG}"
