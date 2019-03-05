@@ -24,9 +24,11 @@ rerun_options_parse "$@"
 TMPDIR=$(mktemp -d -p .)
 pushd "${TMPDIR}"
     print "Converting local image to oci-archive..."
-    /usr/bin/skopeo copy "containers-storage:${SRC}" "oci-archive:${DEST}"
-    print "Copying to rsync registry..."
-    /usr/bin/scp "${DEST}" "root@${HOST}:/srv/rsyncd/registry/${DEST}/${TAG}"
+    /usr/bin/skopeo copy "containers-storage:${SRC}" "oci-archive:IMAGE"
+    print "Compressing image before pushing..."
+    /usr/bin/xz IMAGE
+    print "Pushing to rsync registry..."
+    /usr/bin/scp IMAGE.xz "root@${HOST}:/srv/rsyncd/registry/${DEST}/${TAG}"
 popd
 rm -f "${TMPDIR}/${DEST}"
 rmdir "${TMPDIR}"
