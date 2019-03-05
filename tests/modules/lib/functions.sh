@@ -1,0 +1,4 @@
+function RERUN_FUNC_CLEANUP {
+    rm -rf "$TMPDIR"
+}
+trap RERUN_FUNC_CLEANUP ERR
