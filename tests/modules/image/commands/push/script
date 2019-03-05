@@ -39,7 +39,8 @@ pushd "${TMPDIR}"
         /usr/bin/scp IMAGE.tar.xz "root@${HOST}:/srv/rsyncd/registry/${DEST}/${TAG}"
     fi
 popd
-rm -f "${TMPDIR}/${DEST}"
+rm -r "${TMPDIR}/${DEST}"
+rm -f "${TMPDIR}/IMAGE.tar.xz"
 rmdir "${TMPDIR}"
 print "Done!"
 exit 112
