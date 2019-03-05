@@ -3,5 +3,5 @@
 # Tue 05 Mar 2019 04:58:01 AM UTC
 NAME=push
 DESCRIPTION="Push container image to remote rsync registry via SSH"
-OPTIONS="arg comment verbose register requires host src tag dest"
+OPTIONS="arg comment verbose register requires host tag dest"
 GENERATE_HELP="true"
