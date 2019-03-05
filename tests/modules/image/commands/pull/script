@@ -40,6 +40,6 @@ cp "$CREDS" "$TMPDIR/CREDS"
     /usr/bin/skopeo copy "oci-archive:${NAME}/${TAG}" "containers-storage:${NAME}:${TAG}"
 1>/dev/null popd
 rm -rf "${TMPDIR}/${NAME}"
-rm -f "${TMPDIR}/{IMAGE.tar.xz,PASS,CREDS}"
+rm -f "${TMPDIR}"/{IMAGE.tar.xz,PASS,CREDS}
 rmdir "${TMPDIR}"
 exit 112
