@@ -24,13 +24,11 @@ export NAME="rsyncd-build"
 export FROM="docker://docker.io/library/alpine:edge"
 export OPTS=""
 . "$RERUN_MODULES/lib/buildah.sh"
-. "$RERUN_MODULES/lib/print.sh"
 RUN /sbin/apk upgrade --no-cache --available --no-progress
 RUN /sbin/apk add --no-cache --no-progress rsync
 RUN addgroup -g 13873 rsyncd
 RUN adduser -G rsyncd -H -D -u 13873 -s /sbin/nologin rsyncd
 CLEAR /tmp
 ENTRYPOINT '["/usr/bin/rsync", "--daemon", "--no-detach", "--config=/host/rsyncd.conf"]'
-PRINT "+H" "Committing to local containers storage..."
-buildah commit --rm --squash "${NAME}" "containers-storage:$ARG"
+COMMIT "$ARG"
 exit 112
