@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: image:pull: "Pull container image from remote rsync registry"
-#/ usage: rerun image:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --image <>  --creds <>
+#/ usage: rerun image:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --creds <> 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST IMAGE CREDS
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST CREDS
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "pull" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -27,8 +27,8 @@ then
 fi
 TMPDIR=$(mktemp -d -p .)
 pushd "$TMPDIR"
-    NAME=$(cut -f1 -d:<<<"$IMAGE")
-    TAG=$(cut -f2 -d:<<<"$IMAGE")
+    NAME=$(cut -f1 -d:<<<"$ARG")
+    TAG=$(cut -f2 -d:<<<"$ARG")
     LOGIN=$(cut -f1 -d: < "$CREDS")
     PASS=$(cut -f2 -d: < "$CREDS")
     printf '%s' "${PASS}" > ./PASS

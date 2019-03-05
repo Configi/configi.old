@@ -3,5 +3,5 @@
 # Tue 05 Mar 2019 04:58:05 AM UTC
 NAME=pull
 DESCRIPTION="Pull container image from remote rsync registry"
-OPTIONS="arg comment verbose register requires host image creds"
+OPTIONS="arg comment verbose register requires host creds"
 GENERATE_HELP="true"
