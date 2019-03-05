@@ -25,7 +25,10 @@ unit_active()
 
 unit_image()
 {
-    iid=$(/usr/bin/podman images | grep -F -- "${1} " | awk '{print $3}')
+    name=$(cut -f1 -d: <<< "${1}")
+    tag=$(cut -f2 -d: <<< "${1}")
+    [ "$name" = "$tag" ] && tag="latest"
+    iid=$(/usr/bin/podman images | grep -F -- "${name} " | grep "$tag" | awk '{print $3}')
     echo "$iid"
     sed -i "s|__IMAGE__|$iid|" "/etc/systemd/system/${2}"
 }
