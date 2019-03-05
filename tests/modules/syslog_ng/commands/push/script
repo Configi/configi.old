@@ -26,7 +26,7 @@ pushd "${TMPDIR}"
     print "Converting local image to oci-archive..."
     /usr/bin/skopeo copy "containers-storage:${SRC}" "oci-archive:IMAGE"
     print "Compressing image before pushing..."
-    /usr/bin/xz IMAGE
+    /usr/bin/xz -T0 IMAGE
     print "Pushing to rsync registry..."
     /usr/bin/scp IMAGE.xz "root@${HOST}:/srv/rsyncd/registry/${DEST}/${TAG}"
 popd
