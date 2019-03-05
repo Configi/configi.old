@@ -1,5 +1,8 @@
 function RERUN_FUNC_CLEANUP {
+    echo "Error encountered. Cleaning up..."
     rm -rf "$TMPDIR"
+    echo "Done!"
+
 }
 trap RERUN_FUNC_CLEANUP ERR
 
