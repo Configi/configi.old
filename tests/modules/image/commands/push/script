@@ -23,7 +23,6 @@ rerun_options_parse "$@"
 # Requires skopeo, tar, xz, openssh(scp), coreutils(sha256sum)
 #
 . "$RERUN_MODULES/lib/functions.sh"
-print "Creating temporary directory..."
 TMPDIR=$(mktemp -d -p .)
 1>/dev/null pushd "${TMPDIR}"
     /usr/bin/mkdir "${DEST}"
