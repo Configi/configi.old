@@ -30,9 +30,7 @@ RUN /sbin/apk add --no-cache --no-progress rsync
 RUN addgroup -g 13873 rsyncd
 RUN adduser -G rsyncd -H -D -u 13873 -s /sbin/nologin rsyncd
 CLEAR /tmp
-CONFIG --entrypoint '["/usr/bin/rsync", "--daemon", "--no-detach", "--config=/host/rsyncd.conf"]'
-CONFIG --cmd ''
-CONFIG --stop-signal TERM
+ENTRYPOINT '["/usr/bin/rsync", "--daemon", "--no-detach", "--config=/host/rsyncd.conf"]'
 PRINT "+H" "Committing to local containers storage..."
 buildah commit --rm --squash "${NAME}" "containers-storage:$ARG"
 exit 112
