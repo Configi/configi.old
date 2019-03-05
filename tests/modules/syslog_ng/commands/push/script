@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+#/ command: syslog_ng:push: "Push container image to remote rsync registry via SSH"
+#/ usage: rerun syslog_ng:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --src <>  --dest <> [ --tag <latest>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST SRC DEST TAG
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "push" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+unset $HOST
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+. "$RERUN_MODULES/lib/functions.sh"
+TMPDIR=$(mktemp -d -p .)
+pushd "${TMPDIR}"
+    print "Converting local image to oci-archive..."
+    /usr/bin/skopeo copy "containers-storage:${SRC}" "oci-archive:${DEST}"
+    print "Copying to rsync registry..."
+    /usr/bin/scp "${DEST}" "root@${HOST}:/srv/rsyncd/registry/${DEST}/${TAG}"
+popd
+rm -f "${TMPDIR}/${DEST}"
+rmdir "${TMPDIR}"
+print "Done!"
+exit 112
