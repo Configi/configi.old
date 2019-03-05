@@ -22,6 +22,12 @@ ENTRYPOINT()
     /usr/bin/buildah config --stop-signal TERM "${__CONTAINER}"
 }
 
+COMMIT()
+{
+    printf '[\e[1;33m%s\e[m] \e[1;35m%s\e[m\n' "+H" "Committing container..."
+    /usr/bin/buildah commit --rm --squash "${NAME}" "containers-storage:${1}"
+}
+
 CLEAR()
 {
     printf '[\e[1;33m%s\e[m] \e[1;35m%s\e[m\n' "+C" "Clearing directories..."
