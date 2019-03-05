@@ -23,7 +23,8 @@ rerun_options_parse "$@"
 # Requires skopeo, tar, xz, openssh(scp), coreutils(sha256sum)
 #
 . "$RERUN_MODULES/lib/functions.sh"
-TMPDIR=$(1>/dev/null mktemp -d -p .)
+print "Creating temporary directory..."
+TMPDIR=$(mktemp -d -p .)
 1>/dev/null pushd "${TMPDIR}"
     /usr/bin/mkdir "${DEST}"
     print "Converting local image to oci-archive..."
