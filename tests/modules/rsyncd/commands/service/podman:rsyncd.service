@@ -16,6 +16,7 @@ RestartSec=5s
 LimitNOFILE=16384
 ExecStartPre=-/usr/bin/mkdir -p /srv/rsyncd
 ExecStartPre=-/usr/bin/chown -R 13873:13873 /srv/rsyncd
+ExecStartPre=-/usr/bin/chown 0:0 /srv/rsyncd/rsyncd.secrets
 ExecStartPre=-/usr/bin/chmod 0600 /srv/rsyncd/rsyncd.secrets
 ExecStartPre=-/usr/bin/podman stop rsyncd
 ExecStartPre=-/usr/bin/podman rm rsyncd
