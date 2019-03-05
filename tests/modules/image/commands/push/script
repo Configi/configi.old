@@ -32,7 +32,7 @@ pushd "${TMPDIR}"
     /usr/bin/sha256sum "${DEST}/${TAG}" > "${DEST}/${TAG}.sha256"
     XZ_OPT=-T0 /usr/bin/tar -cJf IMAGE.tar.xz "${DEST}"
     print "Pushing to rsync registry..."
-    if [ "$HOST" = "local" ]
+    if [ "$HOST" = "localhost" ]
     then
         mv IMAGE.tar.xz "/srv/rsyncd/registry/${DEST}/$TAG"
     else
