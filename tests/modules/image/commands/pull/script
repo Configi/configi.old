@@ -32,7 +32,7 @@ cp "$CREDS" "$TMPDIR/CREDS"
     TAG=$(cut -f2 -d:<<<"$ARG")
     LOGIN=$(cut -f1 -d: < ./CREDS)
     PASS=$(cut -f2 -d: < ./CREDS)
-    printf '%s' "${PASS}" > ./PASS
+    printf '%s\n' "${PASS}" > ./PASS
     chmod 0600 ./PASS
     /usr/bin/rsync --password-file=./PASS --progress -h -W "${LOGIN}@${HOST}::${NAME}/${TAG}" ./IMAGE.tar.xz
     /usr/bin/tar -xJf IMAGE.tar.xz
