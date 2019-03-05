@@ -20,6 +20,8 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
+# Requires skopeo, tar, xz, rsync, coreutils(sha256sum)
+#
 . "$RERUN_MODULES/lib/functions.sh"
 if [ ! -f "$CREDS" ]
 then
