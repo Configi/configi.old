@@ -20,7 +20,7 @@ rerun_options_parse "$@"
 # Put the command implementation here.
 # - - -
 THIS="$RERUN_MODULE_DIR/commands/create"
-export NAME="samba-build"
+export NAME="syslog_ng-build"
 export FROM="docker://docker.io/library/alpine:edge"
 export OPTS=""
 . "$RERUN_MODULES/lib/buildah.sh"
