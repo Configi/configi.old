@@ -30,7 +30,7 @@ TMPDIR=$(mktemp -d -p .)
     /usr/bin/skopeo copy "containers-storage:${ARG}" "oci-archive:${DEST}/${TAG}"
     print "Compressing image before pushing..."
     /usr/bin/sha256sum "${DEST}/${TAG}" > "${DEST}/${TAG}.sha256"
-    if [ "$UNSIGNED != "true" ]
+    if [ "$UNSIGNED" != "true" ]
     then
         print "Please sign the following (single line only)..."
         cat "${DEST}/${TAG}.sha256"
