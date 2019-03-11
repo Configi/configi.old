@@ -27,7 +27,7 @@ export OPTS=""
 . "$RERUN_MODULES/lib/print.sh"
 [ -x "$BINARY" ] || { >&2 PRINT "!!" "Missing promtail executable. Please compile your own."; exit 1; }
 sed "s|__LOKI__|$LOKI|" "$THIS/promtail.yaml" > "$THIS/promtail.yaml.new"
-COPY "$THIS/promtail.yaml.new" /
+COPY "$THIS/promtail.yaml.new" /promtail.yaml
 rm -f "$THIS/promtail.yaml.new"
 COPY "$BINARY" /
 ENTRYPOINT '["/promtail", "-config.file=/promtail.yaml"]'
