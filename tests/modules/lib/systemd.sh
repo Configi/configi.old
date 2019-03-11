@@ -1,4 +1,5 @@
 function unit_cleanup() {
+    SERVICE="$SVC"
     echo "[+] Deleting incomplete systemd unit..."
     rm -f "/etc/systemd/system/$SERVICE"
     systemctl daemon-reload
