@@ -5,6 +5,7 @@ function RERUN_FUNC_CLEANUP {
 
 }
 trap RERUN_FUNC_CLEANUP ERR
+trap RERUN_FUNC_CLEANUP INT
 
 print()
 {
