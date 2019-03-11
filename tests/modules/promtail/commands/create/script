@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+#/ command: promtail:create: "Create container image"
+#/ usage: rerun promtail:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>] [ --loki <localhost>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES LOKI
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+THIS="$RERUN_MODULE_DIR/commands/create"
+export NAME="promtail-build"
+export FROM="scratch"
+export OPTS=""
+. "$RERUN_MODULES/lib/buildah.sh"
+COPY "$THIS/promtail.yaml" /
+RUN sed -i "s|__LOKI__|$LOKI|"
+COPY "$THIS/promtail" /
+ENTRYPOINT '["/promtail", "-config.file=/promtail.yaml"]'
+COMMIT "$ARG"
+exit 112

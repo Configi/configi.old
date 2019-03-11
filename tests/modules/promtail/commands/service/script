@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+#/ command: promtail:service: "Ensure container startup is managed by systemd"
+#/ usage: rerun promtail:service  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "service" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+. "$RERUN_MODULES/lib/functions.sh"
+. "$RERUN_MODULES/lib/systemd.sh"
+THIS="$RERUN_MODULE_DIR/commands/service"
+SVC="podman:promtail.service"
+print "Stopping existing unit..."
+unit_stop "$SVC"
+print "Generating systemd unit..."
+unit_install "$THIS/$SVC"
+unit_image "$ARG" "$SVC"
+print "Enabling and starting service..."
+unit_start "$SVC"
+print "Checking if container service is up..."
+unit_active "$SVC"
+print "DONE."
+exit 112

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: image:push: "Push container image to remote rsync registry via SSH"
-#/ usage: rerun image:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <> [ --tag <latest>]  --dest <>
+#/ usage: rerun image:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <> [ --tag <latest>]  --dest <> [ --unsigned <false>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST TAG DEST
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST TAG DEST UNSIGNED
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "push" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -20,7 +20,7 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-# Requires skopeo, tar, xz, openssh(scp), coreutils(sha256sum)
+# Requires skopeo, tar, xz, openssh(scp), coreutils(sha256sum), opmsg
 #
 . "$RERUN_MODULES/lib/functions.sh"
 TMPDIR=$(mktemp -d -p .)
@@ -30,6 +30,14 @@ TMPDIR=$(mktemp -d -p .)
     /usr/bin/skopeo copy "containers-storage:${ARG}" "oci-archive:${DEST}/${TAG}"
     print "Compressing image before pushing..."
     /usr/bin/sha256sum "${DEST}/${TAG}" > "${DEST}/${TAG}.sha256"
+    if [ "$UNSIGNED != "true" ]
+    then
+        print "Please sign the following..."
+        cat "${DEST}/${TAG}.sha256"
+        print "Input the signature here. CTRL-D to mark the end:"
+        SIG=$(</dev/stdin)
+        print '%s' "$SIG" > "${DEST}/${TAG}.sign"
+    fi
     XZ_OPT=-T0 /usr/bin/tar -cJf IMAGE.tar.xz "${DEST}"
     print "Pushing to rsync registry..."
     if [ "$HOST" = "localhost" ]
