@@ -39,9 +39,9 @@ TMPDIR=$(mktemp -d -p .)
     /usr/bin/sha256sum "${DEST}/${TAG}" > "${DEST}/${TAG}.sha256"
     if [ "$UNSIGNED" != "true" ]
     then
-        print "Please sign the following (single line only)..."
+        print "Please sign the following (single line only):"
         cat "${DEST}/${TAG}.sha256"
-        print "you can also paste the following into a terminal:"
+        print "You can also paste the following into a terminal:"
         SUM=$(<"${DEST}/${TAG}.sha256")
         printf 'cat > %s.sha256 << EOS\n%s\nEOS\nopmsg --sign -i %s.sha256 --persona <PERSONA>\n' "$DEST" "$SUM" "$DEST"
         print "Input the signature here that begins with"
