@@ -47,7 +47,7 @@ CLEAR /usr/share/man
 CLEAR /usr/share/common-licenses
 CLEAR /usr/share/doc
 COPY "$THIS/promtail.yaml" /
-RUN sed "s|__LOKI__|$LOKI|" "/promtail.yaml"
+RUN sed -i "s|__LOKI__|$LOKI|" "/promtail.yaml"
 COPY "$BINARY" /
 ENTRYPOINT '["/promtail", "-config.file=/promtail.yaml"]'
 COMMIT "$ARG"
