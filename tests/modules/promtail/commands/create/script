@@ -21,16 +21,33 @@ rerun_options_parse "$@"
 # - - -
 THIS="$RERUN_MODULE_DIR/commands/create"
 export NAME="promtail-build"
-export FROM="scratch"
+export FROM="docker://docker.io/library/debian:unstable-slim"
 export OPTS=""
 . "$RERUN_MODULES/lib/buildah.sh"
 . "$RERUN_MODULES/lib/print.sh"
 [ -x "$BINARY" ] || { >&2 PRINT "!!" "Missing promtail executable. Please compile your own."; exit 1; }
-sed "s|__LOKI__|$LOKI|" "$THIS/promtail.yaml" > "$THIS/promtail.yaml.new"
-COPY "$THIS/promtail.yaml.new" /promtail.yaml
-COPY "$THIS/passwd" /etc/passwd
-COPY "$THIS/group" /etc/group
-rm -f "$THIS/promtail.yaml.new"
+APT_GET="/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -qq"
+MKDIR /usr/share/man/man1
+MKDIR /usr/share/man/man7
+RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
+RUN cp --remove-destination /usr/share/zoneinfo/UTC /etc/localtime
+RUN $APT_GET update
+RUN $APT_GET dist-upgrade
+RUN /usr/bin/find / -type f -exec chmod u-s {} +
+RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs tzdata findutils dmeventd adduser tar gzip
+RUN $APT_GET autoremove
+RUN $APT_GET clean
+RUN useradd -M -N -u 65522 -s /sbin/nologin promtail
+CLEAR /tmp
+CLEAR /var/tmp
+CLEAR /var/cache
+CLEAR /var/log
+CLEAR /var/lib/apt/lists
+CLEAR /usr/share/man
+CLEAR /usr/share/common-licenses
+CLEAR /usr/share/doc
+COPY "$THIS/promtail.yaml" /
+RUN sed "s|__LOKI__|$LOKI|" "/promtail.yaml"
 COPY "$BINARY" /
 ENTRYPOINT '["/promtail", "-config.file=/promtail.yaml"]'
 COMMIT "$ARG"
