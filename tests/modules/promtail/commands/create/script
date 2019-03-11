@@ -46,9 +46,7 @@ RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs t
 RUN $APT_GET autoremove
 RUN $APT_GET clean
 RUN useradd -M -N -u 65522 -s /sbin/nologin promtail
-COPY "$THIS/promtail.yaml" /
-RUN sed -i "s|__LOKI__|$LOKI|" "/promtail.yaml"
 COPY "$BINARY" /
-ENTRYPOINT '["/promtail", "-config.file=/promtail.yaml"]'
+ENTRYPOINT '["/promtail", "-config.file=/host/promtail/promtail.yaml"]'
 COMMIT "$ARG"
 exit 112
