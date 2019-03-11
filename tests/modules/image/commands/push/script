@@ -42,7 +42,7 @@ TMPDIR=$(mktemp -d -p .)
     print "Pushing to rsync registry..."
     if [ "$HOST" = "localhost" ]
     then
-        mv IMAGE.tar.xz "/srv/rsyncd/registry/${DEST}/$TAG"
+        /usr/bin/install -p -D -g 13873 -o 13873 IMAGE.tar.xz "/srv/rsyncd/registry/${DEST}/$TAG"
     else
         /usr/bin/scp IMAGE.tar.xz "root@${HOST}:/srv/rsyncd/registry/${DEST}/${TAG}"
     fi
