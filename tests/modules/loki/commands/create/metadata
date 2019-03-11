@@ -3,5 +3,5 @@
 # Mon 11 Mar 2019 05:30:11 AM UTC
 NAME=create
 DESCRIPTION="Create container image"
-OPTIONS="arg comment verbose register requires"
+OPTIONS="arg comment verbose register requires binary"
 GENERATE_HELP="true"
