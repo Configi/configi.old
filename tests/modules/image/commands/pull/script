@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: image:pull: "Pull container image from remote rsync registry"
-#/ usage: rerun image:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --creds <>
+#/ usage: rerun image:pull  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <>  --creds <> [ --unsigned <false>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST CREDS
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST CREDS UNSIGNED
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "pull" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -38,6 +38,10 @@ cp "$CREDS" "$TMPDIR/CREDS"
     chmod 0600 ./PASS
     /usr/bin/rsync --password-file=./PASS --progress -h -W "${LOGIN}@${HOST}::${NAME}/${TAG}" ./IMAGE.tar.xz
     /usr/bin/tar -xJf IMAGE.tar.xz
+    if [ "$UNSIGNED" != "true" ]
+    then
+        /usr/bin/opmsg -c /etc/opmsg -V "${NAME}/${TAG}.sha256" -i "${NAME}/${TAG}.sign"
+    fi
     /usr/bin/sha256sum -c < "${NAME}/${TAG}.sha256"
     /usr/bin/skopeo copy "oci-archive:${NAME}/${TAG}" "containers-storage:${NAME}:${TAG}"
 1>/dev/null popd
