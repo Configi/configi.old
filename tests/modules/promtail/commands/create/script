@@ -32,6 +32,7 @@ COPY "$THIS/passwd" /etc/passwd
 COPY "$THIS/group" /etc/group
 rm -f "$THIS/promtail.yaml.new"
 COPY "$BINARY" /
+MKDIR /tmp
 ENTRYPOINT '["/promtail", "-config.file=/promtail.yaml"]'
 COMMIT "$ARG"
 exit 112
