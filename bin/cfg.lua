@@ -4,6 +4,8 @@ local argparse = require "argparse"
 local parser = argparse("cfg", "Configi. A wrapper to rerun, for lightweight configuration management.")
 parser:argument("script", "Script to load.")
 parser:flag("-v --verbose", "Verbose output.")
+parser:flag("-i --inline", "Inline STDOUT and STDERR output.")
+parser:flag("-l --log", "Log STDOUT and STDERR to files.")
 parser:flag("-t --cut", "Truncate verbose or error output to 80 columns.")
 local args = parser:parse()
 local lib = require "lib"
@@ -49,22 +51,32 @@ local printer = function(o, mod, cmd, a, p)
   if o.code == 112 then fmt.print("[OK]       %s.%s \"%s\"\n", mod, cmd, a) end
   if o.code == 1   then fmt.print("[FAIL]     %s.%s \"%s\"\n", mod, cmd, a) end
   if o.stdout[1] then
-    util.echo"stdout"
-    local ln = ""
-    for _, l in ipairs(o.stdout) do
-      if args.cut then l = l:sub(1, 77) end
-      ln = string.format("%s | %s \n", ln, l)
+    if args.log then
+      file.write(string.format("%s.%s(%s).%s.stdout", mod, cmd, a, os.date("%F_%T")), table.concat(o.stdout, "\n"))
     end
-    util.print(ln)
-  end
-  if o.stderr[1] then
-    util.echo"stderr"
-    local ln = ""
-    for _, l in ipairs(o.stderr) do
-      if args.cut then l = l:sub(1, 77) end
+    if args.inline then
+      util.echo"stdout"
+      local ln = ""
+      for _, l in ipairs(o.stdout) do
+        if args.cut then l = l:sub(1, 77) end
         ln = string.format("%s | %s \n", ln, l)
       end
-    util.print(ln)
+      util.print(ln)
+    end
+  end
+  if o.stderr[1] then
+    if args.log then
+      file.write(string.format("%s.%s(%s).%s.stderr", mod, cmd, a, os.date("%F_%T")), table.concat(o.stderr, "\n"))
+    end
+    if args.inline then
+      util.echo"stderr"
+      local ln = ""
+      for _, l in ipairs(o.stderr) do
+        if args.cut then l = l:sub(1, 77) end
+          ln = string.format("%s | %s \n", ln, l)
+        end
+      util.print(ln)
+    end
   end
 end
 local ENV = { uuid = uuid }
