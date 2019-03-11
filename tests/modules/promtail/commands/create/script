@@ -33,7 +33,7 @@ RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
 RUN cp --remove-destination /usr/share/zoneinfo/UTC /etc/localtime
 RUN $APT_GET update
 RUN $APT_GET dist-upgrade
-RUN /usr/bin/find / -type f -exec chmod u-s {} +
+RUN /usr/bin/find {/bin,/sbin,/usr/bin,/usr/sbin} -type f -exec chmod u-s {} +
 RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs tzdata findutils dmeventd adduser tar gzip
 RUN $APT_GET autoremove
 RUN $APT_GET clean
