@@ -37,9 +37,10 @@ TMPDIR=$(mktemp -d -p .)
         print "OR use this as basis:"
         SUM=$(<"${DEST}/${TAG}.sha256")
         printf 'cat > %s.sha256 << EOS\n%s\nEOS\nopmsg --sign -i %s.sha256 --persona <PERSONA>\n' "$DEST" "$SUM" "$DEST"
-        print "Input the signature here. CTRL-D to mark the end:"
+        print "Input the signature here that begins with -----BEGIN OPMSG----- and ends with -----END OPMSG-----"
+        print "CTRL-D to finish input:"
         SIG=$(</dev/stdin)
-        printf '%s' "$SIG\n" > "${DEST}/${TAG}.sign"
+        printf '%s\n' "$SIG" > "${DEST}/${TAG}.sign"
     fi
     print "Compressing image..."
     XZ_OPT=-T0 /usr/bin/tar -cJf IMAGE.tar.xz "${DEST}"
