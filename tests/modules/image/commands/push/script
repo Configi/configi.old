@@ -23,6 +23,11 @@ rerun_options_parse "$@"
 # Requires skopeo, tar, xz, openssh(scp), coreutils(sha256sum), opmsg
 #
 . "$RERUN_MODULES/lib/functions.sh"
+print "Checking for runtime requirements..."
+for x in skopeo tar xz scp opmsg
+do
+    [ -x "/usr/bin/$x" ] || { echo >&2 "Runtime requirement /usr/bin/$x not found." ; exit 1 ; }
+done
 TMPDIR=$(mktemp -d -p .)
 1>/dev/null pushd "${TMPDIR}"
     DEST=$(cut -f1 -d:<<<"$ARG")
