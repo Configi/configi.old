@@ -22,4 +22,4 @@ ExecStartPre=-/usr/bin/chown 65522 /srv/logs/positions.yaml
 ExecStartPre=-/usr/bin/podman stop promtail
 ExecStartPre=-/usr/bin/podman rm promtail
 ExecStop=/usr/bin/podman stop promtail
-ExecStart=/usr/bin/podman run -u 65522 --security-opt apparmor=unconfined --name promtail -v /srv/logs:/host --network host --rm --ulimit nofile=4192:8192 __IMAGE__
+ExecStart=!/usr/bin/podman run -u 65522 --security-opt apparmor=unconfined --name promtail -v /srv/logs:/host --network host --rm --ulimit nofile=4192:8192 __IMAGE__
