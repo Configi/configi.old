@@ -1,0 +1,23 @@
+[Unit]
+Description=promtail Container
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+KillSignal=SIGTERM
+Restart=always
+RestartSec=5s
+LimitNOFILE=16384
+ExecStartPre=-/usr/bin/mkdir -p /srv/loki/index
+ExecStartPre=-/usr/bin/mkdir -p /srv/loki/chunks
+ExecStartPre=-/usr/bin/chown -R 65521 /srv/loki
+ExecStartPre=-/usr/bin/podman stop loki
+ExecStartPre=-/usr/bin/podman rm loki
+ExecStop=/usr/bin/podman stop loki
+ExecStart=/usr/bin/podman run --user 65521 --security-opt apparmor=unconfined --name loki -v /srv/loki/index:/host/index -v /srv/loki/chunks:/host/chunks --network host --rm --ulimit nofile=4192:8192 __IMAGE__
