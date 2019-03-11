@@ -25,7 +25,7 @@ export FROM="docker://docker.io/library/debian:unstable-slim"
 export OPTS=""
 . "$RERUN_MODULES/lib/buildah.sh"
 . "$RERUN_MODULES/lib/print.sh"
-[ -x "$BINARY" ] || { >&2 PRINT "!!" "Missing loki executable. Please compile your own."; exit 1 }
+[ -x "$BINARY" ] || { >&2 PRINT "!!" "Missing loki executable. Please compile your own."; exit 1; }
 COPY "$THIS/loki.yaml" /
 COPY "$BINARY" /
 APT_GET="/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -qq"
