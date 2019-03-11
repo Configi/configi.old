@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: image:push: "Push container image to remote rsync registry via SSH"
-#/ usage: rerun image:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <> [ --tag <latest>]  --dest <> [ --unsigned <false>]
+#/ usage: rerun image:push  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]  --host <> [ --unsigned <false>]  --image <>
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST TAG DEST UNSIGNED
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES HOST UNSIGNED IMAGE
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "push" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -25,9 +25,11 @@ rerun_options_parse "$@"
 . "$RERUN_MODULES/lib/functions.sh"
 TMPDIR=$(mktemp -d -p .)
 1>/dev/null pushd "${TMPDIR}"
+    DEST=$(cut -f1 -d:<<<"$ARG")
+    TAG=$(cut -f2 -d:<<<"$ARG")
     /usr/bin/mkdir "${DEST}"
     print "Converting local image to oci-archive..."
-    /usr/bin/skopeo copy "containers-storage:${ARG}" "oci-archive:${DEST}/${TAG}"
+    /usr/bin/skopeo copy "containers-storage:${IMAGE}" "oci-archive:${DEST}/${TAG}"
     print "Compressing image before pushing..."
     /usr/bin/sha256sum "${DEST}/${TAG}" > "${DEST}/${TAG}.sha256"
     if [ "$UNSIGNED" != "true" ]
