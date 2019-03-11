@@ -21,13 +21,32 @@ rerun_options_parse "$@"
 # - - -
 THIS="$RERUN_MODULE_DIR/commands/create"
 export NAME="loki-build"
-export FROM="scratch"
+export FROM="docker://docker.io/library/debian:unstable-slim"
 export OPTS=""
 . "$RERUN_MODULES/lib/buildah.sh"
 . "$RERUN_MODULES/lib/print.sh"
 [ -x "$BINARY" ] || { >&2 PRINT "!!" "Missing loki executable. Please compile your own."; exit 1 }
 COPY "$THIS/loki.yaml" /
 COPY "$BINARY" /
+APT_GET="/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -qq"
+MKDIR /usr/share/man/man1
+MKDIR /usr/share/man/man7
+RUN /usr/bin/touch /usr/share/man/man1/sh.distrib.1.gz
+RUN cp --remove-destination /usr/share/zoneinfo/UTC /etc/localtime
+RUN $APT_GET update
+RUN $APT_GET dist-upgrade
+RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs tzdata
+RUN $APT_GET autoremove
+RUN $APT_GET clean
+RUN useradd -M -N -u 65521 -s /sbin/nologin loki
+CLEAR /tmp
+CLEAR /var/tmp
+CLEAR /var/cache
+CLEAR /var/log
+CLEAR /var/lib/apt/lists
+CLEAR /usr/share/man
+CLEAR /usr/share/common-licenses
+CLEAR /usr/share/doc
 ENTRYPOINT '["/loki", "-config.file=/loki.yaml"]'
 COMMIT "$ARG"
 exit 112
