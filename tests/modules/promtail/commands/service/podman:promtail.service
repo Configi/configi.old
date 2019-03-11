@@ -5,7 +5,7 @@ Description=promtail Container
 WantedBy=multi-user.target
 
 [Service]
-DynamicUsers=yes
+DynamicUser=yes
 User=65522
 PrivateNetwork=false
 PrivateTmp=true
