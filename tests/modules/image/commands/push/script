@@ -32,7 +32,7 @@ TMPDIR=$(mktemp -d -p .)
     /usr/bin/sha256sum "${DEST}/${TAG}" > "${DEST}/${TAG}.sha256"
     if [ "$UNSIGNED != "true" ]
     then
-        print "Please sign the following..."
+        print "Please sign the following (single line only)..."
         cat "${DEST}/${TAG}.sha256"
         print "Input the signature here. CTRL-D to mark the end:"
         SIG=$(</dev/stdin)
