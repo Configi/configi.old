@@ -25,7 +25,7 @@ export FROM="scratch"
 export OPTS=""
 . "$RERUN_MODULES/lib/buildah.sh"
 . "$RERUN_MODULES/lib/print.sh"
-[ -x "$BINARY" ] || { >&2 PRINT "!!" "Missing promtail executable. Please compile your own."; exit 1 }
+[ -x "$BINARY" ] || { >&2 PRINT "!!" "Missing promtail executable. Please compile your own."; exit 1; }
 COPY "$THIS/promtail.yaml" /
 RUN sed -i "s|__LOKI__|$LOKI|"
 COPY "$BINARY" /
