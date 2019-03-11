@@ -27,6 +27,11 @@ if [ ! -f "$CREDS" ]
 then
     print "Missing credentials file."
 fi
+print "Checking for runtime requirements..."
+for x in skopeo tar xz rsync opmsg
+do
+    [ -x "/usr/bin/$x" ] || { echo >&2 "Runtime requirement /usr/bin/$x not found." ; exit 1 ; }
+done
 TMPDIR=$(mktemp -d -p .)
 cp "$CREDS" "$TMPDIR/CREDS"
 1>/dev/null pushd "$TMPDIR"
