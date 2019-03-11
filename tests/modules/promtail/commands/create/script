@@ -34,10 +34,6 @@ RUN cp --remove-destination /usr/share/zoneinfo/UTC /etc/localtime
 RUN $APT_GET update
 RUN $APT_GET dist-upgrade
 RUN /usr/bin/find {/bin,/sbin,/usr/bin,/usr/sbin} -type f -exec chmod u-s {} +
-RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs tzdata findutils dmeventd
-RUN $APT_GET autoremove
-RUN $APT_GET clean
-RUN useradd -M -N -u 65522 -s /sbin/nologin promtail
 CLEAR /tmp
 CLEAR /var/tmp
 CLEAR /var/cache
@@ -46,6 +42,10 @@ CLEAR /var/lib/apt/lists
 CLEAR /usr/share/man
 CLEAR /usr/share/common-licenses
 CLEAR /usr/share/doc
+RUN $APT_GET --allow-remove-essential remove sysvinit-utils e2fsprogs e2fslibs tzdata findutils dmeventd
+RUN $APT_GET autoremove
+RUN $APT_GET clean
+RUN useradd -M -N -u 65522 -s /sbin/nologin promtail
 COPY "$THIS/promtail.yaml" /
 RUN sed -i "s|__LOKI__|$LOKI|" "/promtail.yaml"
 COPY "$BINARY" /
