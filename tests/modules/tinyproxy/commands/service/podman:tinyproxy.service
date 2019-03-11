@@ -1,0 +1,23 @@
+[Unit]
+Description=tinyproxy Container
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PrivateNetwork=false
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+KillSignal=SIGTERM
+Restart=always
+RestartSec=5s
+LimitNOFILE=32768
+ExecStartPre=-/usr/bin/mkdir -p /srv/tinyproxy/conf
+ExecStartPre=-/usr/bin/mkdir -p /srv/tinyproxy/logs
+ExecStartPre=-/usr/bin/chown -R 63128 /srv/tinyproxy
+ExecStartPre=-/usr/bin/podman stop tinyproxy
+ExecStartPre=-/usr/bin/podman rm tinyproxy
+ExecStop=/usr/bin/podman stop tinyproxy
+ExecStart=/usr/bin/podman run --security-opt apparmor=unconfined --name tinyproxy -v /srv/tinyproxy:/host --network host --rm --ulimit nofile=4192:16384 __IMAGE__

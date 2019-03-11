@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+#/ command: tinyproxy:create: "Create container image"
+#/ usage: rerun tinyproxy:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>]
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES
+
+. "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
+  echo >&2 "Failed loading function library." ; exit 1 ;
+}
+
+set -o errexit -o nounset -o pipefail -o errtrace
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+# Put the command implementation here.
+# - - -
+THIS="$RERUN_MODULE_DIR/commands/create"
+export NAME="tinyroxy-build"
+export FROM="docker://docker.io/library/alpine:edge"
+export OPTS=""
+. "$RERUN_MODULES/lib/buildah.sh"
+RUN /sbin/apk upgrade --no-cache --available --no-progress
+RUN /sbin/apk add --no-cache --no-progress tinyproxy
+RUN adduser -D -u 63128 -s /sbin/nologin tinyproxy
+CLEAR /tmp
+ENTRYPOINT '["/usr/bin/tinyproxy", "-d", "-c", "/host/conf/tinyproxy.conf"]'
+COMMIT "$ARG"
+exit 112
