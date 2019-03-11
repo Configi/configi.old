@@ -36,7 +36,7 @@ TMPDIR=$(mktemp -d -p .)
         cat "${DEST}/${TAG}.sha256"
         print "Input the signature here. CTRL-D to mark the end:"
         SIG=$(</dev/stdin)
-        print '%s' "$SIG" > "${DEST}/${TAG}.sign"
+        printf '%s' "$SIG" > "${DEST}/${TAG}.sign"
     fi
     XZ_OPT=-T0 /usr/bin/tar -cJf IMAGE.tar.xz "${DEST}"
     print "Pushing to rsync registry..."
