@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: promtail:create: "Create container image"
-#/ usage: rerun promtail:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>] [ --loki <localhost>]
+#/ usage: rerun promtail:create  --arg <> [ --comment <>] [ --verbose <>] [ --register <>] [ --requires <>] [ --loki <localhost>] [ --binary <./promtail>]
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES LOKI
+#/ option-variables: ARG COMMENT VERBOSE REGISTER REQUIRES LOKI BINARY
 
 . "$RERUN_MODULE_DIR/lib/functions.sh" "create" || {
   echo >&2 "Failed loading function library." ; exit 1 ;
@@ -25,10 +25,10 @@ export FROM="scratch"
 export OPTS=""
 . "$RERUN_MODULES/lib/buildah.sh"
 . "$RERUN_MODULES/lib/print.sh"
-[ -x "$THIS/promtail" ] || { >&2 PRINT "!!" "Missing promtail executable. Please compile your own."; exit 1 }
+[ -x "$BINARY" ] || { >&2 PRINT "!!" "Missing promtail executable. Please compile your own."; exit 1 }
 COPY "$THIS/promtail.yaml" /
 RUN sed -i "s|__LOKI__|$LOKI|"
-COPY "$THIS/promtail" /
+COPY "$BINARY" /
 ENTRYPOINT '["/promtail", "-config.file=/promtail.yaml"]'
 COMMIT "$ARG"
 exit 112

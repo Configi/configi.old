@@ -3,5 +3,5 @@
 # Tue 05 Mar 2019 09:05:30 AM UTC
 NAME=create
 DESCRIPTION="Create container image"
-OPTIONS="arg comment verbose register requires loki"
+OPTIONS="arg comment verbose register requires loki binary"
 GENERATE_HELP="true"
